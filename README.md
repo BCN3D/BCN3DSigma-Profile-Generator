@@ -42,26 +42,26 @@ In order to add, remove or change a nozzle size, filament or quality preconfigur
   **isSupportMaterial** - true/false
   **isFlexibleMaterial** - true/false
   **bedTemperature** - [ºC]
-  **printTemperature** - [ºC], its a list of the minimum and maximum temperatures the manufacturer recommends
-  **defaultPrintSpeed** - [mm/s], default speed when printing Medium quality with 0.4mm Nozzle and 0.2mm layer height
-  **advisedMaxPrintSpeed** - [mm/s], the maximum speed the manufacturer recommends
-  **maxFlow** - [mm3/s]
-  **maxFlowForHighFlowHotends** - [mm3/s], Hotends >0.6mm are considered High Flow. The hot block is bigger and allows higher flows.
+  **printTemperature** - [ºC], its a list of the minimum and maximum temperatures the manufacturer recommends.
+  **defaultPrintSpeed** - [mm/s], default speed when printing Medium quality with 0.4mm Nozzle and 0.2mm layer height.
+  **advisedMaxPrintSpeed** - [mm/s], maximum speed recommended by filament's manufacturer. If "None", then maxFlow value is needed.
+  **maxFlow** - [mm3/s], maximum flow a normal Hotend (<0.6mm) can print. "None" if this parameter is unknown.
+  **maxFlowForHighFlowHotends** - [mm3/s], maximum flow a High Flow Hotend (>0.6mm) can print. "None" if this parameter is unknown.
   **retractionDistance** - [mm]
   **retractionSpeed** - [mm/s]
   **fanMultiplier** - [0-1], 0 for fan off, 1 for 100% power
   **extrusionMultiplier** - 1.2 would extrude 120% the needed amount of filament
-  **purgeMultiplier** - multiplies the Standard amount we use for PLA
+  **purgeMultiplier** - multiplies the standard purge lenght we use for PLA.
 ###### Quality Preconfigurations
   Add the new quality parameters:
-  **id**
-  **layerHeightMultiplier**
-  **defaultSpeed**
-  **firstLayerUnderspeed**
-  **outlineUnderspeed**
-  **topBottomWidth**
-  **wallWidth**
-  **infillPercentage**
+  **id** - Preconfiguration Name
+  **layerHeightMultiplier** - Multiplying this value and the nozzle size you get the layer height.
+  **defaultSpeed** - [mm/s], default speed for PLA
+  **firstLayerUnderspeed** - [0-1], to reduce first layer speed.
+  **outlineUnderspeed** - [0-1], to reduce perimeters speed.
+  **topBottomWidth** - [mm], thickness of solid layers at the top and bottom
+  **wallWidth** - [mm], thickness of walls
+  **infillPercentage** - [0-100]
 
 ## TO-DO
 
