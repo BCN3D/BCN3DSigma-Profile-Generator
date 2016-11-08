@@ -27,7 +27,7 @@ will ask for a functionality:
 
 Pick the desired option by writting its number.
 
-In order to add, remove or change a nozzle size, filament or quality preconfiguration edit the file ProfileData.json
+In order to add, remove or change a nozzle size, filament or quality preconfiguration edit the file *ProfileData.json*.
 
 ## Editing ProfilesData.json
 
@@ -49,13 +49,13 @@ In order to add, remove or change a nozzle size, filament or quality preconfigur
   **maxFlowForHighFlowHotends** - [mm3/s], maximum flow a High Flow Hotend (>0.6mm) can print. "None" if this parameter is unknown.
   **retractionDistance** - [mm]
   **retractionSpeed** - [mm/s]
-  **fanMultiplier** - [0-1], 0 for fan off, 1 for 100% power
-  **extrusionMultiplier** - 1.2 would extrude 120% the needed amount of filament
+  **fanMultiplier** - [0-1], 0 for fan off, 1 for 100% power.
+  **extrusionMultiplier** - 1.2 would extrude 120% the needed amount of filament.
   **purgeMultiplier** - multiplies the standard purge lenght we use for PLA.
 ###### Quality Preconfigurations
   Add the new quality parameters:
   **id** - Preconfiguration Name
-  **layerHeightMultiplier** - Multiplying this value and the nozzle size you get the layer height.
+  **layerHeightMultiplier** - Multiply this value for the nozzle size to get the layer height.
   **defaultSpeed** - [mm/s], default speed for PLA
   **firstLayerUnderspeed** - [0-1], to reduce first layer speed.
   **outlineUnderspeed** - [0-1], to reduce perimeters speed.
