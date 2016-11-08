@@ -47,9 +47,9 @@ def writeData(extruder, currentDefaultSpeed, currentInfillLayerInterval, current
 
 def speedMultiplier(nozzle, filament):
     if filament['isFlexibleMaterial']:
-        return float(filament['printSpeed'][0])/24*nozzle
+        return float(filament['defaultPrintSpeed'])/24*nozzle
     else:
-        return float(filament['printSpeed'][0])/60
+        return float(filament['defaultPrintSpeed'])/60
 
 def purgeValues(nozzle, filament):
     baseSpeed04 = 50
@@ -59,14 +59,14 @@ def purgeValues(nozzle, filament):
 
 def flowValue(nozzle, filament):
     if nozzle <= 0.6:
-        if filament['maxFlow'] == 0:
-            return 0.4*0.2*filament['printSpeed'][1]
+        if filament['maxFlow'] == 'None':
+            return 0.4*0.2*filament['advisedMaxPrintSpeed']
         else:
             return filament['maxFlow']
     else:
-        if filament['maxFlowForHighFlowHotends'] == 0:
-            if filament['maxFlow'] == 0:
-                return 0.4*0.2*filament['printSpeed'][1]
+        if filament['maxFlowForHighFlowHotends'] == 'None':
+            if filament['maxFlow'] == 'None':
+                return 0.4*0.2*filament['advisedMaxPrintSpeed']
             else:
                 return filament['maxFlow']
         else:

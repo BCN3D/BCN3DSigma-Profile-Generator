@@ -27,21 +27,21 @@ will ask for a functionality:
 
 Pick the desired option by writting its number.
 
-###### Generate a bundle of profiles
-Creates a compressed zip file with all possible combinations available in ProfilesData.json.
-The package includes a csv file with useful data of each combination created and all the fff profile files ordered following a folder tree.
+###### 1. Generate a bundle of profiles
+  Creates a compressed zip file with all possible combinations available in ProfilesData.json.
+  The package includes a csv file with useful data of each combination created and all the fff profile files ordered following a folder tree.
 
-###### Generate one single profile
-Will ask for left nozzle size, left loaded filament, right nozzle size and right loaded filament. Then will generate the fff profile file.
+###### 2. Generate one single profile
+  Will ask for left nozzle size, left loaded filament, right nozzle size and right loaded filament. Then will generate the fff profile file.
 
-###### Show available options
-Prints all the options available inside ProfilesData.json.
+###### 3. Show available options
+  Prints all the options available inside ProfilesData.json.
 
-###### Test all combinations
-Like *1. Generate a bundle of profiles* but without storing data neither generating fff profile files. A fast option if you just want to ensure all combinations can be properly created.
+###### 4. Test all combinations
+  Like *1. Generate a bundle of profiles* but without storing data neither generating fff profile files. A fast option if you just want to ensure all combinations can be properly created.
 
-###### Exit
-Quit the program.
+###### 5. Exit
+  Quit the program.
 
 In order to add, remove or change a nozzle size, filament or quality preconfiguration edit the file ProfileData.json
 
