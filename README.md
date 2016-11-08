@@ -3,6 +3,8 @@ Profile Generator for Simplify3D slicing software. Specifically designed for the
 
 The python script is capable of generating Simplify3D profiles according to the nozzle sizes, materials and qualities defined in ProfilesData.json
 
+*Note this is an early version of the script. Although profiles are precisely calculated there may be some combinations where quality can still be improved.*
+
 ## Requirements
 
 - Have python 2.7 installed.
@@ -20,13 +22,13 @@ Decompress it if you need to, open a terminal and go to the directory:
 
 Will ask for a functionality:
 
-1. **Generate a bundle of profiles:** Creates a compressed zip file with all possible combinations available in *ProfilesData.json*. The package includes a csv file with useful data of each combination created and all the fff profile files ordered following a folder tree.
+1. **Generate a bundle of profiles:** Creates a compressed zip file with all possible combinations available in *ProfilesData.json*. The package includes a csv file with useful data of each combination created and all the fff profile files, ordered following a folder tree.
 
 2. **Generate one single profile:** Will ask for left nozzle size, left loaded filament, right nozzle size and right loaded filament. Then will generate the fff profile file.
 
 3. **Show available options:** Prints all the options available inside *ProfilesData.json*.
 
-4. **Test all combinations:** Like *1. Generate a bundle of profiles* but without storing data neither generating fff profile files. A fast option if you just want to ensure all combinations can be properly created.
+4. **Test all combinations:** Like *1. Generate a bundle of profiles* but without storing data neither generating fff profile files. A fast option to just ensure all combinations can be properly created.
 
 5. **Exit:** Quit the program.
 
@@ -37,7 +39,8 @@ In order to add, remove or change a nozzle size, filament or quality preconfigur
 ## Editing ProfilesData.json
 
 ###### Nozzle Sizes
-  Just add the new nozzle size to the list.
+Just add the new nozzle size to the list.
+
 ###### Filaments
 Add the new material parameters:
 * **id** - Filament Name
@@ -47,16 +50,17 @@ Add the new material parameters:
 * **isSupportMaterial** - true/false
 * **isFlexibleMaterial** - true/false
 * **bedTemperature** - [ºC]
-* **printTemperature** - [ºC], its a list of the minimum and maximum temperatures the manufacturer recommends.
+* **printTemperature** - [ºC], a list of the minimum and maximum temperatures the manufacturer recommends.
 * **defaultPrintSpeed** - [mm/s], default speed when printing Medium quality with 0.4mm Nozzle and 0.2mm layer height.
 * **advisedMaxPrintSpeed** - [mm/s], maximum speed recommended by filament's manufacturer. If "None", then maxFlow value is needed.
-* **maxFlow** - [mm3/s], maximum flow a normal Hotend (<0.6mm) can print. "None" if this parameter is unknown.
-* **maxFlowForHighFlowHotends** - [mm3/s], maximum flow a High Flow Hotend (>0.6mm) can print. "None" if this parameter is unknown.
+* **maxFlow** - [mm3/s], maximum flow a normal Hotend (<0.6mm) can print. "None" if it's unknown.
+* **maxFlowForHighFlowHotends** - [mm3/s], maximum flow a High Flow Hotend (>0.6mm) can print. "None" if it's unknown.
 * **retractionDistance** - [mm]
 * **retractionSpeed** - [mm/s]
 * **fanMultiplier** - [0-1], 0 for fan off, 1 for 100% power.
-* **extrusionMultiplier** - 1.2 would extrude 120% the needed amount of filament.
-* **purgeMultiplier** - multiplies the standard purge lenght we use for PLA.
+* **extrusionMultiplier** - 1.2 extrudes 120% the needed amount of filament.
+* **purgeMultiplier** - multiplies the standard purge lenght used for PLA with 0.4mm Nozzle.
+
 ###### Quality Preconfigurations
 Add the new quality parameters:
 * **id** - Preconfiguration Name
