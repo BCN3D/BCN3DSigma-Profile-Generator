@@ -51,7 +51,7 @@ Add the new material parameters:
 * **printTemperature** - [ºC], a list of the minimum and maximum temperatures the manufacturer recommends.
 * **defaultPrintSpeed** - [mm/s], default speed when printing Medium quality with 0.4mm Nozzle and 0.2mm layer height.
 * **advisedMaxPrintSpeed** - [mm/s], maximum speed recommended by filament's manufacturer. If "None", then maxFlow value is needed.
-* **maxFlow** - [mm3/s], maximum flow a normal Hotend (<0.6mm) can print. "None" if it's unknown.
+* **maxFlow** - [mm3/s], maximum flow a normal Hotend (≤0.6mm) can print. "None" if it's unknown.
 * **maxFlowForHighFlowHotends** - [mm3/s], maximum flow a High Flow Hotend (>0.6mm) can print. "None" if it's unknown.
 * **retractionDistance** - [mm]
 * **retractionSpeed** - [mm/s]
