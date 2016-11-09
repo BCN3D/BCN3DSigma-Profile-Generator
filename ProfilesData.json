@@ -17,7 +17,7 @@
         "retractionSpeed": 40,
         "fanMultiplier": 1,
         "extrusionMultiplier": 1,
-        "purgeMultiplier": 1
+        "purgeLenght": 1.5
         },
         {
         "id": "PLA-PHA Colorfabb",
@@ -36,7 +36,7 @@
         "retractionSpeed": 40,
         "fanMultiplier": 1,
         "extrusionMultiplier": 1,
-        "purgeMultiplier": 1
+        "purgeLenght": 1.5
         },
         {
         "id": "EverydayPLA Protopasta",
@@ -55,7 +55,7 @@
         "retractionSpeed": 40,
         "fanMultiplier": 1,
         "extrusionMultiplier": 1,
-        "purgeMultiplier": 1
+        "purgeLenght": 1.5
         },
         {
         "id": "nGen Colorfabb",
@@ -74,7 +74,7 @@
         "retractionSpeed": 40,
         "fanMultiplier": 1,
         "extrusionMultiplier": 1,
-        "purgeMultiplier": 1
+        "purgeLenght": 1.5
         },
         {
         "id": "ABS SmartFilament",
@@ -93,7 +93,7 @@
         "retractionSpeed": 40,
         "fanMultiplier": 0,
         "extrusionMultiplier": 1,
-        "purgeMultiplier": 0.25
+        "purgeLenght": 0.375
         }, 
         {
         "id": "PVA",
@@ -112,7 +112,7 @@
         "retractionSpeed": 40,
         "fanMultiplier": 1,
         "extrusionMultiplier": 1,
-        "purgeMultiplier": 1.5
+        "purgeLenght": 2.25
         }, 
         {
         "id": "XT Colorfabb",
@@ -131,7 +131,7 @@
         "retractionSpeed": 40,
         "fanMultiplier": 1,
         "extrusionMultiplier": 1,
-        "purgeMultiplier": 1
+        "purgeLenght": 1.5
         }, 
         {
         "id": "HT Colorfabb",
@@ -150,7 +150,7 @@
         "retractionSpeed": 40,
         "fanMultiplier": 1,
         "extrusionMultiplier": 1,
-        "purgeMultiplier": 1
+        "purgeLenght": 1.5
         }, 
         {
         "id": "nGenflex Colorfabb",
@@ -169,7 +169,7 @@
         "retractionSpeed": 50,
         "fanMultiplier": 0.25,
         "extrusionMultiplier": 1.15,
-        "purgeMultiplier": 2
+        "purgeLenght": 3
         }, 
         {
         "id": "Filaflex",
@@ -188,7 +188,7 @@
         "retractionSpeed": 40,
         "fanMultiplier": 1,
         "extrusionMultiplier": 1.15,
-        "purgeMultiplier": 3
+        "purgeLenght": 4.5
         }, 
         {
         "id": "TPU Colorfila",
@@ -207,7 +207,7 @@
         "retractionSpeed": 40,
         "fanMultiplier": 1,
         "extrusionMultiplier": 1.05,
-        "purgeMultiplier": 3
+        "purgeLenght": 4.5
         }],
     "quality": [{
         "id": "0 Fast",

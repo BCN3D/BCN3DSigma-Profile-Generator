@@ -55,7 +55,7 @@ def purgeValues(nozzle, filament):
     baseSpeed04 = 50
     baseStartLenght04 = 7
     baseToolChangeLenght04 = 1.5
-    return str("%.2f" % float((nozzle/0.4)**2*baseSpeed04)), str("%.2f" % float((nozzle/0.4)**2*baseStartLenght04*filament['purgeMultiplier'])), str("%.2f" % float((nozzle/0.4)**2*baseToolChangeLenght04*filament['purgeMultiplier']))
+    return str("%.2f" % float((nozzle/0.4)**2*baseSpeed04)), str("%.2f" % float((nozzle/0.4)**2*baseStartLenght04*filament['purgeLengt']/baseToolChangeLenght04)), str("%.2f" % float((nozzle/0.4)**2*filament['purgeLengt']))
 
 def flowValue(nozzle, filament):
     if nozzle <= 0.6:

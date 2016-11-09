@@ -32,9 +32,7 @@ Will ask for a functionality:
 
 5. **Exit:** Quit the program.
 
-Pick the desired option by writting its number.
-
-In order to add, remove or change a nozzle size, filament or quality preconfiguration edit the file *ProfileData.json*.
+In order to add, remove or change a nozzle size, filament or quality preconfiguration edit the file *ProfilesData.json*.
 
 ## Editing ProfilesData.json
 
@@ -59,7 +57,7 @@ Add the new material parameters:
 * **retractionSpeed** - [mm/s]
 * **fanMultiplier** - [0-1], 0 for fan off, 1 for 100% power.
 * **extrusionMultiplier** - 1.2 extrudes 120% the needed amount of filament.
-* **purgeMultiplier** - multiplies the standard purge lenght used for PLA with 0.4mm Nozzle.
+* **purgeLenght** - [mm], lenght to purge at Tool Change with 0.4mm Nozzle.
 
 ###### Quality Preconfigurations
 Add the new quality parameters:
