@@ -418,8 +418,6 @@ def createProfile(nozzleLeft, nozzleRight, filamentLeft, filamentRight, dataLog,
                 currentInfillExtruder = currentPrimaryExtruder
                 currentSupportExtruder = currentPrimaryExtruder
                 currentBedTemperature = currentFilament['bedTemperature']
-                if filamentLeft['id'] != filamentRight['id']:
-                else:
             # IDEX
             else:
                 # IDEX, Support Material
