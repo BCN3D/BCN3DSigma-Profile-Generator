@@ -14,8 +14,6 @@ import string
 
 # bridge speed for flexible
 # adjust coast for ABS
-# only retract on open spaces value changed to 1. Effect?
-# avoidcrossingoutlinefor travel set to 1 except for infill-assisted configs. Effect?
 
 # work with independent json files
 # add files for filament/hotend/quality preset function
@@ -752,48 +750,95 @@ def printAvailableOptions():
             print n['id'][2:]+'.'
     print " Add, remove options or change its own parameters by editing 'ProfilesData.json' file.\n"
 
+def validArguments():
+    if len(sys.argv) == 5:
+        leftHotend = sys.argv[1] in os.listdir('./Profiles Data/Hotends') or sys.argv[1] == 'None'
+        rightHontend = sys.argv[2] in os.listdir('./Profiles Data/Hotends') or sys.argv[2] == 'None'
+        leftFilament = sys.argv[3] in os.listdir('./Profiles Data/Filaments') or (sys.argv[1] == 'None' and sys.argv[3] == 'None')
+        rightFilament = sys.argv[4] in os.listdir('./Profiles Data/Filaments') or (sys.argv[2] == 'None' and sys.argv[4] == 'None')
+        return leftHotend and rightHontend and leftFilament and rightFilament
+    else:
+        return False
+
+def readProfilesData():
+    newProfilesData = dict([("hotend", []), ("filament", []), ("quality", [])])
+    for hotend in os.listdir('./Profiles Data/Hotends'):
+        if hotend[-5:] == '.json':
+            with open('./Profiles Data/Hotends/'+hotend) as hotend_file:    
+                hotendData = json.load(hotend_file)
+                newProfilesData['hotend'].append(hotendData)
+    for filament in os.listdir('./Profiles Data/Filaments'):
+        if filament[-5:] == '.json':
+            with open('./Profiles Data/Filaments/'+filament) as filament_file:    
+                filamentData = json.load(filament_file)
+                newProfilesData['filament'].append(filamentData)
+    for quality in os.listdir('./Profiles Data/Quality Presets'):
+        if quality[-5:] == '.json':
+            with open('./Profiles Data/Quality Presets/'+quality) as quality_file:    
+                qualityData = json.load(quality_file)
+                newProfilesData['quality'].append(qualityData)
+    return newProfilesData
+
 def main():
-    print '\n Welcome to the BCN3D Sigma Profile Generator for Simplify3D \n'
-    while True:
-        print ' Choose your option (1-5):'
-        print ' 1. Generate a bundle of profiles'
-        print ' 2. Generate one single profile'
-        print ' 3. Show available options'
-        print ' 4. Test all combinations'
-        print ' 5. Exit'
-        x = 'x'
-        y = 'y'
-        dataLog = ["LFilament;RFilament;Extruder;Quality;LNozzle;RNozzle;InfillExt;PrimaryExt;SupportExt;LFlow;RFlow;Layers/Infill;DefaultSpeed;FirstLayerUnderspeed;OutLineUnderspeed;SupportUnderspeed;FirstLayerHeightPercentage;LTemp;RTemp;BTemp;\n"]
-        profilesCreatedCount = 0
-        while x not in '12345':
-            x = raw_input(' ')
-        if x in '12':
-            if x == '1':
-                profilesCreatedCount = createProfilesBundle(dataLog, profilesCreatedCount)
-            elif x == '2':
-                a = selectNozzleSizeAndFilament('Left')
-                b = selectNozzleSizeAndFilament('Right')
-                if profilesData['nozzle'][int(a[0])-1] == 'None' and profilesData['nozzle'][int(b[0])-1] == 'None':
-                    print "\n Select at least one nozzle size to create a profile.\n"
-                else:
-                    print "\n Your new profile '"+createProfile(profilesData['nozzle'][int(a[0])-1], profilesData['nozzle'][int(b[0])-1], sorted(profilesData['filament'], key=lambda k: k['id'])[int(a[1])-1], sorted(profilesData['filament'], key=lambda k: k['id'])[int(b[1])-1], dataLog, 'fffFile')+".fff' has been created.\n"
-                    profilesCreatedCount = 1
-            print ' See profile(s) data? (Y/n)'
-            while y not in ['Y', 'n']:
-                y = raw_input(' ')
-            if y == 'Y':
-                for l in dataLog:
-                    print '',
-                    for d in string.split(l, ';'):
-                        print string.rjust(str(d)[:6], 6),
-                print ' '+str(profilesCreatedCount)+' profile(s) created with '+str(len(dataLog)-1)+' configurations.\n'
-        elif x == '3':
-            printAvailableOptions()
-        elif x == '4':
-            testAllCombinations()
-        elif x == '5':
-            print '\n Until next time!\n'
-            break
+    if validArguments():
+
+        print sorted(profilesData['filament'], key=lambda k: k['id'])[int(1)-1]['id']+'.'
+        print sorted(readProfilesData()['filament'], key=lambda k: k['id'])[int(1)-1]['id']+'.'
+        # hotendL = sys.argv[1]
+        # hotendR = sys.argv[3]
+        # if sys.argv[1] == 'None':
+        #     filamentL = sorted(profilesData['filament'], key=lambda k: k['id'])[0]
+        # else:            
+        #     filamentL = sys.argv[2]
+        # if sys.argv[2] == 'None':
+        #     filamentR = sorted(profilesData['filament'], key=lambda k: k['id'])[0]
+        # else:
+        #     filamentR = sys.argv[4]
+        # if sys.argv[1] != 'None' and sys.argv[2] != 'None':
+        #     createProfile(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], 'noData', 'fffFile')
+    else:
+        if len(sys.argv) == 1:
+            print '\n Welcome to the BCN3D Sigma Profile Generator for Simplify3D \n'
+            while True:
+                print ' Choose your option (1-5):'
+                print ' 1. Generate a bundle of profiles'
+                print ' 2. Generate one single profile'
+                print ' 3. Show available options'
+                print ' 4. Test all combinations'
+                print ' 5. Exit'
+                x = 'x'
+                y = 'y'
+                dataLog = ["LFilament;RFilament;Extruder;Quality;LNozzle;RNozzle;InfillExt;PrimaryExt;SupportExt;LFlow;RFlow;Layers/Infill;DefaultSpeed;FirstLayerUnderspeed;OutLineUnderspeed;SupportUnderspeed;FirstLayerHeightPercentage;LTemp;RTemp;BTemp;\n"]
+                profilesCreatedCount = 0
+                while x not in '12345':
+                    x = raw_input(' ')
+                if x in '12':
+                    if x == '1':
+                        profilesCreatedCount = createProfilesBundle(dataLog, profilesCreatedCount)
+                    elif x == '2':
+                        a = selectNozzleSizeAndFilament('Left')
+                        b = selectNozzleSizeAndFilament('Right')
+                        if profilesData['nozzle'][int(a[0])-1] == 'None' and profilesData['nozzle'][int(b[0])-1] == 'None':
+                            print "\n Select at least one nozzle size to create a profile.\n"
+                        else:
+                            print "\n Your new profile '"+createProfile(profilesData['nozzle'][int(a[0])-1], profilesData['nozzle'][int(b[0])-1], sorted(profilesData['filament'], key=lambda k: k['id'])[int(a[1])-1], sorted(profilesData['filament'], key=lambda k: k['id'])[int(b[1])-1], dataLog, 'fffFile')+".fff' has been created.\n"
+                            profilesCreatedCount = 1
+                    print ' See profile(s) data? (Y/n)'
+                    while y not in ['Y', 'n']:
+                        y = raw_input(' ')
+                    if y == 'Y':
+                        for l in dataLog:
+                            print '',
+                            for d in string.split(l, ';'):
+                                print string.rjust(str(d)[:6], 6),
+                        print ' '+str(profilesCreatedCount)+' profile(s) created with '+str(len(dataLog)-1)+' configurations.\n'
+                elif x == '3':
+                    printAvailableOptions()
+                elif x == '4':
+                    testAllCombinations()
+                elif x == '5':
+                    print '\n Until next time!\n'
+                    break
 
 if __name__ == '__main__':
     main() 
