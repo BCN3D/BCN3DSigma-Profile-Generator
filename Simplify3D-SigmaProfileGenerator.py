@@ -165,7 +165,7 @@ def createProfile(nozzleLeft, nozzleRight, filamentLeft, filamentRight, dataLog,
     fff.append(r'<profile name="'+fileName+r'" version="'+time.strftime("%Y-%m-%d")+" "+time.strftime("%H:%M:%S")+r'" app="S3D-Software 3.1.1">'+"\n")    
     fff.append(r'  <baseProfile></baseProfile>'+"\n")
     fff.append(r'  <printMaterial></printMaterial>'+"\n")
-    fff.append(r'  <printQuality>'+defaultPrintQuality+'</printQuality>'+"\n") #+extruder+' - '+str(quality['id'][2:])+
+    fff.append(r'  <printQuality>'+defaultPrintQuality+'</printQuality>'+"\n") #+extruder+secondaryExtruderAction+str(quality['id'][2:])+
     if nozzleRight != 'None':
         fff.append(r'  <printExtruders>Left Extruder Only</printExtruders>'+"\n")
     else:
@@ -418,6 +418,10 @@ def createProfile(nozzleLeft, nozzleRight, filamentLeft, filamentRight, dataLog,
                 currentInfillExtruder = currentPrimaryExtruder
                 currentSupportExtruder = currentPrimaryExtruder
                 currentBedTemperature = currentFilament['bedTemperature']
+                if filamentLeft['id'] != filamentRight['id']:
+                    secondaryExtruderAction = ' ('+currentFilament['id']+') - '
+                else:
+                    secondaryExtruderAction = ' - '
             # IDEX
             else:
                 # IDEX, Support Material
@@ -431,6 +435,7 @@ def createProfile(nozzleLeft, nozzleRight, filamentLeft, filamentRight, dataLog,
                         supportNozzle = nozzleLeft
                         fanActionOnToolChange1 = '{IF NEWTOOL=0} M107'+"\t\t"+r';disable fan for support material,'
                         fanActionOnToolChange2 = '{IF NEWTOOL=1} M106'+"\t\t"+r';enable fan for part material,'
+                        secondaryExtruderAction = ' (Left Ext. for supports) - '
                         currentDefaultSpeed, currentFirstLayerUnderspeed, currentOutlineUnderspeed, currentSupportUnderspeed = speedValues(nozzleLeft, nozzleRight, filamentLeft, filamentRight, quality, 'IDEX, Supports with Left')
                     else:
                         currentPrimaryExtruder = 0
@@ -440,6 +445,7 @@ def createProfile(nozzleLeft, nozzleRight, filamentLeft, filamentRight, dataLog,
                         supportNozzle = nozzleRight
                         fanActionOnToolChange1 = '{IF NEWTOOL=0} M106'+"\t\t"+r';enable fan for part material,'
                         fanActionOnToolChange2 = '{IF NEWTOOL=1} M107'+"\t\t"+r';disable fan for support material,' 
+                        secondaryExtruderAction = ' (Right Ext. for supports) - '
                         currentDefaultSpeed, currentFirstLayerUnderspeed, currentOutlineUnderspeed, currentSupportUnderspeed = speedValues(nozzleLeft, nozzleRight, filamentLeft, filamentRight, quality, 'IDEX, Supports with Right')
                     currentInfillExtruder = currentPrimaryExtruder
                     currentSupportExtruder = abs(currentPrimaryExtruder-1)
@@ -465,6 +471,7 @@ def createProfile(nozzleLeft, nozzleRight, filamentLeft, filamentRight, dataLog,
                         nozzleLeftLayer2Temperature = temperatureValue(filamentLeft, nozzleLeft, currentLayerHeight, currentDefaultSpeed)
                         nozzleRightLayer1Temperature = temperatureValue(filamentRight, nozzleRight, currentLayerHeight*currentInfillLayerInterval, currentDefaultSpeed)
                         nozzleRightLayer2Temperature = temperatureValue(filamentRight, nozzleRight, currentLayerHeight*currentInfillLayerInterval, currentDefaultSpeed)
+                        secondaryExtruderAction = ' (Right Ext. for infill) - '
                         if currentFilament['fanMultiplier'] != 0:
                             fanActionOnToolChange1 = '{IF NEWTOOL=0} M106'+"\t\t"+r';enable fan for perimeters,'
                             fanActionOnToolChange2 = '{IF NEWTOOL=1} M107'+"\t\t"+r';disable fan for infill,'
@@ -482,6 +489,7 @@ def createProfile(nozzleLeft, nozzleRight, filamentLeft, filamentRight, dataLog,
                         nozzleLeftLayer2Temperature = temperatureValue(filamentLeft, nozzleLeft, currentLayerHeight*currentInfillLayerInterval, currentDefaultSpeed)
                         nozzleRightLayer1Temperature = temperatureValue(filamentRight, nozzleRight, currentLayerHeight, currentDefaultSpeed)
                         nozzleRightLayer2Temperature = temperatureValue(filamentRight, nozzleRight, currentLayerHeight, currentDefaultSpeed)
+                        secondaryExtruderAction = ' (Left Ext. for infill) - '
                         if currentFilament['fanMultiplier'] != 0:
                             fanActionOnToolChange1 = '{IF NEWTOOL=0} M107'+"\t\t"+r';disable fan for infill,'
                             fanActionOnToolChange2 = '{IF NEWTOOL=1} M106'+"\t\t"+r';enable fan for perimeters,'
@@ -498,7 +506,7 @@ def createProfile(nozzleLeft, nozzleRight, filamentLeft, filamentRight, dataLog,
             currentBottomSolidLayers = currentTopSolidLayers
             currentRaftExtruder = currentPrimaryExtruder
             currentSkirtExtruder = currentPrimaryExtruder
-            fff.append(r'  <autoConfigureQuality name="'+extruder+' - '+str(quality['id'][2:])+r'">'+"\n")
+            fff.append(r'  <autoConfigureQuality name="'+extruder+secondaryExtruderAction+str(quality['id'][2:])+r'">'+"\n")
             fff.append(r'    <globalExtrusionMultiplier>1</globalExtrusionMultiplier>'+"\n")
             fff.append(r'    <fanSpeed>'+"\n")
             fff.append(r'      <setpoint layer="1" speed="0" />'+"\n")
@@ -600,42 +608,34 @@ def createProfile(nozzleLeft, nozzleRight, filamentLeft, filamentRight, dataLog,
 
     # fff.append(r'  </autoConfigureMaterial>'+"\n")
 
-    # if nozzleLeft != 'None':
-    #     fff.append(r'  <autoConfigureExtruders name="Left Extruder Only"  allowedToolheads="1">'+"\n")
-    #     if nozzleLeft != 'None':
-    #         fff.append(r'    <toggleTemperatureController name="Left Extruder '+str(nozzleLeft)+r'" status="on" stabilize="on"/>'+"\n")
-    #     if nozzleRight != 'None':
-    #         fff.append(r'    <toggleTemperatureController name="Right Extruder '+str(nozzleRight)+r'" status="off" stabilize="off"/>'+"\n")
-    #     if (nozzleLeft != 'None' and filamentLeft['bedTemperature'] > 0) or (nozzleRight != 'None' and filamentRight['bedTemperature'] > 0):
-    #         fff.append(r'    <toggleTemperatureController name="Heated Bed" status="on" stabilize="on"/>'+"\n")
-    #     fff.append(r'  </autoConfigureExtruders>'+"\n")
-    # if nozzleRight != 'None':
-    #     fff.append(r'  <autoConfigureExtruders name="Right Extruder Only"  allowedToolheads="1">'+"\n")
-    #     if nozzleLeft != 'None':
-    #         fff.append(r'    <toggleTemperatureController name="Left Extruder '+str(nozzleLeft)+r'" status="off" stabilize="off"/>'+"\n")
-    #     if nozzleRight != 'None':
-    #         fff.append(r'    <toggleTemperatureController name="Right Extruder '+str(nozzleRight)+r'" status="on" stabilize="on"/>'+"\n")
-    #     if (nozzleLeft != 'None' and filamentLeft['bedTemperature'] > 0) or (nozzleRight != 'None' and filamentRight['bedTemperature'] > 0):
-    #         fff.append(r'    <toggleTemperatureController name="Heated Bed" status="on" stabilize="on"/>'+"\n")
-    #     fff.append(r'  </autoConfigureExtruders>'+"\n")
-    # if nozzleLeft != 'None' and nozzleRight != 'None':
-    #     fff.append(r'  <autoConfigureExtruders name="Both Extruders"  allowedToolheads="2">'+"\n")
-    #     if nozzleLeft != 'None':
-    #         fff.append(r'    <toggleTemperatureController name="Left Extruder '+str(nozzleLeft)+r'" status="on" stabilize="on"/>'+"\n")
-    #     if nozzleRight != 'None':
-    #         fff.append(r'    <toggleTemperatureController name="Right Extruder '+str(nozzleRight)+r'" status="on" stabilize="on"/>'+"\n")
-    #     if (nozzleLeft != 'None' and filamentLeft['bedTemperature'] > 0) or (nozzleRight != 'None' and filamentRight['bedTemperature'] > 0):
-    #         fff.append(r'    <toggleTemperatureController name="Heated Bed" status="on" stabilize="on"/>'+"\n")
-    #     fff.append(r'  </autoConfigureExtruders>'+"\n")
-
-    fff.append(r'  <autoConfigureExtruders name="Both Extruders"  allowedToolheads="2">'+"\n")
     if nozzleLeft != 'None':
-        fff.append(r'    <toggleTemperatureController name="Left Extruder '+str(nozzleLeft)+r'" status="on" stabilize="on"/>'+"\n")
+        fff.append(r'  <autoConfigureExtruders name="Left Extruder Only"  allowedToolheads="1">'+"\n")
+        if nozzleLeft != 'None':
+            fff.append(r'    <toggleTemperatureController name="Left Extruder '+str(nozzleLeft)+r'" status="on" stabilize="on"/>'+"\n")
+        if nozzleRight != 'None':
+            fff.append(r'    <toggleTemperatureController name="Right Extruder '+str(nozzleRight)+r'" status="off" stabilize="off"/>'+"\n")
+        if (nozzleLeft != 'None' and filamentLeft['bedTemperature'] > 0) or (nozzleRight != 'None' and filamentRight['bedTemperature'] > 0):
+            fff.append(r'    <toggleTemperatureController name="Heated Bed" status="on" stabilize="on"/>'+"\n")
+        fff.append(r'  </autoConfigureExtruders>'+"\n")
     if nozzleRight != 'None':
-        fff.append(r'    <toggleTemperatureController name="Right Extruder '+str(nozzleRight)+r'" status="on" stabilize="on"/>'+"\n")
-    if (nozzleLeft != 'None' and filamentLeft['bedTemperature'] > 0) or (nozzleRight != 'None' and filamentRight['bedTemperature'] > 0):
-        fff.append(r'    <toggleTemperatureController name="Heated Bed" status="on" stabilize="on"/>'+"\n")
-    fff.append(r'  </autoConfigureExtruders>'+"\n")
+        fff.append(r'  <autoConfigureExtruders name="Right Extruder Only"  allowedToolheads="1">'+"\n")
+        if nozzleLeft != 'None':
+            fff.append(r'    <toggleTemperatureController name="Left Extruder '+str(nozzleLeft)+r'" status="off" stabilize="off"/>'+"\n")
+        if nozzleRight != 'None':
+            fff.append(r'    <toggleTemperatureController name="Right Extruder '+str(nozzleRight)+r'" status="on" stabilize="on"/>'+"\n")
+        if (nozzleLeft != 'None' and filamentLeft['bedTemperature'] > 0) or (nozzleRight != 'None' and filamentRight['bedTemperature'] > 0):
+            fff.append(r'    <toggleTemperatureController name="Heated Bed" status="on" stabilize="on"/>'+"\n")
+        fff.append(r'  </autoConfigureExtruders>'+"\n")
+    if nozzleLeft != 'None' and nozzleRight != 'None':
+        fff.append(r'  <autoConfigureExtruders name="Both Extruders"  allowedToolheads="2">'+"\n")
+        if nozzleLeft != 'None':
+            fff.append(r'    <toggleTemperatureController name="Left Extruder '+str(nozzleLeft)+r'" status="on" stabilize="on"/>'+"\n")
+        if nozzleRight != 'None':
+            fff.append(r'    <toggleTemperatureController name="Right Extruder '+str(nozzleRight)+r'" status="on" stabilize="on"/>'+"\n")
+        if (nozzleLeft != 'None' and filamentLeft['bedTemperature'] > 0) or (nozzleRight != 'None' and filamentRight['bedTemperature'] > 0):
+            fff.append(r'    <toggleTemperatureController name="Heated Bed" status="on" stabilize="on"/>'+"\n")
+        fff.append(r'  </autoConfigureExtruders>'+"\n")
+
     fff.append(r'</profile>'+"\n")
     if createFile == 'fffFile':
         f = open(fileName+".fff", "w")
