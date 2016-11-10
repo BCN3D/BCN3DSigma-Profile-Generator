@@ -1,0 +1,19 @@
+{
+    "id": "PVA",
+    "filamentDiameter": 2.85,
+    "filamentPricePerKg": 72.48,
+    "filamentDensity": 1.30,
+    "isSupportMaterial": true,
+    "isFlexibleMaterial": false,
+    "bedTemperature": 50,
+    "printTemperature": [190, 195],
+    "defaultPrintSpeed": 60,
+    "advisedMaxPrintSpeed": 100,
+    "maxFlow": "None",
+    "maxFlowForHighFlowHotends": "None",
+    "retractionDistance": 4,
+    "retractionSpeed": 40,
+    "fanMultiplier": 1,
+    "extrusionMultiplier": 1,
+    "purgeLenght": 2.25
+}

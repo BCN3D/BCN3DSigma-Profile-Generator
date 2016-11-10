@@ -49,7 +49,7 @@ def writeData(extruder, currentDefaultSpeed, currentInfillLayerInterval, current
         else:
             printA = "%.2f" % float(float(currentDefaultSpeed)/60*currentInfillLayerInterval*currentLayerHeight*nozzleLeft*supportMaterialLoadedLeft)
             printB = "%.2f" % float(float(currentDefaultSpeed)/60*currentInfillLayerInterval*currentLayerHeight*nozzleRight*supportMaterialLoadedRight)
-    dataLog.append(filamentLeft['id']+";"+filamentRight['id']+";"+extruder+";"+quality['id'][2:]+";"+str(nozzleLeft)+";"+str(nozzleRight)+";"+'T'+str(currentInfillExtruder)+";"+'T'+str(currentPrimaryExtruder)+";"+'T'+str(currentSupportExtruder)+";"+str(printA)+";"+str(printB)+";"+str(currentInfillLayerInterval)+";"+str("%.2f" % float(currentDefaultSpeed/60.))+";"+str(currentFirstLayerUnderspeed)+";"+str(currentOutlineUnderspeed)+";"+str(currentSupportUnderspeed)+";"+str(currentFirstLayerHeightPercentage)+";"+str(nozzleLeftLayer2Temperature)+";"+str(nozzleRightLayer2Temperature)+";"+str(currentBedTemperature)+";\n")
+    dataLog.append(filamentLeft['id']+";"+filamentRight['id']+";"+extruder+";"+quality['id']+";"+str(nozzleLeft)+";"+str(nozzleRight)+";"+'T'+str(currentInfillExtruder)+";"+'T'+str(currentPrimaryExtruder)+";"+'T'+str(currentSupportExtruder)+";"+str(printA)+";"+str(printB)+";"+str(currentInfillLayerInterval)+";"+str("%.2f" % float(currentDefaultSpeed/60.))+";"+str(currentFirstLayerUnderspeed)+";"+str(currentOutlineUnderspeed)+";"+str(currentSupportUnderspeed)+";"+str(currentFirstLayerHeightPercentage)+";"+str(nozzleLeftLayer2Temperature)+";"+str(nozzleRightLayer2Temperature)+";"+str(currentBedTemperature)+";\n")
 
 def speedMultiplier(nozzle, filament):
     if filament['isFlexibleMaterial']:
@@ -138,12 +138,12 @@ def speedValues(nozzleLeft, nozzleRight, filamentLeft, filamentRight, quality, a
 def createProfile(nozzleLeft, nozzleRight, filamentLeft, filamentRight, dataLog, createFile):
     fff = []
     fff.append(r'<?xml version="1.0" encoding="utf-8"?>'+"\n")
-    for q in profilesData['quality']:
-        if q['id'][2:] == 'Medium':
+    for q in newProfilesData['quality']:
+        if q['id'] == 'Medium':
             defaultPrintQualityBase = 'Medium'
             break
         else:
-            defaultPrintQualityBase = profilesData['quality'][0]['id'][2:]
+            defaultPrintQualityBase = newProfilesData['quality'][0]['id']
     if nozzleLeft == 'None':
         fileName = "BCN3D Sigma - Right Extruder "+str(nozzleRight)+" Only ("+filamentRight['id']+")"
         defaultPrintQuality = 'Right Extruder - '+defaultPrintQualityBase
@@ -163,7 +163,7 @@ def createProfile(nozzleLeft, nozzleRight, filamentLeft, filamentRight, dataLog,
     fff.append(r'<profile name="'+fileName+r'" version="'+time.strftime("%Y-%m-%d")+" "+time.strftime("%H:%M:%S")+r'" app="S3D-Software 3.1.1">'+"\n")    
     fff.append(r'  <baseProfile></baseProfile>'+"\n")
     fff.append(r'  <printMaterial></printMaterial>'+"\n")
-    fff.append(r'  <printQuality>'+defaultPrintQuality+'</printQuality>'+"\n") #+extruder+secondaryExtruderAction+str(quality['id'][2:])+
+    fff.append(r'  <printQuality>'+defaultPrintQuality+'</printQuality>'+"\n") #+extruder+secondaryExtruderAction+str(quality['id'])+
     if nozzleRight != 'None':
         fff.append(r'  <printExtruders>Left Extruder Only</printExtruders>'+"\n")
     else:
@@ -384,7 +384,7 @@ def createProfile(nozzleLeft, nozzleRight, filamentLeft, filamentRight, dataLog,
     # fff.append(r'  <printerModelsOverride>zyyx3dprinter.stl</printerModelsOverride>'+"\n")
     # fff.append(r'  <autoConfigureMaterial name="'+str(filamentLeft)+" Left, "+str(filamentRight)+" Right"+r'">'+"\n")
     for extruder in extruderPrintOptions:
-        for quality in sorted(profilesData['quality'], key=lambda k: k['id']):
+        for quality in sorted(newProfilesData['quality'], key=lambda k: k['order']):
             currentInfillLayerInterval = 1
             currentGenerateSupport = 0
             currentAvoidCrossingOutline = 1
@@ -504,7 +504,7 @@ def createProfile(nozzleLeft, nozzleRight, filamentLeft, filamentRight, dataLog,
             currentBottomSolidLayers = currentTopSolidLayers
             currentRaftExtruder = currentPrimaryExtruder
             currentSkirtExtruder = currentPrimaryExtruder
-            fff.append(r'  <autoConfigureQuality name="'+extruder+secondaryExtruderAction+str(quality['id'][2:])+r'">'+"\n")
+            fff.append(r'  <autoConfigureQuality name="'+extruder+secondaryExtruderAction+str(quality['id'])+r'">'+"\n")
             fff.append(r'    <globalExtrusionMultiplier>1</globalExtrusionMultiplier>'+"\n")
             fff.append(r'    <fanSpeed>'+"\n")
             fff.append(r'      <setpoint layer="1" speed="0" />'+"\n")
@@ -662,8 +662,8 @@ def createProfilesBundle(dataLog, profilesCreatedCount):
             else:                
                 os.mkdir("No Right Hotend")
                 os.chdir("No Right Hotend")
-            for filamentLeft in sorted(profilesData['filament'], key=lambda k: k['id']):
-                for filamentRight in sorted(profilesData['filament'], key=lambda k: k['id']):
+            for filamentLeft in sorted(newProfilesData['filament'], key=lambda k: k['id']):
+                for filamentRight in sorted(newProfilesData['filament'], key=lambda k: k['id']):
                     createProfile(nozzleLeft, nozzleRight, filamentLeft, filamentRight, dataLog, 'fffFile')
                     profilesCreatedCount += 1
             os.chdir('..')
@@ -684,8 +684,8 @@ def testAllCombinations():
     combinationCount = 0
     for nozzleLeft in profilesData['nozzle']:
         for nozzleRight in profilesData['nozzle']:
-            for filamentLeft in sorted(profilesData['filament'], key=lambda k: k['id']):
-                for filamentRight in sorted(profilesData['filament'], key=lambda k: k['id']):
+            for filamentLeft in sorted(newProfilesData['filament'], key=lambda k: k['id']):
+                for filamentRight in sorted(newProfilesData['filament'], key=lambda k: k['id']):
                     createProfile(nozzleLeft, nozzleRight, filamentLeft, filamentRight, 'noData', 'noFile')
                     combinationCount += 1
         sys.stdout.flush()
@@ -699,7 +699,7 @@ def selectNozzleSizeAndFilament(extruder):
                 for c in range(len(profilesData['nozzle'])):
                     nozzleOptions.append(str(c+1))
                 materialOptions = []
-                for c in range(len(profilesData['filament'])):
+                for c in range(len(newProfilesData['filament'])):
                     materialOptions.append(str(c+1))
                 for size in range(len(profilesData['nozzle'])):
                     if profilesData['nozzle'][size] != 'None':
@@ -710,13 +710,13 @@ def selectNozzleSizeAndFilament(extruder):
                     answer0 = raw_input(' ')
                 if profilesData['nozzle'][int(answer0)-1] != 'None':
                     print ' '+extruder+' Extruder Nozzle Size: '+str(profilesData['nozzle'][int(answer0)-1])+'mm.'
-                    print "\n Select Sigma's "+extruder+" Extruder Loaded Filament (1-"+str(len(profilesData['filament']))+'):'
+                    print "\n Select Sigma's "+extruder+" Extruder Loaded Filament (1-"+str(len(newProfilesData['filament']))+'):'
                     answer1 = ''
-                    for material in range(len(profilesData['filament'])):
-                        print ' '+str(material+1)+'. '+str(sorted(profilesData['filament'], key=lambda k: k['id'])[material]['id'])
+                    for material in range(len(newProfilesData['filament'])):
+                        print ' '+str(material+1)+'. '+str(sorted(newProfilesData['filament'], key=lambda k: k['id'])[material]['id'])
                     while answer1 not in materialOptions:
                         answer1 = raw_input(' ')
-                    print ' '+extruder+' Extruder Filament: '+sorted(profilesData['filament'], key=lambda k: k['id'])[int(answer1)-1]['id']+'.'
+                    print ' '+extruder+' Extruder Filament: '+sorted(newProfilesData['filament'], key=lambda k: k['id'])[int(answer1)-1]['id']+'.'
                 else:
                     print ' '+extruder+' Extruder Nozzle Size: '+str(profilesData['nozzle'][int(answer0)-1])
                     answer1 = '1'
@@ -736,18 +736,18 @@ def printAvailableOptions():
             else:
                 print n+'.'
     print ' Available Filament(s):',
-    for n in sorted(profilesData['filament'], key=lambda k: k['id']):
-        if n != sorted(profilesData['filament'], key=lambda k: k['id'])[len(profilesData['filament'])-1]:
+    for n in sorted(newProfilesData['filament'], key=lambda k: k['id']):
+        if n != sorted(newProfilesData['filament'], key=lambda k: k['id'])[len(newProfilesData['filament'])-1]:
             print n['id']+',',
         else:
             print n['id']+'.'
 
     print ' Available Quality Preconfiguration(s):',
-    for n in sorted(profilesData['quality'], key=lambda k: k['id']):
-        if n != sorted(profilesData['quality'], key=lambda k: k['id'])[len(profilesData['quality'])-1]:
-            print n['id'][2:]+',',
+    for n in sorted(newProfilesData['quality'], key=lambda k: k['order']):
+        if n != sorted(newProfilesData['quality'], key=lambda k: k['order'])[len(newProfilesData['quality'])-1]:
+            print n['id']+',',
         else:
-            print n['id'][2:]+'.'
+            print n['id']+'.'
     print " Add, remove options or change its own parameters by editing 'ProfilesData.json' file.\n"
 
 def validArguments():
@@ -777,21 +777,19 @@ def readProfilesData():
             with open('./Profiles Data/Quality Presets/'+quality) as quality_file:    
                 qualityData = json.load(quality_file)
                 newProfilesData['quality'].append(qualityData)
-    return newProfilesData
+    global newProfilesData
 
 def main():
     if validArguments():
-
-        print sorted(profilesData['filament'], key=lambda k: k['id'])[int(1)-1]['id']+'.'
-        print sorted(readProfilesData()['filament'], key=lambda k: k['id'])[int(1)-1]['id']+'.'
+        readProfilesData()
         # hotendL = sys.argv[1]
         # hotendR = sys.argv[3]
         # if sys.argv[1] == 'None':
-        #     filamentL = sorted(profilesData['filament'], key=lambda k: k['id'])[0]
+        #     filamentL = sorted(newProfilesData['filament'], key=lambda k: k['id'])[0]
         # else:            
         #     filamentL = sys.argv[2]
         # if sys.argv[2] == 'None':
-        #     filamentR = sorted(profilesData['filament'], key=lambda k: k['id'])[0]
+        #     filamentR = sorted(newProfilesData['filament'], key=lambda k: k['id'])[0]
         # else:
         #     filamentR = sys.argv[4]
         # if sys.argv[1] != 'None' and sys.argv[2] != 'None':
@@ -800,6 +798,7 @@ def main():
         if len(sys.argv) == 1:
             print '\n Welcome to the BCN3D Sigma Profile Generator for Simplify3D \n'
             while True:
+                readProfilesData()
                 print ' Choose your option (1-5):'
                 print ' 1. Generate a bundle of profiles'
                 print ' 2. Generate one single profile'
@@ -821,7 +820,7 @@ def main():
                         if profilesData['nozzle'][int(a[0])-1] == 'None' and profilesData['nozzle'][int(b[0])-1] == 'None':
                             print "\n Select at least one nozzle size to create a profile.\n"
                         else:
-                            print "\n Your new profile '"+createProfile(profilesData['nozzle'][int(a[0])-1], profilesData['nozzle'][int(b[0])-1], sorted(profilesData['filament'], key=lambda k: k['id'])[int(a[1])-1], sorted(profilesData['filament'], key=lambda k: k['id'])[int(b[1])-1], dataLog, 'fffFile')+".fff' has been created.\n"
+                            print "\n Your new profile '"+createProfile(profilesData['nozzle'][int(a[0])-1], profilesData['nozzle'][int(b[0])-1], sorted(newProfilesData['filament'], key=lambda k: k['id'])[int(a[1])-1], sorted(newProfilesData['filament'], key=lambda k: k['id'])[int(b[1])-1], dataLog, 'fffFile')+".fff' has been created.\n"
                             profilesCreatedCount = 1
                     print ' See profile(s) data? (Y/n)'
                     while y not in ['Y', 'n']:

@@ -1,0 +1,19 @@
+{
+    "id": "TPU Colorfila",
+    "filamentDiameter": 2.85,
+    "filamentPricePerKg": 0,
+    "filamentDensity": 0,
+    "isSupportMaterial": false,
+    "isFlexibleMaterial": true,
+    "bedTemperature": 50,
+    "printTemperature": [225, 240],
+    "defaultPrintSpeed": 35,
+    "advisedMaxPrintSpeed": 80,
+    "maxFlow": "None",
+    "maxFlowForHighFlowHotends": "None",
+    "retractionDistance": 6,
+    "retractionSpeed": 40,
+    "fanMultiplier": 1,
+    "extrusionMultiplier": 1.05,
+    "purgeLenght": 4.5
+}

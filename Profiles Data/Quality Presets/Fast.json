@@ -1,0 +1,11 @@
+{
+    "id": "Fast",
+    "order": 0,
+    "layerHeightMultiplier": 0.75,
+    "defaultSpeed": 125,
+    "firstLayerUnderspeed": 0.64,
+    "outlineUnderspeed": 0.48,
+    "topBottomWidth": 0.8,
+    "wallWidth": 1.2,
+    "infillPercentage": 15
+}

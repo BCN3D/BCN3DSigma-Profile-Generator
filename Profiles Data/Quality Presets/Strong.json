@@ -1,0 +1,11 @@
+{
+    "id": "Strong",
+    "order": 3,
+    "layerHeightMultiplier": 0.5,
+    "defaultSpeed": 60,
+    "firstLayerUnderspeed": 0.67,
+    "outlineUnderspeed": 0.58,
+    "topBottomWidth": 2,
+    "wallWidth": 2,
+    "infillPercentage": 30
+}

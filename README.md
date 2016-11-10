@@ -12,7 +12,7 @@ The python script is capable of generating Simplify3D profiles according to the 
 
 ## Usage
 
-first you need to clone/download the repository in your computer:
+First you need to clone/download the repository in your computer:
 
 `git clone https://github.com/BCN3D/BCN3DSigma-Profile-Generator`
 
@@ -62,6 +62,7 @@ Add the new material parameters:
 ###### Quality Preconfigurations
 Add the new quality parameters:
 * **id** - Preconfiguration Name
+* **order** - Order to show the option in Simplify3D
 * **layerHeightMultiplier** - Multiply this value for the nozzle size to get the layer height.
 * **defaultSpeed** - [mm/s], default speed for PLA
 * **firstLayerUnderspeed** - [0-1], to reduce first layer speed.
