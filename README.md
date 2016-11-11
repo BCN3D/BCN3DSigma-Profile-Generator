@@ -29,10 +29,8 @@ e.g.
 `python Simplify3D-SigmaProfileGenerator.py "0.4 - Brass" "0.4 - Brass" "Colorfila PLA" "Colorfila PLA"`
 
 Generates the file *BCN3D Sigma - 0.4 Left (PLA Colorfila), 0.4 Right (PLA Colorfila).fff*
-
-> Valid parameters for Hotends: Names of *.json* files in */Profiles Data/Hotends*. 'None' if not mounted.
-
-> Valid parameters for Fiaments: Names of *.json* files in */Profiles Data/Filaments*. 'None' if empty.
+Valid parameters for Hotends: Names of *.json* files in */Profiles Data/Hotends*. 'None' if not mounted.
+Valid parameters for Fiaments: Names of *.json* files in */Profiles Data/Filaments*. 'None' if empty.
 
 ### **GUI Mode**
 
