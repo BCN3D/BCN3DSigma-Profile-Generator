@@ -15,9 +15,6 @@ import string
 # bridge speed for flexible
 # adjust coast for ABS
 
-#change disable fans str(hotendLeft['nozzleSize'])
-
-# work with independent json files
 # add files for filament/hotend/quality preset function
 
 def writeData(extruder, currentDefaultSpeed, currentInfillLayerInterval, currentLayerHeight, hotendLeft, hotendRight, currentPrimaryExtruder, currentInfillExtruder, currentSupportExtruder, filamentLeft, filamentRight, quality, currentFirstLayerUnderspeed, currentOutlineUnderspeed, currentSupportUnderspeed, currentFirstLayerHeightPercentage, hotendLeftLayer2Temperature, hotendRightLayer2Temperature, currentBedTemperature, dataLog):
