@@ -58,7 +58,7 @@ In order to add, remove or change a nozzle size, filament or quality preconfigur
 
 ###### Hotends
 
-```json
+```json5
 {
     "id": "0.3mm - Brass",  // code for coloring
     "nozzleSize": 0.3,
