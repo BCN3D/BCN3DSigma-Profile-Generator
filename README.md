@@ -57,6 +57,11 @@ In order to add, remove or change a nozzle size, filament or quality preconfigur
 ## Editing Profiles Data
 
 ###### Hotends
+
+```json
+   // code for coloring
+```
+
 * **id** - Hotend Name
 * **nozzleSize** - [mm]
 * **material** - Nozzle material
