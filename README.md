@@ -24,13 +24,11 @@ To generate a profile without entering the GUI. Just call the script and insert 
 
 `python Simplify3D-SigmaProfileGenerator.py LHotend RHotend LFilament RFilament`
 
-e.g. 
+Valid parameters for Hotends are file names in */Profiles Data/Hotends* or 'None' if not mounted. Valid parameters for Fiamentsare are file in */Profiles Data/Filaments* or 'None' if empty. Example: 
 
 `python Simplify3D-SigmaProfileGenerator.py "0.4 - Brass" "0.4 - Brass" "Colorfila PLA" "Colorfila PLA"`
 
 Generates the file *BCN3D Sigma - 0.4 Left (PLA Colorfila), 0.4 Right (PLA Colorfila).fff*
-Valid parameters for Hotends: Names of *.json* files in */Profiles Data/Hotends*. 'None' if not mounted.
-Valid parameters for Fiaments: Names of *.json* files in */Profiles Data/Filaments*. 'None' if empty.
 
 ### **GUI Mode**
 
