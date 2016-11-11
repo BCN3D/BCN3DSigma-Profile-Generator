@@ -391,14 +391,20 @@ def createProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, dataLog,
                     currentLayerHeight = currentHotend['nozzleSize'] * quality['layerHeightMultiplier']
                     currentDefaultSpeed, currentFirstLayerUnderspeed, currentOutlineUnderspeed, currentSupportUnderspeed = speedValues(hotendLeft, hotendRight, filamentLeft, filamentRight, quality, 'MEX Left')
                     hotendLeftTemperature = temperatureValue(filamentLeft, hotendLeft, currentLayerHeight, currentDefaultSpeed)
-                    hotendRightTemperature = temperatureValue(filamentRight, hotendRight, currentLayerHeight, currentDefaultSpeed)
+                    if hotendRight['id'] == 'None':
+                        hotendRightTemperature = 0
+                    else:
+                        hotendRightTemperature = temperatureValue(filamentRight, hotendRight, currentLayerHeight, currentDefaultSpeed)
                 else:
                     currentPrimaryExtruder = 1
                     currentFilament = filamentRight
                     currentHotend = hotendRight
                     currentLayerHeight = currentHotend['nozzleSize'] * quality['layerHeightMultiplier']
                     currentDefaultSpeed, currentFirstLayerUnderspeed, currentOutlineUnderspeed, currentSupportUnderspeed = speedValues(hotendLeft, hotendRight, filamentLeft, filamentRight, quality, 'MEX Right')
-                    hotendLeftTemperature = temperatureValue(filamentLeft, hotendLeft, currentLayerHeight, currentDefaultSpeed)
+                    if hotendLeft['id'] == 'None':
+                        hotendLeftTemperature = 0
+                    else:
+                        hotendLeftTemperature = temperatureValue(filamentLeft, hotendLeft, currentLayerHeight, currentDefaultSpeed)
                     hotendRightTemperature = temperatureValue(filamentRight, hotendRight, currentLayerHeight, currentDefaultSpeed)
                 currentInfillExtruder = currentPrimaryExtruder
                 currentSupportExtruder = currentPrimaryExtruder
@@ -754,7 +760,7 @@ def main():
             print '\n Welcome to the BCN3D Sigma Profile Generator for Simplify3D \n'
             while True:
                 readProfilesData()
-                print ' Choose your option (1-4):'
+                print ' Choose one option (1-4):'
                 print ' 1. Generate a bundle of profiles'
                 print ' 2. Generate one single profile'
                 print ' 3. Test all combinations'
