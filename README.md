@@ -57,50 +57,52 @@ In order to add, remove or change a nozzle size, filament or quality preconfigur
 ## Editing Profiles Data
 
 ###### Hotends
-
 ```json5
 {
-    "id": "0.3mm - Brass",  // code for coloring
-    "nozzleSize": 0.3,
-    "material": "Brass",
-    "hotBlock": "Standard"
-}   
+    "id": "0.4mm - Brass", 					// Hotend Name
+    "nozzleSize": 0.4,						// [mm]
+    "material": "Brass",					// Nozzle material
+    "hotBlock": "Standard"					// Block style
+} 
 ```
 
-* **id** - Hotend Name
-* **nozzleSize** - [mm]
-* **material** - Nozzle material
-* **hotBlock** - block style
-
 ###### Filaments
-* **id** - Filament Name
-* **filamentDiameter** - [mm]
-* **filamentPricePerKg** - [€]
-* **filamentDensity** - [g/cm3]
-* **isSupportMaterial** - true/false
-* **isFlexibleMaterial** - true/false
-* **bedTemperature** - [ºC]
-* **printTemperature** - [ºC], a list of the minimum and maximum temperatures the manufacturer recommends.
-* **defaultPrintSpeed** - [mm/s], default speed when printing Medium quality with 0.4mm Nozzle and 0.2mm layer height.
-* **advisedMaxPrintSpeed** - [mm/s], maximum speed recommended by filament's manufacturer. If "None", then maxFlow value is needed.
-* **maxFlow** - [mm3/s], maximum flow a normal Hotend (≤0.6mm) can print. "None" if it's unknown.
-* **maxFlowForHighFlowHotends** - [mm3/s], maximum flow a High Flow Hotend (>0.6mm) can print. "None" if it's unknown.
-* **retractionDistance** - [mm]
-* **retractionSpeed** - [mm/s]
-* **fanMultiplier** - [0-1], 0 for fan off, 1 for 100% power.
-* **extrusionMultiplier** - 1.2 extrudes 120% the needed amount of filament.
-* **purgeLenght** - [mm], lenght to purge at Tool Change with 0.4mm Nozzle.
+```json5
+{
+    "id": "PLA Colorfila",					// Filament Name
+    "filamentDiameter": 2.85,				// [mm]
+    "filamentPricePerKg": 19.95,			// [€]
+    "filamentDensity": 1.25,				// [g/cm3]
+    "isSupportMaterial": false,				// true/false
+    "isFlexibleMaterial": false,			// true/false
+    "bedTemperature": 50,					// [ºC]
+    "printTemperature": [195, 225],			// [ºC], minimum and maximum print temperatures.
+    "defaultPrintSpeed": 60,				// [mm/s], default speed when printing Medium quality with 0.4mm Nozzle and 0.2mm layer height.
+    "advisedMaxPrintSpeed": "None",			// [mm/s], maximum speed recommended by filament's manufacturer. If "None", maxFlow value is needed.
+    "maxFlow": 15,							// [mm3/s], maximum flow a default Hotend can print. "None" if unknown.
+    "maxFlowForHighFlowHotends": "None",	// [mm3/s], maximum flow a High Flow Hotend can print. "None" if unknown.
+    "retractionDistance": 4,				// [mm]
+    "retractionSpeed": 40,					// [mm/s]
+    "fanMultiplier": 1,						// [0-1], 0 for fan off, 1 for 100% power.
+    "extrusionMultiplier": 1,				// 1.2 extrudes 120% the needed amount of filament.
+    "purgeLenght": 1.5 						// [mm], lenght to purge at Tool Change with 0.4mm Nozzle.
+}
+```
 
 ###### Quality Preconfigurations
-* **id** - Preconfiguration Name
-* **order** - Order to show the option in Simplify3D
-* **layerHeightMultiplier** - Multiply this value for the nozzle size to get the layer height.
-* **defaultSpeed** - [mm/s], default speed for PLA
-* **firstLayerUnderspeed** - [0-1], to reduce first layer speed.
-* **outlineUnderspeed** - [0-1], to reduce perimeters speed.
-* **topBottomWidth** - [mm], thickness of solid layers at the top and bottom
-* **wallWidth** - [mm], thickness of walls
-* **infillPercentage** - [0-100]
+```json5
+{
+    "id": "Medium",							// Preconfiguration Name
+    "order": 1,								// Order to show the option in Simplify3D
+    "layerHeightMultiplier": 0.5,			// Multiply this value for the nozzle size to get the layer height.
+    "defaultSpeed": 60,						// [mm/s], default speed for PLA
+    "firstLayerUnderspeed": 0.67,			// [0-1]
+    "outlineUnderspeed": 0.58,				// [0-1]
+    "topBottomWidth": 0.8,					// [mm], thickness of solid layers at the top and bottom
+    "wallWidth": 1.2,						// [mm], thickness of walls
+    "infillPercentage": 20					// [0-100]
+}
+```
 
 ## TO-DO
 
