@@ -1,6 +1,6 @@
 {
     "id": "Strong",
-    "order": 3,
+    "index": 4,
     "layerHeightMultiplier": 0.5,
     "defaultSpeed": 60,
     "firstLayerUnderspeed": 0.67,

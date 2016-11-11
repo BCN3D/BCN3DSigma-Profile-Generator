@@ -376,7 +376,7 @@ def createProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, dataLog,
     # fff.append(r'  <printerModelsOverride>zyyx3dprinter.stl</printerModelsOverride>'+"\n")
     # fff.append(r'  <autoConfigureMaterial name="'+str(filamentLeft)+" Left, "+str(filamentRight)+" Right"+r'">'+"\n")
     for extruder in extruderPrintOptions:
-        for quality in sorted(profilesData['quality'], key=lambda k: k['order']):
+        for quality in sorted(profilesData['quality'], key=lambda k: k['index']):
             currentInfillLayerInterval = 1
             currentGenerateSupport = 0
             currentAvoidCrossingOutline = 1

@@ -1,6 +1,6 @@
 {
     "id": "Fast",
-    "order": 0,
+    "index": 1,
     "layerHeightMultiplier": 0.75,
     "defaultSpeed": 125,
     "firstLayerUnderspeed": 0.64,

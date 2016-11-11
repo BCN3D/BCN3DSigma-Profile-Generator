@@ -1,6 +1,6 @@
 {
     "id": "Medium",
-    "order": 1,
+    "index": 2,
     "layerHeightMultiplier": 0.5,
     "defaultSpeed": 60,
     "firstLayerUnderspeed": 0.67,

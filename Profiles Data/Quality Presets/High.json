@@ -1,6 +1,6 @@
 {
     "id": "High",
-    "order": 2,
+    "index": 3,
     "layerHeightMultiplier": 0.25,
     "defaultSpeed": 50,
     "firstLayerUnderspeed": 0.7,

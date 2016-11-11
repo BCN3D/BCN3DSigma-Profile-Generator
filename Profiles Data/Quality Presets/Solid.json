@@ -1,6 +1,6 @@
 {
     "id": "Solid",
-    "order": 4,
+    "index": 5,
     "layerHeightMultiplier": 0.5,
     "defaultSpeed": 60,
     "firstLayerUnderspeed": 0.67,
