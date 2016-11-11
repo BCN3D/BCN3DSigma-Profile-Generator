@@ -385,6 +385,8 @@ def createProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, dataLog,
             currentInfillLayerInterval = 1
             currentGenerateSupport = 0
             currentAvoidCrossingOutline = 1
+            fanActionOnToolChange1 = ''
+            fanActionOnToolChange2 = ''
             # MEX
             if extruder[0] == 'L' or extruder[0] == 'R':
                 if extruder[0] == 'L':
@@ -409,7 +411,6 @@ def createProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, dataLog,
                     hotendRightLayer2Temperature = temperatureValue(currentFilament, currentHotend, currentLayerHeight, currentDefaultSpeed)
                 currentPurgeSpeed, currentStartPurgeLenght, currentToolChangePurgeLenght = purgeValues(currentHotend, currentFilament)
                 currentStartingGcode = r'      <startingGcode>G21'+"\t\t"+r';metric values,G90'+"\t\t"+r';absolute positioning,M82'+"\t\t"+r';set extruder to absolute mode,M107'+"\t\t"+r';start with the fan off,G28 X0 Y0'+"\t\t"+r';move X/Y to min endstops,G28 Z0'+"\t\t"+r';move Z to min endstops,T'+str(currentPrimaryExtruder)+"\t\t"+r';change to active toolhead,G92 E0'+"\t\t"+r';zero the extruded length,G1 Z5 F200'+"\t\t"+r';Safety Z axis movement,G1 F'+currentPurgeSpeed+' E'+currentStartPurgeLenght+"\t"+r';extrude '+currentStartPurgeLenght+r'mm of feed stock,G92 E0'+"\t\t"+r';zero the extruded length again,G1 F200 E-4'+"\t\t"+r';Retract before printing,G1 F[travel_speed],</startingGcode>'+"\n"
-                currentToolChangeGCode = r'      <toolChangeGcode/>'+"\n"
                 currentInfillExtruder = currentPrimaryExtruder
                 currentSupportExtruder = currentPrimaryExtruder
                 currentBedTemperature = currentFilament['bedTemperature']
@@ -451,8 +452,6 @@ def createProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, dataLog,
                     hotendRightLayer2Temperature = temperatureValue(filamentRight, hotendRight, currentLayerHeight, currentDefaultSpeed)
                 # IDEX, Combined Infill
                 else:
-                    fanActionOnToolChange1 = ''
-                    fanActionOnToolChange2 = ''
                     currentAvoidCrossingOutline = 0
                     if hotendLeft['nozzleSize'] <= hotendRight['nozzleSize']:
                         currentPrimaryExtruder = 0
@@ -494,7 +493,12 @@ def createProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, dataLog,
                 currentPurgeSpeedT0, currentStartPurgeLenghtT0, currentToolChangePurgeLenghtT0 = purgeValues(hotendLeft, filamentLeft)
                 currentPurgeSpeedT1, currentStartPurgeLenghtT1, currentToolChangePurgeLenghtT1 = purgeValues(hotendRight, filamentRight)       
                 currentStartingGcode = r'      <startingGcode>G21'+"\t\t"+r';metric values,G90'+"\t\t"+r';absolute positioning,M107'+"\t\t"+r';start with the fan off,G28 X0 Y0'+"\t\t"+r';move X/Y to min endstops,G28 Z0'+"\t\t"+r';move Z to min endstops,T1'+"\t\t"+r';Switch to the 2nd extruder,G92 E0'+"\t\t"+r';zero the extruded length,G1 F'+currentPurgeSpeedT1+' E'+currentStartPurgeLenghtT1+"\t"+r';extrude '+currentStartPurgeLenghtT1+r'mm of feed stock,G92 E0'+"\t\t"+r';zero the extruded length again,G1 F200 E-9,T0'+"\t\t"+r';Switch to the first extruder,G92 E0'+"\t\t"+r';zero the extruded length,G1 F'+currentPurgeSpeedT0+' E'+currentStartPurgeLenghtT0+"\t"+r';extrude '+currentStartPurgeLenghtT0+r'mm of feed stock,G92 E0'+"\t\t"+r';zero the extruded length again,G1 Z5 F200'+"\t\t"+r';Safety Z axis movement,G1 F[travel_speed]</startingGcode>'+"\n"              
+            if hotendLeft['id'] != 'None' and hotendRight['id'] != 'None':                
+                currentPurgeSpeedT0, currentStartPurgeLenghtT0, currentToolChangePurgeLenghtT0 = purgeValues(hotendLeft, filamentLeft)
+                currentPurgeSpeedT1, currentStartPurgeLenghtT1, currentToolChangePurgeLenghtT1 = purgeValues(hotendRight, filamentRight)
                 currentToolChangeGCode = r'      <toolChangeGcode>{IF NEWTOOL=0} T0'+"\t\t"+r';start tool switch 0,;{IF NEWTOOL=0} G1 X0 Y0 F[travel_speed]'+"\t"+r';travel,{IF NEWTOOL=0} G1 F500 E-0.5'+"\t\t"+r';fast purge,{IF NEWTOOL=0} G1 F'+currentPurgeSpeedT0+' E'+currentToolChangePurgeLenghtT0+"\t"+r';slow purge,{IF NEWTOOL=0} G92 E0'+"\t\t"+r';reset t0,{IF NEWTOOL=0} G1 F3000 E-4.5'+"\t"+r';retract,{IF NEWTOOL=0} G1 F[travel_speed]'+"\t"+r';end tool switch,'+fanActionOnToolChange1+r',{IF NEWTOOL=1} T1'+"\t\t"+r';start tool switch 1,;{IF NEWTOOL=1} G1 X210 Y0 F[travel_speed]'+"\t"+r';travel,{IF NEWTOOL=1} G1 F500 E-0.5'+"\t\t"+r';fast purge,{IF NEWTOOL=1} G1 F'+currentPurgeSpeedT1+' E'+currentToolChangePurgeLenghtT1+"\t"+r';slow purge,{IF NEWTOOL=1} T1'+"\t\t"+r';start tool switch 1,{IF NEWTOOL=1} G92 E0'+"\t\t"+r';reset t1,{IF NEWTOOL=1} G1 F3000 E-4.5'+"\t"+r';retract,{IF NEWTOOL=1} G1 F[travel_speed]'+"\t"+r';end tool switch,'+fanActionOnToolChange2+r',G91,G1 F[travel_speed] Z2,G90</toolChangeGcode>'+"\n"
+            else:
+                currentToolChangeGCode = r'      <toolChangeGcode/>'+"\n"
             currentFirstLayerHeightPercentage = int(min(125, flowValue(currentHotend, currentFilament)*100/(currentHotend['nozzleSize']*currentLayerHeight*(currentDefaultSpeed/60)*float(currentFirstLayerUnderspeed))))       
             currentPerimeterOutlines = max(2, int(round(quality['wallWidth'] / currentHotend['nozzleSize']))) #2 minimum Perimeters needed
             currentTopSolidLayers = max(4, int(round(quality['topBottomWidth'] / currentLayerHeight))) #4 minimum layers needed
