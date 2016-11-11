@@ -12,11 +12,6 @@ import sys
 import json
 import string
 
-# bridge speed for flexible
-# adjust coast for ABS
-
-# add files for filament/hotend/quality preset function
-
 def writeData(extruder, currentDefaultSpeed, currentInfillLayerInterval, currentLayerHeight, hotendLeft, hotendRight, currentPrimaryExtruder, currentInfillExtruder, currentSupportExtruder, filamentLeft, filamentRight, quality, currentFirstLayerUnderspeed, currentOutlineUnderspeed, currentSupportUnderspeed, currentFirstLayerHeightPercentage, hotendLeftTemperature, hotendRightTemperature, currentBedTemperature, dataLog):
     if extruder[0] == 'L':
         printA = "%.2f" % float(float(currentDefaultSpeed)/60*currentInfillLayerInterval*currentLayerHeight*hotendLeft['nozzleSize'])
@@ -456,7 +451,7 @@ def createProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, dataLog,
                         hotendLeftTemperature = temperatureValue(filamentLeft, hotendLeft, currentLayerHeight, currentDefaultSpeed)
                         hotendRightTemperature = temperatureValue(filamentRight, hotendRight, currentLayerHeight*currentInfillLayerInterval, currentDefaultSpeed)
                         secondaryExtruderAction = ' (Right Ext. for infill) - '
-                        if currentFilament['fanMultiplier'] != 0:
+                        if currentFilament['fanPercentage'] != 0:
                             fanActionOnToolChange1 = '' # '{IF NEWTOOL=0} M106'+"\t\t"+r';enable fan for perimeters,'
                             fanActionOnToolChange2 = '' # '{IF NEWTOOL=1} M107'+"\t\t"+r';disable fan for infill,'
                         if hotendLeft['nozzleSize'] == hotendRight['nozzleSize']:
@@ -471,7 +466,7 @@ def createProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, dataLog,
                         hotendLeftTemperature = temperatureValue(filamentLeft, hotendLeft, currentLayerHeight*currentInfillLayerInterval, currentDefaultSpeed)
                         hotendRightTemperature = temperatureValue(filamentRight, hotendRight, currentLayerHeight, currentDefaultSpeed)
                         secondaryExtruderAction = ' (Left Ext. for infill) - '
-                        if currentFilament['fanMultiplier'] != 0:
+                        if currentFilament['fanPercentage'] != 0:
                             fanActionOnToolChange1 = '' # '{IF NEWTOOL=0} M107'+"\t\t"+r';disable fan for infill,'
                             fanActionOnToolChange2 = '' # '{IF NEWTOOL=1} M106'+"\t\t"+r';enable fan for perimeters,'
                     currentInfillExtruder = abs(currentPrimaryExtruder-1)
@@ -487,7 +482,7 @@ def createProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, dataLog,
             fff.append(r'    <globalExtrusionMultiplier>1</globalExtrusionMultiplier>'+"\n")
             fff.append(r'    <fanSpeed>'+"\n")
             fff.append(r'      <setpoint layer="1" speed="0" />'+"\n")
-            fff.append(r'      <setpoint layer="2" speed="'+str(currentFilament['fanMultiplier']*100)+r'" />'+"\n")
+            fff.append(r'      <setpoint layer="2" speed="'+str(currentFilament['fanPercentage'])+r'" />'+"\n")
             fff.append(r'    </fanSpeed>'+"\n")
             fff.append(r'    <filamentDiameter>'+str(currentFilament['filamentDiameter'])+r'</filamentDiameter>'+"\n")
             fff.append(r'    <filamentPricePerKg>'+str(currentFilament['filamentPricePerKg'])+r'</filamentPricePerKg>'+"\n")

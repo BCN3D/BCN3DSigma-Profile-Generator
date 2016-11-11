@@ -70,16 +70,16 @@ Filaments
     "isSupportMaterial": false,				// true/false
     "isFlexibleMaterial": false,			// true/false
     "bedTemperature": 50,					// [ºC]
-    "printTemperature": [195, 225],			// [ºC], minimum and maximum print temperatures.
-    "defaultPrintSpeed": 60,				// [mm/s], default speed when printing Medium quality with 0.4mm Nozzle and 0.2mm layer height.
-    "advisedMaxPrintSpeed": "None",			// [mm/s], maximum speed recommended by filament's manufacturer. If "None", maxFlow value is needed.
+    "printTemperature": [195, 225],			// [ºC],    minimum and maximum print temperatures.
+    "defaultPrintSpeed": 60,				// [mm/s],  default speed when printing Medium quality with 0.4mm Nozzle and 0.2mm layer height.
+    "advisedMaxPrintSpeed": "None",			// [mm/s],  maximum speed recommended by filament's manufacturer. If "None", maxFlow value is needed.
     "maxFlow": 15,							// [mm3/s], maximum flow a default Hotend can print. "None" if unknown.
     "maxFlowForHighFlowHotends": "None",	// [mm3/s], maximum flow a High Flow Hotend can print. "None" if unknown.
     "retractionDistance": 4,				// [mm]
     "retractionSpeed": 40,					// [mm/s]
-    "fanMultiplier": 1,						// [0-1], 0 for fan off, 1 for 100% power.
+    "fanPercentage": 100,					// [0-100]
     "extrusionMultiplier": 1,				// 1.2 extrudes 120% the needed amount of filament.
-    "purgeLenght": 1.5 						// [mm], lenght to purge at Tool Change with 0.4mm Nozzle.
+    "purgeLenght": 1.5 						// [mm],    lenght to purge at Tool Change with 0.4mm Nozzle.
 }
 ```
 
@@ -89,11 +89,11 @@ Quality Preconfigurations
     "id": "Medium",							// Preconfiguration Name
     "order": 1,								// Order to show the option in Simplify3D
     "layerHeightMultiplier": 0.5,			// Multiply this value for the nozzle size to get the layer height.
-    "defaultSpeed": 60,						// [mm/s], default speed for PLA
+    "defaultSpeed": 60,						// [mm/s],  default speed for PLA
     "firstLayerUnderspeed": 0.67,			// [0-1]
     "outlineUnderspeed": 0.58,				// [0-1]
-    "topBottomWidth": 0.8,					// [mm], thickness of solid layers at the top and bottom
-    "wallWidth": 1.2,						// [mm], thickness of walls
+    "topBottomWidth": 0.8,					// [mm],    thickness of solid layers at the top and bottom
+    "wallWidth": 1.2,						// [mm],    thickness of walls
     "infillPercentage": 20					// [0-100]
 }
 ```
@@ -101,4 +101,7 @@ Quality Preconfigurations
 ## TO-DO
 
 - [ ] Availability to generate profiles for Cura
+- [ ] Availability to create .json files right from the script
 - [ ] Better print speed management for flexible materials
+- [ ] Adjust bridging for flexible materials
+- [ ] Adjust coast for ABS
