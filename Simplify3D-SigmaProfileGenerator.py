@@ -780,7 +780,6 @@ def readProfilesData():
 def main():
     if validArguments():
         readProfilesData()
-
         for hotend in os.listdir('./Profiles Data/Hotends'):
             if hotend == sys.argv[1]+'.json':
                 with open('./Profiles Data/Hotends/'+hotend) as hotend_file:    
@@ -795,12 +794,10 @@ def main():
             if filament == sys.argv[4]+'.json':
                 with open('./Profiles Data/Filaments/'+filament) as filament_file:    
                     rightFilament = json.load(filament_file)
-
         if sys.argv[3] == 'None':
             leftFilament = profilesData['filament'][0]
         if sys.argv[4] == 'None':
             rightFilament = profilesData['filament'][0]
-
         createProfile(leftHotend, rightHotend, leftFilament, rightFilament, 'noData', 'fffFile')
     else:
         if len(sys.argv) == 1:
