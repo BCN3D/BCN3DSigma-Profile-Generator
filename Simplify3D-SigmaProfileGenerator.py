@@ -717,34 +717,6 @@ def selectHotendAndFilament(extruder):
         answer1 = '1'
     return (int(answer0)-1, int(answer1)-1)
 
-def printAvailableOptions():
-    print '\n Available Hotend(s):',
-    for n in sorted(profilesData['hotend'], key=lambda k: k['id']):
-        if n != sorted(profilesData['hotend'], key=lambda k: k['id'])[len(profilesData['hotend'])-1]:
-            if type(n) == float:
-                print str(n)+'mm,',
-            else:
-                print n+',',
-        else:
-            if type(n) == float:
-                print str(n)+'mm.'
-            else:
-                print n+'.'
-    print ' Available Filament(s):',
-    for n in sorted(profilesData['filament'], key=lambda k: k['id']):
-        if n != sorted(profilesData['filament'], key=lambda k: k['id'])[len(profilesData['filament'])-1]:
-            print n['id']+',',
-        else:
-            print n['id']+'.'
-
-    print ' Available Quality Preconfiguration(s):',
-    for n in sorted(profilesData['quality'], key=lambda k: k['order']):
-        if n != sorted(profilesData['quality'], key=lambda k: k['order'])[len(profilesData['quality'])-1]:
-            print n['id']+',',
-        else:
-            print n['id']+'.'
-    print " Add, remove options or change its own parameters by editing 'ProfilesData.json' file.\n"
-
 def validArguments():
     if len(sys.argv) == 5:
         leftHotend = sys.argv[1]+'.json' in os.listdir('./Profiles Data/Hotends') or sys.argv[1] == 'None'
@@ -802,17 +774,16 @@ def main():
             print '\n Welcome to the BCN3D Sigma Profile Generator for Simplify3D \n'
             while True:
                 readProfilesData()
-                print ' Choose your option (1-5):'
+                print ' Choose your option (1-4):'
                 print ' 1. Generate a bundle of profiles'
                 print ' 2. Generate one single profile'
-                print ' 3. Show available options'
-                print ' 4. Test all combinations'
-                print ' 5. Exit'
+                print ' 3. Test all combinations'
+                print ' 4. Exit'
                 x = 'x'
                 y = 'y'
                 dataLog = ["LFilament;RFilament;Extruder;Quality;LNozzle;RNozzle;InfillExt;PrimaryExt;SupportExt;LFlow;RFlow;Layers/Infill;DefaultSpeed;FirstLayerUnderspeed;OutLineUnderspeed;SupportUnderspeed;FirstLayerHeightPercentage;LTemp;RTemp;BTemp;\n"]
                 profilesCreatedCount = 0
-                while x not in '12345':
+                while x not in '1234':
                     x = raw_input(' ')
                 if x in '12':
                     if x == '1':
@@ -835,10 +806,8 @@ def main():
                                 print string.rjust(str(d)[:6], 6),
                         print ' '+str(profilesCreatedCount)+' profile(s) created with '+str(len(dataLog)-1)+' configurations.\n'
                 elif x == '3':
-                    printAvailableOptions()
-                elif x == '4':
                     testAllCombinations()
-                elif x == '5':
+                elif x == '4':
                     print '\n Until next time!\n'
                     break
 

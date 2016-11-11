@@ -42,11 +42,9 @@ Will ask for a functionality:
 
 2. **Generate one single profile:** Will ask for left nozzle size, left loaded filament, right nozzle size and right loaded filament. Then will generate the fff profile file.
 
-3. **Show available options:** Prints all the options available in *Profiles Data* folder.
+3. **Test all combinations:** Like *1. Generate a bundle of profiles* but without storing data neither generating fff profile files. A fast option to just ensure all combinations can be properly created.
 
-4. **Test all combinations:** Like *1. Generate a bundle of profiles* but without storing data neither generating fff profile files. A fast option to just ensure all combinations can be properly created.
-
-5. **Exit:** Quit the program.
+4. **Exit:** Quit the program.
 
 In order to add, remove or change a nozzle size, filament or quality preconfiguration edit the files in *Profiles Data* folder.
 
