@@ -28,7 +28,7 @@ e.g.
 
 `python Simplify3D-SigmaProfileGenerator.py "0.4 - Brass" "0.4 - Brass" "Colorfila PLA" "Colorfila PLA"`
 
-generates the file *BCN3D Sigma - 0.4 Left (PLA Colorfila), 0.4 Right (PLA Colorfila).fff*
+Generates the file *BCN3D Sigma - 0.4 Left (PLA Colorfila), 0.4 Right (PLA Colorfila).fff*
 
 > Valid parameters for Hotends: Names of *.json* files in */Profiles Data/Hotends*. 'None' if not mounted.
 
@@ -56,7 +56,7 @@ In order to add, remove or change a nozzle size, filament or quality preconfigur
 
 ## Editing *Profiles Data* files
 
-### Hotends
+Hotends
 ```json5
 {
     "id": "0.4mm - Brass", 					// Hotend Name
@@ -66,7 +66,7 @@ In order to add, remove or change a nozzle size, filament or quality preconfigur
 } 
 ```
 
-### Filaments
+Filaments
 ```json5
 {
     "id": "PLA Colorfila",					// Filament Name
@@ -89,7 +89,7 @@ In order to add, remove or change a nozzle size, filament or quality preconfigur
 }
 ```
 
-### Quality Preconfigurations
+Quality Preconfigurations
 ```json5
 {
     "id": "Medium",							// Preconfiguration Name
