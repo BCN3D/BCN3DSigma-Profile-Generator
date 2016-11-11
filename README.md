@@ -18,7 +18,7 @@ First you need to clone/download the repository in your computer:
 
 Decompress it if you need to, open a terminal and go to the directory. 
 
-###### Fast mode
+###### **Fast mode**
 
 To generate a profile without entering the GUI. Just call the script and insert 4 valid parameters:
 
@@ -31,10 +31,9 @@ e.g.
 generates the file *BCN3D Sigma - 0.4 Left (PLA Colorfila), 0.4 Right (PLA Colorfila).fff*
 
 > Valid parameters for Hotends: Names of *.json* files in */Profiles Data/Hotends*. 'None' if not mounted.
-
 > Valid parameters for Fiaments: Names of *.json* files in */Profiles Data/Filaments*. 'None' if empty.
 
-###### GUI Mode
+###### **GUI Mode**
 
 To enter the GUI call the script without additional parameters:
 
