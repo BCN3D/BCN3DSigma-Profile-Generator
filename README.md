@@ -16,7 +16,25 @@ First you need to clone/download the repository in your computer:
 
 `git clone https://github.com/BCN3D/BCN3DSigma-Profile-Generator`
 
-Decompress it if you need to, open a terminal and go to the directory:
+Decompress it if you need to, open a terminal and go to the directory. 
+
+###### Fast mode
+
+To generate a profile without entering the GUI. Just call the script and insert 4 valid parameters:
+
+`python Simplify3D-SigmaProfileGenerator.py LHotend RHotend LFilament RFilament`
+
+e.g. 
+
+`python Simplify3D-SigmaProfileGenerator.py "0.4 - Brass" "0.4 - Brass" "Colorfila PLA" "Colorfila PLA"`
+
+Valid parameters for Hotends: Names of *.json* files in */Profiles Data/Hotends*. 'None' if not mounted.
+
+Valid parameters for Fiaments: Names of *.json* files in */Profiles Data/Filaments*. 'None' if empty.
+
+###### GUI Mode
+
+To enter the GUI call the script without additional parameters:
 
 `python Simplify3D-SigmaProfileGenerator.py`
 
@@ -32,15 +50,17 @@ Will ask for a functionality:
 
 5. **Exit:** Quit the program.
 
-In order to add, remove or change a nozzle size, filament or quality preconfiguration edit the file *ProfilesData.json*.
+In order to add, remove or change a nozzle size, filament or quality preconfiguration edit the files in */ProfilesData* folder.
 
-## Editing ProfilesData.json
+## Editing Profiles Data
 
-###### Nozzle Sizes
-Just add the new nozzle size to the list.
+###### Hotends
+* **id** - Hotend Name
+* **nozzleSize** - [mm]
+* **material** - Nozzle material
+* **hotBlock** - block style
 
 ###### Filaments
-Add the new material parameters:
 * **id** - Filament Name
 * **filamentDiameter** - [mm]
 * **filamentPricePerKg** - [€]
@@ -60,7 +80,6 @@ Add the new material parameters:
 * **purgeLenght** - [mm], lenght to purge at Tool Change with 0.4mm Nozzle.
 
 ###### Quality Preconfigurations
-Add the new quality parameters:
 * **id** - Preconfiguration Name
 * **order** - Order to show the option in Simplify3D
 * **layerHeightMultiplier** - Multiply this value for the nozzle size to get the layer height.
