@@ -28,6 +28,8 @@ e.g.
 
 `python Simplify3D-SigmaProfileGenerator.py "0.4 - Brass" "0.4 - Brass" "Colorfila PLA" "Colorfila PLA"`
 
+generates the file *BCN3D Sigma - 0.4 Left (PLA Colorfila), 0.4 Right (PLA Colorfila).fff*
+
 Valid parameters for Hotends: Names of *.json* files in */Profiles Data/Hotends*. 'None' if not mounted.
 
 Valid parameters for Fiaments: Names of *.json* files in */Profiles Data/Filaments*. 'None' if empty.
@@ -40,17 +42,17 @@ To enter the GUI call the script without additional parameters:
 
 Will ask for a functionality:
 
-1. **Generate a bundle of profiles:** Creates a compressed zip file with all possible combinations available in *ProfilesData.json*. The package includes a csv file with useful data of each combination created and all the fff profile files, ordered following a folder tree.
+1. **Generate a bundle of profiles:** Creates a compressed zip file with all possible combinations available in *Profiles Data* folder. The package includes a csv file with useful data of each combination created and all the fff profile files, ordered following a folder tree.
 
 2. **Generate one single profile:** Will ask for left nozzle size, left loaded filament, right nozzle size and right loaded filament. Then will generate the fff profile file.
 
-3. **Show available options:** Prints all the options available inside *ProfilesData.json*.
+3. **Show available options:** Prints all the options available in *Profiles Data* folder.
 
 4. **Test all combinations:** Like *1. Generate a bundle of profiles* but without storing data neither generating fff profile files. A fast option to just ensure all combinations can be properly created.
 
 5. **Exit:** Quit the program.
 
-In order to add, remove or change a nozzle size, filament or quality preconfiguration edit the files in */ProfilesData* folder.
+In order to add, remove or change a nozzle size, filament or quality preconfiguration edit the files in *Profiles Data* folder.
 
 ## Editing Profiles Data
 
