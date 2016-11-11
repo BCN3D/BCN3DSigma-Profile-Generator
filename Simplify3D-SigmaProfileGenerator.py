@@ -15,7 +15,7 @@ import string
 # bridge speed for flexible
 # adjust coast for ABS
 
-#change disable fansstr(hotendLeft['nozzleSize'])
+#change disable fans str(hotendLeft['nozzleSize'])
 
 # work with independent json files
 # add files for filament/hotend/quality preset function
@@ -471,8 +471,8 @@ def createProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, dataLog,
                         hotendRightLayer2Temperature = temperatureValue(filamentRight, hotendRight, currentLayerHeight*currentInfillLayerInterval, currentDefaultSpeed)
                         secondaryExtruderAction = ' (Right Ext. for infill) - '
                         if currentFilament['fanMultiplier'] != 0:
-                            fanActionOnToolChange1 = '{IF NEWTOOL=0} M106'+"\t\t"+r';enable fan for perimeters,'
-                            fanActionOnToolChange2 = '{IF NEWTOOL=1} M107'+"\t\t"+r';disable fan for infill,'
+                            fanActionOnToolChange1 = '' # '{IF NEWTOOL=0} M106'+"\t\t"+r';enable fan for perimeters,'
+                            fanActionOnToolChange2 = '' # '{IF NEWTOOL=1} M107'+"\t\t"+r';disable fan for infill,'
                         if hotendLeft['nozzleSize'] == hotendRight['nozzleSize']:
                             hotendRightLayer1Temperature = temperatureValue(filamentRight, hotendRight, currentLayerHeight, currentDefaultSpeed)
                             hotendRightLayer2Temperature = temperatureValue(filamentRight, hotendRight, currentLayerHeight, currentDefaultSpeed)
@@ -489,8 +489,8 @@ def createProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, dataLog,
                         hotendRightLayer2Temperature = temperatureValue(filamentRight, hotendRight, currentLayerHeight, currentDefaultSpeed)
                         secondaryExtruderAction = ' (Left Ext. for infill) - '
                         if currentFilament['fanMultiplier'] != 0:
-                            fanActionOnToolChange1 = '{IF NEWTOOL=0} M107'+"\t\t"+r';disable fan for infill,'
-                            fanActionOnToolChange2 = '{IF NEWTOOL=1} M106'+"\t\t"+r';enable fan for perimeters,'
+                            fanActionOnToolChange1 = '' # '{IF NEWTOOL=0} M107'+"\t\t"+r';disable fan for infill,'
+                            fanActionOnToolChange2 = '' # '{IF NEWTOOL=1} M106'+"\t\t"+r';enable fan for perimeters,'
                     currentInfillExtruder = abs(currentPrimaryExtruder-1)
                     currentSupportExtruder = currentPrimaryExtruder
                 currentBedTemperature = max(filamentLeft['bedTemperature'], filamentRight['bedTemperature'])
