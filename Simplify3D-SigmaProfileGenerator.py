@@ -677,7 +677,7 @@ def testAllCombinations():
     print ' All '+str(combinationCount)+' profiles can be generated!\n'
 
 def selectHotendAndFilament(extruder):
-    print "\n Select Sigma's "+extruder+" Extruder Hotend (1-"+str(len(profilesData['hotend']))+'):'
+    print "\n Select Sigma's "+extruder+" Hotend (1-"+str(len(profilesData['hotend']))+'):'
     answer0 = ''
     hotendOptions = []
     for c in range(len(profilesData['hotend'])):
@@ -690,7 +690,7 @@ def selectHotendAndFilament(extruder):
         print ' '+str(hotend+1)+'. '+sorted(profilesData['hotend'], key=lambda k: k['id'])[hotend]['id']
     while answer0 not in hotendOptions:
         answer0 = raw_input(' ')
-    print ' '+extruder+' Extruder Hotend: '+sorted(profilesData['hotend'], key=lambda k: k['id'])[int(answer0)-1]['id']
+    print ' '+extruder+' Hotend: '+sorted(profilesData['hotend'], key=lambda k: k['id'])[int(answer0)-1]['id']
     if answer0 != str(int(hotendOptions[-1])-1):
         print "\n Select Sigma's "+extruder+" Extruder Loaded Filament (1-"+str(len(profilesData['filament']))+'):'
         answer1 = ''
@@ -774,6 +774,9 @@ def main():
                 if x in '12':
                     if x == '1':
                         profilesCreatedCount = createProfilesBundle(dataLog, profilesCreatedCount)
+                        print ' See profile(s) data? (Y/n)'
+                        while y not in ['Y', 'n']:
+                            y = raw_input(' ')
                     elif x == '2':
                         a = selectHotendAndFilament('Left')
                         b = selectHotendAndFilament('Right')
@@ -782,9 +785,9 @@ def main():
                         else:
                             print "\n Your new profile '"+createProfile(sorted(profilesData['hotend'], key=lambda k: k['id'])[a[0]], sorted(profilesData['hotend'], key=lambda k: k['id'])[b[0]], sorted(profilesData['filament'], key=lambda k: k['id'])[a[1]], sorted(profilesData['filament'], key=lambda k: k['id'])[b[1]], dataLog, 'fffFile')+".fff' has been created.\n"
                             profilesCreatedCount = 1
-                    print ' See profile(s) data? (Y/n)'
-                    while y not in ['Y', 'n']:
-                        y = raw_input(' ')
+                            print ' See profile(s) data? (Y/n)'
+                            while y not in ['Y', 'n']:
+                                y = raw_input(' ')
                     if y == 'Y':
                         for l in dataLog:
                             print '',

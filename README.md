@@ -38,9 +38,9 @@ To enter the GUI call the script without additional parameters:
 
 Will ask for a functionality:
 
-1. **Generate a bundle of profiles:** Creates a compressed zip file with all possible combinations available in *Profiles Data* folder. The package includes a csv file with useful data of each combination created and all the fff profile files, ordered following a folder tree.
+1. **Generate a bundle of profiles:** Combines all Hotends, Filaments and Quality Preconfigurations stored in *Profiles Data* folder to create a  zip file with all profiles available. The package also includes a csv file with useful data of each combination created.
 
-2. **Generate one single profile:** Will ask for left nozzle size, left loaded filament, right nozzle size and right loaded filament. Then will generate the fff profile file.
+2. **Generate one single profile:** Will ask for left Hotend, left loaded Filament, right Hotend and right loaded Filament. Then will generate the fff profile file.
 
 3. **Test all combinations:** Like *1. Generate a bundle of profiles* but without storing data neither generating fff profile files. A fast option to just ensure all combinations can be properly created.
 
@@ -100,7 +100,7 @@ Quality Preconfigurations
 
 ## TO-DO
 
-- [ ] Availability to generate profiles for Cura
+- [ ] Availability to generate Cura profiles
 - [ ] Availability to create .json files right from the script
 - [ ] Better print speed management for flexible materials
 - [ ] Adjust bridging for flexible materials
