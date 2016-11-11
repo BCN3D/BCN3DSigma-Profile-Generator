@@ -30,9 +30,9 @@ e.g.
 
 generates the file *BCN3D Sigma - 0.4 Left (PLA Colorfila), 0.4 Right (PLA Colorfila).fff*
 
-Valid parameters for Hotends: Names of *.json* files in */Profiles Data/Hotends*. 'None' if not mounted.
+> Valid parameters for Hotends: Names of *.json* files in */Profiles Data/Hotends*. 'None' if not mounted.
 
-Valid parameters for Fiaments: Names of *.json* files in */Profiles Data/Filaments*. 'None' if empty.
+> Valid parameters for Fiaments: Names of *.json* files in */Profiles Data/Filaments*. 'None' if empty.
 
 ###### GUI Mode
 
@@ -54,7 +54,7 @@ Will ask for a functionality:
 
 In order to add, remove or change a nozzle size, filament or quality preconfiguration edit the files in *Profiles Data* folder.
 
-## Editing Profiles Data
+## Editing *Profiles Data* files
 
 ###### Hotends
 ```json5
