@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<profile name="BCN3D Sigma - 0.4 Left (PLA Colorfila), 0.4 Right (PLA Colorfila)" version="2016-11-10 17:11:54" app="S3D-Software 3.1.1">
+<profile name="BCN3D Sigma - 0.4 Left (PLA Colorfila), 0.4 Right (PLA Colorfila)" version="2016-11-11 15:10:28" app="S3D-Software 3.1.1">
   <baseProfile></baseProfile>
   <printMaterial></printMaterial>
   <printQuality>Left Extruder - Medium</printQuality>
@@ -1081,7 +1081,7 @@
       <setpoint layer="1" temperature="50"/>
     </temperatureController>
   </autoConfigureQuality>
-  <autoConfigureQuality name="Both Extruders - Fast">
+  <autoConfigureQuality name="Both Extruders (Right Ext. for infill) - Fast">
     <globalExtrusionMultiplier>1</globalExtrusionMultiplier>
     <fanSpeed>
       <setpoint layer="1" speed="0" />
@@ -1129,7 +1129,7 @@
     <supportExtruder>0</supportExtruder>
     <generateSupport>0</generateSupport>
       <startingGcode>G21		;metric values,G90		;absolute positioning,M107		;start with the fan off,G28 X0 Y0		;move X/Y to min endstops,G28 Z0		;move Z to min endstops,T1		;Switch to the 2nd extruder,G92 E0		;zero the extruded length,G1 F50.00 E7.00	;extrude 7.00mm of feed stock,G92 E0		;zero the extruded length again,G1 F200 E-9,T0		;Switch to the first extruder,G92 E0		;zero the extruded length,G1 F50.00 E7.00	;extrude 7.00mm of feed stock,G92 E0		;zero the extruded length again,G1 Z5 F200		;Safety Z axis movement,G1 F[travel_speed]</startingGcode>
-      <toolChangeGcode>{IF NEWTOOL=0} T0		;start tool switch 0,;{IF NEWTOOL=0} G1 X0 Y0 F[travel_speed]	;travel,{IF NEWTOOL=0} G1 F500 E-0.5		;fast purge,{IF NEWTOOL=0} G1 F50.00 E1.50	;slow purge,{IF NEWTOOL=0} G92 E0		;reset t0,{IF NEWTOOL=0} G1 F3000 E-4.5	;retract,{IF NEWTOOL=0} G1 F[travel_speed]	;end tool switch,{IF NEWTOOL=0} M106		;enable fan for perimeters,,{IF NEWTOOL=1} T1		;start tool switch 1,;{IF NEWTOOL=1} G1 X210 Y0 F[travel_speed]	;travel,{IF NEWTOOL=1} G1 F500 E-0.5		;fast purge,{IF NEWTOOL=1} G1 F50.00 E1.50	;slow purge,{IF NEWTOOL=1} T1		;start tool switch 1,{IF NEWTOOL=1} G92 E0		;reset t1,{IF NEWTOOL=1} G1 F3000 E-4.5	;retract,{IF NEWTOOL=1} G1 F[travel_speed]	;end tool switch,{IF NEWTOOL=1} M107		;disable fan for infill,,G91,G1 F[travel_speed] Z2,G90</toolChangeGcode>
+      <toolChangeGcode>{IF NEWTOOL=0} T0		;start tool switch 0,;{IF NEWTOOL=0} G1 X0 Y0 F[travel_speed]	;travel,{IF NEWTOOL=0} G1 F500 E-0.5		;fast purge,{IF NEWTOOL=0} G1 F50.00 E1.50	;slow purge,{IF NEWTOOL=0} G92 E0		;reset t0,{IF NEWTOOL=0} G1 F3000 E-4.5	;retract,{IF NEWTOOL=0} G1 F[travel_speed]	;end tool switch,,{IF NEWTOOL=1} T1		;start tool switch 1,;{IF NEWTOOL=1} G1 X210 Y0 F[travel_speed]	;travel,{IF NEWTOOL=1} G1 F500 E-0.5		;fast purge,{IF NEWTOOL=1} G1 F50.00 E1.50	;slow purge,{IF NEWTOOL=1} T1		;start tool switch 1,{IF NEWTOOL=1} G92 E0		;reset t1,{IF NEWTOOL=1} G1 F3000 E-4.5	;retract,{IF NEWTOOL=1} G1 F[travel_speed]	;end tool switch,,G91,G1 F[travel_speed] Z2,G90</toolChangeGcode>
     <layerHeight>0.3</layerHeight>
     <firstLayerHeightPercentage>125</firstLayerHeightPercentage>
     <topSolidLayers>4</topSolidLayers>
@@ -1167,7 +1167,7 @@
       <setpoint layer="1" temperature="50"/>
     </temperatureController>
   </autoConfigureQuality>
-  <autoConfigureQuality name="Both Extruders - Medium">
+  <autoConfigureQuality name="Both Extruders (Right Ext. for infill) - Medium">
     <globalExtrusionMultiplier>1</globalExtrusionMultiplier>
     <fanSpeed>
       <setpoint layer="1" speed="0" />
@@ -1215,7 +1215,7 @@
     <supportExtruder>0</supportExtruder>
     <generateSupport>0</generateSupport>
       <startingGcode>G21		;metric values,G90		;absolute positioning,M107		;start with the fan off,G28 X0 Y0		;move X/Y to min endstops,G28 Z0		;move Z to min endstops,T1		;Switch to the 2nd extruder,G92 E0		;zero the extruded length,G1 F50.00 E7.00	;extrude 7.00mm of feed stock,G92 E0		;zero the extruded length again,G1 F200 E-9,T0		;Switch to the first extruder,G92 E0		;zero the extruded length,G1 F50.00 E7.00	;extrude 7.00mm of feed stock,G92 E0		;zero the extruded length again,G1 Z5 F200		;Safety Z axis movement,G1 F[travel_speed]</startingGcode>
-      <toolChangeGcode>{IF NEWTOOL=0} T0		;start tool switch 0,;{IF NEWTOOL=0} G1 X0 Y0 F[travel_speed]	;travel,{IF NEWTOOL=0} G1 F500 E-0.5		;fast purge,{IF NEWTOOL=0} G1 F50.00 E1.50	;slow purge,{IF NEWTOOL=0} G92 E0		;reset t0,{IF NEWTOOL=0} G1 F3000 E-4.5	;retract,{IF NEWTOOL=0} G1 F[travel_speed]	;end tool switch,{IF NEWTOOL=0} M106		;enable fan for perimeters,,{IF NEWTOOL=1} T1		;start tool switch 1,;{IF NEWTOOL=1} G1 X210 Y0 F[travel_speed]	;travel,{IF NEWTOOL=1} G1 F500 E-0.5		;fast purge,{IF NEWTOOL=1} G1 F50.00 E1.50	;slow purge,{IF NEWTOOL=1} T1		;start tool switch 1,{IF NEWTOOL=1} G92 E0		;reset t1,{IF NEWTOOL=1} G1 F3000 E-4.5	;retract,{IF NEWTOOL=1} G1 F[travel_speed]	;end tool switch,{IF NEWTOOL=1} M107		;disable fan for infill,,G91,G1 F[travel_speed] Z2,G90</toolChangeGcode>
+      <toolChangeGcode>{IF NEWTOOL=0} T0		;start tool switch 0,;{IF NEWTOOL=0} G1 X0 Y0 F[travel_speed]	;travel,{IF NEWTOOL=0} G1 F500 E-0.5		;fast purge,{IF NEWTOOL=0} G1 F50.00 E1.50	;slow purge,{IF NEWTOOL=0} G92 E0		;reset t0,{IF NEWTOOL=0} G1 F3000 E-4.5	;retract,{IF NEWTOOL=0} G1 F[travel_speed]	;end tool switch,,{IF NEWTOOL=1} T1		;start tool switch 1,;{IF NEWTOOL=1} G1 X210 Y0 F[travel_speed]	;travel,{IF NEWTOOL=1} G1 F500 E-0.5		;fast purge,{IF NEWTOOL=1} G1 F50.00 E1.50	;slow purge,{IF NEWTOOL=1} T1		;start tool switch 1,{IF NEWTOOL=1} G92 E0		;reset t1,{IF NEWTOOL=1} G1 F3000 E-4.5	;retract,{IF NEWTOOL=1} G1 F[travel_speed]	;end tool switch,,G91,G1 F[travel_speed] Z2,G90</toolChangeGcode>
     <layerHeight>0.2</layerHeight>
     <firstLayerHeightPercentage>125</firstLayerHeightPercentage>
     <topSolidLayers>4</topSolidLayers>
@@ -1253,7 +1253,7 @@
       <setpoint layer="1" temperature="50"/>
     </temperatureController>
   </autoConfigureQuality>
-  <autoConfigureQuality name="Both Extruders - High">
+  <autoConfigureQuality name="Both Extruders (Right Ext. for infill) - High">
     <globalExtrusionMultiplier>1</globalExtrusionMultiplier>
     <fanSpeed>
       <setpoint layer="1" speed="0" />
@@ -1301,7 +1301,7 @@
     <supportExtruder>0</supportExtruder>
     <generateSupport>0</generateSupport>
       <startingGcode>G21		;metric values,G90		;absolute positioning,M107		;start with the fan off,G28 X0 Y0		;move X/Y to min endstops,G28 Z0		;move Z to min endstops,T1		;Switch to the 2nd extruder,G92 E0		;zero the extruded length,G1 F50.00 E7.00	;extrude 7.00mm of feed stock,G92 E0		;zero the extruded length again,G1 F200 E-9,T0		;Switch to the first extruder,G92 E0		;zero the extruded length,G1 F50.00 E7.00	;extrude 7.00mm of feed stock,G92 E0		;zero the extruded length again,G1 Z5 F200		;Safety Z axis movement,G1 F[travel_speed]</startingGcode>
-      <toolChangeGcode>{IF NEWTOOL=0} T0		;start tool switch 0,;{IF NEWTOOL=0} G1 X0 Y0 F[travel_speed]	;travel,{IF NEWTOOL=0} G1 F500 E-0.5		;fast purge,{IF NEWTOOL=0} G1 F50.00 E1.50	;slow purge,{IF NEWTOOL=0} G92 E0		;reset t0,{IF NEWTOOL=0} G1 F3000 E-4.5	;retract,{IF NEWTOOL=0} G1 F[travel_speed]	;end tool switch,{IF NEWTOOL=0} M106		;enable fan for perimeters,,{IF NEWTOOL=1} T1		;start tool switch 1,;{IF NEWTOOL=1} G1 X210 Y0 F[travel_speed]	;travel,{IF NEWTOOL=1} G1 F500 E-0.5		;fast purge,{IF NEWTOOL=1} G1 F50.00 E1.50	;slow purge,{IF NEWTOOL=1} T1		;start tool switch 1,{IF NEWTOOL=1} G92 E0		;reset t1,{IF NEWTOOL=1} G1 F3000 E-4.5	;retract,{IF NEWTOOL=1} G1 F[travel_speed]	;end tool switch,{IF NEWTOOL=1} M107		;disable fan for infill,,G91,G1 F[travel_speed] Z2,G90</toolChangeGcode>
+      <toolChangeGcode>{IF NEWTOOL=0} T0		;start tool switch 0,;{IF NEWTOOL=0} G1 X0 Y0 F[travel_speed]	;travel,{IF NEWTOOL=0} G1 F500 E-0.5		;fast purge,{IF NEWTOOL=0} G1 F50.00 E1.50	;slow purge,{IF NEWTOOL=0} G92 E0		;reset t0,{IF NEWTOOL=0} G1 F3000 E-4.5	;retract,{IF NEWTOOL=0} G1 F[travel_speed]	;end tool switch,,{IF NEWTOOL=1} T1		;start tool switch 1,;{IF NEWTOOL=1} G1 X210 Y0 F[travel_speed]	;travel,{IF NEWTOOL=1} G1 F500 E-0.5		;fast purge,{IF NEWTOOL=1} G1 F50.00 E1.50	;slow purge,{IF NEWTOOL=1} T1		;start tool switch 1,{IF NEWTOOL=1} G92 E0		;reset t1,{IF NEWTOOL=1} G1 F3000 E-4.5	;retract,{IF NEWTOOL=1} G1 F[travel_speed]	;end tool switch,,G91,G1 F[travel_speed] Z2,G90</toolChangeGcode>
     <layerHeight>0.1</layerHeight>
     <firstLayerHeightPercentage>125</firstLayerHeightPercentage>
     <topSolidLayers>8</topSolidLayers>
@@ -1339,7 +1339,7 @@
       <setpoint layer="1" temperature="50"/>
     </temperatureController>
   </autoConfigureQuality>
-  <autoConfigureQuality name="Both Extruders - Strong">
+  <autoConfigureQuality name="Both Extruders (Right Ext. for infill) - Strong">
     <globalExtrusionMultiplier>1</globalExtrusionMultiplier>
     <fanSpeed>
       <setpoint layer="1" speed="0" />
@@ -1387,7 +1387,7 @@
     <supportExtruder>0</supportExtruder>
     <generateSupport>0</generateSupport>
       <startingGcode>G21		;metric values,G90		;absolute positioning,M107		;start with the fan off,G28 X0 Y0		;move X/Y to min endstops,G28 Z0		;move Z to min endstops,T1		;Switch to the 2nd extruder,G92 E0		;zero the extruded length,G1 F50.00 E7.00	;extrude 7.00mm of feed stock,G92 E0		;zero the extruded length again,G1 F200 E-9,T0		;Switch to the first extruder,G92 E0		;zero the extruded length,G1 F50.00 E7.00	;extrude 7.00mm of feed stock,G92 E0		;zero the extruded length again,G1 Z5 F200		;Safety Z axis movement,G1 F[travel_speed]</startingGcode>
-      <toolChangeGcode>{IF NEWTOOL=0} T0		;start tool switch 0,;{IF NEWTOOL=0} G1 X0 Y0 F[travel_speed]	;travel,{IF NEWTOOL=0} G1 F500 E-0.5		;fast purge,{IF NEWTOOL=0} G1 F50.00 E1.50	;slow purge,{IF NEWTOOL=0} G92 E0		;reset t0,{IF NEWTOOL=0} G1 F3000 E-4.5	;retract,{IF NEWTOOL=0} G1 F[travel_speed]	;end tool switch,{IF NEWTOOL=0} M106		;enable fan for perimeters,,{IF NEWTOOL=1} T1		;start tool switch 1,;{IF NEWTOOL=1} G1 X210 Y0 F[travel_speed]	;travel,{IF NEWTOOL=1} G1 F500 E-0.5		;fast purge,{IF NEWTOOL=1} G1 F50.00 E1.50	;slow purge,{IF NEWTOOL=1} T1		;start tool switch 1,{IF NEWTOOL=1} G92 E0		;reset t1,{IF NEWTOOL=1} G1 F3000 E-4.5	;retract,{IF NEWTOOL=1} G1 F[travel_speed]	;end tool switch,{IF NEWTOOL=1} M107		;disable fan for infill,,G91,G1 F[travel_speed] Z2,G90</toolChangeGcode>
+      <toolChangeGcode>{IF NEWTOOL=0} T0		;start tool switch 0,;{IF NEWTOOL=0} G1 X0 Y0 F[travel_speed]	;travel,{IF NEWTOOL=0} G1 F500 E-0.5		;fast purge,{IF NEWTOOL=0} G1 F50.00 E1.50	;slow purge,{IF NEWTOOL=0} G92 E0		;reset t0,{IF NEWTOOL=0} G1 F3000 E-4.5	;retract,{IF NEWTOOL=0} G1 F[travel_speed]	;end tool switch,,{IF NEWTOOL=1} T1		;start tool switch 1,;{IF NEWTOOL=1} G1 X210 Y0 F[travel_speed]	;travel,{IF NEWTOOL=1} G1 F500 E-0.5		;fast purge,{IF NEWTOOL=1} G1 F50.00 E1.50	;slow purge,{IF NEWTOOL=1} T1		;start tool switch 1,{IF NEWTOOL=1} G92 E0		;reset t1,{IF NEWTOOL=1} G1 F3000 E-4.5	;retract,{IF NEWTOOL=1} G1 F[travel_speed]	;end tool switch,,G91,G1 F[travel_speed] Z2,G90</toolChangeGcode>
     <layerHeight>0.2</layerHeight>
     <firstLayerHeightPercentage>125</firstLayerHeightPercentage>
     <topSolidLayers>10</topSolidLayers>
@@ -1425,7 +1425,7 @@
       <setpoint layer="1" temperature="50"/>
     </temperatureController>
   </autoConfigureQuality>
-  <autoConfigureQuality name="Both Extruders - Solid">
+  <autoConfigureQuality name="Both Extruders (Right Ext. for infill) - Solid">
     <globalExtrusionMultiplier>1</globalExtrusionMultiplier>
     <fanSpeed>
       <setpoint layer="1" speed="0" />
@@ -1473,7 +1473,7 @@
     <supportExtruder>0</supportExtruder>
     <generateSupport>0</generateSupport>
       <startingGcode>G21		;metric values,G90		;absolute positioning,M107		;start with the fan off,G28 X0 Y0		;move X/Y to min endstops,G28 Z0		;move Z to min endstops,T1		;Switch to the 2nd extruder,G92 E0		;zero the extruded length,G1 F50.00 E7.00	;extrude 7.00mm of feed stock,G92 E0		;zero the extruded length again,G1 F200 E-9,T0		;Switch to the first extruder,G92 E0		;zero the extruded length,G1 F50.00 E7.00	;extrude 7.00mm of feed stock,G92 E0		;zero the extruded length again,G1 Z5 F200		;Safety Z axis movement,G1 F[travel_speed]</startingGcode>
-      <toolChangeGcode>{IF NEWTOOL=0} T0		;start tool switch 0,;{IF NEWTOOL=0} G1 X0 Y0 F[travel_speed]	;travel,{IF NEWTOOL=0} G1 F500 E-0.5		;fast purge,{IF NEWTOOL=0} G1 F50.00 E1.50	;slow purge,{IF NEWTOOL=0} G92 E0		;reset t0,{IF NEWTOOL=0} G1 F3000 E-4.5	;retract,{IF NEWTOOL=0} G1 F[travel_speed]	;end tool switch,{IF NEWTOOL=0} M106		;enable fan for perimeters,,{IF NEWTOOL=1} T1		;start tool switch 1,;{IF NEWTOOL=1} G1 X210 Y0 F[travel_speed]	;travel,{IF NEWTOOL=1} G1 F500 E-0.5		;fast purge,{IF NEWTOOL=1} G1 F50.00 E1.50	;slow purge,{IF NEWTOOL=1} T1		;start tool switch 1,{IF NEWTOOL=1} G92 E0		;reset t1,{IF NEWTOOL=1} G1 F3000 E-4.5	;retract,{IF NEWTOOL=1} G1 F[travel_speed]	;end tool switch,{IF NEWTOOL=1} M107		;disable fan for infill,,G91,G1 F[travel_speed] Z2,G90</toolChangeGcode>
+      <toolChangeGcode>{IF NEWTOOL=0} T0		;start tool switch 0,;{IF NEWTOOL=0} G1 X0 Y0 F[travel_speed]	;travel,{IF NEWTOOL=0} G1 F500 E-0.5		;fast purge,{IF NEWTOOL=0} G1 F50.00 E1.50	;slow purge,{IF NEWTOOL=0} G92 E0		;reset t0,{IF NEWTOOL=0} G1 F3000 E-4.5	;retract,{IF NEWTOOL=0} G1 F[travel_speed]	;end tool switch,,{IF NEWTOOL=1} T1		;start tool switch 1,;{IF NEWTOOL=1} G1 X210 Y0 F[travel_speed]	;travel,{IF NEWTOOL=1} G1 F500 E-0.5		;fast purge,{IF NEWTOOL=1} G1 F50.00 E1.50	;slow purge,{IF NEWTOOL=1} T1		;start tool switch 1,{IF NEWTOOL=1} G92 E0		;reset t1,{IF NEWTOOL=1} G1 F3000 E-4.5	;retract,{IF NEWTOOL=1} G1 F[travel_speed]	;end tool switch,,G91,G1 F[travel_speed] Z2,G90</toolChangeGcode>
     <layerHeight>0.2</layerHeight>
     <firstLayerHeightPercentage>125</firstLayerHeightPercentage>
     <topSolidLayers>4</topSolidLayers>
@@ -1511,6 +1511,16 @@
       <setpoint layer="1" temperature="50"/>
     </temperatureController>
   </autoConfigureQuality>
+  <autoConfigureExtruders name="Left Extruder Only"  allowedToolheads="1">
+    <toggleTemperatureController name="Left Extruder 0.4" status="on" stabilize="on"/>
+    <toggleTemperatureController name="Right Extruder 0.4" status="off" stabilize="off"/>
+    <toggleTemperatureController name="Heated Bed" status="on" stabilize="on"/>
+  </autoConfigureExtruders>
+  <autoConfigureExtruders name="Right Extruder Only"  allowedToolheads="1">
+    <toggleTemperatureController name="Left Extruder 0.4" status="off" stabilize="off"/>
+    <toggleTemperatureController name="Right Extruder 0.4" status="on" stabilize="on"/>
+    <toggleTemperatureController name="Heated Bed" status="on" stabilize="on"/>
+  </autoConfigureExtruders>
   <autoConfigureExtruders name="Both Extruders"  allowedToolheads="2">
     <toggleTemperatureController name="Left Extruder 0.4" status="on" stabilize="on"/>
     <toggleTemperatureController name="Right Extruder 0.4" status="on" stabilize="on"/>
