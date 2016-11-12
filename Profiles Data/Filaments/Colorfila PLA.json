@@ -10,7 +10,7 @@
     "defaultPrintSpeed": 60,
     "advisedMaxPrintSpeed": "None",
     "maxFlow": 15,
-    "maxFlowForHighFlowHotends": "None",
+    "maxFlowForHighFlowHotend": "None",
     "retractionDistance": 4,
     "retractionSpeed": 40,
     "fanPercentage": 1,
