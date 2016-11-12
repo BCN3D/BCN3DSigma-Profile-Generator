@@ -374,7 +374,7 @@ def createProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, dataLog,
     fff.append(r'  <thinWallAllowedOverlapPercentage>10</thinWallAllowedOverlapPercentage>'+"\n")
     fff.append(r'  <horizontalSizeCompensation>0</horizontalSizeCompensation>'+"\n")
     # fff.append(r'  <overridePrinterModels>1</overridePrinterModels>'+"\n")
-    # fff.append(r'  <printerModelsOverride>zyyx3dprinter.stl</printerModelsOverride>'+"\n")
+    # fff.append(r'  <printerModelsOverride>BCN3DSigma.stl</printerModelsOverride>'+"\n")
     # fff.append(r'  <autoConfigureMaterial name="'+str(filamentLeft)+" Left, "+str(filamentRight)+" Right"+r'">'+"\n")
     for extruder in extruderPrintOptions:
         for quality in sorted(profilesData['quality'], key=lambda k: k['index']):
@@ -626,65 +626,86 @@ def createProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, dataLog,
         f.close()
     return fileName+'.fff'
 
-def createProfilesBundle(dataLog, profilesCreatedCount):
-    totalProfilesAvailable = len(profilesData['hotend'])**2 * len(profilesData['filament'])**2
+def getBundleSize():
     if ".BCN3D Sigma - Simplify3D Profiles temp" in os.listdir('.'):
         shutil.rmtree(".BCN3D Sigma - Simplify3D Profiles temp")
     os.mkdir(".BCN3D Sigma - Simplify3D Profiles temp")
     os.chdir(".BCN3D Sigma - Simplify3D Profiles temp")
-    # for hotendLeft in sorted(profilesData['hotend'], key=lambda k: k['id']):
-    #     if hotendLeft['id'] != 'None':
-    #         os.mkdir("Left Hotend "+hotendLeft['id'])
-    #         os.chdir("Left Hotend "+hotendLeft['id'])
-    #     else:            
-    #         os.mkdir("No Left Hotend")
-    #         os.chdir("No Left Hotend")
-    #     for hotendRight in sorted(profilesData['hotend'], key=lambda k: k['id']):
-    #         if hotendRight['id'] != 'None':
-    #             os.mkdir("Right Hotend "+hotendRight['id'])
-    #             os.chdir("Right Hotend "+hotendRight['id'])
-    #         else:                
-    #             os.mkdir("No Right Hotend")
-    #             os.chdir("No Right Hotend")
-    #         for filamentLeft in sorted(profilesData['filament'], key=lambda k: k['id']):
-    #             for filamentRight in sorted(profilesData['filament'], key=lambda k: k['id']):
-    #                 createProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, dataLog, 'fffFile')
-    #                 profilesCreatedCount += 1
-    #                 sys.stdout.write("\r Progress: %d%%" % int(float(profilesCreatedCount)/totalProfilesAvailable*100))
-    #                 sys.stdout.flush()
-    #         os.chdir('..')
-    #     os.chdir('..')
-    z = zipfile.ZipFile("../testGran.zip", "w")
-    for hotendLeft in sorted(profilesData['hotend'], key=lambda k: k['id']):
-        if hotendLeft['id'] != 'None':
-            folderLevel1 = "Left Hotend "+hotendLeft['id']
-        else:            
-            folderLevel1 = "No Left Hotend"
-        for hotendRight in sorted(profilesData['hotend'], key=lambda k: k['id']):
-            if hotendRight['id'] != 'None':
-                folderLevel2 = "Right Hotend "+hotendRight['id']
-            else:                
-                folderLevel2 = "No Right Hotend"
-            for filamentLeft in sorted(profilesData['filament'], key=lambda k: k['id']):
-                for filamentRight in sorted(profilesData['filament'], key=lambda k: k['id']):
-                    if hotendLeft['id'] != 'None' and hotendRight['id'] != 'None':
-                        fileName = createProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, dataLog, 'fffFile')
-                        z.write(fileName, folderLevel1+'/'+folderLevel2+'/'+fileName)
-                        os.remove(os.listdir('.')[0])
-                    profilesCreatedCount += 1
-                    sys.stdout.write("\r Progress: %d%%" % int(float(profilesCreatedCount)/totalProfilesAvailable*100))
-                    sys.stdout.flush()
-    # csv = open("BCN3D Sigma - Simplify3D Profiles.csv", "w")
-    # csv.writelines(dataLog)
-    # csv.close()
+    
+    totalSmaProfiles = (len(profilesData['hotend'])-1) *  len(profilesData['filament']) * 2
+    totalBigProfiles = (len(profilesData['hotend'])-1)**2 * len(profilesData['filament'])**2
+
+    fileNameBig = createProfile(profilesData['hotend'][0], profilesData['hotend'][0], profilesData['filament'][0], profilesData['filament'][0], 'noData', 'fffFile')
+    fileNameSmall = createProfile(profilesData['hotend'][0], profilesData['hotend'][-1], profilesData['filament'][0], profilesData['filament'][0], 'noData', 'fffFile')
+    
+    oneLineCsvSize = float(10494984)/78480 # experimental value
+    csvSize = oneLineCsvSize * (totalSmaProfiles*len(profilesData['quality']) + totalBigProfiles*len(profilesData['quality'])*3)
+    bundleSize = totalSmaProfiles*os.path.getsize(fileNameSmall)+totalBigProfiles*os.path.getsize(fileNameBig) + csvSize
+
     os.chdir('..')
-    z.close()
-    # sys.stdout.write("\r Progress: Creating the zip file...")
-    # sys.stdout.flush()
-    # shutil.make_archive('BCN3D Sigma - Simplify3D Profiles', 'zip', '.BCN3D Sigma - Simplify3D Profiles temp')
     shutil.rmtree(".BCN3D Sigma - Simplify3D Profiles temp")
-    print("\r Your bundle 'BCN3D Sigma - Simplify3D Profiles.zip' is ready. Enjoy!\n")
-    return profilesCreatedCount
+    return bundleSize*1.05
+
+
+def createProfilesBundle(dataLog, profilesCreatedCount):    
+    y = 'y'
+    if getBundleSize()/1024/1024 >= 150: # define Size limit to notice (in MB)
+        print ' Estimated space needed during the process: '+str(int(getBundleSize()*1.075/1024/1024))+' MB.'
+        print ' Estimated final bundle size: '+str(int(getBundleSize()*0.075/1024/1024))+' MB.'
+        print ' Do you want to continue? (Y/n)'
+        while y not in ['Y', 'n']:
+            y = raw_input(' ')
+        print
+    else:
+        y = 'Y'
+    if y == 'Y':
+        totalSmaProfiles = (len(profilesData['hotend'])-1) *  len(profilesData['filament']) * 2
+        totalBigProfiles = (len(profilesData['hotend'])-1)**2 * len(profilesData['filament'])**2
+        totalProfilesAvailable = totalSmaProfiles + totalBigProfiles
+        if ".BCN3D Sigma - Simplify3D Profiles temp" in os.listdir('.'):
+            shutil.rmtree(".BCN3D Sigma - Simplify3D Profiles temp")
+        os.mkdir(".BCN3D Sigma - Simplify3D Profiles temp")
+        os.chdir(".BCN3D Sigma - Simplify3D Profiles temp")
+        for hotendLeft in sorted(profilesData['hotend'], key=lambda k: k['id']):
+            if hotendLeft['id'] != 'None':
+                os.mkdir("Left Hotend "+hotendLeft['id'])
+                os.chdir("Left Hotend "+hotendLeft['id'])
+            else:
+                os.mkdir("No Left Hotend")
+                os.chdir("No Left Hotend")
+            for hotendRight in sorted(profilesData['hotend'], key=lambda k: k['id']):
+                if hotendRight['id'] != 'None':
+                    os.mkdir("Right Hotend "+hotendRight['id'])
+                    os.chdir("Right Hotend "+hotendRight['id'])
+                else:                
+                    os.mkdir("No Right Hotend")
+                    os.chdir("No Right Hotend")
+                for filamentLeft in sorted(profilesData['filament'], key=lambda k: k['id']):
+                    for filamentRight in sorted(profilesData['filament'], key=lambda k: k['id']):
+                        if hotendRight['id'] == 'None' and hotendLeft['id'] == 'None':
+                            break
+                        profilesCreatedCount += 1
+                        createProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, dataLog, 'fffFile')
+                        sys.stdout.write("\r Progress: %d%%" % int(float(profilesCreatedCount)/totalProfilesAvailable*100))
+                        sys.stdout.flush()
+                        if hotendRight['id'] == 'None':
+                            break
+                    if hotendLeft['id'] == 'None':
+                        break
+                os.chdir('..')
+            os.chdir('..')
+        csv = open("BCN3D Sigma - Simplify3D Profiles.csv", "w")
+        csv.writelines(dataLog)
+        csv.close()
+        os.chdir('..')
+        sys.stdout.write("\r Progress: Creating the zip file...")
+        sys.stdout.flush()
+        shutil.make_archive('BCN3D Sigma - Simplify3D Profiles', 'zip', '.BCN3D Sigma - Simplify3D Profiles temp')
+        shutil.rmtree(".BCN3D Sigma - Simplify3D Profiles temp")
+        print("\r Your bundle 'BCN3D Sigma - Simplify3D Profiles.zip' is ready. Enjoy!\n")
+        return profilesCreatedCount
+    else:
+        return 0
 
 def testAllCombinations():
     combinationCount = 0
@@ -782,7 +803,6 @@ def main():
         if len(sys.argv) == 1:
             print '\n Welcome to the BCN3D Sigma Profile Generator for Simplify3D \n'
             while True:
-                readProfilesData()
                 print ' Choose one option (1-4):'
                 print ' 1. Generate a bundle of profiles'
                 print ' 2. Generate one single profile'
@@ -790,16 +810,18 @@ def main():
                 print ' 4. Exit'
                 x = 'x'
                 y = 'y'
-                dataLog = ["LFilament;RFilament;Extruder;Quality;LNozzle;RNozzle;InfillExt;PrimaryExt;SupportExt;LFlow;RFlow;Layers/Infill;DefaultSpeed;FirstLayerUnderspeed;OutLineUnderspeed;SupportUnderspeed;FirstLayerHeightPercentage;LTemp;RTemp;BTemp;\n"]
-                profilesCreatedCount = 0
                 while x not in '1234':
                     x = raw_input(' ')
+                dataLog = ["LFilament;RFilament;Extruder;Quality;LNozzle;RNozzle;InfillExt;PrimaryExt;SupportExt;LFlow;RFlow;Layers/Infill;DefaultSpeed;FirstLayerUnderspeed;OutLineUnderspeed;SupportUnderspeed;FirstLayerHeightPercentage;LTemp;RTemp;BTemp;\n"]
+                profilesCreatedCount = 0
+                readProfilesData()
                 if x in '12':
                     if x == '1':
                         profilesCreatedCount = createProfilesBundle(dataLog, profilesCreatedCount)
-                        print ' See profile(s) data? (Y/n)'
-                        while y not in ['Y', 'n']:
-                            y = raw_input(' ')
+                        if profilesCreatedCount > 0:
+                            print ' See profile(s) data? (Y/n)'
+                            while y not in ['Y', 'n']:
+                                y = raw_input(' ')
                     elif x == '2':
                         a = selectHotendAndFilament('Left')
                         b = selectHotendAndFilament('Right')
