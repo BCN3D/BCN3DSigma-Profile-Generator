@@ -71,7 +71,7 @@ def flowValue(hotend, filament):
             return filament['maxFlowForHighFlowHotend']
 
 def temperatureValue(filament, hotend, layerHeight, speed, base = 5):
-    # adaptative temperature for flow values. Rounded to base
+    # adaptative temperature according to flow values. Rounded to base
     flow = hotend['nozzleSize']*layerHeight*float(speed)/60
     temperature = int(base * round((filament['printTemperature'][0]+flow*float(filament['printTemperature'][1]-filament['printTemperature'][0])/flowValue(hotend, filament))/float(base)))
     return temperature
@@ -645,7 +645,6 @@ def getBundleSize():
     os.chdir('..')
     shutil.rmtree(".BCN3D Sigma - Simplify3D Profiles temp")
     return bundleSize*1.05
-
 
 def createProfilesBundle(dataLog, profilesCreatedCount):    
     y = 'y'
