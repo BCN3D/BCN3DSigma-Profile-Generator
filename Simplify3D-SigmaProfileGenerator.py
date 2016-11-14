@@ -392,9 +392,7 @@ def createProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, dataLog,
                     currentLayerHeight = currentHotend['nozzleSize'] * quality['layerHeightMultiplier']
                     currentDefaultSpeed, currentFirstLayerUnderspeed, currentOutlineUnderspeed, currentSupportUnderspeed = speedValues(hotendLeft, hotendRight, filamentLeft, filamentRight, quality, 'MEX Left')
                     hotendLeftTemperature = temperatureValue(filamentLeft, hotendLeft, currentLayerHeight, currentDefaultSpeed)
-                    if hotendRight['id'] == 'None':
-                        hotendRightTemperature = 0
-                    else:
+                    if hotendRight['id'] != 'None':
                         hotendRightTemperature = temperatureValue(filamentRight, hotendRight, currentLayerHeight, currentDefaultSpeed)
                 else:
                     currentPrimaryExtruder = 1
@@ -402,9 +400,7 @@ def createProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, dataLog,
                     currentHotend = hotendRight
                     currentLayerHeight = currentHotend['nozzleSize'] * quality['layerHeightMultiplier']
                     currentDefaultSpeed, currentFirstLayerUnderspeed, currentOutlineUnderspeed, currentSupportUnderspeed = speedValues(hotendLeft, hotendRight, filamentLeft, filamentRight, quality, 'MEX Right')
-                    if hotendLeft['id'] == 'None':
-                        hotendLeftTemperature = 0
-                    else:
+                    if hotendLeft['id'] != 'None':
                         hotendLeftTemperature = temperatureValue(filamentLeft, hotendLeft, currentLayerHeight, currentDefaultSpeed)
                     hotendRightTemperature = temperatureValue(filamentRight, hotendRight, currentLayerHeight, currentDefaultSpeed)
                 currentInfillExtruder = currentPrimaryExtruder
