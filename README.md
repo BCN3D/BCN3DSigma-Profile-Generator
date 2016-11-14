@@ -74,7 +74,7 @@ Filaments
     "defaultPrintSpeed": 60,				// [mm/s],  default speed when printing Medium quality with 0.4mm Nozzle and 0.2mm layer height.
     "advisedMaxPrintSpeed": "None",			// [mm/s],  maximum speed recommended by filament's manufacturer. If "None", maxFlow value is needed.
     "maxFlow": 15,							// [mm3/s], maximum flow a default Hotend can print. "None" if unknown.
-    "maxFlowForHighFlowHotends": "None",	// [mm3/s], maximum flow a High Flow Hotend can print. "None" if unknown.
+    "maxFlowForHighFlowHotend": "None",	    // [mm3/s], maximum flow a High Flow Hotend can print. "None" if unknown.
     "retractionDistance": 4,				// [mm]
     "retractionSpeed": 40,					// [mm/s]
     "fanPercentage": 100,					// [0-100]
