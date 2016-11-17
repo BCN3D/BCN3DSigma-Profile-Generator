@@ -22,11 +22,11 @@ Decompress it if you need to, open a terminal and go to the directory.
 
 To generate a profile without entering the GUI. Just call the script and insert 4 valid parameters:
 
-`python Simplify3D-SigmaProfileGenerator.py LHotend RHotend LFilament RFilament`
+`python Simplify3D-SigmaProfileGenerator.py LHotend RHotend LFilament RFilament --software`
 
 Valid parameters for Hotends are file names in */Profiles Data/Hotends* or 'None' if not mounted. Valid parameters for Fiamentsare are file in */Profiles Data/Filaments* or 'None' if empty. Example: 
 
-`python Simplify3D-SigmaProfileGenerator.py "0.4 - Brass" "0.4 - Brass" "Colorfila PLA" "Colorfila PLA"`
+`python Simplify3D-SigmaProfileGenerator.py "0.4 - Brass" "0.4 - Brass" "Colorfila PLA" "Colorfila PLA" --simplify3d`
 
 Generates the file *BCN3D Sigma - 0.4 Left (PLA Colorfila), 0.4 Right (PLA Colorfila).fff*
 
@@ -101,7 +101,7 @@ Quality Preconfigurations
 ## TO-DO
 
 - [ ] Fix temperature values when using dual extruder assistant.
-- [ ] Availability to generate Cura profiles
+- [ ] Availability to generate Cura profiles (Work in progress!)
 - [ ] Availability to create .json files right from the script
 - [ ] Better print speed management for flexible materials
 - [ ] Adjust bridging for flexible materials
