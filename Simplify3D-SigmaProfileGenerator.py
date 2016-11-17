@@ -629,7 +629,7 @@ def createProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, dataLog,
         f.writelines(fff)
         f.close()
     if createFile == 'nofffFile':
-        return string.join(fff)
+        print string.join(fff)
     return fileName+'.fff'
 
 def getBundleSize():
