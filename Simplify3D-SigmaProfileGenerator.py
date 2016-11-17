@@ -264,7 +264,7 @@ def createProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, dataLog,
         fff.append(r'    <isHeatedBed>0</isHeatedBed>'+"\n")
         fff.append(r'    <relayBetweenLayers>0</relayBetweenLayers>'+"\n")
         fff.append(r'    <relayBetweenLoops>0</relayBetweenLoops>'+"\n")
-        fff.append(r'    <stabilizeAtStartup>1</stabilizeAtStartup>'+"\n")
+        # fff.append(r'    <stabilizeAtStartup>1</stabilizeAtStartup>'+"\n")
         fff.append(r'    <setpoint layer="1" temperature="150"/>'+"\n")
         fff.append(r'  </temperatureController>'+"\n")
     if hotendRight['id'] != 'None':
@@ -273,7 +273,7 @@ def createProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, dataLog,
         fff.append(r'    <isHeatedBed>0</isHeatedBed>'+"\n")
         fff.append(r'    <relayBetweenLayers>0</relayBetweenLayers>'+"\n")
         fff.append(r'    <relayBetweenLoops>0</relayBetweenLoops>'+"\n")
-        fff.append(r'    <stabilizeAtStartup>1</stabilizeAtStartup>'+"\n")
+        # fff.append(r'    <stabilizeAtStartup>1</stabilizeAtStartup>'+"\n")
         fff.append(r'    <setpoint layer="1" temperature="150"/>'+"\n")
         fff.append(r'  </temperatureController>'+"\n")
     if (hotendLeft['id'] != 'None' and filamentLeft['bedTemperature'] > 0) or (hotendRight['id'] != 'None' and filamentRight['bedTemperature'] > 0):
@@ -282,7 +282,7 @@ def createProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, dataLog,
         fff.append(r'    <isHeatedBed>1</isHeatedBed>'+"\n")
         fff.append(r'    <relayBetweenLayers>0</relayBetweenLayers>'+"\n")
         fff.append(r'    <relayBetweenLoops>0</relayBetweenLoops>'+"\n")
-        fff.append(r'    <stabilizeAtStartup>1</stabilizeAtStartup>'+"\n")
+        # fff.append(r'    <stabilizeAtStartup>1</stabilizeAtStartup>'+"\n")
         fff.append(r'    <setpoint layer="1" temperature="50"/>'+"\n")
         fff.append(r'  </temperatureController>'+"\n")
     fff.append(r'  <fanSpeed>'+"\n")
@@ -383,6 +383,8 @@ def createProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, dataLog,
             currentAvoidCrossingOutline = 1
             fanActionOnToolChange1 = ''
             fanActionOnToolChange2 = ''
+            hotendLeftStabilize = 1
+            hotendRightStabilize = 1
             # MEX
             if extruder[0] == 'L' or extruder[0] == 'R':
                 if extruder[0] == 'L':
@@ -394,15 +396,21 @@ def createProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, dataLog,
                     hotendLeftTemperature = temperatureValue(filamentLeft, hotendLeft, currentLayerHeight, currentDefaultSpeed)
                     if hotendRight['id'] != 'None':
                         hotendRightTemperature = temperatureValue(filamentRight, hotendRight, currentLayerHeight, currentDefaultSpeed)
+                        hotendRightStabilize = 0
+                    else:
+                        hotendRightTemperature = hotendLeftTemperature
                 else:
                     currentPrimaryExtruder = 1
                     currentFilament = filamentRight
                     currentHotend = hotendRight
                     currentLayerHeight = currentHotend['nozzleSize'] * quality['layerHeightMultiplier']
                     currentDefaultSpeed, currentFirstLayerUnderspeed, currentOutlineUnderspeed, currentSupportUnderspeed = speedValues(hotendLeft, hotendRight, filamentLeft, filamentRight, quality, 'MEX Right')
+                    hotendRightTemperature = temperatureValue(filamentRight, hotendRight, currentLayerHeight, currentDefaultSpeed)
                     if hotendLeft['id'] != 'None':
                         hotendLeftTemperature = temperatureValue(filamentLeft, hotendLeft, currentLayerHeight, currentDefaultSpeed)
-                    hotendRightTemperature = temperatureValue(filamentRight, hotendRight, currentLayerHeight, currentDefaultSpeed)
+                        hotendLeftStabilize = 0
+                    else:
+                        hotendLeftTemperature = hotendRightTemperature
                 currentInfillExtruder = currentPrimaryExtruder
                 currentSupportExtruder = currentPrimaryExtruder
                 currentBedTemperature = currentFilament['bedTemperature']
@@ -548,7 +556,7 @@ def createProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, dataLog,
                 fff.append(r'      <isHeatedBed>0</isHeatedBed>'+"\n")
                 fff.append(r'      <relayBetweenLayers>0</relayBetweenLayers>'+"\n")
                 fff.append(r'      <relayBetweenLoops>0</relayBetweenLoops>'+"\n")
-                fff.append(r'      <stabilizeAtStartup>1</stabilizeAtStartup>'+"\n")
+                # fff.append(r'      <stabilizeAtStartup>'+str(hotendLeftStabilize)+'</stabilizeAtStartup>'+"\n")
                 fff.append(r'      <setpoint layer="1" temperature="'+str(hotendLeftTemperature)+r'"/>'+"\n")
                 fff.append(r'    </temperatureController>'+"\n")
             if hotendRight['id'] != 'None':
@@ -557,7 +565,7 @@ def createProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, dataLog,
                 fff.append(r'      <isHeatedBed>0</isHeatedBed>'+"\n")
                 fff.append(r'      <relayBetweenLayers>0</relayBetweenLayers>'+"\n")
                 fff.append(r'      <relayBetweenLoops>0</relayBetweenLoops>'+"\n")
-                fff.append(r'      <stabilizeAtStartup>1</stabilizeAtStartup>'+"\n")
+                # fff.append(r'      <stabilizeAtStartup>'+str(hotendRightStabilize)+'</stabilizeAtStartup>'+"\n")
                 fff.append(r'      <setpoint layer="1" temperature="'+str(hotendRightTemperature)+r'"/>'+"\n")
                 fff.append(r'    </temperatureController>'+"\n")
             if (hotendLeft['id'] != 'None' and filamentLeft['bedTemperature'] > 0) or (hotendRight['id'] != 'None' and filamentRight['bedTemperature'] > 0):
@@ -566,7 +574,7 @@ def createProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, dataLog,
                 fff.append(r'      <isHeatedBed>1</isHeatedBed>'+"\n")
                 fff.append(r'      <relayBetweenLayers>0</relayBetweenLayers>'+"\n")
                 fff.append(r'      <relayBetweenLoops>0</relayBetweenLoops>'+"\n")
-                fff.append(r'      <stabilizeAtStartup>1</stabilizeAtStartup>'+"\n")
+                # fff.append(r'      <stabilizeAtStartup>1</stabilizeAtStartup>'+"\n")
                 fff.append(r'      <setpoint layer="1" temperature="'+str(currentBedTemperature)+r'"/>'+"\n")
                 fff.append(r'    </temperatureController>'+"\n")
             fff.append(r'  </autoConfigureQuality>'+"\n")
@@ -586,7 +594,7 @@ def createProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, dataLog,
         if (hotendLeft['id'] != 'None' and filamentLeft['bedTemperature'] > 0) or (hotendRight['id'] != 'None' and filamentRight['bedTemperature'] > 0):
             fff.append(r'    <toggleTemperatureController name="Heated Bed" status="on" stabilize="on"/>'+"\n")
         currentPurgeSpeed, currentStartPurgeLenght, currentToolChangePurgeLenght = purgeValues(hotendLeft, filamentLeft)
-        fff.append(r'    <startingGcode>G21'+"\t\t"+r';metric values,G90'+"\t\t"+r';absolute positioning,M82'+"\t\t"+r';set extruder to absolute mode,M107'+"\t\t"+r';start with the fan off,G28 X0 Y0'+"\t\t"+r';move X/Y to min endstops,G28 Z0'+"\t\t"+r';move Z to min endstops,T'+str(currentPrimaryExtruder)+"\t\t"+r';change to active toolhead,G92 E0'+"\t\t"+r';zero the extruded length,G1 Z5 F200'+"\t\t"+r';Safety Z axis movement,G1 F'+currentPurgeSpeed+' E'+currentStartPurgeLenght+"\t"+r';extrude '+currentStartPurgeLenght+r'mm of feed stock,G92 E0'+"\t\t"+r');zero the extruded length again,G1 F200 E-4'+"\t\t"+r';Retract before printing,G1 F[travel_speed],</startingGcode>'+"\n")
+        fff.append(r'    <startingGcode>G21'+"\t\t"+r';metric values,G90'+"\t\t"+r';absolute positioning,M82'+"\t\t"+r';set extruder to absolute mode,M107'+"\t\t"+r';start with the fan off,G28 X0 Y0'+"\t\t"+r';move X/Y to min endstops,G28 Z0'+"\t\t"+r';move Z to min endstops,T0'+"\t\t"+r';change to active toolhead,G92 E0'+"\t\t"+r';zero the extruded length,G1 Z5 F200'+"\t\t"+r';Safety Z axis movement,G1 F'+currentPurgeSpeed+' E'+currentStartPurgeLenght+"\t"+r';extrude '+currentStartPurgeLenght+r'mm of feed stock,G92 E0'+"\t\t"+r';zero the extruded length again,G1 F200 E-4'+"\t\t"+r';Retract before printing,G1 F[travel_speed],</startingGcode>'+"\n")
         fff.append(r'    <toolChangeGcode/>'+"\n")
         fff.append(r'  </autoConfigureExtruders>'+"\n")
     if hotendRight['id'] != 'None':
@@ -598,7 +606,7 @@ def createProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, dataLog,
         if (hotendLeft['id'] != 'None' and filamentLeft['bedTemperature'] > 0) or (hotendRight['id'] != 'None' and filamentRight['bedTemperature'] > 0):
             fff.append(r'    <toggleTemperatureController name="Heated Bed" status="on" stabilize="on"/>'+"\n")
         currentPurgeSpeed, currentStartPurgeLenght, currentToolChangePurgeLenght = purgeValues(hotendRight, filamentRight)
-        fff.append(r'    <startingGcode>G21'+"\t\t"+r';metric values,G90'+"\t\t"+r';absolute positioning,M82'+"\t\t"+r';set extruder to absolute mode,M107'+"\t\t"+r';start with the fan off,G28 X0 Y0'+"\t\t"+r';move X/Y to min endstops,G28 Z0'+"\t\t"+r';move Z to min endstops,T'+str(currentPrimaryExtruder)+"\t\t"+r';change to active toolhead,G92 E0'+"\t\t"+r';zero the extruded length,G1 Z5 F200'+"\t\t"+r';Safety Z axis movement,G1 F'+currentPurgeSpeed+' E'+currentStartPurgeLenght+"\t"+r';extrude '+currentStartPurgeLenght+r'mm of feed stock,G92 E0'+"\t\t"+r';zero the extruded length again,G1 F200 E-4'+"\t\t"+r';Retract before printing,G1 F[travel_speed],</startingGcode>'+"\n")
+        fff.append(r'    <startingGcode>G21'+"\t\t"+r';metric values,G90'+"\t\t"+r';absolute positioning,M82'+"\t\t"+r';set extruder to absolute mode,M107'+"\t\t"+r';start with the fan off,G28 X0 Y0'+"\t\t"+r';move X/Y to min endstops,G28 Z0'+"\t\t"+r';move Z to min endstops,T1'+"\t\t"+r';change to active toolhead,G92 E0'+"\t\t"+r';zero the extruded length,G1 Z5 F200'+"\t\t"+r';Safety Z axis movement,G1 F'+currentPurgeSpeed+' E'+currentStartPurgeLenght+"\t"+r';extrude '+currentStartPurgeLenght+r'mm of feed stock,G92 E0'+"\t\t"+r';zero the extruded length again,G1 F200 E-4'+"\t\t"+r';Retract before printing,G1 F[travel_speed],</startingGcode>'+"\n")
         fff.append(r'    <toolChangeGcode/>'+"\n")
         fff.append(r'  </autoConfigureExtruders>'+"\n")
     if hotendLeft['id'] != 'None' and hotendRight['id'] != 'None':
@@ -620,6 +628,8 @@ def createProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, dataLog,
         f = open(fileName+".fff", "w")
         f.writelines(fff)
         f.close()
+    if createFile == 'nofffFile':
+        return string.join(fff)
     return fileName+'.fff'
 
 def getBundleSize():
@@ -749,6 +759,14 @@ def validArguments():
         leftFilament = sys.argv[3]+'.json' in os.listdir('./Profiles Data/Filaments') or (sys.argv[1] == 'None' and sys.argv[3] == 'None')
         rightFilament = sys.argv[4]+'.json' in os.listdir('./Profiles Data/Filaments') or (sys.argv[2] == 'None' and sys.argv[4] == 'None')
         return leftHotend and rightHontend and leftFilament and rightFilament
+    if len(sys.argv) == 6:
+        leftHotend = sys.argv[1]+'.json' in os.listdir('./Profiles Data/Hotends') or sys.argv[1] == 'None'
+        rightHontend = sys.argv[2]+'.json' in os.listdir('./Profiles Data/Hotends') or sys.argv[2] == 'None'
+        leftFilament = sys.argv[3]+'.json' in os.listdir('./Profiles Data/Filaments') or (sys.argv[1] == 'None' and sys.argv[3] == 'None')
+        rightFilament = sys.argv[4]+'.json' in os.listdir('./Profiles Data/Filaments') or (sys.argv[2] == 'None' and sys.argv[4] == 'None')
+        fileAction = sys.argv[5] == '--no-file'
+        return leftHotend and rightHontend and leftFilament and rightFilament and fileAction
+
     else:
         return False
 
@@ -793,7 +811,10 @@ def main():
             leftFilament = profilesData['filament'][0]
         if sys.argv[4] == 'None':
             rightFilament = profilesData['filament'][0]
-        createProfile(leftHotend, rightHotend, leftFilament, rightFilament, 'noData', 'fffFile')
+        if len(sys.argv) == 6:
+            createProfile(leftHotend, rightHotend, leftFilament, rightFilament, 'noData', 'nofffFile')
+        else:
+            createProfile(leftHotend, rightHotend, leftFilament, rightFilament, 'noData', 'fffFile')
     else:
         if len(sys.argv) == 1:
             print '\n Welcome to the BCN3D Sigma Profile Generator for Simplify3D \n'

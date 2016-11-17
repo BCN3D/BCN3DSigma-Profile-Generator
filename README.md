@@ -100,6 +100,7 @@ Quality Preconfigurations
 
 ## TO-DO
 
+- [ ] Fix temperature values when using dual extruder assistant.
 - [ ] Availability to generate Cura profiles
 - [ ] Availability to create .json files right from the script
 - [ ] Better print speed management for flexible materials
