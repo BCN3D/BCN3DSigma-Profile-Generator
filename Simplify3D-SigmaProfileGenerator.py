@@ -639,23 +639,45 @@ def createCuraProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, qual
     
     #  Attention: hotendLeft and hotendRight must be the same, or "None" 
 
+    if hotendLeft['id'] != 'None' and hotendRight['id'] != 'None':
+        if hotendLeft['id'] != hotendRight['id']:
+            return
+    if hotendLeft['id'] == 'None':
+        if hotendRight['id'] == 'None':
+            return
+        else:            
+            fileName = "BCN3D Sigma - Right Extruder "+str(hotendRight['nozzleSize'])+" Only ("+filamentRight['id']+")"
+            extruderPrintOptions = ["Right Extruder"]
+            filamentLeft = dict([('id', '')])
+    elif hotendRight['id'] == 'None':
+        fileName = "BCN3D Sigma - Left Extruder "+str(hotendLeft['nozzleSize'])+" Only ("+filamentLeft['id']+")"
+        extruderPrintOptions = ["Left Extruder"]
+        filamentRight = dict([('id', '')])
+    else:
+        fileName = "BCN3D Sigma - "+str(hotendLeft['nozzleSize'])+" Left ("+filamentLeft['id']+"), Right ("+filamentRight['id']+")"
+        extruderPrintOptions = ["Left Extruder", "Right Extruder", "Both Extruders"]    
+
+    for extruder in extruderPrintOptions:
+            # MEX
+            if extruder[0] == 'L' or extruder[0] == 'R':
+                # MEX Left
+                if extruder[0] == 'L':
+                # MEX Right
+                else:
+            # IDEX
+            else:
+                # IDEX, Support Material
+                if filamentLeft['isSupportMaterial'] != filamentRight['isSupportMaterial']:
+                    if filamentLeft['isSupportMaterial']:
+                    else:
+                # IDEX, Dual Color / Material
+                else:
+
     currentLayerHeight = hotend['nozzleSize'] * quality['layerHeightMultiplier']
     perimeters = 0
     while perimeters*hotend['nozzleSize'] < quality['wallWidth']:
         perimeters += 1
     currentWallThickness = perimeters * hotend['nozzleSize']
-
-    # if dualMode == 'MEX Left':
-    #     currentDefaultSpeed, currentFirstLayerUnderspeed, currentOutlineUnderspeed, currentSupportUnderspeed = speedValues(hotend, hotend, filamentLeft, filamentRight, quality, 'IDEX, Supports with Right')
-    # elif dualMode == 'MEX Right':
-
-    # elif dualMode == 'IDEX':
-    #     if 
-    #     if filamentLeft['isSupportMaterial'] or filamentRight['isSupportMaterial']:
-    #         currentDefaultSpeed, currentFirstLayerUnderspeed, currentOutlineUnderspeed, currentSupportUnderspeed = speedValues(hotend, hotend, filamentLeft, filamentRight, quality, 'IDEX, Supports with Right')
-    #     else:
-
-
 
     ini = []
     ini.append(r'[profile]'+"\n")
@@ -665,7 +687,7 @@ def createCuraProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, qual
     ini.append(r'solid_layer_thickness = '+str(quality['topBottomWidth'])+"\n")
     ini.append(r'fill_density = '+str(quality['infillPercentage'])+"\n")
     ini.append(r'nozzle_size = '+str(hotend['nozzleSize'])+"\n")
-    ini.append(r'print_speed = 40'+"\n")
+    ini.append(r'print_speed = 40'+"\n") # Working...
     ini.append(r'print_temperature = 200'+"\n")
     ini.append(r'print_temperature2 = 0'+"\n")
     ini.append(r'print_temperature3 = 0'+"\n")
