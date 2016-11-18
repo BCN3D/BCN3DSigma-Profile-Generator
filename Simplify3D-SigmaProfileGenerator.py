@@ -635,15 +635,36 @@ def createSimplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight
         print fileName+'.fff'
     return fileName+'.fff'
 
-def createCuraProfile(hotend, filamentLeft, filamentRight, createFile):
+def createCuraProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, quality, createFile):
+    
+    #  Attention: hotendLeft and hotendRight must be the same, or "None" 
+
+    currentLayerHeight = hotend['nozzleSize'] * quality['layerHeightMultiplier']
+    perimeters = 0
+    while perimeters*hotend['nozzleSize'] < quality['wallWidth']:
+        perimeters += 1
+    currentWallThickness = perimeters * hotend['nozzleSize']
+
+    # if dualMode == 'MEX Left':
+    #     currentDefaultSpeed, currentFirstLayerUnderspeed, currentOutlineUnderspeed, currentSupportUnderspeed = speedValues(hotend, hotend, filamentLeft, filamentRight, quality, 'IDEX, Supports with Right')
+    # elif dualMode == 'MEX Right':
+
+    # elif dualMode == 'IDEX':
+    #     if 
+    #     if filamentLeft['isSupportMaterial'] or filamentRight['isSupportMaterial']:
+    #         currentDefaultSpeed, currentFirstLayerUnderspeed, currentOutlineUnderspeed, currentSupportUnderspeed = speedValues(hotend, hotend, filamentLeft, filamentRight, quality, 'IDEX, Supports with Right')
+    #     else:
+
+
+
     ini = []
     ini.append(r'[profile]'+"\n")
-    ini.append(r'layer_height = 0.2'+"\n")
-    ini.append(r'wall_thickness = 0.8'+"\n")
+    ini.append(r'layer_height = '+str(currentLayerHeight)+"\n")
+    ini.append(r'wall_thickness = '+str(currentWallThickness)+"\n")
     ini.append(r'retraction_enable = True'+"\n")
-    ini.append(r'solid_layer_thickness = 0.8'+"\n")
-    ini.append(r'fill_density = 15'+"\n")
-    ini.append(r'nozzle_size = 0.4'+"\n")
+    ini.append(r'solid_layer_thickness = '+str(quality['topBottomWidth'])+"\n")
+    ini.append(r'fill_density = '+str(quality['infillPercentage'])+"\n")
+    ini.append(r'nozzle_size = '+str(hotend['nozzleSize'])+"\n")
     ini.append(r'print_speed = 40'+"\n")
     ini.append(r'print_temperature = 200'+"\n")
     ini.append(r'print_temperature2 = 0'+"\n")
@@ -1003,15 +1024,17 @@ def main():
             if filament == sys.argv[4]+'.json':
                 with open('./Profiles Data/Filaments/'+filament) as filament_file:    
                     rightFilament = json.load(filament_file)
+        if sys.argv[1] == 'None':
+            leftHotend = dict([('id', 'None')])
+        if sys.argv[2] == "None":
+            rightHotend = dict([('id', 'None')])
         if sys.argv[3] == 'None':
             leftFilament = profilesData['filament'][0]
         if sys.argv[4] == 'None':
             rightFilament = profilesData['filament'][0]
         if len(sys.argv) == 7:
-            if sys.argv[6] == '--no-file':
-                createSimplify3DProfile(leftHotend, rightHotend, leftFilament, rightFilament, 'noData', 'noFile')
-            if sys.argv[6] == '--only-filename':
-                createSimplify3DProfile(leftHotend, rightHotend, leftFilament, rightFilament, 'noData', 'onlyFilename')
+            if sys.argv[6] == '--no-file' or sys.argv[6] == '--only-filename':
+                createSimplify3DProfile(leftHotend, rightHotend, leftFilament, rightFilament, 'noData', sys.argv[6])
         else:
             createSimplify3DProfile(leftHotend, rightHotend, leftFilament, rightFilament, 'noData', 'createFile')
     else:
