@@ -99,3 +99,5 @@ Profiles Data/Hotends/1.0 - Brass.json
 Profiles Data/Hotends/0.5 - Special.json
 
 *.zip
+
+*.ini
