@@ -662,16 +662,21 @@ def createCuraProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, qual
             if extruder[0] == 'L' or extruder[0] == 'R':
                 # MEX Left
                 if extruder[0] == 'L':
+                    pass
                 # MEX Right
                 else:
+                    pass
             # IDEX
             else:
                 # IDEX, Support Material
                 if filamentLeft['isSupportMaterial'] != filamentRight['isSupportMaterial']:
                     if filamentLeft['isSupportMaterial']:
+                        pass
                     else:
+                        pass
                 # IDEX, Dual Color / Material
                 else:
+                    pass
 
     currentLayerHeight = hotend['nozzleSize'] * quality['layerHeightMultiplier']
     perimeters = 0
