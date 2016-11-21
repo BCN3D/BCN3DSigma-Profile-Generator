@@ -385,9 +385,10 @@ def createSimplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight
             fanActionOnToolChange2 = ''
             # hotendLeftStabilize = 1
             # hotendRightStabilize = 1
-            # MEX
             if extruder[0] == 'L' or extruder[0] == 'R':
+                # MEX
                 if extruder[0] == 'L':
+                    # MEX Left
                     currentPrimaryExtruder = 0
                     currentFilament = filamentLeft
                     currentHotend = hotendLeft
@@ -400,6 +401,7 @@ def createSimplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight
                     else:
                         hotendRightTemperature = hotendLeftTemperature
                 else:
+                    # MEX Right
                     currentPrimaryExtruder = 1
                     currentFilament = filamentRight
                     currentHotend = hotendRight
@@ -418,12 +420,13 @@ def createSimplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight
                     secondaryExtruderAction = ' ('+currentFilament['id']+') - '
                 else:
                     secondaryExtruderAction = ' - '
-            # IDEX
             else:
-                # IDEX, Support Material
+                # IDEX
                 if filamentLeft['isSupportMaterial'] != filamentRight['isSupportMaterial']:
+                    # IDEX, Support Material
                     currentGenerateSupport = 1
                     if filamentLeft['isSupportMaterial']:
+                        # IDEX, Support Material in Left Hotend
                         currentPrimaryExtruder = 1
                         currentFilament = filamentRight
                         currentHotend = hotendRight
@@ -434,6 +437,7 @@ def createSimplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight
                         secondaryExtruderAction = ' (Left Ext. for supports) - '
                         currentDefaultSpeed, currentFirstLayerUnderspeed, currentOutlineUnderspeed, currentSupportUnderspeed = speedValues(hotendLeft, hotendRight, filamentLeft, filamentRight, quality, 'IDEX, Supports with Left')
                     else:
+                        # IDEX, Support Material in Right Hotend
                         currentPrimaryExtruder = 0
                         currentFilament = filamentLeft
                         currentHotend = hotendLeft
@@ -448,10 +452,11 @@ def createSimplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight
                     currentLayerHeight = currentHotend['nozzleSize'] * quality['layerHeightMultiplier']
                     hotendLeftTemperature = temperatureValue(filamentLeft, hotendLeft, currentLayerHeight, currentDefaultSpeed)
                     hotendRightTemperature = temperatureValue(filamentRight, hotendRight, currentLayerHeight, currentDefaultSpeed)
-                # IDEX, Combined Infill
                 else:
+                    # IDEX, Combined Infill
                     currentAvoidCrossingOutline = 0
                     if hotendLeft['nozzleSize'] <= hotendRight['nozzleSize']:
+                        # IDEX, Combined Infill (Right Hotend has thicker nozzle)
                         currentPrimaryExtruder = 0
                         currentFilament = filamentLeft
                         currentHotend = hotendLeft
@@ -468,6 +473,7 @@ def createSimplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight
                         if hotendLeft['nozzleSize'] == hotendRight['nozzleSize']:
                             hotendRightTemperature = temperatureValue(filamentRight, hotendRight, currentLayerHeight, currentDefaultSpeed)
                     else:
+                        # IDEX, Combined Infill (Left Hotend has thicker nozzle)
                         currentPrimaryExtruder = 1
                         currentFilament = filamentRight
                         currentHotend = hotendRight
@@ -658,24 +664,26 @@ def createCuraProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, qual
         extruderPrintOptions = ["Left Extruder", "Right Extruder", "Both Extruders"]    
 
     for extruder in extruderPrintOptions:
-            # MEX
             if extruder[0] == 'L' or extruder[0] == 'R':
-                # MEX Left
+                # MEX
                 if extruder[0] == 'L':
+                    # MEX Left
                     pass
-                # MEX Right
                 else:
+                    # MEX Right
                     pass
-            # IDEX
             else:
-                # IDEX, Support Material
+                # IDEX
                 if filamentLeft['isSupportMaterial'] != filamentRight['isSupportMaterial']:
+                    # IDEX, Support Material
                     if filamentLeft['isSupportMaterial']:
+                        # IDEX, Support Material in Left Hotend
                         pass
                     else:
+                        # IDEX, Support Material in Right Hotend
                         pass
-                # IDEX, Dual Color / Material
                 else:
+                    # IDEX, Dual Color / Material
                     pass
 
     currentLayerHeight = hotend['nozzleSize'] * quality['layerHeightMultiplier']
