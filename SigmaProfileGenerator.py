@@ -157,7 +157,7 @@ def createSimplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight
     fff.append(r'  <baseProfile></baseProfile>'+"\n")
     fff.append(r'  <printMaterial></printMaterial>'+"\n")
     fff.append(r'  <printQuality>'+defaultPrintQuality+'</printQuality>'+"\n") #+extruder+secondaryExtruderAction+str(quality['id'])+
-    if hotendRight['id'] != 'None':
+    if hotendLeft['id'] != 'None':
         fff.append(r'  <printExtruders>Left Extruder Only</printExtruders>'+"\n")
     else:
         fff.append(r'  <printExtruders>Right Extruder Only</printExtruders>'+"\n")
@@ -416,10 +416,7 @@ def createSimplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight
                 currentInfillExtruder = currentPrimaryExtruder
                 currentSupportExtruder = currentPrimaryExtruder
                 currentBedTemperature = currentFilament['bedTemperature']
-                if filamentLeft['id'] != filamentRight['id']:
-                    secondaryExtruderAction = ' ('+currentFilament['id']+') - '
-                else:
-                    secondaryExtruderAction = ' - '
+                secondaryExtruderAction = ' - '
             else:
                 # IDEX
                 if filamentLeft['isSupportMaterial'] != filamentRight['isSupportMaterial']:
