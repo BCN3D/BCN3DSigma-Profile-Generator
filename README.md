@@ -30,7 +30,7 @@ Will ask for a functionality:
 
 4. **Cura: Generate one single profile:** Same as *2*, now for Cura (will ask for Quality at the end).
 
-5. **Test all combinations:** Like *1. Generate a bundle of profiles* but without storing data neither generating fff profile files. A fast option to just ensure all combinations can be properly created.
+5. **Test all combinations:** Without storing any data neither generating profile files. A fast option to just ensure all combinations can be properly created.
 
 6. **Exit:** Quit the program.
 
