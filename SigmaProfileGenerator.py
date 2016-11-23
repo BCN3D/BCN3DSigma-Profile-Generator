@@ -93,13 +93,13 @@ def speedValues(hotendLeft, hotendRight, filamentLeft, filamentRight, quality, a
             currentFirstLayerUnderspeed = 1.00
             currentOutlineUnderspeed = 1.00
         else:
-            currentFirstLayerUnderspeed = "%.2f" % float(min(leftExtruderNeededFirstLayerUnderspeed, 1))
-            currentOutlineUnderspeed = "%.2f" % float(min(leftExtruderNeededOutlineUnderspeed, 1))
+            currentFirstLayerUnderspeed = float("%.2f" % float(min(leftExtruderNeededFirstLayerUnderspeed, 1)))
+            currentOutlineUnderspeed = float("%.2f" % float(min(leftExtruderNeededOutlineUnderspeed, 1)))
 
         if action == 'IDEX, Supports with Right':
-            currentSupportUnderspeed = "%.2f" % float(flowValue(hotendRight, filamentRight)/float(hotendLeft['nozzleSize'] * quality['layerHeightMultiplier']*hotendRight['nozzleSize']*currentDefaultSpeed/60.))
+            currentSupportUnderspeed = float("%.2f" % float(flowValue(hotendRight, filamentRight)/float(hotendLeft['nozzleSize'] * quality['layerHeightMultiplier']*hotendRight['nozzleSize']*currentDefaultSpeed/60.)))
         else:
-            currentSupportUnderspeed = "%.2f" % float(min(leftExtruderNeededSupportUnderspeed, 1))
+            currentSupportUnderspeed = float("%.2f" % float(min(leftExtruderNeededSupportUnderspeed, 1)))
     elif action == 'MEX Right' or action == 'IDEX, Infill with Left' or action == 'IDEX, Supports with Left':
         currentFilament = filamentRight
         rightExtruderDefaultSpeed = quality['defaultSpeed']*speedMultiplier(hotendRight, filamentRight)
@@ -116,12 +116,12 @@ def speedValues(hotendLeft, hotendRight, filamentLeft, filamentRight, quality, a
             currentFirstLayerUnderspeed = 1.00
             currentOutlineUnderspeed = 1.00
         else:
-            currentFirstLayerUnderspeed = "%.2f" % float(min(rightExtruderNeededFirstLayerUnderspeed, 1))
-            currentOutlineUnderspeed = "%.2f" % float(min(rightExtruderNeededOutlineUnderspeed, 1))
+            currentFirstLayerUnderspeed = float("%.2f" % float(min(rightExtruderNeededFirstLayerUnderspeed, 1)))
+            currentOutlineUnderspeed = float("%.2f" % float(min(rightExtruderNeededOutlineUnderspeed, 1)))
         if action == 'IDEX, Supports with Left':
-            currentSupportUnderspeed = "%.2f" % float(flowValue(hotendLeft, filamentLeft)/float(hotendRight['nozzleSize']*quality['layerHeightMultiplier']*hotendLeft['nozzleSize']*currentDefaultSpeed/60.))
+            currentSupportUnderspeed = float("%.2f" % float(flowValue(hotendLeft, filamentLeft)/float(hotendRight['nozzleSize']*quality['layerHeightMultiplier']*hotendLeft['nozzleSize']*currentDefaultSpeed/60.)))
         else:
-            currentSupportUnderspeed = "%.2f" % float(min(rightExtruderNeededSupportUnderspeed, 1))
+            currentSupportUnderspeed = float("%.2f" % float(min(rightExtruderNeededSupportUnderspeed, 1)))
     if currentFilament['isFlexibleMaterial']:
         currentFirstLayerUnderspeed = 1.00
         currentOutlineUnderspeed = 1.00
@@ -251,9 +251,11 @@ def createSimplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight
     fff.append(r'  <denseSupportLayers>5</denseSupportLayers>'+"\n")
     fff.append(r'  <denseSupportInfillPercentage>75</denseSupportInfillPercentage>'+"\n")
     fff.append(r'  <supportLayerInterval>1</supportLayerInterval>'+"\n")
+
     fff.append(r'  <supportHorizontalPartOffset>0.2</supportHorizontalPartOffset>'+"\n")
     fff.append(r'  <supportUpperSeparationLayers>1</supportUpperSeparationLayers>'+"\n")
     fff.append(r'  <supportLowerSeparationLayers>1</supportLowerSeparationLayers>'+"\n")
+
     fff.append(r'  <supportType>0</supportType>'+"\n")
     fff.append(r'  <supportGridSpacing>3</supportGridSpacing>'+"\n")
     fff.append(r'  <maxOverhangAngle>45</maxOverhangAngle>'+"\n")
@@ -380,6 +382,9 @@ def createSimplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight
         for quality in sorted(profilesData['quality'], key=lambda k: k['index']):
             currentInfillLayerInterval = 1
             currentGenerateSupport = 0
+            currentSupportHorizontalPartOffset = 0.2
+            currentSupportUpperSeparationLayers = 1
+            currentSupportLowerSeparationLayers = 1
             currentAvoidCrossingOutline = 1
             fanActionOnToolChange1 = ''
             fanActionOnToolChange2 = ''
@@ -422,6 +427,9 @@ def createSimplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight
                 if filamentLeft['isSupportMaterial'] != filamentRight['isSupportMaterial']:
                     # IDEX, Support Material
                     currentGenerateSupport = 1
+                    currentSupportHorizontalPartOffset = 0.1
+                    currentSupportUpperSeparationLayers = 0
+                    currentSupportLowerSeparationLayers = 0
                     if filamentLeft['isSupportMaterial']:
                         # IDEX, Support Material in Left Hotend
                         currentPrimaryExtruder = 1
@@ -553,6 +561,9 @@ def createSimplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight
             fff.append(r'    <outlineUnderspeed>'+str(currentOutlineUnderspeed)+r'</outlineUnderspeed>'+"\n")
             fff.append(r'    <supportUnderspeed>'+str(currentSupportUnderspeed)+r'</supportUnderspeed>'+"\n")
             fff.append(r'    <avoidCrossingOutline>'+str(currentAvoidCrossingOutline)+'</avoidCrossingOutline>'+"\n")
+            fff.append(r'    <supportHorizontalPartOffset>'+str(currentSupportHorizontalPartOffset)+'</supportHorizontalPartOffset>'+"\n")
+            fff.append(r'    <supportUpperSeparationLayers>'+str(currentSupportUpperSeparationLayers)+'</supportUpperSeparationLayers>'+"\n")
+            fff.append(r'    <supportLowerSeparationLayers>'+str(currentSupportLowerSeparationLayers)+'</supportLowerSeparationLayers>'+"\n")
             if hotendLeft['id'] != 'None':
                 fff.append(r'    <temperatureController name="Left Extruder '+str(hotendLeft['nozzleSize'])+r'">'+"\n")
                 fff.append(r'      <temperatureNumber>0</temperatureNumber>'+"\n")
@@ -599,6 +610,7 @@ def createSimplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight
         #     fff.append(r'    <toggleTemperatureController name="Heated Bed" status="on" stabilize="on"/>'+"\n")
         currentPurgeSpeed, currentStartPurgeLenght, currentToolChangePurgeLenght = purgeValues(hotendLeft, filamentLeft)
         fff.append(r'    <startingGcode>G21'+"\t\t"+r';metric values,G90'+"\t\t"+r';absolute positioning,M82'+"\t\t"+r';set extruder to absolute mode,M107'+"\t\t"+r';start with the fan off,G28 X0 Y0'+"\t\t"+r';move X/Y to min endstops,G28 Z0'+"\t\t"+r';move Z to min endstops,T0'+"\t\t"+r';change to active toolhead,G92 E0'+"\t\t"+r';zero the extruded length,G1 Z5 F200'+"\t\t"+r';Safety Z axis movement,G1 F'+currentPurgeSpeed+' E'+currentStartPurgeLenght+"\t"+r';extrude '+currentStartPurgeLenght+r'mm of feed stock,G92 E0'+"\t\t"+r';zero the extruded length again,G1 F200 E-4'+"\t\t"+r';Retract before printing,G1 F[travel_speed],</startingGcode>'+"\n")
+        # fff.append(r'    <layerChangeGcode/>'+"\n")
         fff.append(r'    <toolChangeGcode/>'+"\n")
         fff.append(r'  </autoConfigureExtruders>'+"\n")
     if hotendRight['id'] != 'None':
@@ -611,6 +623,7 @@ def createSimplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight
         #     fff.append(r'    <toggleTemperatureController name="Heated Bed" status="on" stabilize="on"/>'+"\n")
         currentPurgeSpeed, currentStartPurgeLenght, currentToolChangePurgeLenght = purgeValues(hotendRight, filamentRight)
         fff.append(r'    <startingGcode>G21'+"\t\t"+r';metric values,G90'+"\t\t"+r';absolute positioning,M82'+"\t\t"+r';set extruder to absolute mode,M107'+"\t\t"+r';start with the fan off,G28 X0 Y0'+"\t\t"+r';move X/Y to min endstops,G28 Z0'+"\t\t"+r';move Z to min endstops,T1'+"\t\t"+r';change to active toolhead,G92 E0'+"\t\t"+r';zero the extruded length,G1 Z5 F200'+"\t\t"+r';Safety Z axis movement,G1 F'+currentPurgeSpeed+' E'+currentStartPurgeLenght+"\t"+r';extrude '+currentStartPurgeLenght+r'mm of feed stock,G92 E0'+"\t\t"+r';zero the extruded length again,G1 F200 E-4'+"\t\t"+r';Retract before printing,G1 F[travel_speed],</startingGcode>'+"\n")
+        # fff.append(r'    <layerChangeGcode/>'+"\n")
         fff.append(r'    <toolChangeGcode/>'+"\n")
         fff.append(r'  </autoConfigureExtruders>'+"\n")
     if hotendLeft['id'] != 'None' and hotendRight['id'] != 'None':
@@ -624,6 +637,7 @@ def createSimplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight
         currentPurgeSpeedT0, currentStartPurgeLenghtT0, currentToolChangePurgeLenghtT0 = purgeValues(hotendLeft, filamentLeft)
         currentPurgeSpeedT1, currentStartPurgeLenghtT1, currentToolChangePurgeLenghtT1 = purgeValues(hotendRight, filamentRight)
         fff.append(r'    <startingGcode>G21'+"\t\t"+r';metric values,G90'+"\t\t"+r';absolute positioning,M107'+"\t\t"+r';start with the fan off,G28 X0 Y0'+"\t\t"+r';move X/Y to min endstops,G28 Z0'+"\t\t"+r';move Z to min endstops,T1'+"\t\t"+r';Switch to the 2nd extruder,G92 E0'+"\t\t"+r';zero the extruded length,G1 F'+currentPurgeSpeedT1+' E'+currentStartPurgeLenghtT1+"\t"+r';extrude '+currentStartPurgeLenghtT1+r'mm of feed stock,G92 E0'+"\t\t"+r';zero the extruded length again,G1 F200 E-9,T0'+"\t\t"+r';Switch to the first extruder,G92 E0'+"\t\t"+r';zero the extruded length,G1 F'+currentPurgeSpeedT0+' E'+currentStartPurgeLenghtT0+"\t"+r';extrude '+currentStartPurgeLenghtT0+r'mm of feed stock,G92 E0'+"\t\t"+r';zero the extruded length again,G1 Z5 F200'+"\t\t"+r';Safety Z axis movement,G1 F[travel_speed]</startingGcode>'+"\n")
+        # fff.append(r'    <layerChangeGcode>'+fanActionOnToolChange1+fanActionOnToolChange2+'</layerChangeGcode>'+"\n")
         fff.append(r'    <toolChangeGcode>{IF NEWTOOL=0} T0'+"\t\t"+r';start tool switch 0,;{IF NEWTOOL=0} G1 X0 Y0 F[travel_speed]'+"\t"+r';travel,{IF NEWTOOL=0} G1 F500 E-0.5'+"\t\t"+r';fast purge,{IF NEWTOOL=0} G1 F'+currentPurgeSpeedT0+' E'+currentToolChangePurgeLenghtT0+"\t"+r';slow purge,{IF NEWTOOL=0} G92 E0'+"\t\t"+r';reset t0,{IF NEWTOOL=0} G1 F3000 E-4.5'+"\t"+r';retract,{IF NEWTOOL=0} G1 F[travel_speed]'+"\t"+r';end tool switch,'+fanActionOnToolChange1+r',{IF NEWTOOL=1} T1'+"\t\t"+r';start tool switch 1,;{IF NEWTOOL=1} G1 X210 Y0 F[travel_speed]'+"\t"+r';travel,{IF NEWTOOL=1} G1 F500 E-0.5'+"\t\t"+r';fast purge,{IF NEWTOOL=1} G1 F'+currentPurgeSpeedT1+' E'+currentToolChangePurgeLenghtT1+"\t"+r';slow purge,{IF NEWTOOL=1} T1'+"\t\t"+r';start tool switch 1,{IF NEWTOOL=1} G92 E0'+"\t\t"+r';reset t1,{IF NEWTOOL=1} G1 F3000 E-4.5'+"\t"+r';retract,{IF NEWTOOL=1} G1 F[travel_speed]'+"\t"+r';end tool switch,'+fanActionOnToolChange2+r',G91,G1 F[travel_speed] Z2,G90</toolChangeGcode>'+"\n")
         fff.append(r'  </autoConfigureExtruders>'+"\n")
 
@@ -632,62 +646,120 @@ def createSimplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight
         f = open(fileName+".fff", "w")
         f.writelines(fff)
         f.close()
-    if createFile == 'noFile':
+    if createFile == '--no-file':
         print string.join(fff)
-    if createFile == 'onlyFilename':
+    if createFile == '--only-filename':
         print fileName+'.fff'
     return fileName+'.fff'
 
-def createCuraProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, quality, createFile):
+def createCuraProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, quality, dataLog, createFile):
     
     #  Attention: hotendLeft and hotendRight must be the same, or "None" 
 
-    if hotendLeft['id'] != 'None' and hotendRight['id'] != 'None':
-        if hotendLeft['id'] != hotendRight['id']:
-            return
+    makeSupports = 'None'
+    supportDualExtrusion = 'First extruder'
+    supportXYDistance = 0.7
+    supportZdistance = 0.2
+
+    if hotendLeft['id'] != 'None' and hotendRight['id'] != 'None' and hotendLeft['id'] != hotendRight['id']:
+        return
     if hotendLeft['id'] == 'None':
         if hotendRight['id'] == 'None':
             return
         else:            
-            fileName = "BCN3D Sigma - Right Extruder "+str(hotendRight['nozzleSize'])+" Only ("+filamentRight['id']+")"
+            # MEX Right    
+            hotend = hotendRight
+            currentLayerHeight = hotend['nozzleSize'] * quality['layerHeightMultiplier']
+            fileName = "BCN3D Sigma - Right Extruder "+str(hotendRight['nozzleSize'])+" Only ("+filamentRight['id']+") - "+quality['id']
             extruderPrintOptions = ["Right Extruder"]
             filamentLeft = dict([('id', '')])
+            currentDefaultSpeed, currentFirstLayerUnderspeed, currentOutlineUnderspeed, currentSupportUnderspeed = speedValues(hotendLeft, hotendRight, filamentLeft, filamentRight, quality, 'MEX Right')
+            printTemperature1 = temperatureValue(filamentRight, hotendRight, currentLayerHeight, currentDefaultSpeed)
+            printTemperature2 = 0
+            bedTemperature = filamentRight['bedTemperature']
+            filamentDiameter1 = filamentRight['filamentDiameter']
+            filamentDiameter2 = 0
+            filamentFlow = filamentRight['extrusionMultiplier']*100
+            retractionSpeed = filamentRight['retractionSpeed']
+            retractionAmount = filamentRight['retractionDistance']
+            firstLayerHeight = "%.2f" % float(currentLayerHeight * int(min(125, flowValue(hotendRight, filamentRight)*100/(hotend['nozzleSize']*currentLayerHeight*(currentDefaultSpeed/60)*float(currentFirstLayerUnderspeed))))/100.)
+            if filamentRight['fanPercentage'] > 0:
+                fanEnabled = 'True'
+            else:
+                fanEnabled = 'False'
+            fanSpeed = filamentRight['fanPercentage']
     elif hotendRight['id'] == 'None':
-        fileName = "BCN3D Sigma - Left Extruder "+str(hotendLeft['nozzleSize'])+" Only ("+filamentLeft['id']+")"
+        # MEX Left
+        hotend = hotendLeft
+        currentLayerHeight = hotend['nozzleSize'] * quality['layerHeightMultiplier']
+        fileName = "BCN3D Sigma - Left Extruder "+str(hotendLeft['nozzleSize'])+" Only ("+filamentLeft['id']+") - "+quality['id']
         extruderPrintOptions = ["Left Extruder"]
         filamentRight = dict([('id', '')])
+        currentDefaultSpeed, currentFirstLayerUnderspeed, currentOutlineUnderspeed, currentSupportUnderspeed = speedValues(hotendLeft, hotendRight, filamentLeft, filamentRight, quality, 'MEX Left')
+        printTemperature1 = temperatureValue(filamentLeft, hotendLeft, currentLayerHeight, currentDefaultSpeed)
+        printTemperature2 = 0
+        bedTemperature = filamentLeft['bedTemperature']
+        filamentDiameter1 = filamentLeft['filamentDiameter']
+        filamentDiameter2 = 0
+        filamentFlow = filamentLeft['extrusionMultiplier']*100
+        retractionSpeed = filamentLeft['retractionSpeed']
+        retractionAmount = filamentLeft['retractionDistance']
+        firstLayerHeight = "%.2f" % float(currentLayerHeight * int(min(125, flowValue(hotendLeft, filamentLeft)*100/(hotend['nozzleSize']*currentLayerHeight*(currentDefaultSpeed/60)*float(currentFirstLayerUnderspeed))))/100.)
+        if filamentLeft['fanPercentage'] > 0:
+            fanEnabled = 'True'
+        else:
+            fanEnabled = 'False'
+        fanSpeed = filamentLeft['fanPercentage']
     else:
-        fileName = "BCN3D Sigma - "+str(hotendLeft['nozzleSize'])+" Left ("+filamentLeft['id']+"), Right ("+filamentRight['id']+")"
-        extruderPrintOptions = ["Left Extruder", "Right Extruder", "Both Extruders"]    
-
-    for extruder in extruderPrintOptions:
-            if extruder[0] == 'L' or extruder[0] == 'R':
-                # MEX
-                if extruder[0] == 'L':
-                    # MEX Left
-                    pass
-                else:
-                    # MEX Right
-                    pass
+        # IDEX
+        hotend = hotendLeft
+        currentLayerHeight = hotend['nozzleSize'] * quality['layerHeightMultiplier']
+        fileName = "BCN3D Sigma - "+str(hotendLeft['nozzleSize'])+" Left ("+filamentLeft['id']+"),"+str(hotendRight['nozzleSize'])+" Right ("+filamentRight['id']+") - "+quality['id']
+        extruderPrintOptions = ["Both Extruders"] 
+        if filamentLeft['isSupportMaterial'] != filamentRight['isSupportMaterial']:
+            # IDEX, Support Material
+            makeSupports = 'Everywhere'
+            supportDualExtrusion = 'Second extruder'
+            supportXYDistance = 0.2
+            supportZdistance = 0
+            if filamentLeft['isSupportMaterial']:
+                # IDEX, Support Material in Left Hotend
+                currentDefaultSpeed, currentFirstLayerUnderspeed, currentOutlineUnderspeed, currentSupportUnderspeed = speedValues(hotendLeft, hotendRight, filamentLeft, filamentRight, quality, 'IDEX, Supports with Left')
             else:
-                # IDEX
-                if filamentLeft['isSupportMaterial'] != filamentRight['isSupportMaterial']:
-                    # IDEX, Support Material
-                    if filamentLeft['isSupportMaterial']:
-                        # IDEX, Support Material in Left Hotend
-                        pass
-                    else:
-                        # IDEX, Support Material in Right Hotend
-                        pass
-                else:
-                    # IDEX, Dual Color / Material
-                    pass
+                # IDEX, Support Material in Right Hotend
+                currentDefaultSpeed, currentFirstLayerUnderspeed, currentOutlineUnderspeed, currentSupportUnderspeed = speedValues(hotendLeft, hotendRight, filamentLeft, filamentRight, quality, 'IDEX, Supports with Right')
+        else:
+            # IDEX, Dual Color / Material
+            makeSupports = 'None'
+            supportDualExtrusion = 'Both'
+            currentDefaultSpeedL, currentFirstLayerUnderspeedL, currentOutlineUnderspeedL, currentSupportUnderspeedL = speedValues(hotendLeft, hotendRight, filamentLeft, filamentRight, quality, 'MEX Left')
+            currentDefaultSpeedR, currentFirstLayerUnderspeedR, currentOutlineUnderspeedR, currentSupportUnderspeedR = speedValues(hotendLeft, hotendRight, filamentLeft, filamentRight, quality, 'MEX Right')
+            currentDefaultSpeed = min(currentDefaultSpeedL, currentDefaultSpeedR)
+            currentFirstLayerUnderspeed = min(currentFirstLayerUnderspeedL, currentFirstLayerUnderspeedR)
+            currentOutlineUnderspeed = min(currentOutlineUnderspeedL, currentOutlineUnderspeedR)
+            currentSupportUnderspeed  = min(currentSupportUnderspeedL, currentSupportUnderspeedR)
+        printTemperature1 = temperatureValue(filamentLeft, hotendLeft, currentLayerHeight, currentDefaultSpeed)
+        printTemperature2 = temperatureValue(filamentRight, hotendRight, currentLayerHeight, currentDefaultSpeed)
+        bedTemperature = max(filamentLeft['bedTemperature'], filamentRight['bedTemperature'])
+        filamentDiameter1 = filamentLeft['filamentDiameter']
+        filamentDiameter2 = filamentRight['filamentDiameter']
+        filamentFlow = max(filamentLeft['extrusionMultiplier'], filamentRight['extrusionMultiplier'])*100
+        retractionSpeed = max(filamentLeft['retractionSpeed'], filamentRight['retractionSpeed'])
+        retractionAmount = max(filamentLeft['retractionDistance'], filamentRight['retractionDistance'])
+        firstLayerHeight = "%.2f" % float(currentLayerHeight * int(min(125, min(flowValue(hotendLeft, filamentLeft),flowValue(hotendRight, filamentRight))*100/(hotend['nozzleSize']*currentLayerHeight*(currentDefaultSpeed/60)*float(currentFirstLayerUnderspeed))))/100.)
+        if filamentLeft['fanPercentage'] > 0 or filamentRight['fanPercentage']:
+            fanEnabled = 'True'
+        else:
+            fanEnabled = 'False'
+        fanSpeed = max(filamentLeft['fanPercentage'], filamentRight['fanPercentage'])   
 
-    currentLayerHeight = hotend['nozzleSize'] * quality['layerHeightMultiplier']
     perimeters = 0
     while perimeters*hotend['nozzleSize'] < quality['wallWidth']:
         perimeters += 1
     currentWallThickness = perimeters * hotend['nozzleSize']
+    bottomLayerSpeed = int(currentFirstLayerUnderspeed * currentDefaultSpeed/60.)
+    outerShellSpeed = int(currentOutlineUnderspeed * currentDefaultSpeed/60.)
+    innerShellSpeed = int(outerShellSpeed + (currentDefaultSpeed/60.-outerShellSpeed)/2.)
 
     ini = []
     ini.append(r'[profile]'+"\n")
@@ -697,49 +769,49 @@ def createCuraProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, qual
     ini.append(r'solid_layer_thickness = '+str(quality['topBottomWidth'])+"\n")
     ini.append(r'fill_density = '+str(quality['infillPercentage'])+"\n")
     ini.append(r'nozzle_size = '+str(hotend['nozzleSize'])+"\n")
-    ini.append(r'print_speed = 40'+"\n") # Working...
-    ini.append(r'print_temperature = 200'+"\n")
-    ini.append(r'print_temperature2 = 0'+"\n")
+    ini.append(r'print_speed = '+str(currentDefaultSpeed/60)+"\n")
+    ini.append(r'print_temperature = '+str(printTemperature1)+"\n")
+    ini.append(r'print_temperature2 = '+str(printTemperature2)+"\n")
     ini.append(r'print_temperature3 = 0'+"\n")
     ini.append(r'print_temperature4 = 0'+"\n")
     ini.append(r'print_temperature5 = 0'+"\n")
-    ini.append(r'print_bed_temperature = 50'+"\n")
-    ini.append(r'support = None'+"\n")
+    ini.append(r'print_bed_temperature = '+str(bedTemperature)+"\n")
+    ini.append(r'support = '+makeSupports+"\n")
     ini.append(r'platform_adhesion = None'+"\n")
-    ini.append(r'support_dual_extrusion = Both'+"\n")
-    ini.append(r'wipe_tower = False'+"\n")
+    ini.append(r'support_dual_extrusion = '+supportDualExtrusion+"\n")
+    ini.append(r'wipe_tower = False'+"\n") # Working..
     ini.append(r'wipe_tower_volume = 50'+"\n")
     ini.append(r'ooze_shield = False'+"\n")
-    ini.append(r'filament_diameter = 2.9'+"\n")
-    ini.append(r'filament_diameter2 = 0'+"\n")
+    ini.append(r'filament_diameter = '+str(filamentDiameter1)+"\n")
+    ini.append(r'filament_diameter2 = '+str(filamentDiameter2)+"\n")
     ini.append(r'filament_diameter3 = 0'+"\n")
     ini.append(r'filament_diameter4 = 0'+"\n")
     ini.append(r'filament_diameter5 = 0'+"\n")
-    ini.append(r'filament_flow = 100'+"\n")
-    ini.append(r'retraction_speed = 40'+"\n")
-    ini.append(r'retraction_amount = 4'+"\n")
+    ini.append(r'filament_flow = '+str(filamentFlow)+"\n")
+    ini.append(r'retraction_speed = '+str(retractionSpeed)+"\n")
+    ini.append(r'retraction_amount = '+str(retractionAmount)+"\n")
     ini.append(r'retraction_dual_amount = 8'+"\n")
     ini.append(r'retraction_min_travel = 1.5'+"\n")
     ini.append(r'retraction_combing = All'+"\n")
     ini.append(r'retraction_minimal_extrusion = 0'+"\n")
     ini.append(r'retraction_hop = 0.05'+"\n")
-    ini.append(r'bottom_thickness = 0.25'+"\n")
+    ini.append(r'bottom_thickness = '+str(firstLayerHeight)+"\n")
     ini.append(r'layer0_width_factor = 100'+"\n")
     ini.append(r'object_sink = 0'+"\n")
     ini.append(r'overlap_dual = 0.15'+"\n")
     ini.append(r'travel_speed = 200'+"\n")
-    ini.append(r'bottom_layer_speed = 40'+"\n")
-    ini.append(r'infill_speed = 60'+"\n")
-    ini.append(r'solidarea_speed = 40'+"\n")
-    ini.append(r'inset0_speed = 35'+"\n")
-    ini.append(r'insetx_speed = 50'+"\n")
+    ini.append(r'bottom_layer_speed = '+str(bottomLayerSpeed)+"\n")
+    ini.append(r'infill_speed = '+str(currentDefaultSpeed/60)+"\n")
+    ini.append(r'solidarea_speed = '+str(bottomLayerSpeed)+"\n")
+    ini.append(r'inset0_speed = '+str(outerShellSpeed)+"\n")
+    ini.append(r'insetx_speed = '+str(innerShellSpeed)+"\n")
     ini.append(r'cool_min_layer_time = 5'+"\n")
-    ini.append(r'fan_enabled = True'+"\n")
+    ini.append(r'fan_enabled = '+str(fanEnabled)+"\n")
     ini.append(r'skirt_line_count = 2'+"\n")
     ini.append(r'skirt_gap = 2'+"\n")
     ini.append(r'skirt_minimal_length = 150.0'+"\n")
     ini.append(r'fan_full_height = 0.5'+"\n")
-    ini.append(r'fan_speed = 100'+"\n")
+    ini.append(r'fan_speed = '+str(fanSpeed)+"\n")
     ini.append(r'fan_speed_max = 100'+"\n")
     ini.append(r'cool_min_feedrate = 10'+"\n")
     ini.append(r'cool_head_lift = False'+"\n")
@@ -750,8 +822,8 @@ def createCuraProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, qual
     ini.append(r'support_type = Lines'+"\n")
     ini.append(r'support_angle = 65'+"\n")
     ini.append(r'support_fill_rate = 40'+"\n")
-    ini.append(r'support_xy_distance = 0.7'+"\n")
-    ini.append(r'support_z_distance = 0.2'+"\n")
+    ini.append(r'support_xy_distance = '+str(supportXYDistance)+"\n")
+    ini.append(r'support_z_distance = '+str(supportZdistance)+"\n")
     ini.append(r'spiralize = False'+"\n")
     ini.append(r'simple_mode = False'+"\n")
     ini.append(r'brim_line_count = 5'+"\n")
@@ -771,7 +843,7 @@ def createCuraProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, qual
     ini.append(r'fix_horrible_use_open_bits = False'+"\n")
     ini.append(r'fix_horrible_extensive_stitching = False'+"\n")
     ini.append(r'plugin_config = '+'(lp1'+"\n")
-    ini.append(r'   .'+"\n")
+    ini.append("\t."+"\n")
     ini.append(r'object_center_x = -1'+"\n")
     ini.append(r'object_center_y = -1'+"\n")
     ini.append(r'quality_fast = False'+"\n")
@@ -795,92 +867,98 @@ def createCuraProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, qual
     ini.append(r'fila_right_dual = False'+"\n")
     ini.append(r'pva_right_dual = False'+"\n")
     ini.append(r'dual_support = False'+"\n")
-
+    ini.append("\n")
     ini.append(r'[alterations]'+"\n")
     ini.append(r'start.gcode = ;Sliced at: {day} {date} {time}'+"\n")
-    ini.append(r'   ;Basic settings: Layer height: {layer_height} Walls: {wall_thickness} Fill: {fill_density}'+"\n")
-    ini.append(r'   ;Print time: {print_time}'+"\n")
-    ini.append(r'   ;Filament used: {filament_amount}m {filament_weight}g'+"\n")
-    ini.append(r'   ;Filament cost: {filament_cost}'+"\n")
-    ini.append(r'   ;M190 S{print_bed_temperature} ;Uncomment to add your own bed temperature line'+"\n")
-    ini.append(r'   ;M109 S{print_temperature} ;Uncomment to add your own temperature line'+"\n")
-    ini.append(r'   G21             ;metric values'+"\n")
-    ini.append(r'   G90             ;absolute positioning'+"\n")
-    ini.append(r'   M82             ;set extruder to absolute mode'+"\n")
-    ini.append(r'   M107            ;start with the fan off'+"\n")
-    ini.append(r'   G28 X0 Y0       ;move X/Y to min endstops'+"\n")
-    ini.append(r'   G28 Z0          ;move Z to min endstops'+"\n")
-    ini.append(r'   G92 E0          ;zero the extruded length'+"\n")
-    ini.append(r'   G1 Z5 F200      ;Safety Z axis movement'+"\n")
-    ini.append(r'   G1 F50 E7       ;extrude 7mm of feed stock'+"\n")
-    ini.append(r'   G92 E0          ;zero the extruded length again'+"\n")
-    ini.append(r'   G1 F200 E-4     ;Retract before printing'+"\n")
-    ini.append(r'   G1 F{travel_speed}'+"\n")
-    ini.append(r'   M117 Printing...    ;Put printing message on LCD screen'+"\n")
+    ini.append('\t;Basic settings: Layer height: {layer_height} Walls: {wall_thickness} Fill: {fill_density}'+"\n")
+    ini.append('\t;Print time: {print_time}'+"\n")
+    ini.append('\t;Filament used: {filament_amount}m {filament_weight}g'+"\n")
+    ini.append('\t;Filament cost: {filament_cost}'+"\n")
+    ini.append('\t;M190 S{print_bed_temperature} ;Uncomment to add your own bed temperature line'+"\n")
+    ini.append('\t;M109 S{print_temperature}  ;Uncomment to add your own temperature line'+"\n")
+    ini.append('\tG21                         ;metric values'+"\n")
+    ini.append('\tG90                         ;absolute positioning'+"\n")
+    ini.append('\tM82                         ;set extruder to absolute mode'+"\n")
+    ini.append('\tM107                        ;start with the fan off'+"\n")
+    ini.append('\tG28 X0 Y0                   ;move X/Y to min endstops'+"\n")
+    ini.append('\tG28 Z0                      ;move Z to min endstops'+"\n")
+    ini.append('\tG92 E0                      ;zero the extruded length'+"\n")
+    ini.append('\tG1 Z5 F200                  ;Safety Z axis movement'+"\n")
+    ini.append('\tG1 F50 E7                   ;extrude 7mm of feed stock'+"\n")
+    ini.append('\tG92 E0                      ;zero the extruded length again'+"\n")
+    ini.append('\tG1 F200 E-4                 ;Retract before printing'+"\n")
+    ini.append('\tG1 F{travel_speed}'+"\n")
+    ini.append('\tM117 Printing...            ;Put printing message on LCD screen'+"\n")
     ini.append(r'end.gcode = M104 S0'+"\n")
-    ini.append(r'   M140 S0             ;heated bed heater off (if you have it)'+"\n")
-    ini.append(r'   G91             ;relative positioning'+"\n")
-    ini.append(r'   G1 Y+10 F{travel_speed}     ;move Z up a bit and retract filament even more'+"\n")
-    ini.append(r'   G28 X0 Y0       ;move X/Y to min endstops, so the head is out of the way'+"\n")
-    ini.append(r'   M84                 ;steppers off'+"\n")
-    ini.append(r'   G90             ;absolute positioning'+"\n")
-    ini.append(r'   ;{profile_string}'+"\n")
+    ini.append('\tM140 S0                     ;heated bed heater off (if you have it)'+"\n")
+    ini.append('\tG91                         ;relative positioning'+"\n")
+    ini.append('\tG1 Y+10 F{travel_speed}     ;move Z up a bit and retract filament even more'+"\n")
+    ini.append('\tG28 X0 Y0                   ;move X/Y to min endstops, so the head is out of the way'+"\n")
+    ini.append('\tM84                         ;steppers off'+"\n")
+    ini.append('\tG90                         ;absolute positioning'+"\n")
+    ini.append('\t;{profile_string}'+"\n")
     ini.append(r'start2.gcode = ;Sliced at: {day} {date} {time}'+"\n")
-    ini.append(r'   ;Basic settings: Layer height: {layer_height} Walls: {wall_thickness} Fill: {fill_density}'+"\n")
-    ini.append(r'   ;Print time: {print_time}'+"\n")
-    ini.append(r'   ;Filament used: {filament_amount}m {filament_weight}g'+"\n")
-    ini.append(r'   ;Filament cost: {filament_cost}'+"\n")
-    ini.append(r'   ;M190 S{print_bed_temperature} ;Uncomment to add your own bed temperature line'+"\n")
-    ini.append(r'   ;M104 S{print_temperature} ;Uncomment to add your own temperature line'+"\n")
-    ini.append(r'   ;M109 T1 S{print_temperature2} ;Uncomment to add your own temperature line'+"\n")
-    ini.append(r'   ;M109 T0 S{print_temperature} ;Uncomment to add your own temperature line'+"\n")
-    ini.append(r'   G21         ;metric values'+"\n")
-    ini.append(r'   G90         ;absolute positioning'+"\n")
-    ini.append(r'   M107        ;start with the fan off'+"\n")
-    ini.append(r'   G28 X0 Y0   ;move X/Y to min endstops'+"\n")
-    ini.append(r'   G28 Z0      ;move Z to min endstops'+"\n")
-    ini.append(r'   T1              ;Switch to the 2nd extruder'+"\n")
-    ini.append(r'   G92 E0          ;zero the extruded length'+"\n")
-    ini.append(r'   G1 F100 E7  ;extrude 7mm of feed stock'+"\n")
-    ini.append(r'   G92 E0          ;zero the extruded length again'+"\n")
-    ini.append(r'   G1 F200 E-{retraction_dual_amount}'+"\n")
-    ini.append(r'   T0          ;Switch to the first extruder'+"\n")
-    ini.append(r'   G92 E0          ;zero the extruded length'+"\n")
-    ini.append(r'   G1 F200 E7  ;extrude 7mm of feed stock'+"\n")
-    ini.append(r'   G92 E0          ;zero the extruded length again'+"\n")
-    ini.append(r'   G1 Z5 F200  ;Safety Z axis movement'+"\n")
-    ini.append(r'   G1 F{travel_speed}'+"\n")
-    ini.append(r'   M117 Printing...    ;Put printing message on LCD screen'+"\n")
+    ini.append('\t;Basic settings: Layer height: {layer_height} Walls: {wall_thickness} Fill: {fill_density}'+"\n")
+    ini.append('\t;Print time: {print_time}'+"\n")
+    ini.append('\t;Filament used: {filament_amount}m {filament_weight}g'+"\n")
+    ini.append('\t;Filament cost: {filament_cost}'+"\n")
+    ini.append('\t;M190 S{print_bed_temperature} ;Uncomment to add your own bed temperature line'+"\n")
+    ini.append('\t;M104 S{print_temperature}  ;Uncomment to add your own temperature line'+"\n")
+    ini.append('\t;M109 T1 S{print_temperature2} ;Uncomment to add your own temperature line'+"\n")
+    ini.append('\t;M109 T0 S{print_temperature} ;Uncomment to add your own temperature line'+"\n")
+    ini.append('\tG21                         ;metric values'+"\n")
+    ini.append('\tG90                         ;absolute positioning'+"\n")
+    ini.append('\tM107                        ;start with the fan off'+"\n")
+    ini.append('\tG28 X0 Y0                   ;move X/Y to min endstops'+"\n")
+    ini.append('\tG28 Z0                      ;move Z to min endstops'+"\n")
+    ini.append('\tT1                          ;Switch to the 2nd extruder'+"\n")
+    ini.append('\tG92 E0                      ;zero the extruded length'+"\n")
+    ini.append('\tG1 F100 E7                  ;extrude 7mm of feed stock'+"\n")
+    ini.append('\tG92 E0                      ;zero the extruded length again'+"\n")
+    ini.append('\tG1 F200 E-{retraction_dual_amount}'+"\n")
+    ini.append('\tT0                          ;Switch to the first extruder'+"\n")
+    ini.append('\tG92 E0                      ;zero the extruded length'+"\n")
+    ini.append('\tG1 F200 E7                  ;extrude 7mm of feed stock'+"\n")
+    ini.append('\tG92 E0                      ;zero the extruded length again'+"\n")
+    ini.append('\tG1 Z5 F200                  ;Safety Z axis movement'+"\n")
+    ini.append('\tG1 F{travel_speed}'+"\n")
+    ini.append('\tM117 Printing...            ;Put printing message on LCD screen'+"\n")
     ini.append(r'end2.gcode = M104 T0 S0'+"\n")
-    ini.append(r'   M104 T1 S0      ;extruder heater off'+"\n")
-    ini.append(r'   M140 S0         ;heated bed heater off (if you have it)'+"\n")
-    ini.append(r'   G91         ;relative positioning'+"\n")
-    ini.append(r'   G1 Y+10 F{travel_speed} ;move Z up a bit and retract filament even more'+"\n")
-    ini.append(r'   G28 X0 Y0       ;move X/Y to min endstops, so the head is out of the way'+"\n")
-    ini.append(r'   M84             ;steppers off'+"\n")
-    ini.append(r'   G90         ;absolute positioning'+"\n")
-    ini.append(r'   ;{profile_string}'+"\n")
+    ini.append('\tM104 T1 S0                  ;extruder heater off'+"\n")
+    ini.append('\tM140 S0                     ;heated bed heater off (if you have it)'+"\n")
+    ini.append('\tG91                         ;relative positioning'+"\n")
+    ini.append('\tG1 Y+10 F{travel_speed}     ;move Z up a bit and retract filament even more'+"\n")
+    ini.append('\tG28 X0 Y0                   ;move X/Y to min endstops, so the head is out of the way'+"\n")
+    ini.append('\tM84                         ;steppers off'+"\n")
+    ini.append('\tG90                         ;absolute positioning'+"\n")
+    ini.append('\t;{profile_string}'+"\n")
     ini.append(r'support_start.gcode = '+"\n")
     ini.append(r'support_end.gcode = '+"\n")
     ini.append(r'cool_start.gcode = '+"\n")
     ini.append(r'cool_end.gcode = '+"\n")
     ini.append(r'replace.csv = '+"\n")
-    ini.append(r'preswitchextruder.gcode = ;Switch between the current extruder and the next extruder, when printing with multiple extruders.'+"\n")
-    ini.append(r'   ;This code is added before the T(n)'+"\n")
-    ini.append(r'postswitchextruder.gcode = ;Switch between the current extruder and the next extruder, when printing with multiple extruders.'+"\n")
-    ini.append(r'   ;This code is added after the T(n)'+"\n")
-    ini.append(r'   G1 F500 E-0.5'+"\n")
-    ini.append(r'   G1 F50 E0.5'+"\n")
-    ini.append(r'   G92 E0'+"\n")
-    ini.append(r'   G1 F3000 E-4.5'+"\n")
-    ini.append(r'   G1 F{travel_speed}'+"\n")
+    ini.append(r'preswitchextruder.gcode =          ;Switch between the current extruder and the next extruder, when printing with multiple extruders.'+"\n")
+    ini.append('\t;This code is added before the T(n)'+"\n")
+    ini.append(r'postswitchextruder.gcode =         ;Switch between the current extruder and the next extruder, when printing with multiple extruders.'+"\n")
+    ini.append('\t;This code is added after the T(n)'+"\n")
+    ini.append('\tG1 F500 E-0.5'+"\n")
+    ini.append('\tG1 F50 E0.5'+"\n")
+    ini.append('\tG92 E0'+"\n")
+    ini.append('\tG1 F3000 E-4.5'+"\n")
+    ini.append('\tG1 F{travel_speed}'+"\n")
+
+    if dataLog != 'noData' :
+        # Store flows, speeds, temperatures and other data
+        pass
+        # writeData(extruder, currentDefaultSpeed, currentInfillLayerInterval, currentLayerHeight, hotendLeft, hotendRight, currentPrimaryExtruder, currentInfillExtruder, currentSupportExtruder, filamentLeft, filamentRight, quality, currentFirstLayerUnderspeed, currentOutlineUnderspeed, currentSupportUnderspeed, currentFirstLayerHeightPercentage, hotendLeftTemperature, hotendRightTemperature, currentBedTemperature, dataLog)
+
     if createFile == 'createFile':
         f = open(fileName+".ini", "w")
         f.writelines(ini)
         f.close()
-    if createFile == 'noFile':
+    if createFile == '--no-file':
         print string.join(ini)
-    if createFile == 'onlyFilename':
+    if createFile == '--only-filename':
         print fileName+'.fff'
     return fileName+'.ini'
 
@@ -904,7 +982,7 @@ def getBundleSize():
     shutil.rmtree(".BCN3D Sigma - Simplify3D Profiles temp")
     return bundleSize*1.05
 
-def createProfilesBundle(dataLog, profilesCreatedCount):    
+def createSimplify3DProfilesBundle(dataLog, profilesCreatedCount):    
     y = 'y'
     if getBundleSize()/1024/1024 >= 150: # define Size limit to notice (in MB)
         print ' Estimated space needed during the process: '+str(int(getBundleSize()*1.075/1024/1024))+' MB.'
@@ -966,16 +1044,29 @@ def createProfilesBundle(dataLog, profilesCreatedCount):
 
 def testAllCombinations():
     combinationCount = 0
-    totalProfilesAvailable = len(profilesData['hotend'])**2 * len(profilesData['filament'])**2
+    totalSimplify3DProfilesAvailable = len(profilesData['hotend'])**2 * len(profilesData['filament'])**2
     for hotendLeft in sorted(profilesData['hotend'], key=lambda k: k['id']):
         for hotendRight in sorted(profilesData['hotend'], key=lambda k: k['id']):
             for filamentLeft in sorted(profilesData['filament'], key=lambda k: k['id']):
                 for filamentRight in sorted(profilesData['filament'], key=lambda k: k['id']):
                     createSimplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, 'noData', 'nothing')
                     combinationCount += 1
-                    sys.stdout.write("\r Progress: %d%%" % int(float(combinationCount)/totalProfilesAvailable*100))
+                    sys.stdout.write("\r Testing Simplify3D Profiles: %d%%" % int(float(combinationCount)/totalSimplify3DProfilesAvailable*100))
                     sys.stdout.flush()
-    print '\r All '+str(combinationCount)+' profiles can be generated!\n'
+    print '\r Testing Simplify3D Profiles: OK  '
+    combinationCount = 0
+    totalProfilesAvailable = len(profilesData['hotend'])**2 * len(profilesData['filament'])**2 * len(profilesData['quality'])
+    for hotendLeft in sorted(profilesData['hotend'], key=lambda k: k['id']):
+        for hotendRight in sorted(profilesData['hotend'], key=lambda k: k['id']):
+            for filamentLeft in sorted(profilesData['filament'], key=lambda k: k['id']):
+                for filamentRight in sorted(profilesData['filament'], key=lambda k: k['id']):
+                    for quality in sorted(profilesData['quality'], key=lambda k: k['id']):
+                        createCuraProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, quality, 'noData', 'nothing')
+                        combinationCount += 1
+                        sys.stdout.write("\r Testing    Cura    Profiles: %d%%" % int(float(combinationCount)/totalProfilesAvailable*100))
+                        sys.stdout.flush()
+    print '\r Testing    Cura    Profiles: OK  '
+    print ' All '+str(totalSimplify3DProfilesAvailable + len(profilesData['hotend'])*3 * len(profilesData['filament'])**2 * len(profilesData['quality']))+' profiles can be generated!\n'
 
 def selectHotendAndFilament(extruder):
     print "\n Select Sigma's "+extruder+" Hotend (1-"+str(len(profilesData['hotend']))+'):'
@@ -1004,18 +1095,46 @@ def selectHotendAndFilament(extruder):
         answer1 = '1'
     return (int(answer0)-1, int(answer1)-1)
 
+def selectQuality():
+    print "\n Select Quality:"
+    answer0 = ''
+    qualityOptions = []
+    for c in range(len(profilesData['quality'])):
+        qualityOptions.append(str(c+1))
+    qualityOptions.append(str(c+2))
+    for quality in range(len(profilesData['quality'])):
+        print ' '+str(quality+1)+'. '+sorted(profilesData['quality'], key=lambda k: k['id'])[quality]['id']
+    while answer0 not in qualityOptions:
+        answer0 = raw_input(' ')
+    print ' Quality: '+sorted(profilesData['quality'], key=lambda k: k['id'])[int(answer0)-1]['id']
+    return int(answer0)-1   
+
+
 def validArguments():
-    if len(sys.argv) == 6 or len(sys.argv) == 7:
-        leftHotend = sys.argv[1]+'.json' in os.listdir('./Profiles Data/Hotends') or sys.argv[1] == 'None'
-        rightHontend = sys.argv[2]+'.json' in os.listdir('./Profiles Data/Hotends') or sys.argv[2] == 'None'
-        leftFilament = sys.argv[3]+'.json' in os.listdir('./Profiles Data/Filaments') or (sys.argv[1] == 'None' and sys.argv[3] == 'None')
-        rightFilament = sys.argv[4]+'.json' in os.listdir('./Profiles Data/Filaments') or (sys.argv[2] == 'None' and sys.argv[4] == 'None')
-        software = sys.argv[5] == '--cura' or sys.argv[5] == '--simplify3d'
-        if len(sys.argv) == 7:
-            fileAction = sys.argv[6] == '--no-file' or sys.argv[6] == '--only-filename'
-            return leftHotend and rightHontend and leftFilament and rightFilament and software and fileAction
+    if len(sys.argv) > 1:
+        if sys.argv[-1] == '--cura' and (len(sys.argv) == 7 or len(sys.argv) == 8):
+            leftHotend = sys.argv[1]+'.json' in os.listdir('./Profiles Data/Hotends') or sys.argv[1] == 'None'
+            rightHontend = sys.argv[2]+'.json' in os.listdir('./Profiles Data/Hotends') or sys.argv[2] == 'None'
+            leftFilament = sys.argv[3]+'.json' in os.listdir('./Profiles Data/Filaments') or (sys.argv[1] == 'None' and sys.argv[3] == 'None')
+            rightFilament = sys.argv[4]+'.json' in os.listdir('./Profiles Data/Filaments') or (sys.argv[2] == 'None' and sys.argv[4] == 'None')
+            quality = sys.argv[5]+'.json' in os.listdir('./Profiles Data/Quality Presets')
+            if len(sys.argv) == 8:
+                fileAction = sys.argv[6] == '--no-file' or sys.argv[6] == '--only-filename'
+                return leftHotend and rightHontend and leftFilament and rightFilament and quality and fileAction
+            else:
+                return leftHotend and rightHontend and leftFilament and rightFilament and quality
+        elif sys.argv[-1] == '--simplify3d' and (len(sys.argv) == 6 or len(sys.argv) == 7):
+            leftHotend = sys.argv[1]+'.json' in os.listdir('./Profiles Data/Hotends') or sys.argv[1] == 'None'
+            rightHontend = sys.argv[2]+'.json' in os.listdir('./Profiles Data/Hotends') or sys.argv[2] == 'None'
+            leftFilament = sys.argv[3]+'.json' in os.listdir('./Profiles Data/Filaments') or (sys.argv[1] == 'None' and sys.argv[3] == 'None')
+            rightFilament = sys.argv[4]+'.json' in os.listdir('./Profiles Data/Filaments') or (sys.argv[2] == 'None' and sys.argv[4] == 'None')       
+            if len(sys.argv) == 7:
+                fileAction = sys.argv[5] == '--no-file' or sys.argv[5] == '--only-filename'
+                return leftHotend and rightHontend and leftFilament and rightFilament and fileAction
+            else:
+                return leftHotend and rightHontend and leftFilament and rightFilament           
         else:
-            return leftHotend and rightHontend and leftFilament and rightFilament and software
+            return False
     else:
         return False
 
@@ -1064,45 +1183,69 @@ def main():
             leftFilament = profilesData['filament'][0]
         if sys.argv[4] == 'None':
             rightFilament = profilesData['filament'][0]
-        if len(sys.argv) == 7:
-            if sys.argv[6] == '--no-file' or sys.argv[6] == '--only-filename':
-                createSimplify3DProfile(leftHotend, rightHotend, leftFilament, rightFilament, 'noData', sys.argv[6])
-        else:
-            createSimplify3DProfile(leftHotend, rightHotend, leftFilament, rightFilament, 'noData', 'createFile')
+        if sys.argv[-1] == '--simplify3d':
+            if len(sys.argv) == 7:
+                if sys.argv[5] == '--no-file' or sys.argv[5] == '--only-filename':
+                    createSimplify3DProfile(leftHotend, rightHotend, leftFilament, rightFilament, 'noData', sys.argv[5])
+            else:
+                createSimplify3DProfile(leftHotend, rightHotend, leftFilament, rightFilament, 'noData', 'createFile')
+        elif sys.argv[-1] == '--cura':
+            for quality in os.listdir('./Profiles Data/Quality Presets'):
+                if quality == sys.argv[5]+'.json':
+                    with open('./Profiles Data/Quality Presets/'+quality) as quality_file:    
+                        qualityCura = json.load(quality_file)
+            if len(sys.argv) == 8:
+                if sys.argv[6] == '--no-file' or sys.argv[6] == '--only-filename':
+                    createCuraProfile(leftHotend, rightHotend, leftFilament, rightFilament, qualityCura, 'noData', sys.argv[6])
+            else:
+                createCuraProfile(leftHotend, rightHotend, leftFilament, rightFilament, qualityCura, 'noData', 'createFile')
     else:
         if len(sys.argv) == 1:
-            print '\n Welcome to the BCN3D Sigma Profile Generator for Simplify3D \n'
+            print '\n Welcome to the BCN3D Sigma Profile Generator \n'
             while True:
-                print ' Choose one option (1-4):'
-                print ' 1. Generate a bundle of profiles'
-                print ' 2. Generate one single profile'
-                print ' 3. Test all combinations'
-                print ' 4. Exit'
+                print ' Choose one option (1-6):'
+                print ' 1. Simplify3D : Generate a bundle of profiles'
+                print ' 2. Simplify3D : Generate one single profile'
+                print ' 3.    Cura    : Generate a bundle of profiles'
+                print ' 4.    Cura    : Generate one single profile'
+                print ' 5. Test all combinations'
+                print ' 6. Exit'
                 x = 'x'
                 y = 'y'
-                while x not in '1234':
+                while x not in ['1','2','3','4','5','6']:
                     x = raw_input(' ')
                 dataLog = ["LFilament;RFilament;Extruder;Quality;LNozzle;RNozzle;InfillExt;PrimaryExt;SupportExt;LFlow;RFlow;Layers/Infill;DefaultSpeed;FirstLayerUnderspeed;OutLineUnderspeed;SupportUnderspeed;FirstLayerHeightPercentage;LTemp;RTemp;BTemp;\n"]
                 profilesCreatedCount = 0
-                readProfilesData()
-                if x in '12':
+                readProfilesData()               
+
+                if x in ['1','2','4']:
                     if x == '1':
-                        profilesCreatedCount = createProfilesBundle(dataLog, profilesCreatedCount)
+                        profilesCreatedCount = createSimplify3DProfilesBundle(dataLog, profilesCreatedCount)
                         if profilesCreatedCount > 0:
                             print ' See profile(s) data? (Y/n)'
                             while y not in ['Y', 'n']:
                                 y = raw_input(' ')
-                    elif x == '2':
+                    elif x in ['2','4']:
                         a = selectHotendAndFilament('Left')
                         b = selectHotendAndFilament('Right')
                         if sorted(profilesData['hotend'], key=lambda k: k['id'])[a[0]]['id'] == 'None' and sorted(profilesData['hotend'], key=lambda k: k['id'])[b[0]]['id'] == 'None':
                             print "\n Select at least one hotend to create a profile.\n"
                         else:
-                            print "\n Your new profile '"+createSimplify3DProfile(sorted(profilesData['hotend'], key=lambda k: k['id'])[a[0]], sorted(profilesData['hotend'], key=lambda k: k['id'])[b[0]], sorted(profilesData['filament'], key=lambda k: k['id'])[a[1]], sorted(profilesData['filament'], key=lambda k: k['id'])[b[1]], dataLog, 'createFile')+"' has been created.\n"
-                            profilesCreatedCount = 1
-                            print ' See profile(s) data? (Y/n)'
-                            while y not in ['Y', 'n']:
-                                y = raw_input(' ')
+                            if x == '2':
+                                print "\n Your new Simplify3D profile '"+createSimplify3DProfile(sorted(profilesData['hotend'], key=lambda k: k['id'])[a[0]], sorted(profilesData['hotend'], key=lambda k: k['id'])[b[0]], sorted(profilesData['filament'], key=lambda k: k['id'])[a[1]], sorted(profilesData['filament'], key=lambda k: k['id'])[b[1]], dataLog, 'createFile')+"' has been created.\n"
+                                profilesCreatedCount = 1
+                                print ' See profile(s) data? (Y/n)'
+                                while y not in ['Y', 'n']:
+                                    y = raw_input(' ')
+                            elif x == '4':
+                                makeProfile = 'Yes'
+                                if sorted(profilesData['hotend'], key=lambda k: k['id'])[a[0]]['id'] != 'None' and sorted(profilesData['hotend'], key=lambda k: k['id'])[b[0]]['id'] != 'None':
+                                    if sorted(profilesData['hotend'], key=lambda k: k['id'])[a[0]]['nozzleSize'] != sorted(profilesData['hotend'], key=lambda k: k['id'])[b[0]]:
+                                        print "\n Select two hotends with the same nozzle size to create a Cura profile.\n"
+                                        makeProfile = 'No'
+                                if makeProfile == 'Yes':
+                                    c = selectQuality()
+                                    print "\n Your new Cura profile '"+createCuraProfile(sorted(profilesData['hotend'], key=lambda k: k['id'])[a[0]], sorted(profilesData['hotend'], key=lambda k: k['id'])[b[0]], sorted(profilesData['filament'], key=lambda k: k['id'])[a[1]], sorted(profilesData['filament'], key=lambda k: k['id'])[b[1]], sorted(profilesData['quality'], key=lambda k: k['id'])[c], dataLog, 'createFile')+"' has been created.\n"
                     if y == 'Y':
                         for l in dataLog:
                             print '',
@@ -1110,8 +1253,10 @@ def main():
                                 print string.rjust(str(d)[:6], 6),
                         print ' '+str(profilesCreatedCount)+' profile(s) created with '+str(len(dataLog)-1)+' configurations.\n'
                 elif x == '3':
+                    print '\n Available soon...\n'
+                elif x == '5':
                     testAllCombinations()
-                elif x == '4':
+                elif x == '6':
                     print '\n Until next time!\n'
                     break
 
