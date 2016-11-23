@@ -1,19 +1,19 @@
 {
-    "id": "Protopasta EverydayPLA",
+    "id": "SpoolWorks Scaffold",
     "filamentDiameter": 2.85,
     "filamentPricePerKg": 0,
-    "filamentDensity": 1.25,
-    "isSupportMaterial": false,
+    "filamentDensity": 0,
+    "isSupportMaterial": true,
     "isFlexibleMaterial": false,
-    "bedTemperature": 60,
-    "printTemperature": [200, 220],
+    "bedTemperature": 70,
+    "printTemperature": [210, 210],
     "defaultPrintSpeed": 60,
-    "advisedMaxPrintSpeed": 100,
+    "advisedMaxPrintSpeed": 60,
     "maxFlow": "None",
     "maxFlowForHighFlowHotend": "None",
     "retractionDistance": 4,
     "retractionSpeed": 40,
     "fanPercentage": 100,
     "extrusionMultiplier": 1,
-    "purgeLenght": 1.5
+    "purgeLenght": 2.25
 }
