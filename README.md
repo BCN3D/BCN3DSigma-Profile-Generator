@@ -20,15 +20,26 @@ Decompress it if you need to, open a terminal and go to the directory.
 
 ### **Fast mode**
 
-To generate a profile without entering the GUI. Just call the script and insert 4 valid parameters:
+To generate a profile without entering the GUI. 
+
+Simplify3D: call the script and insert 4 valid parameters:
 
 `python SigmaProfileGenerator.py LHotend RHotend LFilament RFilament --software`
 
-Valid parameters for Hotends are file names in */Profiles Data/Hotends* or 'None' if not mounted. Valid parameters for Fiamentsare are file in */Profiles Data/Filaments* or 'None' if empty. Example: 
+Cura: call the script and insert 5 valid parameters:
+
+`python SigmaProfileGenerator.py LHotend RHotend LFilament RFilament Quality --software`
+
+Valid parameters for Hotends are filenames in */Profiles Data/Hotends* or 'None' if not mounted. Valid parameters for Fiaments are filenames in */Profiles Data/Filaments* or 'None' if empty. Valid parameters for Quality are filenames in */Profiles Data/Quality Presets*. Examples: 
 
 `python SigmaProfileGenerator.py "0.4 - Brass" "0.4 - Brass" "Colorfila PLA" "Colorfila PLA" --simplify3d`
 
 Generates the file *BCN3D Sigma - 0.4 Left (PLA Colorfila), 0.4 Right (PLA Colorfila).fff*
+
+`python SigmaProfileGenerator.py "0.4 - Brass" "0.4 - Brass" "Colorfila PLA" "Colorfila PLA" "Medium" --cura`
+
+Generates the file *BCN3D Sigma - 0.4 Left (PLA Colorfila), 0.4 Right (PLA Colorfila) - Medium.ini*
+
 
 ### **GUI Mode**
 
@@ -38,13 +49,17 @@ To enter the GUI call the script without additional parameters:
 
 Will ask for a functionality:
 
-1. **Generate a bundle of profiles:** Combines all Hotends, Filaments and Quality Preconfigurations stored in *Profiles Data* folder to create a  zip file with all profiles available. The package also includes a csv file with useful data of each combination created.
+1. **Simplify3D: Generate a bundle of profiles:** Combines all Hotends, Filaments and Quality Preconfigurations stored in *Profiles Data* folder to create a  zip file with all profiles available. The package also includes a csv file with useful data of each combination created.
 
-2. **Generate one single profile:** Will ask for left Hotend, left loaded Filament, right Hotend and right loaded Filament. Then will generate the fff profile file.
+2. **Simplify3D: Generate one single profile:** Will ask for left Hotend, left loaded Filament, right Hotend and right loaded Filament. Then will generate the fff profile file.
 
-3. **Test all combinations:** Like *1. Generate a bundle of profiles* but without storing data neither generating fff profile files. A fast option to just ensure all combinations can be properly created.
+3. **Cura: Generate a bundle of profiles:** Same as *1*, now for Cura.
 
-4. **Exit:** Quit the program.
+4. **Cura: Generate one single profile:** Same as *2*, now for Cura (will ask for Quality at the end).
+
+5. **Test all combinations:** Like *1. Generate a bundle of profiles* but without storing data neither generating fff profile files. A fast option to just ensure all combinations can be properly created.
+
+6. **Exit:** Quit the program.
 
 In order to add, remove or change a nozzle size, filament or quality preconfiguration edit the files in *Profiles Data* folder.
 
@@ -101,7 +116,7 @@ Quality Preconfigurations
 ## TO-DO
 
 - [ ] Fix temperature values when using dual extruder assistant.
-- [ ] Availability to generate Cura profiles (Work in progress!)
+- [x] Availability to generate Cura profiles
 - [ ] Availability to create .json files right from the script
 - [ ] Better print speed management for flexible materials
 - [ ] Adjust bridging for flexible materials
