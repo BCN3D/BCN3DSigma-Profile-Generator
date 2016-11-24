@@ -1324,10 +1324,10 @@ def main():
             print '\n Welcome to the BCN3D Sigma Profile Generator \n'
             while True:
                 print ' Choose one option (1-6):'
-                print ' 1. Simplify3D : Generate a bundle of profiles'
-                print ' 2. Simplify3D : Generate one single profile'
-                print ' 3.    Cura    : Generate a bundle of profiles'
-                print ' 4.    Cura    : Generate one single profile'
+                print ' 1. Generate one single profile - Simplify3D'
+                print ' 2. Generate one single profile - Cura'
+                print ' 3. Generate a bundle of profiles - Simplify3D'
+                print ' 4. Generate a bundle of profiles - Cura'
                 print ' 5. Test all combinations'
                 print ' 6. Exit'
                 x = 'x'
@@ -1339,21 +1339,20 @@ def main():
                 readProfilesData()
 
                 if x in ['1','2','3','4']:
-                    if x == '1':
+                    if x == '3':
                         profilesCreatedCount = createSimplify3DProfilesBundle(dataLog, profilesCreatedCount)
-                        
-                    elif x == '3':
+                    elif x == '4':
                         profilesCreatedCount = createCuraProfilesBundle(dataLog, profilesCreatedCount)
-                    elif x in ['2','4']:
+                    elif x in ['1','2']:
                         a = selectHotendAndFilament('Left')
                         b = selectHotendAndFilament('Right')
                         if sorted(profilesData['hotend'], key=lambda k: k['id'])[a[0]]['id'] == 'None' and sorted(profilesData['hotend'], key=lambda k: k['id'])[b[0]]['id'] == 'None':
                             print "\n Select at least one hotend to create a profile.\n"
                         else:
-                            if x == '2':
+                            if x == '1':
                                 print "\n Your new Simplify3D profile '"+createSimplify3DProfile(sorted(profilesData['hotend'], key=lambda k: k['id'])[a[0]], sorted(profilesData['hotend'], key=lambda k: k['id'])[b[0]], sorted(profilesData['filament'], key=lambda k: k['id'])[a[1]], sorted(profilesData['filament'], key=lambda k: k['id'])[b[1]], dataLog, 'createFile')+"' has been created.\n"
                                 profilesCreatedCount = 1
-                            elif x == '4':
+                            elif x == '2':
                                 makeProfile = 'Yes'
                                 if sorted(profilesData['hotend'], key=lambda k: k['id'])[a[0]]['id'] != 'None' and sorted(profilesData['hotend'], key=lambda k: k['id'])[b[0]]['id'] != 'None':
                                     if sorted(profilesData['hotend'], key=lambda k: k['id'])[a[0]]['nozzleSize'] != sorted(profilesData['hotend'], key=lambda k: k['id'])[b[0]]['nozzleSize']:
