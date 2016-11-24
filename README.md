@@ -74,7 +74,7 @@ Hotends
 Filaments
 ```json5
 {
-    "id": "PLA Colorfila",					// Filament Name
+    "id": "Colorfila PLA",					// Filament Name
     "filamentDiameter": 2.85,				// [mm]
     "filamentPricePerKg": 19.95,			// [€]
     "filamentDensity": 1.25,				// [g/cm3]
