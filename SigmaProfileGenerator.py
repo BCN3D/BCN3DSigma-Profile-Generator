@@ -570,7 +570,8 @@ def createCuraProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, qual
             filamentFlow = filamentRight['extrusionMultiplier']*100
             retractionSpeed = filamentRight['retractionSpeed']
             retractionAmount = filamentRight['retractionDistance']
-            firstLayerHeight = "%.2f" % (currentLayerHeight * int(min(125, flowValue(hotendRight, filamentRight)*100/(hotend['nozzleSize']*currentLayerHeight*(currentDefaultSpeed/60.)*float(currentFirstLayerUnderspeed))))/100.)
+            currentFirstLayerHeightPercentage = int(min(125, flowValue(hotendRight, filamentRight)*100/(hotend['nozzleSize']*currentLayerHeight*(currentDefaultSpeed/60.)*float(currentFirstLayerUnderspeed))))
+            firstLayerHeight = "%.2f" % (currentLayerHeight * currentFirstLayerHeightPercentage/100.)
             if filamentRight['fanPercentage'] > 0:
                 fanEnabled = 'True'
             else:
@@ -593,7 +594,8 @@ def createCuraProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, qual
         filamentFlow = filamentLeft['extrusionMultiplier']*100
         retractionSpeed = filamentLeft['retractionSpeed']
         retractionAmount = filamentLeft['retractionDistance']
-        firstLayerHeight = "%.2f" % (currentLayerHeight * int(min(125, flowValue(hotendLeft, filamentLeft)*100/(hotend['nozzleSize']*currentLayerHeight*(currentDefaultSpeed/60.)*float(currentFirstLayerUnderspeed))))/100.)
+        currentFirstLayerHeightPercentage = int(min(125, flowValue(hotendLeft, filamentLeft)*100/(hotend['nozzleSize']*currentLayerHeight*(currentDefaultSpeed/60.)*float(currentFirstLayerUnderspeed))))
+        firstLayerHeight = "%.2f" % (currentLayerHeight * currentFirstLayerHeightPercentage/100.)
         if filamentLeft['fanPercentage'] > 0:
             fanEnabled = 'True'
         else:
@@ -842,7 +844,7 @@ def createCuraProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, qual
 
     if dataLog != 'noData' :
         # Store flows, speeds, temperatures and other data
-        writeData(extruder, currentDefaultSpeed, "1", currentLayerHeight, hotendLeft, hotendRight, currentPrimaryExtruder, currentInfillExtruder, currentSupportExtruder, filamentLeft, filamentRight, quality, currentFirstLayerUnderspeed, currentOutlineUnderspeed, currentSupportUnderspeed, currentFirstLayerHeightPercentage, hotendLeftTemperature, hotendRightTemperature, bedTemperature, dataLog)
+        writeData(extruder, currentDefaultSpeed, 1, currentLayerHeight, hotendLeft, hotendRight, currentPrimaryExtruder, currentInfillExtruder, currentSupportExtruder, filamentLeft, filamentRight, quality, currentFirstLayerUnderspeed, currentOutlineUnderspeed, currentSupportUnderspeed, currentFirstLayerHeightPercentage, hotendLeftTemperature, hotendRightTemperature, bedTemperature, dataLog)
 
     if createFile == 'createFile':
         f = open(fileName+".ini", "w")
@@ -856,9 +858,9 @@ def createCuraProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, qual
 
 def createSimplify3DProfilesBundle(dataLog, profilesCreatedCount):    
     y = 'y'
-    if getBundleSize()/1024/1024 >= 150: # define Size limit to notice (in MB)
-        print ' Estimated space needed during the process: '+str(int(getBundleSize()*1.075/1024/1024))+' MB.'
-        print ' Estimated final bundle size: '+str(int(getBundleSize()*0.075/1024/1024))+' MB.'
+    if getSimplify3DBundleSize()/1024/1024 >= 150: # define Size limit to notice (in MB)
+        print ' Estimated space needed during the process: '+str(int(getSimplify3DBundleSize()*1.075/1024/1024))+' MB.'
+        print ' Estimated final bundle size: '+str(int(getSimplify3DBundleSize()*0.075/1024/1024))+' MB.'
         print ' Do you want to continue? (Y/n)'
         while y not in ['Y', 'n']:
             y = raw_input(' ')
@@ -914,8 +916,122 @@ def createSimplify3DProfilesBundle(dataLog, profilesCreatedCount):
     else:
         return 0
 
-def createCuraProfilesBundle(dataLog, profilesCreatedCount):
-    return
+def getSimplify3DBundleSize(oneLineCsvSize = float(10494984)/78480): # experimental value
+    if ".BCN3D Sigma - Simplify3D Profiles temp" in os.listdir('.'):
+        shutil.rmtree(".BCN3D Sigma - Simplify3D Profiles temp")
+    os.mkdir(".BCN3D Sigma - Simplify3D Profiles temp")
+    os.chdir(".BCN3D Sigma - Simplify3D Profiles temp")
+    
+    totalSmaProfiles = (len(profilesData['hotend'])-1) *  len(profilesData['filament']) * 2
+    totalBigProfiles = (len(profilesData['hotend'])-1)**2 * len(profilesData['filament'])**2
+
+    fileNameBig = createSimplify3DProfile(profilesData['hotend'][0], profilesData['hotend'][0], profilesData['filament'][0], profilesData['filament'][0], 'noData', 'createFile')
+    fileNameSmall = createSimplify3DProfile(profilesData['hotend'][0], profilesData['hotend'][-1], profilesData['filament'][0], profilesData['filament'][0], 'noData', 'createFile')
+    
+    csvSize = oneLineCsvSize * (totalSmaProfiles*len(profilesData['quality']) + totalBigProfiles*len(profilesData['quality'])*3)
+    bundleSize = totalSmaProfiles*os.path.getsize(fileNameSmall)+totalBigProfiles*os.path.getsize(fileNameBig) + csvSize
+
+    os.chdir('..')
+    shutil.rmtree(".BCN3D Sigma - Simplify3D Profiles temp")
+    return bundleSize*1.05
+
+def createCuraProfilesBundle(dataLog, profilesCreatedCount):  
+    y = 'y'
+    if getCuraBundleSize()/1024/1024 >= 150: # define Size limit to notice (in MB)
+        print ' Estimated space needed during the process: '+str(int(getSimplify3DBundleSize()*1.075/1024/1024))+' MB.'
+        print ' Estimated final bundle size: '+str(int(getSimplify3DBundleSize()*0.075/1024/1024))+' MB.'
+        print ' Do you want to continue? (Y/n)'
+        while y not in ['Y', 'n']:
+            y = raw_input(' ')
+        print
+    else:
+        y = 'Y'
+    if y == 'Y':
+        nozzleSizes = []
+        for hotend in sorted(profilesData['hotend'], key=lambda k: k['id'])[:-1]:
+            nozzleSizes.append(hotend['nozzleSize'])
+        curaGroupedSizes = {x:nozzleSizes.count(x) for x in nozzleSizes}
+        curaIDEXHotendsCombinations = 0
+        for size in curaGroupedSizes:
+            curaIDEXHotendsCombinations += curaGroupedSizes[size]**2
+        totalProfilesAvailable = ((len(profilesData['hotend'])-1) *  len(profilesData['filament']) * 2 + curaIDEXHotendsCombinations * len(profilesData['filament'])**2) * len(profilesData['quality'])
+        if ".BCN3D Sigma - Cura Profiles temp" in os.listdir('.'):
+            shutil.rmtree(".BCN3D Sigma - Cura Profiles temp")
+        os.mkdir(".BCN3D Sigma - Cura Profiles temp")
+        os.chdir(".BCN3D Sigma - Cura Profiles temp")
+
+        for hotendLeft in sorted(profilesData['hotend'], key=lambda k: k['id']):
+            if hotendLeft['id'] != 'None':
+                os.mkdir("Left Hotend "+hotendLeft['id'])
+                os.chdir("Left Hotend "+hotendLeft['id'])
+            else:
+                os.mkdir("No Left Hotend")
+                os.chdir("No Left Hotend")
+            for hotendRight in sorted(profilesData['hotend'], key=lambda k: k['id']):
+                if hotendRight['id'] != 'None':
+                    os.mkdir("Right Hotend "+hotendRight['id'])
+                    os.chdir("Right Hotend "+hotendRight['id'])
+                else:                
+                    os.mkdir("No Right Hotend")
+                    os.chdir("No Right Hotend")
+                for quality in sorted(profilesData['quality'], key=lambda k: k['id']):
+                    os.mkdir(quality['id'])
+                    os.chdir(quality['id'])
+                    for filamentLeft in sorted(profilesData['filament'], key=lambda k: k['id']):
+                        for filamentRight in sorted(profilesData['filament'], key=lambda k: k['id']):
+                            if hotendRight['id'] == 'None' and hotendLeft['id'] == 'None':
+                                break
+                            if hotendLeft['id'] != 'None' and hotendRight['id'] != 'None':
+                                if hotendLeft['nozzleSize'] != hotendRight['nozzleSize']:
+                                    break
+                            profilesCreatedCount += 1
+                            createCuraProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, quality, dataLog, 'createFile')
+                            sys.stdout.write("\r Progress: %d%%" % int(float(profilesCreatedCount)/totalProfilesAvailable*100))
+                            sys.stdout.flush()
+                            if hotendRight['id'] == 'None':
+                                break
+                        if hotendLeft['id'] == 'None':
+                            break
+                    os.chdir('..')
+                os.chdir('..')
+            os.chdir('..')
+        csv = open("BCN3D Sigma - Cura Profiles.csv", "w")
+        csv.writelines(dataLog)
+        csv.close()
+        os.chdir('..')
+        sys.stdout.write("\r Progress: Creating the zip file...")
+        sys.stdout.flush()
+        shutil.make_archive('BCN3D Sigma - Cura Profiles', 'zip', '.BCN3D Sigma - Cura Profiles temp')
+        shutil.rmtree(".BCN3D Sigma - Cura Profiles temp")
+        print("\r Your bundle 'BCN3D Sigma - Cura Profiles.zip' is ready. Enjoy!\n")
+        return profilesCreatedCount
+    else:
+        return 0
+
+def getCuraBundleSize(oneLineCsvSize = float(10494984)/78480): # experimental value
+    if ".BCN3D Sigma - Cura Profiles temp" in os.listdir('.'):
+        shutil.rmtree(".BCN3D Sigma - Cura Profiles temp")
+    os.mkdir(".BCN3D Sigma - Cura Profiles temp")
+    os.chdir(".BCN3D Sigma - Cura Profiles temp")
+
+    nozzleSizes = []
+    for hotend in sorted(profilesData['hotend'], key=lambda k: k['id'])[:-1]:
+        nozzleSizes.append(hotend['nozzleSize'])
+    curaGroupedSizes = {x:nozzleSizes.count(x) for x in nozzleSizes}
+    curaIDEXHotendsCombinations = 0
+    for size in curaGroupedSizes:
+        curaIDEXHotendsCombinations += curaGroupedSizes[size]**2
+
+    totalProfiles = ((len(profilesData['hotend'])-1) *  len(profilesData['filament']) * 2 + curaIDEXHotendsCombinations * len(profilesData['filament'])**2) * len(profilesData['quality'])
+
+    fileName = createCuraProfile(profilesData['hotend'][0], profilesData['hotend'][0], profilesData['filament'][0], profilesData['filament'][0], profilesData['quality'][0], 'noData', 'createFile')
+    
+    csvSize = oneLineCsvSize * totalProfiles
+    bundleSize = totalProfiles*os.path.getsize(fileName) + csvSize
+
+    os.chdir('..')
+    shutil.rmtree(".BCN3D Sigma - Cura Profiles temp")
+    return bundleSize*1.05
 
 def speedMultiplier(hotend, filament):
     if filament['isFlexibleMaterial']:
@@ -1001,27 +1117,24 @@ def speedValues(hotendLeft, hotendRight, filamentLeft, filamentRight, quality, a
         currentOutlineUnderspeed = 1.00
     return currentDefaultSpeed, currentFirstLayerUnderspeed, currentOutlineUnderspeed, currentSupportUnderspeed
 
-def getBundleSize():
-    if ".BCN3D Sigma - Simplify3D Profiles temp" in os.listdir('.'):
-        shutil.rmtree(".BCN3D Sigma - Simplify3D Profiles temp")
-    os.mkdir(".BCN3D Sigma - Simplify3D Profiles temp")
-    os.chdir(".BCN3D Sigma - Simplify3D Profiles temp")
-    
+def testAllCombinations():
+
+    # Calculate All profiles available for each software
     totalSmaProfiles = (len(profilesData['hotend'])-1) *  len(profilesData['filament']) * 2
     totalBigProfiles = (len(profilesData['hotend'])-1)**2 * len(profilesData['filament'])**2
+    realSimplify3DProfilesAvailable = totalSmaProfiles + totalBigProfiles
 
-    fileNameBig = createSimplify3DProfile(profilesData['hotend'][0], profilesData['hotend'][0], profilesData['filament'][0], profilesData['filament'][0], 'noData', 'createFile')
-    fileNameSmall = createSimplify3DProfile(profilesData['hotend'][0], profilesData['hotend'][-1], profilesData['filament'][0], profilesData['filament'][0], 'noData', 'createFile')
-    
-    oneLineCsvSize = float(10494984)/78480 # experimental value
-    csvSize = oneLineCsvSize * (totalSmaProfiles*len(profilesData['quality']) + totalBigProfiles*len(profilesData['quality'])*3)
-    bundleSize = totalSmaProfiles*os.path.getsize(fileNameSmall)+totalBigProfiles*os.path.getsize(fileNameBig) + csvSize
+    nozzleSizes = []
+    for hotend in sorted(profilesData['hotend'], key=lambda k: k['id'])[:-1]:
+        nozzleSizes.append(hotend['nozzleSize'])
+    curaGroupedSizes = {x:nozzleSizes.count(x) for x in nozzleSizes}
+    curaIDEXHotendsCombinations = 0
+    for size in curaGroupedSizes:
+        curaIDEXHotendsCombinations += curaGroupedSizes[size]**2
 
-    os.chdir('..')
-    shutil.rmtree(".BCN3D Sigma - Simplify3D Profiles temp")
-    return bundleSize*1.05
+    realCuraProfileaAvailable = (totalSmaProfiles + curaIDEXHotendsCombinations * len(profilesData['filament'])**2) * len(profilesData['quality'])
 
-def testAllCombinations():
+    # Start iteration
     combinationCount = 0
     totalSimplify3DProfilesAvailable = len(profilesData['hotend'])**2 * len(profilesData['filament'])**2
     for hotendLeft in sorted(profilesData['hotend'], key=lambda k: k['id']):
@@ -1032,7 +1145,7 @@ def testAllCombinations():
                     combinationCount += 1
                     sys.stdout.write("\r Testing Simplify3D Profiles: %d%%" % int(float(combinationCount)/totalSimplify3DProfilesAvailable*100))
                     sys.stdout.flush()
-    print '\r Testing Simplify3D Profiles: OK  '
+    print '\r Testing Simplify3D Profiles: OK. Profiles tested: '+str(realSimplify3DProfilesAvailable)
     combinationCount = 0
     totalProfilesAvailable = len(profilesData['hotend'])**2 * len(profilesData['filament'])**2 * len(profilesData['quality'])
     for hotendLeft in sorted(profilesData['hotend'], key=lambda k: k['id']):
@@ -1044,8 +1157,9 @@ def testAllCombinations():
                         combinationCount += 1
                         sys.stdout.write("\r Testing    Cura    Profiles: %d%%" % int(float(combinationCount)/totalProfilesAvailable*100))
                         sys.stdout.flush()
-    print '\r Testing    Cura    Profiles: OK  '
-    print ' All '+str(totalSimplify3DProfilesAvailable + len(profilesData['hotend'])*3 * len(profilesData['filament'])**2 * len(profilesData['quality']))+' profiles can be generated!\n'
+    print '\r Testing Cura Profiles: OK. Profiles Tested:'+str(realCuraProfileaAvailable)
+
+    print ' All '+str(realSimplify3DProfilesAvailable + realCuraProfileaAvailable)+' profiles can be generated!\n'
 
 def selectHotendAndFilament(extruder):
     print "\n Select Sigma's "+extruder+" Hotend (1-"+str(len(profilesData['hotend']))+'):'
@@ -1053,7 +1167,6 @@ def selectHotendAndFilament(extruder):
     hotendOptions = []
     for c in range(len(profilesData['hotend'])):
         hotendOptions.append(str(c+1))
-    hotendOptions.append(str(c+2))
     materialOptions = []
     for c in range(len(profilesData['filament'])):
         materialOptions.append(str(c+1))
@@ -1062,7 +1175,7 @@ def selectHotendAndFilament(extruder):
     while answer0 not in hotendOptions:
         answer0 = raw_input(' ')
     print ' '+extruder+' Hotend: '+sorted(profilesData['hotend'], key=lambda k: k['id'])[int(answer0)-1]['id']
-    if answer0 != str(int(hotendOptions[-1])-1):
+    if answer0 != str(int(hotendOptions[-1])):
         print "\n Select Sigma's "+extruder+" Extruder Loaded Filament (1-"+str(len(profilesData['filament']))+'):'
         answer1 = ''
         for material in range(len(profilesData['filament'])):
@@ -1080,7 +1193,6 @@ def selectQuality():
     qualityOptions = []
     for c in range(len(profilesData['quality'])):
         qualityOptions.append(str(c+1))
-    qualityOptions.append(str(c+2))
     for quality in range(len(profilesData['quality'])):
         print ' '+str(quality+1)+'. '+sorted(profilesData['quality'], key=lambda k: k['id'])[quality]['id']
     while answer0 not in qualityOptions:
@@ -1224,15 +1336,14 @@ def main():
                     x = raw_input(' ')
                 dataLog = ["LFilament;RFilament;Extruder;Quality;LNozzle;RNozzle;InfillExt;PrimaryExt;SupportExt;LFlow;RFlow;Layers/Infill;DefaultSpeed;FirstLayerUnderspeed;OutLineUnderspeed;SupportUnderspeed;FirstLayerHeightPercentage;LTemp;RTemp;BTemp;\n"]
                 profilesCreatedCount = 0
-                readProfilesData()               
+                readProfilesData()
 
-                if x in ['1','2','4']:
+                if x in ['1','2','3','4']:
                     if x == '1':
                         profilesCreatedCount = createSimplify3DProfilesBundle(dataLog, profilesCreatedCount)
-                        if profilesCreatedCount > 0:
-                            print ' See profile(s) data? (Y/n)'
-                            while y not in ['Y', 'n']:
-                                y = raw_input(' ')
+                        
+                    elif x == '3':
+                        profilesCreatedCount = createCuraProfilesBundle(dataLog, profilesCreatedCount)
                     elif x in ['2','4']:
                         a = selectHotendAndFilament('Left')
                         b = selectHotendAndFilament('Right')
@@ -1242,26 +1353,26 @@ def main():
                             if x == '2':
                                 print "\n Your new Simplify3D profile '"+createSimplify3DProfile(sorted(profilesData['hotend'], key=lambda k: k['id'])[a[0]], sorted(profilesData['hotend'], key=lambda k: k['id'])[b[0]], sorted(profilesData['filament'], key=lambda k: k['id'])[a[1]], sorted(profilesData['filament'], key=lambda k: k['id'])[b[1]], dataLog, 'createFile')+"' has been created.\n"
                                 profilesCreatedCount = 1
-                                print ' See profile(s) data? (Y/n)'
-                                while y not in ['Y', 'n']:
-                                    y = raw_input(' ')
                             elif x == '4':
                                 makeProfile = 'Yes'
                                 if sorted(profilesData['hotend'], key=lambda k: k['id'])[a[0]]['id'] != 'None' and sorted(profilesData['hotend'], key=lambda k: k['id'])[b[0]]['id'] != 'None':
-                                    if sorted(profilesData['hotend'], key=lambda k: k['id'])[a[0]]['nozzleSize'] != sorted(profilesData['hotend'], key=lambda k: k['id'])[b[0]]:
+                                    if sorted(profilesData['hotend'], key=lambda k: k['id'])[a[0]]['nozzleSize'] != sorted(profilesData['hotend'], key=lambda k: k['id'])[b[0]]['nozzleSize']:
                                         print "\n Select two hotends with the same nozzle size to create a Cura profile.\n"
                                         makeProfile = 'No'
                                 if makeProfile == 'Yes':
                                     c = selectQuality()
                                     print "\n Your new Cura profile '"+createCuraProfile(sorted(profilesData['hotend'], key=lambda k: k['id'])[a[0]], sorted(profilesData['hotend'], key=lambda k: k['id'])[b[0]], sorted(profilesData['filament'], key=lambda k: k['id'])[a[1]], sorted(profilesData['filament'], key=lambda k: k['id'])[b[1]], sorted(profilesData['quality'], key=lambda k: k['id'])[c], dataLog, 'createFile')+"' has been created.\n"
+                                    profilesCreatedCount = 1
+                    if profilesCreatedCount > 0:
+                        print ' See profile(s) data? (Y/n)'
+                        while y not in ['Y', 'n']:
+                            y = raw_input(' ')
                     if y == 'Y':
                         for l in dataLog:
                             print '',
                             for d in string.split(l, ';'):
                                 print string.rjust(str(d)[:6], 6),
                         print ' '+str(profilesCreatedCount)+' profile(s) created with '+str(len(dataLog)-1)+' configurations.\n'
-                elif x == '3':
-                    print '\n Available soon...\n'
                 elif x == '5':
                     testAllCombinations()
                 elif x == '6':
