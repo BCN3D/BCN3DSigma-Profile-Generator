@@ -13,120 +13,6 @@ import string
 import shutil
 import zipfile
 
-def writeData(extruder, currentDefaultSpeed, currentInfillLayerInterval, currentLayerHeight, hotendLeft, hotendRight, currentPrimaryExtruder, currentInfillExtruder, currentSupportExtruder, filamentLeft, filamentRight, quality, currentFirstLayerUnderspeed, currentOutlineUnderspeed, currentSupportUnderspeed, currentFirstLayerHeightPercentage, hotendLeftTemperature, hotendRightTemperature, currentBedTemperature, dataLog):
-    if extruder[0] == 'L':
-        printA = "%.2f" % (float(currentDefaultSpeed)/60*currentInfillLayerInterval*currentLayerHeight*hotendLeft['nozzleSize'])
-        printB = ""
-    elif extruder[0] == 'R':
-        printA = ""
-        printB = "%.2f" % (float(currentDefaultSpeed)/60*currentInfillLayerInterval*currentLayerHeight*hotendRight['nozzleSize'])
-    else:
-        if filamentLeft['isSupportMaterial'] != filamentRight['isSupportMaterial']:
-            if filamentLeft['isSupportMaterial']:
-                supportMaterialLoadedLeft = float(currentSupportUnderspeed)
-                supportMaterialLoadedRight = 1
-            else:
-                supportMaterialLoadedLeft = 1
-                supportMaterialLoadedRight = float(currentSupportUnderspeed)
-        else:
-            supportMaterialLoadedLeft = 1
-            supportMaterialLoadedRight = 1
-        if hotendLeft['nozzleSize'] != hotendRight['nozzleSize']:
-            if currentPrimaryExtruder == 0: 
-                printA = "%.2f" % (float(currentDefaultSpeed)/60*currentLayerHeight*hotendLeft['nozzleSize']*supportMaterialLoadedLeft)
-                printB = "%.2f" % (float(currentDefaultSpeed)/60*currentInfillLayerInterval*currentLayerHeight*hotendRight['nozzleSize']*supportMaterialLoadedRight)
-            else:
-                printA = "%.2f" % (float(currentDefaultSpeed)/60*currentLayerHeight*currentInfillLayerInterval*hotendLeft['nozzleSize']*supportMaterialLoadedLeft)
-                printB = "%.2f" % (float(currentDefaultSpeed)/60*currentLayerHeight*hotendRight['nozzleSize']*supportMaterialLoadedRight)
-        else:
-            printA = "%.2f" % (float(currentDefaultSpeed)/60*currentInfillLayerInterval*currentLayerHeight*hotendLeft['nozzleSize']*supportMaterialLoadedLeft)
-            printB = "%.2f" % (float(currentDefaultSpeed)/60*currentInfillLayerInterval*currentLayerHeight*hotendRight['nozzleSize']*supportMaterialLoadedRight)
-    dataLog.append(filamentLeft['id']+";"+filamentRight['id']+";"+extruder+";"+quality['id']+";"+hotendLeft['id']+";"+hotendRight['id']+";"+'T'+str(currentInfillExtruder)+";"+'T'+str(currentPrimaryExtruder)+";"+'T'+str(currentSupportExtruder)+";"+str(printA)+";"+str(printB)+";"+str(currentInfillLayerInterval)+";"+str("%.2f" % (currentDefaultSpeed/60.))+";"+str(currentFirstLayerUnderspeed)+";"+str(currentOutlineUnderspeed)+";"+str(currentSupportUnderspeed)+";"+str(currentFirstLayerHeightPercentage)+";"+str(hotendLeftTemperature)+";"+str(hotendRightTemperature)+";"+str(currentBedTemperature)+";\n")
-
-def speedMultiplier(hotend, filament):
-    if filament['isFlexibleMaterial']:
-        return float(filament['defaultPrintSpeed'])/24*hotend['nozzleSize']
-    else:
-        return float(filament['defaultPrintSpeed'])/60
-
-def purgeValues(hotend, filament):
-    baseSpeed04 = 50
-    baseStartLenght04 = 7
-    baseToolChangeLenght04 = 1.5
-    return str("%.2f" % ((hotend['nozzleSize']/0.4)**2*baseSpeed04)), str("%.2f" % ((hotend['nozzleSize']/0.4)**2*baseStartLenght04*filament['purgeLenght']/baseToolChangeLenght04)), str("%.2f" % ((hotend['nozzleSize']/0.4)**2*filament['purgeLenght']))
-
-def flowValue(hotend, filament):
-    if hotend['nozzleSize'] <= 0.6:
-        if filament['maxFlow'] == 'None':
-            return 0.4*0.2*filament['advisedMaxPrintSpeed']
-        else:
-            return filament['maxFlow']
-    else:
-        if filament['maxFlowForHighFlowHotend'] == 'None':
-            if filament['maxFlow'] == 'None':
-                return 0.4*0.2*filament['advisedMaxPrintSpeed']
-            else:
-                return filament['maxFlow']
-        else:
-            return filament['maxFlowForHighFlowHotend']
-
-def temperatureValue(filament, hotend, layerHeight, speed, base = 5):
-    # adaptative temperature according to flow values. Rounded to base
-    flow = hotend['nozzleSize']*layerHeight*float(speed)/60
-    temperature = int(base * round((filament['printTemperature'][0]+flow*float(filament['printTemperature'][1]-filament['printTemperature'][0])/flowValue(hotend, filament))/float(base)))
-    return temperature
-
-def speedValues(hotendLeft, hotendRight, filamentLeft, filamentRight, quality, action):
-    if action == 'MEX Left' or action == 'IDEX, Infill with Right' or action == 'IDEX, Supports with Right':
-        currentFilament = filamentLeft
-        leftExtruderDefaultSpeed = quality['defaultSpeed']*speedMultiplier(hotendLeft, filamentLeft)
-        leftExtruderMaxSpeedAtDefaultTemperature = flowValue(hotendLeft, filamentLeft)/(hotendLeft['nozzleSize']*quality['layerHeightMultiplier']*hotendLeft['nozzleSize'])
-        if action == 'IDEX, Infill with Right':
-            rightExtruderMaxSpeedAtHighTemperature = flowValue(hotendRight, filamentRight)/(hotendRight['nozzleSize']*quality['layerHeightMultiplier']*hotendRight['nozzleSize'])
-            currentDefaultSpeed = int(str(float(min(leftExtruderDefaultSpeed, leftExtruderMaxSpeedAtDefaultTemperature, rightExtruderMaxSpeedAtHighTemperature)*60)).split('.')[0])
-        else:
-            currentDefaultSpeed = int(str(float(min(leftExtruderDefaultSpeed, leftExtruderMaxSpeedAtDefaultTemperature)*60)).split('.')[0])
-        leftExtruderNeededFirstLayerUnderspeed = leftExtruderDefaultSpeed*60*quality['firstLayerUnderspeed']/float(currentDefaultSpeed) 
-        leftExtruderNeededOutlineUnderspeed = leftExtruderDefaultSpeed*60*quality['outlineUnderspeed']/float(currentDefaultSpeed)
-        leftExtruderNeededSupportUnderspeed = leftExtruderDefaultSpeed*60*0.9/float(currentDefaultSpeed)
-        if filamentLeft['isFlexibleMaterial']:
-            currentFirstLayerUnderspeed = 1.00
-            currentOutlineUnderspeed = 1.00
-        else:
-            currentFirstLayerUnderspeed = float("%.2f" % (min(leftExtruderNeededFirstLayerUnderspeed, 1)))
-            currentOutlineUnderspeed = float("%.2f" % (min(leftExtruderNeededOutlineUnderspeed, 1)))
-
-        if action == 'IDEX, Supports with Right':
-            currentSupportUnderspeed = float("%.2f" % (flowValue(hotendRight, filamentRight)/float(hotendLeft['nozzleSize'] * quality['layerHeightMultiplier']*hotendRight['nozzleSize']*currentDefaultSpeed/60.)))
-        else:
-            currentSupportUnderspeed = float("%.2f" % (min(leftExtruderNeededSupportUnderspeed, 1)))
-    elif action == 'MEX Right' or action == 'IDEX, Infill with Left' or action == 'IDEX, Supports with Left':
-        currentFilament = filamentRight
-        rightExtruderDefaultSpeed = quality['defaultSpeed']*speedMultiplier(hotendRight, filamentRight)
-        rightExtruderMaxSpeedAtDefaultTemperature = flowValue(hotendRight, filamentRight)/(hotendRight['nozzleSize']*quality['layerHeightMultiplier']*hotendRight['nozzleSize'])
-        if action == 'IDEX, Infill with Left':
-            leftExtruderMaxSpeedAtHighTemperature = flowValue(hotendLeft, filamentLeft)/(hotendLeft['nozzleSize']*quality['layerHeightMultiplier']*hotendLeft['nozzleSize'])
-            currentDefaultSpeed = int(str(float(min(rightExtruderDefaultSpeed, rightExtruderMaxSpeedAtDefaultTemperature, leftExtruderMaxSpeedAtHighTemperature)*60)).split('.')[0])
-        else:
-            currentDefaultSpeed = int(str(float(min(rightExtruderDefaultSpeed, rightExtruderMaxSpeedAtDefaultTemperature)*60)).split('.')[0])
-        rightExtruderNeededFirstLayerUnderspeed = rightExtruderDefaultSpeed*60*quality['firstLayerUnderspeed']/float(currentDefaultSpeed)
-        rightExtruderNeededOutlineUnderspeed = rightExtruderDefaultSpeed*60*quality['outlineUnderspeed']/float(currentDefaultSpeed)
-        rightExtruderNeededSupportUnderspeed = rightExtruderDefaultSpeed*60*0.9/float(currentDefaultSpeed)
-        if filamentRight['isFlexibleMaterial']:
-            currentFirstLayerUnderspeed = 1.00
-            currentOutlineUnderspeed = 1.00
-        else:
-            currentFirstLayerUnderspeed = float("%.2f" % (min(rightExtruderNeededFirstLayerUnderspeed, 1)))
-            currentOutlineUnderspeed = float("%.2f" % (min(rightExtruderNeededOutlineUnderspeed, 1)))
-        if action == 'IDEX, Supports with Left':
-            currentSupportUnderspeed = float("%.2f" % (flowValue(hotendLeft, filamentLeft)/float(hotendRight['nozzleSize']*quality['layerHeightMultiplier']*hotendLeft['nozzleSize']*currentDefaultSpeed/60.)))
-        else:
-            currentSupportUnderspeed = float("%.2f" % (min(rightExtruderNeededSupportUnderspeed, 1)))
-    if currentFilament['isFlexibleMaterial']:
-        currentFirstLayerUnderspeed = 1.00
-        currentOutlineUnderspeed = 1.00
-    return currentDefaultSpeed, currentFirstLayerUnderspeed, currentOutlineUnderspeed, currentSupportUnderspeed
-
 def createSimplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, dataLog, createFile):
     fff = []
     fff.append(r'<?xml version="1.0" encoding="utf-8"?>'+"\n")
@@ -968,26 +854,6 @@ def createCuraProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, qual
         print fileName+'.fff'
     return fileName+'.ini'
 
-def getBundleSize():
-    if ".BCN3D Sigma - Simplify3D Profiles temp" in os.listdir('.'):
-        shutil.rmtree(".BCN3D Sigma - Simplify3D Profiles temp")
-    os.mkdir(".BCN3D Sigma - Simplify3D Profiles temp")
-    os.chdir(".BCN3D Sigma - Simplify3D Profiles temp")
-    
-    totalSmaProfiles = (len(profilesData['hotend'])-1) *  len(profilesData['filament']) * 2
-    totalBigProfiles = (len(profilesData['hotend'])-1)**2 * len(profilesData['filament'])**2
-
-    fileNameBig = createSimplify3DProfile(profilesData['hotend'][0], profilesData['hotend'][0], profilesData['filament'][0], profilesData['filament'][0], 'noData', 'createFile')
-    fileNameSmall = createSimplify3DProfile(profilesData['hotend'][0], profilesData['hotend'][-1], profilesData['filament'][0], profilesData['filament'][0], 'noData', 'createFile')
-    
-    oneLineCsvSize = float(10494984)/78480 # experimental value
-    csvSize = oneLineCsvSize * (totalSmaProfiles*len(profilesData['quality']) + totalBigProfiles*len(profilesData['quality'])*3)
-    bundleSize = totalSmaProfiles*os.path.getsize(fileNameSmall)+totalBigProfiles*os.path.getsize(fileNameBig) + csvSize
-
-    os.chdir('..')
-    shutil.rmtree(".BCN3D Sigma - Simplify3D Profiles temp")
-    return bundleSize*1.05
-
 def createSimplify3DProfilesBundle(dataLog, profilesCreatedCount):    
     y = 'y'
     if getBundleSize()/1024/1024 >= 150: # define Size limit to notice (in MB)
@@ -1050,6 +916,110 @@ def createSimplify3DProfilesBundle(dataLog, profilesCreatedCount):
 
 def createCuraProfilesBundle(dataLog, profilesCreatedCount):
     return
+
+def speedMultiplier(hotend, filament):
+    if filament['isFlexibleMaterial']:
+        return float(filament['defaultPrintSpeed'])/24*hotend['nozzleSize']
+    else:
+        return float(filament['defaultPrintSpeed'])/60
+
+def purgeValues(hotend, filament):
+    baseSpeed04 = 50
+    baseStartLenght04 = 7
+    baseToolChangeLenght04 = 1.5
+    return str("%.2f" % ((hotend['nozzleSize']/0.4)**2*baseSpeed04)), str("%.2f" % ((hotend['nozzleSize']/0.4)**2*baseStartLenght04*filament['purgeLenght']/baseToolChangeLenght04)), str("%.2f" % ((hotend['nozzleSize']/0.4)**2*filament['purgeLenght']))
+
+def flowValue(hotend, filament):
+    if hotend['nozzleSize'] <= 0.6:
+        if filament['maxFlow'] == 'None':
+            return 0.4*0.2*filament['advisedMaxPrintSpeed']
+        else:
+            return filament['maxFlow']
+    else:
+        if filament['maxFlowForHighFlowHotend'] == 'None':
+            if filament['maxFlow'] == 'None':
+                return 0.4*0.2*filament['advisedMaxPrintSpeed']
+            else:
+                return filament['maxFlow']
+        else:
+            return filament['maxFlowForHighFlowHotend']
+
+def temperatureValue(filament, hotend, layerHeight, speed, base = 5):
+    # adaptative temperature according to flow values. Rounded to base
+    flow = hotend['nozzleSize']*layerHeight*float(speed)/60
+    temperature = int(base * round((filament['printTemperature'][0]+flow*float(filament['printTemperature'][1]-filament['printTemperature'][0])/flowValue(hotend, filament))/float(base)))
+    return temperature
+
+def speedValues(hotendLeft, hotendRight, filamentLeft, filamentRight, quality, action):
+    if action == 'MEX Left' or action == 'IDEX, Infill with Right' or action == 'IDEX, Supports with Right':
+        currentFilament = filamentLeft
+        leftExtruderDefaultSpeed = quality['defaultSpeed']*speedMultiplier(hotendLeft, filamentLeft)
+        leftExtruderMaxSpeedAtDefaultTemperature = flowValue(hotendLeft, filamentLeft)/(hotendLeft['nozzleSize']*quality['layerHeightMultiplier']*hotendLeft['nozzleSize'])
+        if action == 'IDEX, Infill with Right':
+            rightExtruderMaxSpeedAtHighTemperature = flowValue(hotendRight, filamentRight)/(hotendRight['nozzleSize']*quality['layerHeightMultiplier']*hotendRight['nozzleSize'])
+            currentDefaultSpeed = int(str(float(min(leftExtruderDefaultSpeed, leftExtruderMaxSpeedAtDefaultTemperature, rightExtruderMaxSpeedAtHighTemperature)*60)).split('.')[0])
+        else:
+            currentDefaultSpeed = int(str(float(min(leftExtruderDefaultSpeed, leftExtruderMaxSpeedAtDefaultTemperature)*60)).split('.')[0])
+        leftExtruderNeededFirstLayerUnderspeed = leftExtruderDefaultSpeed*60*quality['firstLayerUnderspeed']/float(currentDefaultSpeed) 
+        leftExtruderNeededOutlineUnderspeed = leftExtruderDefaultSpeed*60*quality['outlineUnderspeed']/float(currentDefaultSpeed)
+        leftExtruderNeededSupportUnderspeed = leftExtruderDefaultSpeed*60*0.9/float(currentDefaultSpeed)
+        if filamentLeft['isFlexibleMaterial']:
+            currentFirstLayerUnderspeed = 1.00
+            currentOutlineUnderspeed = 1.00
+        else:
+            currentFirstLayerUnderspeed = float("%.2f" % (min(leftExtruderNeededFirstLayerUnderspeed, 1)))
+            currentOutlineUnderspeed = float("%.2f" % (min(leftExtruderNeededOutlineUnderspeed, 1)))
+
+        if action == 'IDEX, Supports with Right':
+            currentSupportUnderspeed = float("%.2f" % (flowValue(hotendRight, filamentRight)/float(hotendLeft['nozzleSize'] * quality['layerHeightMultiplier']*hotendRight['nozzleSize']*currentDefaultSpeed/60.)))
+        else:
+            currentSupportUnderspeed = float("%.2f" % (min(leftExtruderNeededSupportUnderspeed, 1)))
+    elif action == 'MEX Right' or action == 'IDEX, Infill with Left' or action == 'IDEX, Supports with Left':
+        currentFilament = filamentRight
+        rightExtruderDefaultSpeed = quality['defaultSpeed']*speedMultiplier(hotendRight, filamentRight)
+        rightExtruderMaxSpeedAtDefaultTemperature = flowValue(hotendRight, filamentRight)/(hotendRight['nozzleSize']*quality['layerHeightMultiplier']*hotendRight['nozzleSize'])
+        if action == 'IDEX, Infill with Left':
+            leftExtruderMaxSpeedAtHighTemperature = flowValue(hotendLeft, filamentLeft)/(hotendLeft['nozzleSize']*quality['layerHeightMultiplier']*hotendLeft['nozzleSize'])
+            currentDefaultSpeed = int(str(float(min(rightExtruderDefaultSpeed, rightExtruderMaxSpeedAtDefaultTemperature, leftExtruderMaxSpeedAtHighTemperature)*60)).split('.')[0])
+        else:
+            currentDefaultSpeed = int(str(float(min(rightExtruderDefaultSpeed, rightExtruderMaxSpeedAtDefaultTemperature)*60)).split('.')[0])
+        rightExtruderNeededFirstLayerUnderspeed = rightExtruderDefaultSpeed*60*quality['firstLayerUnderspeed']/float(currentDefaultSpeed)
+        rightExtruderNeededOutlineUnderspeed = rightExtruderDefaultSpeed*60*quality['outlineUnderspeed']/float(currentDefaultSpeed)
+        rightExtruderNeededSupportUnderspeed = rightExtruderDefaultSpeed*60*0.9/float(currentDefaultSpeed)
+        if filamentRight['isFlexibleMaterial']:
+            currentFirstLayerUnderspeed = 1.00
+            currentOutlineUnderspeed = 1.00
+        else:
+            currentFirstLayerUnderspeed = float("%.2f" % (min(rightExtruderNeededFirstLayerUnderspeed, 1)))
+            currentOutlineUnderspeed = float("%.2f" % (min(rightExtruderNeededOutlineUnderspeed, 1)))
+        if action == 'IDEX, Supports with Left':
+            currentSupportUnderspeed = float("%.2f" % (flowValue(hotendLeft, filamentLeft)/float(hotendRight['nozzleSize']*quality['layerHeightMultiplier']*hotendLeft['nozzleSize']*currentDefaultSpeed/60.)))
+        else:
+            currentSupportUnderspeed = float("%.2f" % (min(rightExtruderNeededSupportUnderspeed, 1)))
+    if currentFilament['isFlexibleMaterial']:
+        currentFirstLayerUnderspeed = 1.00
+        currentOutlineUnderspeed = 1.00
+    return currentDefaultSpeed, currentFirstLayerUnderspeed, currentOutlineUnderspeed, currentSupportUnderspeed
+
+def getBundleSize():
+    if ".BCN3D Sigma - Simplify3D Profiles temp" in os.listdir('.'):
+        shutil.rmtree(".BCN3D Sigma - Simplify3D Profiles temp")
+    os.mkdir(".BCN3D Sigma - Simplify3D Profiles temp")
+    os.chdir(".BCN3D Sigma - Simplify3D Profiles temp")
+    
+    totalSmaProfiles = (len(profilesData['hotend'])-1) *  len(profilesData['filament']) * 2
+    totalBigProfiles = (len(profilesData['hotend'])-1)**2 * len(profilesData['filament'])**2
+
+    fileNameBig = createSimplify3DProfile(profilesData['hotend'][0], profilesData['hotend'][0], profilesData['filament'][0], profilesData['filament'][0], 'noData', 'createFile')
+    fileNameSmall = createSimplify3DProfile(profilesData['hotend'][0], profilesData['hotend'][-1], profilesData['filament'][0], profilesData['filament'][0], 'noData', 'createFile')
+    
+    oneLineCsvSize = float(10494984)/78480 # experimental value
+    csvSize = oneLineCsvSize * (totalSmaProfiles*len(profilesData['quality']) + totalBigProfiles*len(profilesData['quality'])*3)
+    bundleSize = totalSmaProfiles*os.path.getsize(fileNameSmall)+totalBigProfiles*os.path.getsize(fileNameBig) + csvSize
+
+    os.chdir('..')
+    shutil.rmtree(".BCN3D Sigma - Simplify3D Profiles temp")
+    return bundleSize*1.05
 
 def testAllCombinations():
     combinationCount = 0
@@ -1165,6 +1135,36 @@ def readProfilesData():
             with open('./Profiles Data/Quality Presets/'+quality) as quality_file:    
                 qualityData = json.load(quality_file)
                 profilesData['quality'].append(qualityData)
+
+def writeData(extruder, currentDefaultSpeed, currentInfillLayerInterval, currentLayerHeight, hotendLeft, hotendRight, currentPrimaryExtruder, currentInfillExtruder, currentSupportExtruder, filamentLeft, filamentRight, quality, currentFirstLayerUnderspeed, currentOutlineUnderspeed, currentSupportUnderspeed, currentFirstLayerHeightPercentage, hotendLeftTemperature, hotendRightTemperature, currentBedTemperature, dataLog):
+    if extruder[0] == 'L':
+        printA = "%.2f" % (float(currentDefaultSpeed)/60*currentInfillLayerInterval*currentLayerHeight*hotendLeft['nozzleSize'])
+        printB = ""
+    elif extruder[0] == 'R':
+        printA = ""
+        printB = "%.2f" % (float(currentDefaultSpeed)/60*currentInfillLayerInterval*currentLayerHeight*hotendRight['nozzleSize'])
+    else:
+        if filamentLeft['isSupportMaterial'] != filamentRight['isSupportMaterial']:
+            if filamentLeft['isSupportMaterial']:
+                supportMaterialLoadedLeft = float(currentSupportUnderspeed)
+                supportMaterialLoadedRight = 1
+            else:
+                supportMaterialLoadedLeft = 1
+                supportMaterialLoadedRight = float(currentSupportUnderspeed)
+        else:
+            supportMaterialLoadedLeft = 1
+            supportMaterialLoadedRight = 1
+        if hotendLeft['nozzleSize'] != hotendRight['nozzleSize']:
+            if currentPrimaryExtruder == 0: 
+                printA = "%.2f" % (float(currentDefaultSpeed)/60*currentLayerHeight*hotendLeft['nozzleSize']*supportMaterialLoadedLeft)
+                printB = "%.2f" % (float(currentDefaultSpeed)/60*currentInfillLayerInterval*currentLayerHeight*hotendRight['nozzleSize']*supportMaterialLoadedRight)
+            else:
+                printA = "%.2f" % (float(currentDefaultSpeed)/60*currentLayerHeight*currentInfillLayerInterval*hotendLeft['nozzleSize']*supportMaterialLoadedLeft)
+                printB = "%.2f" % (float(currentDefaultSpeed)/60*currentLayerHeight*hotendRight['nozzleSize']*supportMaterialLoadedRight)
+        else:
+            printA = "%.2f" % (float(currentDefaultSpeed)/60*currentInfillLayerInterval*currentLayerHeight*hotendLeft['nozzleSize']*supportMaterialLoadedLeft)
+            printB = "%.2f" % (float(currentDefaultSpeed)/60*currentInfillLayerInterval*currentLayerHeight*hotendRight['nozzleSize']*supportMaterialLoadedRight)
+    dataLog.append(filamentLeft['id']+";"+filamentRight['id']+";"+extruder+";"+quality['id']+";"+hotendLeft['id']+";"+hotendRight['id']+";"+'T'+str(currentInfillExtruder)+";"+'T'+str(currentPrimaryExtruder)+";"+'T'+str(currentSupportExtruder)+";"+str(printA)+";"+str(printB)+";"+str(currentInfillLayerInterval)+";"+str("%.2f" % (currentDefaultSpeed/60.))+";"+str(currentFirstLayerUnderspeed)+";"+str(currentOutlineUnderspeed)+";"+str(currentSupportUnderspeed)+";"+str(currentFirstLayerHeightPercentage)+";"+str(hotendLeftTemperature)+";"+str(hotendRightTemperature)+";"+str(currentBedTemperature)+";\n")
 
 def main():
     if validArguments():
