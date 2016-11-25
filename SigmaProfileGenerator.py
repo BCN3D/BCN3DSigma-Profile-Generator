@@ -30,11 +30,13 @@ def createSimplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight
             defaultPrintQuality = 'Right Extruder - '+defaultPrintQualityBase
             extruderPrintOptions = ["Right Extruder"]
             filamentLeft = dict([('id', '')])
+            currentPurgeSpeedT1, currentStartPurgeLenghtT1, currentToolChangePurgeLenghtT1 = purgeValues(hotendRight, filamentRight)
     elif hotendRight['id'] == 'None':
         fileName = "BCN3D Sigma - Left Extruder "+str(hotendLeft['nozzleSize'])+" Only ("+filamentLeft['id']+")"
         defaultPrintQuality = 'Left Extruder - '+defaultPrintQualityBase
         extruderPrintOptions = ["Left Extruder"]
         filamentRight = dict([('id', '')])
+        currentPurgeSpeedT0, currentStartPurgeLenghtT0, currentToolChangePurgeLenghtT0 = purgeValues(hotendLeft, filamentLeft)
     else:
         fileName = "BCN3D Sigma - "+str(hotendLeft['nozzleSize'])+" Left ("+filamentLeft['id']+"), "+str(hotendRight['nozzleSize'])+" Right ("+filamentRight['id']+")"
         defaultPrintQuality = 'Left Extruder - '+defaultPrintQualityBase
@@ -45,9 +47,6 @@ def createSimplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight
     fff.append(r'  <printQuality>'+defaultPrintQuality+'</printQuality>'+"\n") #+extruder+secondaryExtruderAction+str(quality['id'])+
     if hotendLeft['id'] != 'None':
         fff.append(r'  <printExtruders>Left Extruder Only</printExtruders>'+"\n")
-    else:
-        fff.append(r'  <printExtruders>Right Extruder Only</printExtruders>'+"\n")
-    if hotendLeft['id'] != 'None':
         fff.append(r'  <extruder name="Left Extruder '+str(hotendLeft['nozzleSize'])+r'">'+"\n")
         fff.append(r'    <toolheadNumber>0</toolheadNumber>'+"\n")
         fff.append(r'    <diameter>'+str(hotendLeft['nozzleSize'])+r'</diameter>'+"\n")
@@ -63,6 +62,24 @@ def createSimplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight
         fff.append(r'    <coastingDistance>0.2</coastingDistance>'+"\n")
         fff.append(r'    <useWipe>1</useWipe>'+"\n")
         fff.append(r'    <wipeDistance>5</wipeDistance>'+"\n")
+        fff.append(r'  </extruder>'+"\n")
+    else:
+        fff.append(r'  <printExtruders>Right Extruder Only</printExtruders>'+"\n")
+        fff.append(r'  <extruder name="">'+"\n")
+        fff.append(r'    <toolheadNumber>0</toolheadNumber>'+"\n")
+        fff.append(r'    <diameter>0</diameter>'+"\n")
+        fff.append(r'    <autoWidth>0</autoWidth>'+"\n")
+        fff.append(r'    <width>0</width>'+"\n")
+        fff.append(r'    <extrusionMultiplier>0</extrusionMultiplier>'+"\n")
+        fff.append(r'    <useRetract>0</useRetract>'+"\n")
+        fff.append(r'    <retractionDistance>0</retractionDistance>'+"\n")
+        fff.append(r'    <extraRestartDistance>0</extraRestartDistance>'+"\n")
+        fff.append(r'    <retractionZLift>0</retractionZLift>'+"\n")
+        fff.append(r'    <retractionSpeed>0</retractionSpeed>'+"\n")
+        fff.append(r'    <useCoasting>0</useCoasting>'+"\n")
+        fff.append(r'    <coastingDistance>0</coastingDistance>'+"\n")
+        fff.append(r'    <useWipe>0</useWipe>'+"\n")
+        fff.append(r'    <wipeDistance>0</wipeDistance>'+"\n")
         fff.append(r'  </extruder>'+"\n")
     if hotendRight['id'] != 'None':
         fff.append(r'  <extruder name="Right Extruder '+str(hotendRight['nozzleSize'])+r'">'+"\n")
@@ -310,8 +327,6 @@ def createSimplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight
                 secondaryExtruderAction = ' - '
             else:
                 # IDEX                
-                currentPurgeSpeedT0, currentStartPurgeLenghtT0, currentToolChangePurgeLenghtT0 = purgeValues(hotendLeft, filamentLeft)
-                currentPurgeSpeedT1, currentStartPurgeLenghtT1, currentToolChangePurgeLenghtT1 = purgeValues(hotendRight, filamentRight)
                 if filamentLeft['isSupportMaterial'] != filamentRight['isSupportMaterial']:
                     # IDEX, Support Material
                     currentGenerateSupport = 1
@@ -349,8 +364,9 @@ def createSimplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight
                     # IDEX, Combined Infill
                     currentAvoidCrossingOutline = 0
                     if hotendLeft['nozzleSize'] <= hotendRight['nozzleSize']:
-                        # IDEX, Combined Infill (Right Hotend has thicker nozzle)
-                        currentToolChangePurgeLenghtT1 = str("%.2f" % (float(currentToolChangePurgeLenghtT1)/4))
+                        # IDEX, Combined Infill (Right Hotend has thicker or equal nozzle)
+                        if hotendLeft['nozzleSize'] < hotendRight['nozzleSize']:
+                            currentToolChangePurgeLenghtT1 = str("%.2f" % (float(currentToolChangePurgeLenghtT1)/4))
                         currentPrimaryExtruder = 0
                         currentFilament = filamentLeft
                         currentHotend = hotendLeft
@@ -498,8 +514,7 @@ def createSimplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight
         #     fff.append(r'    <toggleTemperatureController name="Right Extruder '+str(hotendRight['nozzleSize'])+r'" status="off" stabilize="off"/>'+"\n")
         # if (hotendLeft['id'] != 'None' and filamentLeft['bedTemperature'] > 0) or (hotendRight['id'] != 'None' and filamentRight['bedTemperature'] > 0):
         #     fff.append(r'    <toggleTemperatureController name="Heated Bed" status="on" stabilize="on"/>'+"\n")
-        currentPurgeSpeed, currentStartPurgeLenght, currentToolChangePurgeLenght = purgeValues(hotendLeft, filamentLeft)
-        fff.append(r'    <startingGcode>G21'+"\t\t"+r';metric values,G90'+"\t\t"+r';absolute positioning,M82'+"\t\t"+r';set extruder to absolute mode,M107'+"\t\t"+r';start with the fan off,G28 X0 Y0'+"\t\t"+r';move X/Y to min endstops,G28 Z0'+"\t\t"+r';move Z to min endstops,T0'+"\t\t"+r';change to active toolhead,G92 E0'+"\t\t"+r';zero the extruded length,G1 Z5 F200'+"\t\t"+r';Safety Z axis movement,G1 F'+currentPurgeSpeed+' E'+currentStartPurgeLenght+"\t"+r';extrude '+currentStartPurgeLenght+r'mm of feed stock,G92 E0'+"\t\t"+r';zero the extruded length again,G1 F200 E-4'+"\t\t"+r';Retract before printing,G1 F[travel_speed],</startingGcode>'+"\n")
+        fff.append(r'    <startingGcode>G21'+"\t\t"+r';metric values,G90'+"\t\t"+r';absolute positioning,M82'+"\t\t"+r';set extruder to absolute mode,M107'+"\t\t"+r';start with the fan off,G28 X0 Y0'+"\t\t"+r';move X/Y to min endstops,G28 Z0'+"\t\t"+r';move Z to min endstops,T0'+"\t\t"+r';change to active toolhead,G92 E0'+"\t\t"+r';zero the extruded length,G1 Z5 F200'+"\t\t"+r';Safety Z axis movement,G1 F'+currentPurgeSpeedT0+' E'+currentStartPurgeLenghtT0+"\t"+r';extrude '+currentStartPurgeLenghtT0+r'mm of feed stock,G92 E0'+"\t\t"+r';zero the extruded length again,G1 F200 E-4'+"\t\t"+r';Retract before printing,G1 F[travel_speed],</startingGcode>'+"\n")
         # fff.append(r'    <layerChangeGcode/>'+"\n")
         fff.append(r'    <toolChangeGcode/>'+"\n")
         fff.append(r'  </autoConfigureExtruders>'+"\n")
@@ -511,8 +526,7 @@ def createSimplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight
         #     fff.append(r'    <toggleTemperatureController name="Right Extruder '+str(hotendRight['nozzleSize'])+r'" status="on" stabilize="on"/>'+"\n")
         # if (hotendLeft['id'] != 'None' and filamentLeft['bedTemperature'] > 0) or (hotendRight['id'] != 'None' and filamentRight['bedTemperature'] > 0):
         #     fff.append(r'    <toggleTemperatureController name="Heated Bed" status="on" stabilize="on"/>'+"\n")
-        currentPurgeSpeed, currentStartPurgeLenght, currentToolChangePurgeLenght = purgeValues(hotendRight, filamentRight)
-        fff.append(r'    <startingGcode>G21'+"\t\t"+r';metric values,G90'+"\t\t"+r';absolute positioning,M82'+"\t\t"+r';set extruder to absolute mode,M107'+"\t\t"+r';start with the fan off,G28 X0 Y0'+"\t\t"+r';move X/Y to min endstops,G28 Z0'+"\t\t"+r';move Z to min endstops,T1'+"\t\t"+r';change to active toolhead,G92 E0'+"\t\t"+r';zero the extruded length,G1 Z5 F200'+"\t\t"+r';Safety Z axis movement,G1 F'+currentPurgeSpeed+' E'+currentStartPurgeLenght+"\t"+r';extrude '+currentStartPurgeLenght+r'mm of feed stock,G92 E0'+"\t\t"+r';zero the extruded length again,G1 F200 E-4'+"\t\t"+r';Retract before printing,G1 F[travel_speed],</startingGcode>'+"\n")
+        fff.append(r'    <startingGcode>G21'+"\t\t"+r';metric values,G90'+"\t\t"+r';absolute positioning,M82'+"\t\t"+r';set extruder to absolute mode,M107'+"\t\t"+r';start with the fan off,G28 X0 Y0'+"\t\t"+r';move X/Y to min endstops,G28 Z0'+"\t\t"+r';move Z to min endstops,T1'+"\t\t"+r';change to active toolhead,G92 E0'+"\t\t"+r';zero the extruded length,G1 Z5 F200'+"\t\t"+r';Safety Z axis movement,G1 F'+currentPurgeSpeedT1+' E'+currentStartPurgeLenghtT1+"\t"+r';extrude '+currentStartPurgeLenghtT1+r'mm of feed stock,G92 E0'+"\t\t"+r';zero the extruded length again,G1 F200 E-4'+"\t\t"+r';Retract before printing,G1 F[travel_speed],</startingGcode>'+"\n")
         # fff.append(r'    <layerChangeGcode/>'+"\n")
         fff.append(r'    <toolChangeGcode/>'+"\n")
         fff.append(r'  </autoConfigureExtruders>'+"\n")
@@ -578,6 +592,8 @@ def createCuraProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, qual
                 fanEnabled = 'False'
             fanSpeed = filamentRight['fanPercentage']            
             hotendLeftTemperature, hotendRightTemperature = 0, printTemperature1
+            # startGcode =
+            # start2Gcode =  
     elif hotendRight['id'] == 'None':
         # MEX Left
         hotend, extruder, currentPrimaryExtruder, currentInfillExtruder, currentSupportExtruder = hotendLeft, "Left Extruder", 0, 0, 0
