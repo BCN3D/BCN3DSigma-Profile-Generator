@@ -303,7 +303,10 @@ def createSimplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight
                     currentLayerHeight = currentHotend['nozzleSize'] * quality['layerHeightMultiplier']
                     currentDefaultSpeed, currentFirstLayerUnderspeed, currentOutlineUnderspeed, currentSupportUnderspeed = speedValues(hotendLeft, hotendRight, filamentLeft, filamentRight, quality, 'MEX Left')
                     hotendLeftTemperature = temperatureValue(filamentLeft, hotendLeft, currentLayerHeight, currentDefaultSpeed)
-                    hotendRightTemperature = filamentRight['printTemperature'][0]
+                    if hotendRight['id'] != 'None':
+                        hotendRightTemperature = temperatureValue(filamentRight, hotendRight, currentLayerHeight, currentDefaultSpeed)
+                    else:
+                        hotendRightTemperature = hotendLeftTemperature
                 else:
                     # MEX Right
                     currentPrimaryExtruder = 1
@@ -312,7 +315,10 @@ def createSimplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight
                     currentLayerHeight = currentHotend['nozzleSize'] * quality['layerHeightMultiplier']
                     currentDefaultSpeed, currentFirstLayerUnderspeed, currentOutlineUnderspeed, currentSupportUnderspeed = speedValues(hotendLeft, hotendRight, filamentLeft, filamentRight, quality, 'MEX Right')
                     hotendRightTemperature = temperatureValue(filamentRight, hotendRight, currentLayerHeight, currentDefaultSpeed)
-                    hotendLeftTemperature = filamentLeft['printTemperature'][0]
+                    if hotendLeft['id'] != 'None':
+                        hotendLeftTemperature = temperatureValue(filamentLeft, hotendLeft, currentLayerHeight, currentDefaultSpeed)
+                    else:
+                        hotendLeftTemperature = hotendRightTemperature
                 currentInfillExtruder = currentPrimaryExtruder
                 currentSupportExtruder = currentPrimaryExtruder
                 currentBedTemperature = currentFilament['bedTemperature']
