@@ -563,8 +563,8 @@ def createCuraProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, qual
             extruderPrintOptions = ["Right Extruder"]
             filamentLeft = dict([('id', '')])
             currentDefaultSpeed, currentFirstLayerUnderspeed, currentOutlineUnderspeed, currentSupportUnderspeed = speedValues(hotendLeft, hotendRight, filamentLeft, filamentRight, quality, 'MEX Right')
-            printTemperature1 = temperatureValue(filamentRight, hotendRight, currentLayerHeight, currentDefaultSpeed)
-            printTemperature2 = 0
+            printTemperature1 = 0
+            printTemperature2 = temperatureValue(filamentRight, hotendRight, currentLayerHeight, currentDefaultSpeed)
             bedTemperature = filamentRight['bedTemperature']
             filamentDiameter1 = filamentRight['filamentDiameter']
             filamentDiameter2 = 0
@@ -578,8 +578,10 @@ def createCuraProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, qual
             else:
                 fanEnabled = 'False'
             fanSpeed = filamentRight['fanPercentage']            
-            hotendLeftTemperature, hotendRightTemperature = 0, printTemperature1
+            hotendLeftTemperature, hotendRightTemperature = 0, printTemperature2
             currentPurgeSpeed, currentStartPurgeLenght, currentToolChangePurgeLenght = purgeValues(hotendRight, filamentRight)
+            currentPurgeSpeedT0, currentStartPurgeLenghtT0, currentToolChangePurgeLenghtT0 = currentPurgeSpeed, currentStartPurgeLenght, currentToolChangePurgeLenght
+            currentPurgeSpeedT1, currentStartPurgeLenghtT1, currentToolChangePurgeLenghtT1 = currentPurgeSpeed, currentStartPurgeLenght, currentToolChangePurgeLenght
     elif hotendRight['id'] == 'None':
         # MEX Left
         hotend, extruder, currentPrimaryExtruder, currentInfillExtruder, currentSupportExtruder = hotendLeft, "Left Extruder", 0, 0, 0
@@ -605,6 +607,8 @@ def createCuraProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, qual
         fanSpeed = filamentLeft['fanPercentage']
         hotendLeftTemperature, hotendRightTemperature = printTemperature1, 0
         currentPurgeSpeed, currentStartPurgeLenght, currentToolChangePurgeLenght = purgeValues(hotendLeft, filamentLeft)
+        currentPurgeSpeedT0, currentStartPurgeLenghtT0, currentToolChangePurgeLenghtT0 = currentPurgeSpeed, currentStartPurgeLenght, currentToolChangePurgeLenght
+        currentPurgeSpeedT1, currentStartPurgeLenghtT1, currentToolChangePurgeLenghtT1 = currentPurgeSpeed, currentStartPurgeLenght, currentToolChangePurgeLenght
     else:
         # IDEX
         hotend, extruder, currentPrimaryExtruder, currentInfillExtruder, currentSupportExtruder = hotendLeft, "Both Extruders", 0, 0, 0
@@ -775,8 +779,9 @@ def createCuraProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, qual
     ini.append('\t;Print time: {print_time}'+"\n")
     ini.append('\t;Filament used: {filament_amount}m {filament_weight}g'+"\n")
     ini.append('\t;Filament cost: {filament_cost}'+"\n")
-    ini.append('\t;M190 S{print_bed_temperature} ;Uncomment to add your own bed temperature line'+"\n")
-    ini.append('\t;M109 S{print_temperature}  ;Uncomment to add your own temperature line'+"\n")
+    ini.append('\tM104 S0 T'+str(abs(currentPrimaryExtruder-1))+';cooldown left Hotend,'+"\n")
+    ini.append('\tM109 S'+str(max(printTemperature1, printTemperature2))+' T'+str(currentPrimaryExtruder)+';stabilize right Hotend Temperature,'+"\n")
+    ini.append('\tM190 S'+str(bedTemperature)+"\t\t"+r';stabilize bed temperature'+"\n")
     ini.append('\tG21                         ;metric values'+"\n")
     ini.append('\tG90                         ;absolute positioning'+"\n")
     ini.append('\tM82                         ;set extruder to absolute mode'+"\n")
