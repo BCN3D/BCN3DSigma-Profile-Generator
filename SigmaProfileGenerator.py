@@ -847,10 +847,13 @@ def createCuraProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, qual
     ini.append(r'postswitchextruder.gcode =         ;Switch between the current extruder and the next extruder, when printing with multiple extruders.'+"\n")
     ini.append('\t;This code is added after the T(n)'+"\n")
     ini.append('\tG1 F500 E-0.5'+"\n")
-    ini.append('\tG1 F50 E0.5'+"\n")
+    ini.append('\tG1 F'+str(currentPurgeSpeed)+' E'+str(currentToolChangePurgeLenght)+"\n")
     ini.append('\tG92 E0'+"\n")
     ini.append('\tG1 F3000 E-4.5'+"\n")
     ini.append('\tG1 F{travel_speed}'+"\n")
+    ini.append('\tG91'+"\n")
+    ini.append('\tG1 F{travel_speed} Z2'+"\n")
+    ini.append('\tG90'+"\n")
 
     if dataLog != 'noData' :
         # Store flows, speeds, temperatures and other data
