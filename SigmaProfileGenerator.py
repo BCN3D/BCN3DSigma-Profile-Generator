@@ -613,7 +613,7 @@ def createCuraProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, qual
         # IDEX
         hotend, extruder, currentPrimaryExtruder, currentInfillExtruder, currentSupportExtruder = hotendLeft, "Both Extruders", 0, 0, 0
         currentLayerHeight = hotend['nozzleSize'] * quality['layerHeightMultiplier']
-        fileName = "BCN3D Sigma - "+str(hotendLeft['nozzleSize'])+" Left ("+filamentLeft['id']+"),"+str(hotendRight['nozzleSize'])+" Right ("+filamentRight['id']+") - "+quality['id']
+        fileName = "BCN3D Sigma - "+str(hotendLeft['nozzleSize'])+" Left ("+filamentLeft['id']+"), "+str(hotendRight['nozzleSize'])+" Right ("+filamentRight['id']+") - "+quality['id']
         extruderPrintOptions = ["Both Extruders"] 
         if filamentLeft['isSupportMaterial'] != filamentRight['isSupportMaterial']:
             # IDEX, Support Material
