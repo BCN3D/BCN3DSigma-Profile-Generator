@@ -40,8 +40,10 @@ def createSimplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight
     else:
         fileName = "BCN3D Sigma - "+str(hotendLeft['nozzleSize'])+" Left ("+filamentLeft['id']+"), "+str(hotendRight['nozzleSize'])+" Right ("+filamentRight['id']+")"
         defaultPrintQuality = 'Left Extruder - '+defaultPrintQualityBase
-        extruderPrintOptions = ["Left Extruder", "Right Extruder", "Both Extruders"]    
-    fff.append(r'<profile name="'+fileName+r'" version="'+time.strftime("%Y-%m-%d")+" "+time.strftime("%H:%M:%S")+r'" app="S3D-Software 3.1.1">'+"\n")    
+        extruderPrintOptions = ["Left Extruder", "Right Extruder", "Both Extruders"]
+        currentPurgeSpeedT0, currentStartPurgeLenghtT0, currentToolChangePurgeLenghtT0 = purgeValues(hotendLeft, filamentLeft)
+        currentPurgeSpeedT1, currentStartPurgeLenghtT1, currentToolChangePurgeLenghtT1 = purgeValues(hotendRight, filamentRight) 
+    fff.append(r'<profile name="'+fileName+r'" version="'+time.strftime("%Y-%m-%d")+" "+time.strftime("%H:%M:%S")+r'" app="S3D-Software 3.1.1">'+"\n")
     fff.append(r'  <baseProfile></baseProfile>'+"\n")
     fff.append(r'  <printMaterial></printMaterial>'+"\n")
     fff.append(r'  <printQuality>'+defaultPrintQuality+'</printQuality>'+"\n") #+extruder+secondaryExtruderAction+str(quality['id'])+
@@ -201,7 +203,7 @@ def createSimplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight
     fff.append(r'  <increaseFanForCooling>0</increaseFanForCooling>'+"\n")
     fff.append(r'  <minFanLayerTime>45</minFanLayerTime>'+"\n")
     fff.append(r'  <maxCoolingFanSpeed>100</maxCoolingFanSpeed>'+"\n")
-    fff.append(r'  <increaseFanForBridging>0</increaseFanForBridging>'+"\n")
+    fff.append(r'  <increaseFanForBridging>1</increaseFanForBridging>'+"\n")
     fff.append(r'  <bridgingFanSpeed>100</bridgingFanSpeed>'+"\n")
     fff.append(r'  <use5D>1</use5D>'+"\n")
     fff.append(r'  <relativeEdistances>0</relativeEdistances>'+"\n")
