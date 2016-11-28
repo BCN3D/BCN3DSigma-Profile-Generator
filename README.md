@@ -111,9 +111,11 @@ Quality Preconfigurations
 
 ## TO-DO
 
-- [ ] Fix temperature values when using dual extruder assistant.
 - [x] Availability to generate Cura profiles
 - [ ] Availability to create .json files right from the script
 - [ ] Better print speed management for flexible materials
 - [ ] Adjust bridging for flexible materials
-- [ ] Adjust coast for ABS
+- [ ] Simplify3D: Fix temperature values for idle Hotend (depends on Simplify3D).
+- [ ] Simplify3D: Adjust coast & wipe
+- [ ] Cura: Adjust toolchange & start scripts
+ 
