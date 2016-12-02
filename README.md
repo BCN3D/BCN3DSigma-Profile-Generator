@@ -112,10 +112,10 @@ Quality Preconfigurations
 ## TO-DO
 
 - [x] Availability to generate Cura profiles
-- [ ] Availability to create .json files right from the script
-- [ ] Better print speed management for flexible materials
-- [ ] Adjust bridging for flexible materials
 - [x] Simplify3D: Fix temperature values for 'None' Hotend.
 - [x] Simplify3D: Adjust coast & wipe
 - [x] Cura: Adjust toolchange & start scripts
+- [ ] Availability to create .json files right from the script
+- [ ] Better print speed management for flexible materials
+- [ ] Adjust bridging for flexible materials
  
