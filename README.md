@@ -115,7 +115,7 @@ Quality Preconfigurations
 - [ ] Availability to create .json files right from the script
 - [ ] Better print speed management for flexible materials
 - [ ] Adjust bridging for flexible materials
-- [ ] Simplify3D: Fix temperature values for idle Hotend (depends on Simplify3D).
-- [ ] Simplify3D: Adjust coast & wipe
-- [ ] Cura: Adjust toolchange & start scripts
+- [x] Simplify3D: Fix temperature values for 'None' Hotend.
+- [x] Simplify3D: Adjust coast & wipe
+- [x] Cura: Adjust toolchange & start scripts
  
