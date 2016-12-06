@@ -163,7 +163,7 @@ def createSimplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight
 
     fff.append(r'  <supportType>0</supportType>'+"\n")
     fff.append(r'  <supportGridSpacing>1</supportGridSpacing>'+"\n")
-    fff.append(r'  <maxOverhangAngle>45</maxOverhangAngle>'+"\n")
+    fff.append(r'  <maxOverhangAngle>60</maxOverhangAngle>'+"\n")
     fff.append(r'  <supportAngles>90</supportAngles>'+"\n")
     if hotendLeft['id'] != 'None':
         fff.append(r'  <temperatureController name="Left Extruder '+str(hotendLeft['nozzleSize'])+r'">'+"\n")
@@ -729,7 +729,7 @@ def createCuraProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, qual
     ini.append(r'fill_overlap = 15'+"\n")
     ini.append(r'perimeter_before_infill = True'+"\n")
     ini.append(r'support_type = Lines'+"\n")
-    ini.append(r'support_angle = 65'+"\n")
+    ini.append(r'support_angle = 60'+"\n")
     ini.append(r'support_fill_rate = 40'+"\n")
     ini.append(r'support_xy_distance = '+str(supportXYDistance)+"\n")
     ini.append(r'support_z_distance = '+str(supportZdistance)+"\n")
@@ -876,9 +876,9 @@ def createCuraProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, qual
 def createSimplify3DProfilesBundle(dataLog, profilesCreatedCount):    
     y = 'y'
     if getSimplify3DBundleSize()/1024/1024 >= 150: # define Size limit to notice (in MB)
-        print '\t\t Estimated space needed during the process: '+str(int(getSimplify3DBundleSize()*1.075/1024/1024))+' MB.'
-        print '\t\t Estimated final bundle size: '+str(int(getSimplify3DBundleSize()*0.075/1024/1024))+' MB.'
-        print '\t\t Do you want to continue? (Y/n)'
+        print '\t\tEstimated space needed during the process: '+str(int(getSimplify3DBundleSize()*1.075/1024/1024))+' MB.'
+        print '\t\tEstimated final bundle size: '+str(int(getSimplify3DBundleSize()*0.075/1024/1024))+' MB.'
+        print '\t\tDo you want to continue? (Y/n)'
         while y not in ['Y', 'n']:
             y = raw_input('\t\t')
         print
