@@ -1,14 +1,14 @@
 # BCN3DSigma-Profile-Generator
 Profile Generator for Simplify3D & Cura slicing softwares. Specifically designed for the BCN3D Sigma.
 
-The python script is capable of generating profiles according to nozzle sizes, materials and qualities defined in *Profiles Data* folder.
+The python script is capable of generating profiles according to hotends, filaments and qualities defined in *Profiles Data* folder.
 
 *Note this is an early version of the script. Although profiles are precisely calculated there may be some combinations where quality can still be improved.*
 
 ## Requirements
 
 - Python 2.7 installed.
-- *Profiles Data* folder with at least one Nozzle size, one filament and one quality preset. The included one comes with all Nozzle sizes, materials and qualities we have tested.
+- *Profiles Data* folder with at least one hotend, one filament and one quality preset. The included one comes with all hotends, filaments and qualities we have tested.
 
 ## Usage
 
@@ -30,7 +30,7 @@ Will ask for a functionality:
 
 4. **Exit:** Quit the program.
 
-In order to add, remove or change a nozzle size, filament or quality preconfiguration edit the files in *Profiles Data* folder.
+In order to add, remove or change a hotend, filament or quality preconfiguration edit the files in *Profiles Data* folder.
 
 ### **Fast mode (No GUI)**
 
