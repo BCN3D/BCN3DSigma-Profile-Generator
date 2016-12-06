@@ -1187,7 +1187,7 @@ def testAllCombinations():
                     for quality in sorted(profilesData['quality'], key=lambda k: k['id']):
                         createCuraProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, quality, 'noData', 'nothing')
                         combinationCount += 1
-                        sys.stdout.write("\r Testing    Cura    Profiles: %d%%" % int(float(combinationCount)/totalProfilesAvailable*100))
+                        sys.stdout.write("\r Testing Cura Profiles: %d%%" % int(float(combinationCount)/totalProfilesAvailable*100))
                         sys.stdout.flush()
     print '\r Testing Cura Profiles: OK. Profiles Tested:'+str(realCuraProfileaAvailable)
 
@@ -1353,47 +1353,97 @@ def main():
                 createCuraProfile(leftHotend, rightHotend, leftFilament, rightFilament, qualityCura, 'noData', 'createFile')
     else:
         if len(sys.argv) == 1:
-            print '\n Welcome to the BCN3D Sigma Profile Generator \n'
+            experimentalMenu = False
             while True:
-                print ' Choose one option (1-6):'
-                print ' 1. Generate one single profile - Simplify3D'
-                print ' 2. Generate one single profile - Cura'
-                print ' 3. Generate a bundle of profiles - Simplify3D'
-                print ' 4. Generate a bundle of profiles - Cura'
-                print ' 5. Test all combinations'
-                print ' 6. Exit'
+                os.system('clear')
+                print '\n Welcome to the BCN3D Sigma Profile Generator \n'
+                print ' Choose one option (1-4):'
+                print ' 1. Profile for Simplify3D'
+                print ' 2. Profile for Cura'
+                print ' 3. Experimental features'
+                print ' 4. Exit'
                 x = 'x'
                 y = 'y'
-                while x not in ['1','2','3','4','5','6']:
+                while x not in ['1','2','3','4']:
                     x = raw_input(' ')
                 dataLog = ["LFilament;RFilament;Extruder;Quality;LNozzle;RNozzle;InfillExt;PrimaryExt;SupportExt;LFlow;RFlow;Layers/Infill;DefaultSpeed;FirstLayerUnderspeed;OutLineUnderspeed;SupportUnderspeed;FirstLayerHeightPercentage;LTemp;RTemp;BTemp;\n"]
                 profilesCreatedCount = 0
                 readProfilesData()
 
-                if x in ['1','2','3','4']:
-                    if x == '3':
+                if x == '3':
+                    os.system('clear')
+                    print '\n Welcome to the BCN3D Sigma Profile Generator \n'
+                    print ' Choose one option (1-5):'
+                    print '    Profile for Simplify3D'
+                    print '    Profile for Cura'
+                    print '    Experimental features'
+                    print '\t1. Generate a bundle of profiles - Simplify3D'
+                    print '\t2. Generate a bundle of profiles - Cura'
+                    print '\t3. Test all combinations'
+                    print '\t4. MacOS Only - Slice a model (with Cura)'
+                    print '\t5. Back'
+                    print '    Exit'
+                    x2 = 'x'
+                    while x2 not in ['1','2','3','4', '5']:
+                        x2 = raw_input(' ')
+
+                singleProfileSimplify3D, singleProfileCura, bundleProfilesSimplify3D, bundleProfilesCura, testComb, sliceModel = False, False, False, False, False, False
+
+                if x == '1':
+                    singleProfileSimplify3D = True
+                elif x == '2':
+                    singleProfileCura = True
+                elif x == '3':                   
+                    if x2 == '1':
+                        bundleProfilesSimplify3D = True
+                    elif x2 == '2':
+                        bundleProfilesCura = True
+                    elif x2 == '3':
+                        testComb = True
+                    elif x2 == '4':
+                        sliceModel = True
+                elif x == '4':
+                    print '\n Until next time!\n'
+                    break
+
+                if bundleProfilesSimplify3D or bundleProfilesCura or singleProfileSimplify3D or singleProfileCura or sliceModel:
+                    if bundleProfilesSimplify3D:
                         profilesCreatedCount = createSimplify3DProfilesBundle(dataLog, profilesCreatedCount)
-                    elif x == '4':
+                    elif bundleProfilesCura:
                         profilesCreatedCount = createCuraProfilesBundle(dataLog, profilesCreatedCount)
-                    elif x in ['1','2']:
+                    elif singleProfileSimplify3D or singleProfileCura or sliceModel:                    
                         a = selectHotendAndFilament('Left')
                         b = selectHotendAndFilament('Right')
                         if sorted(profilesData['hotend'], key=lambda k: k['id'])[a[0]]['id'] == 'None' and sorted(profilesData['hotend'], key=lambda k: k['id'])[b[0]]['id'] == 'None':
-                            print "\n Select at least one hotend to create a profile.\n"
+                            raw_input("\n Select at least one hotend to create a profile. Press Enter to continue...")
                         else:
-                            if x == '1':
+                            if singleProfileSimplify3D:
                                 print "\n Your new Simplify3D profile '"+createSimplify3DProfile(sorted(profilesData['hotend'], key=lambda k: k['id'])[a[0]], sorted(profilesData['hotend'], key=lambda k: k['id'])[b[0]], sorted(profilesData['filament'], key=lambda k: k['id'])[a[1]], sorted(profilesData['filament'], key=lambda k: k['id'])[b[1]], dataLog, 'createFile')+"' has been created.\n"
                                 profilesCreatedCount = 1
-                            elif x == '2':
-                                makeProfile = 'Yes'
+                            elif singleProfileCura or sliceModel:
+                                makeProfile = True
                                 if sorted(profilesData['hotend'], key=lambda k: k['id'])[a[0]]['id'] != 'None' and sorted(profilesData['hotend'], key=lambda k: k['id'])[b[0]]['id'] != 'None':
                                     if sorted(profilesData['hotend'], key=lambda k: k['id'])[a[0]]['nozzleSize'] != sorted(profilesData['hotend'], key=lambda k: k['id'])[b[0]]['nozzleSize']:
-                                        print "\n Select two hotends with the same nozzle size to create a Cura profile.\n"
-                                        makeProfile = 'No'
-                                if makeProfile == 'Yes':
+                                        raw_input("\n Select two hotends with the same nozzle size to create a Cura profile. Press Enter to continue...")
+                                        makeProfile = False
+                                if makeProfile:
                                     c = selectQuality()
-                                    print "\n Your new Cura profile '"+createCuraProfile(sorted(profilesData['hotend'], key=lambda k: k['id'])[a[0]], sorted(profilesData['hotend'], key=lambda k: k['id'])[b[0]], sorted(profilesData['filament'], key=lambda k: k['id'])[a[1]], sorted(profilesData['filament'], key=lambda k: k['id'])[b[1]], sorted(profilesData['quality'], key=lambda k: k['id'])[c], dataLog, 'createFile')+"' has been created.\n"
-                                    profilesCreatedCount = 1
+                                    if singleProfileCura:
+                                        print "\n Your new Cura profile '"+createCuraProfile(sorted(profilesData['hotend'], key=lambda k: k['id'])[a[0]], sorted(profilesData['hotend'], key=lambda k: k['id'])[b[0]], sorted(profilesData['filament'], key=lambda k: k['id'])[a[1]], sorted(profilesData['filament'], key=lambda k: k['id'])[b[1]], sorted(profilesData['quality'], key=lambda k: k['id'])[c], dataLog, 'createFile')+"' has been created.\n"
+                                        profilesCreatedCount = 1
+                                    elif sliceModel:
+                                        if ".BCN3D Sigma - Cura Profiles temp" in os.listdir('.'):
+                                            shutil.rmtree(".BCN3D Sigma - Cura Profiles temp")
+                                        os.mkdir(".BCN3D Sigma - Cura Profiles temp")
+                                        os.chdir(".BCN3D Sigma - Cura Profiles temp")
+                                        profileName = createCuraProfile(sorted(profilesData['hotend'], key=lambda k: k['id'])[a[0]], sorted(profilesData['hotend'], key=lambda k: k['id'])[b[0]], sorted(profilesData['filament'], key=lambda k: k['id'])[a[1]], sorted(profilesData['filament'], key=lambda k: k['id'])[b[1]], sorted(profilesData['quality'], key=lambda k: k['id'])[c], dataLog, 'createFile')
+                                        stlFile = raw_input('\n Drag & Drop your STL model file to this window. Then press Enter.\n ')[:-1].replace('\\', '')
+                                        os.chdir('..')
+                                        gcodeFile = stlFile[:-4]+'.gcode'
+                                        os.system(r'/Applications/Cura/Cura-BCN3D.app/Contents/MacOS/Cura-BCN3D -i "'+os.getcwd()+'/.BCN3D Sigma - Cura Profiles temp/'+profileName+r'" -s "'+stlFile+r'" -o "'+gcodeFile+r'"')
+                                        shutil.rmtree(".BCN3D Sigma - Cura Profiles temp")
+                                        print "\n Your gcode file '"+string.split(stlFile, '/')[-1][:-4]+'.gcode'+"' has been created. You can find it in the same folder as the stl file.\n "
+                                        raw_input(" Press Enter to continue...")
                     if profilesCreatedCount > 0:
                         print ' See profile(s) data? (Y/n)'
                         while y not in ['Y', 'n']:
@@ -1404,11 +1454,12 @@ def main():
                             for d in string.split(l, ';'):
                                 print string.rjust(str(d)[:6], 6),
                         print ' '+str(profilesCreatedCount)+' profile(s) created with '+str(len(dataLog)-1)+' configurations.\n'
-                elif x == '5':
+                        raw_input(" Press Enter to continue...")
+                    elif y == 'n':
+                        print ''
+                elif testComb:                    
                     testAllCombinations()
-                elif x == '6':
-                    print '\n Until next time!\n'
-                    break
+                    raw_input(" Press Enter to continue...")
 
 if __name__ == '__main__':
     main() 
