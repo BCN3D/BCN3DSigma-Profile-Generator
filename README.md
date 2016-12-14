@@ -24,7 +24,7 @@ Will ask for a functionality:
 
 1. **Profile for Simplify3D:** Will ask for left Hotend, left loaded Filament, right Hotend and right loaded Filament. Then will generate the fff profile file.
 
-2. **Profile for Cura:** Same as *2*, now for Cura (will ask for Quality at the end).
+2. **Profile for Cura:** Same as *1*, now for Cura (will ask for Quality at the end).
 
 3. **Experimental features:** Some experimental extra features.
 
@@ -104,14 +104,4 @@ Quality Preconfigurations
     "infillPercentage": 20					// [0-100]
 }
 ```
-
-## TO-DO
-
-- [x] Availability to generate Cura profiles
-- [x] Simplify3D: Fix temperature values for 'None' Hotend.
-- [x] Simplify3D: Adjust coast & wipe
-- [x] Cura: Adjust toolchange & start scripts
-- [ ] Availability to create .json files right from the script
-- [ ] Better print speed management for flexible materials
-- [ ] Adjust bridging for flexible materials
  
