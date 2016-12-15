@@ -5,7 +5,7 @@
     "filamentDensity": 1.30,
     "isSupportMaterial": true,
     "isFlexibleMaterial": false,
-    "bedTemperature": 50,
+    "bedTemperature": 65,
     "printTemperature": [190, 190],
     "defaultPrintSpeed": 50,
     "advisedMaxPrintSpeed": 50,
