@@ -1,0 +1,19 @@
+{
+    "id": "Colorfabb HT",
+    "filamentDiameter": 2.85,
+    "filamentPricePerKg": 59.93,
+    "filamentDensity": 1.18,
+    "isSupportMaterial": false,
+    "isFlexibleMaterial": false,
+    "bedTemperature": 110,
+    "printTemperature": [250, 280],
+    "defaultPrintSpeed": 30,
+    "advisedMaxPrintSpeed": 50,
+    "maxFlow": "None",
+    "maxFlowForHighFlowHotend": "None",
+    "retractionDistance": 4,
+    "retractionSpeed": 40,
+    "fanPercentage": 50,
+    "extrusionMultiplier": 1,
+    "purgeLenght": 1.5
+}
