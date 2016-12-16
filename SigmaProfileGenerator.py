@@ -435,7 +435,7 @@ def createSimplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight
                 fff.append(r'      <useRetract>1</useRetract>'+"\n")
                 fff.append(r'      <retractionDistance>'+str(filamentLeft['retractionDistance'])+r'</retractionDistance>'+"\n")
                 fff.append(r'      <extraRestartDistance>0</extraRestartDistance>'+"\n")
-                fff.append(r'      <retractionZLift>'+str(currentLayerHeight/2)+'</retractionZLift>'+"\n")
+                fff.append(r'      <retractionZLift>'+str("%.2f" % (currentLayerHeight/2.))+'</retractionZLift>'+"\n")
                 fff.append(r'      <retractionSpeed>'+str(filamentLeft['retractionSpeed']*60)+r'</retractionSpeed>'+"\n")
                 fff.append(r'      <useCoasting>1</useCoasting>'+"\n")
                 fff.append(r'      <coastingDistance>'+str(coastValue(hotendLeft, filamentLeft))+r'</coastingDistance>'+"\n")
@@ -716,7 +716,7 @@ def createCuraProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, qual
     ini.append(r'retraction_min_travel = 1.5'+"\n")
     ini.append(r'retraction_combing = All'+"\n")
     ini.append(r'retraction_minimal_extrusion = 0'+"\n")
-    ini.append(r'retraction_hop = 0.05'+"\n")
+    ini.append(r'retraction_hop = '+str("%.2f" % (currentLayerHeight/2.))+"\n")
     ini.append(r'bottom_thickness = '+str(firstLayerHeight)+"\n")
     ini.append(r'layer0_width_factor = 100'+"\n")
     ini.append(r'object_sink = 0'+"\n")
@@ -1086,8 +1086,8 @@ def retractValues(filament):
         retractWhileWiping = 1
         onlyWipeOutlines = 1
     else:
-        onlyRetractWhenCrossingOutline = 1
-        retractBetweenLayers = 0
+        onlyRetractWhenCrossingOutline = 0
+        retractBetweenLayers = 1
         useRetractionMinTravel = 1
         retractWhileWiping = 1
         onlyWipeOutlines = 1
