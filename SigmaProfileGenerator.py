@@ -1335,7 +1335,7 @@ def clearDisplay():
 def main():
     if platform.system() == 'Windows':
         # os.system('color f0')
-        os.system('mode con: cols=153 lines=35')
+        os.system('mode con: cols=154 lines=35')
     if validArguments():
         readProfilesData()
         for hotend in os.listdir('./Profiles Data/Hotends'):
