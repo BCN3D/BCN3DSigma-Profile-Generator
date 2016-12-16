@@ -8,6 +8,7 @@
 import time
 import math
 import os
+import platform
 import sys
 import json
 import string
@@ -1203,7 +1204,7 @@ def testAllCombinations():
     print '\t\tAll '+str(realSimplify3DProfilesAvailable + realCuraProfileaAvailable)+' profiles can be generated!\n'
 
 def selectHotendAndFilament(extruder, header):
-    os.system('clear')
+    clearDisplay()
     print header
     print "\n\tSelect Sigma's "+extruder+" Hotend (1-"+str(len(profilesData['hotend']))+'):'
     answer0 = ''
@@ -1219,7 +1220,7 @@ def selectHotendAndFilament(extruder, header):
         answer0 = raw_input('\t')
     print '\t'+extruder+' Hotend: '+sorted(profilesData['hotend'], key=lambda k: k['id'])[int(answer0)-1]['id']
     if answer0 != str(int(hotendOptions[-1])):
-        os.system('clear')
+        clearDisplay()
         print header
         print "\n\tSelect Sigma's "+extruder+" Extruder Loaded Filament (1-"+str(len(profilesData['filament']))+'):'
         answer1 = ''
@@ -1233,7 +1234,7 @@ def selectHotendAndFilament(extruder, header):
     return (int(answer0)-1, int(answer1)-1)
 
 def selectQuality(header):
-    os.system('clear')
+    clearDisplay()
     print header
     print "\n\tSelect Quality:"
     answer0 = ''
@@ -1325,6 +1326,12 @@ def writeData(extruder, currentDefaultSpeed, currentInfillLayerInterval, current
             printB = "%.2f" % (float(currentDefaultSpeed)/60*currentInfillLayerInterval*currentLayerHeight*hotendRight['nozzleSize']*supportMaterialLoadedRight)
     dataLog.append(filamentLeft['id']+";"+filamentRight['id']+";"+extruder+";"+quality['id']+";"+hotendLeft['id']+";"+hotendRight['id']+";"+'T'+str(currentInfillExtruder)+";"+'T'+str(currentPrimaryExtruder)+";"+'T'+str(currentSupportExtruder)+";"+str(printA)+";"+str(printB)+";"+str(currentInfillLayerInterval)+";"+str("%.2f" % (currentDefaultSpeed/60.))+";"+str(currentFirstLayerUnderspeed)+";"+str(currentOutlineUnderspeed)+";"+str(currentSupportUnderspeed)+";"+str(currentFirstLayerHeightPercentage)+";"+str(hotendLeftTemperature)+";"+str(hotendRightTemperature)+";"+str(currentBedTemperature)+";\n")
 
+def clearDisplay():
+    if platform.system() == 'Windows':
+        os.system('cls')
+    else:
+        os.system('clear')
+
 def main():
     if validArguments():
         readProfilesData()
@@ -1370,7 +1377,7 @@ def main():
         if len(sys.argv) == 1:
             experimentalMenu = False
             while True:
-                os.system('clear')
+                clearDisplay()
                 print '\n Welcome to the BCN3D Sigma Profile Generator \n'
                 print ' Choose one option (1-4):'
                 print ' 1. Profile for Simplify3D'
@@ -1389,7 +1396,7 @@ def main():
                 readProfilesData()
 
                 if x == '3':
-                    os.system('clear')
+                    clearDisplay()
                     print '\n Welcome to the BCN3D Sigma Profile Generator \n\n\n\n'
                     print '    Experimental features'
                     print '\n\tChoose one option (1-5):'
@@ -1432,17 +1439,17 @@ def main():
 
                 if bundleProfilesSimplify3D or bundleProfilesCura or singleProfileSimplify3D or singleProfileCura:
                     if bundleProfilesSimplify3D:
-                        os.system('clear')
+                        clearDisplay()
                         print GUIHeader
                         profilesCreatedCount = createSimplify3DProfilesBundle(dataLog, profilesCreatedCount)
                     elif bundleProfilesCura:
-                        os.system('clear')
+                        clearDisplay()
                         print GUIHeader
                         profilesCreatedCount = createCuraProfilesBundle(dataLog, profilesCreatedCount)
                     elif singleProfileSimplify3D or singleProfileCura:
                         a = selectHotendAndFilament('Left', GUIHeader)
                         b = selectHotendAndFilament('Right', GUIHeader)
-                        os.system('clear')
+                        clearDisplay()
                         print GUIHeader
                         if sorted(profilesData['hotend'], key=lambda k: k['id'])[a[0]]['id'] == 'None' and sorted(profilesData['hotend'], key=lambda k: k['id'])[b[0]]['id'] == 'None':
                             raw_input("\n\tSelect at least one hotend to create a profile. Press Enter to continue...")
@@ -1458,7 +1465,7 @@ def main():
                                         makeProfile = False
                                 if makeProfile:
                                     c = selectQuality(GUIHeader)
-                                    os.system('clear')
+                                    clearDisplay()
                                     print GUIHeader
                                     if singleProfileCura:
                                         print "\n\tYour new Cura profile '"+createCuraProfile(sorted(profilesData['hotend'], key=lambda k: k['id'])[a[0]], sorted(profilesData['hotend'], key=lambda k: k['id'])[b[0]], sorted(profilesData['filament'], key=lambda k: k['id'])[a[1]], sorted(profilesData['filament'], key=lambda k: k['id'])[b[1]], sorted(profilesData['quality'], key=lambda k: k['id'])[c], dataLog, 'createFile')+"' has been created.\n"
@@ -1476,7 +1483,7 @@ def main():
                     elif y == 'n':
                         print ''
                 elif sliceModel:
-                    os.system('clear')
+                    clearDisplay()
                     print GUIHeader
                     profileFile = raw_input('\n\t\tDrag & Drop your .ini profile to this window. Then press Enter.\n\t\t')[:-1].replace('\\', '')
                     stlFile = raw_input('\n\t\tDrag & Drop your .stl model file to this window. Then press Enter.\n\t\t')[:-1].replace('\\', '')
@@ -1485,7 +1492,7 @@ def main():
                     os.system(r'/Applications/Cura/Cura-BCN3D.app/Contents/MacOS/Cura-BCN3D -i "'+profileFile+r'" -s "'+stlFile+r'" -o "'+gcodeFile+r'"')
                     raw_input("\n\t\tYour gcode file '"+string.split(stlFile, '/')[-1][:-4]+'.gcode'+"' has been created! Find it in the same folder as the .stl file.\n\t\tPress Enter to continue...")
                 elif testComb:
-                    os.system('clear')
+                    clearDisplay()
                     print GUIHeader              
                     testAllCombinations()
                     raw_input("\t\tPress Enter to continue...")
