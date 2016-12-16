@@ -6,6 +6,7 @@
 #https://opensource.org/licenses/GPL-3.0
 
 import time
+import math
 import os
 import sys
 import json
@@ -656,10 +657,10 @@ def createCuraProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, qual
         retractionAmount = max(filamentLeft['retractionDistance'], filamentRight['retractionDistance'])
         currentFirstLayerHeightPercentage = int(min(125, min(flowValue(hotendLeft, filamentLeft),flowValue(hotendRight, filamentRight))*100/(hotend['nozzleSize']*currentLayerHeight*(currentDefaultSpeed/60)*float(currentFirstLayerUnderspeed))))
         firstLayerHeight = "%.2f" % (currentLayerHeight * currentFirstLayerHeightPercentage/100.)
-        if filamentLeft['fanPercentage'] > 0 or filamentRight['fanPercentage']:
-            fanEnabled = 'True'
-        else:
+        if filamentLeft['fanPercentage'] == 0 or filamentRight['fanPercentage'] == 0:
             fanEnabled = 'False'
+        else:
+            fanEnabled = 'True'
         fanSpeed = max(filamentLeft['fanPercentage'], filamentRight['fanPercentage'])
         hotendLeftTemperature, hotendRightTemperature = printTemperature1, printTemperature2
 
@@ -1064,9 +1065,9 @@ def speedMultiplier(hotend, filament):
 def purgeValues(hotend, filament, speed, layerHeight):
     baseStartLenght04 = 7
     baseToolChangeLenght04 = 1.5
-    purgeSpeed = "%.2f" % (speed * hotend['nozzleSize'] * layerHeight / (filament['filamentDiameter']/2.)**2)
-    startPurgeLenght = "%.2f" % max(10, ((hotend['nozzleSize']/0.4)**2*baseStartLenght04*filament['purgeLenght']/baseToolChangeLenght04))
-    toolChangePurgeLenght = "%.2f" % ((hotend['nozzleSize']/0.4)**2*filament['purgeLenght'])
+    purgeSpeed = float("%.2f" % (speed * hotend['nozzleSize'] * layerHeight / (math.pi * (filament['filamentDiameter']/2.)**2)))
+    startPurgeLenght = float("%.2f" % max(10, ((hotend['nozzleSize']/0.4)**2*baseStartLenght04*filament['purgeLenght']/baseToolChangeLenght04)))
+    toolChangePurgeLenght = float("%.2f" % ((hotend['nozzleSize']/0.4)**2*filament['purgeLenght']))
 
     return purgeSpeed, startPurgeLenght, toolChangePurgeLenght
 
