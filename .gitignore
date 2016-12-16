@@ -93,3 +93,5 @@ ENV/
 *.zip
 
 *.ini
+
+Profiles Data Experimental/*
