@@ -45,7 +45,10 @@ def createSimplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight
     fff.append(r'  <baseProfile></baseProfile>'+"\n")
     fff.append(r'  <printMaterial></printMaterial>'+"\n")
     fff.append(r'  <printQuality>'+defaultPrintQuality+'</printQuality>'+"\n") #+extruder+secondaryExtruderAction+str(quality['id'])+
-    fff.append(r'  <printExtruders>Single Extruder</printExtruders>'+"\n")
+    if hotendLeft['id'] != 'None':
+        fff.append(r'  <printExtruders>Left Extruder Only</printExtruders>'+"\n")
+    else:
+        fff.append(r'  <printExtruders>Right Extruder Only</printExtruders>'+"\n")        
     if hotendLeft['id'] != 'None':
         fff.append(r'  <extruder name="Left Extruder '+str(hotendLeft['nozzleSize'])+r'">'+"\n")
         fff.append(r'    <toolheadNumber>0</toolheadNumber>'+"\n")
@@ -1083,7 +1086,7 @@ def retractValues(filament):
         retractWhileWiping = 1
         onlyWipeOutlines = 1
     else:
-        onlyRetractWhenCrossingOutline = 0
+        onlyRetractWhenCrossingOutline = 1
         retractBetweenLayers = 0
         useRetractionMinTravel = 1
         retractWhileWiping = 1
