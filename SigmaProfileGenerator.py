@@ -366,7 +366,7 @@ def createSimplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight
                     currentAvoidCrossingOutline = 0
                     if hotendLeft['nozzleSize'] <= hotendRight['nozzleSize']:
                         # IDEX, Combined Infill (Right Hotend has thicker or equal nozzle)
-                        if hotendLeft['nozzleSize'] < hotendRight['nozzleSize']:
+                        if quality['infillPercentage'] >= 90:
                             currentToolChangePurgeLenghtT1 = str("%.2f" % (float(currentToolChangePurgeLenghtT1)/4))
                         currentPrimaryExtruder = 0
                         currentFilament = filamentLeft
@@ -435,8 +435,8 @@ def createSimplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight
                 fff.append(r'      <retractionZLift>0.05</retractionZLift>'+"\n")
                 fff.append(r'      <retractionSpeed>'+str(filamentLeft['retractionSpeed']*60)+r'</retractionSpeed>'+"\n")
                 fff.append(r'      <useCoasting>1</useCoasting>'+"\n")
-                fff.append(r'      <coastingDistance>'+str(hotendLeft['nozzleSize'])+r'</coastingDistance>'+"\n")
-                fff.append(r'      <useWipe>1</useWipe>'+"\n")
+                fff.append(r'      <coastingDistance>'+str(coastValue(hotendLeft, filamentLeft))+r'</coastingDistance>'+"\n")
+                fff.append(r'      <useWipe>0</useWipe>'+"\n")
                 fff.append(r'      <wipeDistance>'+str(hotendLeft['nozzleSize']*12.5)+r'</wipeDistance>'+"\n")
                 fff.append(r'    </extruder>'+"\n")
             if hotendRight['id'] != 'None':
@@ -452,8 +452,8 @@ def createSimplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight
                 fff.append(r'      <retractionZLift>0.05</retractionZLift>'+"\n")
                 fff.append(r'      <retractionSpeed>'+str(filamentRight['retractionSpeed']*60)+r'</retractionSpeed>'+"\n")
                 fff.append(r'      <useCoasting>1</useCoasting>'+"\n")
-                fff.append(r'      <coastingDistance>'+str(hotendRight['nozzleSize'])+r'</coastingDistance>'+"\n")
-                fff.append(r'      <useWipe>1</useWipe>'+"\n")
+                fff.append(r'      <coastingDistance>'+str(coastValue(hotendRight, filamentRight))+r'</coastingDistance>'+"\n")
+                fff.append(r'      <useWipe>0</useWipe>'+"\n")
                 fff.append(r'      <wipeDistance>'+str(hotendRight['nozzleSize']*12.5)+r'</wipeDistance>'+"\n")
                 fff.append(r'    </extruder>'+"\n")
             fff.append(r'    <primaryExtruder>'+str(currentPrimaryExtruder)+r'</primaryExtruder>'+"\n")
@@ -514,11 +514,11 @@ def createSimplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight
                 fff.append(r'      <setpoint layer="1" temperature="'+str(currentBedTemperature)+r'"/>'+"\n")
                 fff.append(r'    </temperatureController>'+"\n")
             if extruder == 'Left Extruder':
-                fff.append(r'    <startingGcode>M140 S[bed0_temperature],M104 S[extruder0_temperature] T0,M109 S[extruder0_temperature] T0,M190 S[bed0_temperature],G21'+"\t\t"+r';metric values,G90'+"\t\t"+r';absolute positioning,M82'+"\t\t"+r';set extruder to absolute mode,M107'+"\t\t"+r';start with the fan off,G28 X0 Y0'+"\t\t"+r';move X/Y to min endstops,G28 Z0'+"\t\t"+r';move Z to min endstops,T0'+"\t\t"+r';change to active toolhead,G92 E0'+"\t\t"+r';zero the extruded length,G1 Z5 F200'+"\t\t"+r';Safety Z axis movement,G1 F'+str(currentPurgeSpeedT0)+' E'+str(currentStartPurgeLenghtT0)+"\t"+r';extrude '+str(currentStartPurgeLenghtT0)+r'mm of feed stock,G92 E0'+"\t\t"+r';zero the extruded length again,G1 F200 E-4'+"\t\t"+r';Retract before printing,G1 F[travel_speed],</startingGcode>'+"\n")
+                fff.append(r'    <startingGcode>M140 S[bed0_temperature],M104 S[extruder0_temperature] T0,M109 S[extruder0_temperature] T0,M190 S[bed0_temperature],G21'+"\t\t"+r';metric values,G90'+"\t\t"+r';absolute positioning,M82'+"\t\t"+r';set extruder to absolute mode,M107'+"\t\t"+r';start with the fan off,G28 X0 Y0'+"\t\t"+r';move X/Y to min endstops,G28 Z0'+"\t\t"+r';move Z to min endstops,T0'+"\t\t"+r';change to active toolhead,G92 E0'+"\t\t"+r';zero the extruded length,G1 Z5 F200'+"\t\t"+r';Safety Z axis movement,G1 F'+str(currentPurgeSpeedT0)+' E'+str(currentStartPurgeLenghtT0)+"\t"+r';extrude '+str(currentStartPurgeLenghtT0)+r'mm of feed stock,G92 E0'+"\t\t"+r';zero the extruded length again,G1 F[travel_speed],</startingGcode>'+"\n")
                 fff.append(r'    <layerChangeGcode>M104 S0 T1</layerChangeGcode>'+"\n")
                 fff.append(r'    <toolChangeGcode/>'+"\n")
             elif extruder == 'Right Extruder':
-                fff.append(r'    <startingGcode>M140 S[bed0_temperature],M104 S[extruder1_temperature] T1,M109 S[extruder1_temperature] T1,M190 S[bed0_temperature],G21'+"\t\t"+r';metric values,G90'+"\t\t"+r';absolute positioning,M82'+"\t\t"+r';set extruder to absolute mode,M107'+"\t\t"+r';start with the fan off,G28 X0 Y0'+"\t\t"+r';move X/Y to min endstops,G28 Z0'+"\t\t"+r';move Z to min endstops,T1'+"\t\t"+r';change to active toolhead,G92 E0'+"\t\t"+r';zero the extruded length,G1 Z5 F200'+"\t\t"+r';Safety Z axis movement,G1 F'+str(currentPurgeSpeedT1)+' E'+str(currentStartPurgeLenghtT1)+"\t"+r';extrude '+str(currentStartPurgeLenghtT1)+r'mm of feed stock,G92 E0'+"\t\t"+r';zero the extruded length again,G1 F200 E-4'+"\t\t"+r';Retract before printing,G1 F[travel_speed],</startingGcode>'+"\n")
+                fff.append(r'    <startingGcode>M140 S[bed0_temperature],M104 S[extruder1_temperature] T1,M109 S[extruder1_temperature] T1,M190 S[bed0_temperature],G21'+"\t\t"+r';metric values,G90'+"\t\t"+r';absolute positioning,M82'+"\t\t"+r';set extruder to absolute mode,M107'+"\t\t"+r';start with the fan off,G28 X0 Y0'+"\t\t"+r';move X/Y to min endstops,G28 Z0'+"\t\t"+r';move Z to min endstops,T1'+"\t\t"+r';change to active toolhead,G92 E0'+"\t\t"+r';zero the extruded length,G1 Z5 F200'+"\t\t"+r';Safety Z axis movement,G1 F'+str(currentPurgeSpeedT1)+' E'+str(currentStartPurgeLenghtT1)+"\t"+r';extrude '+str(currentStartPurgeLenghtT1)+r'mm of feed stock,G92 E0'+"\t\t"+r';zero the extruded length again,G1 F[travel_speed],</startingGcode>'+"\n")
                 fff.append(r'    <layerChangeGcode>M104 S0 T0</layerChangeGcode>'+"\n")
                 fff.append(r'    <toolChangeGcode/>'+"\n")
             else:
@@ -1074,18 +1074,21 @@ def purgeValues(hotend, filament, speed, layerHeight):
 
 def retractValues(filament):
     if filament['isFlexibleMaterial']:
-        onlyRetractWhenCrossingOutline = 0
+        onlyRetractWhenCrossingOutline = 1
         retractBetweenLayers = 0
         useRetractionMinTravel = 1
         retractWhileWiping = 1
         onlyWipeOutlines = 1
     else:
         onlyRetractWhenCrossingOutline = 0
-        retractBetweenLayers = 1
+        retractBetweenLayers = 0
         useRetractionMinTravel = 1
         retractWhileWiping = 1
         onlyWipeOutlines = 1
     return onlyRetractWhenCrossingOutline, retractBetweenLayers, useRetractionMinTravel, retractWhileWiping, onlyWipeOutlines
+
+def coastValue(hotend, filament):
+    return float("%.2f" % ((hotend['nozzleSize']/0.4)**2*filament['purgeLenght']))
 
 def flowValue(hotend, filament):
     if hotend['nozzleSize'] <= 0.6:
