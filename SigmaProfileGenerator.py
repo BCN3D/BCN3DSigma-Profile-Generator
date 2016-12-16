@@ -1086,8 +1086,8 @@ def retractValues(filament):
         retractWhileWiping = 1
         onlyWipeOutlines = 1
     else:
-        onlyRetractWhenCrossingOutline = 0
-        retractBetweenLayers = 1
+        onlyRetractWhenCrossingOutline = 1
+        retractBetweenLayers = 0
         useRetractionMinTravel = 1
         retractWhileWiping = 1
         onlyWipeOutlines = 1
