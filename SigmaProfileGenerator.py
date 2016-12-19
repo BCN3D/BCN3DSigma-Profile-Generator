@@ -415,7 +415,7 @@ def createSimplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight
             currentBottomSolidLayers = currentTopSolidLayers
             currentRaftExtruder = currentPrimaryExtruder
             currentSkirtExtruder = currentPrimaryExtruder
-            onlyRetractWhenCrossingOutline, retractBetweenLayers, useRetractionMinTravel, retractWhileWiping, onlyWipeOutlines = retractValues(currentFilament)
+            useCoasting, useWipe, onlyRetractWhenCrossingOutline, retractBetweenLayers, useRetractionMinTravel, retractWhileWiping, onlyWipeOutlines = retractValues(currentFilament)
             fff.append(r'  <autoConfigureQuality name="'+extruder+secondaryExtruderAction+str(quality['id'])+r'">'+"\n")
             fff.append(r'    <globalExtrusionMultiplier>1</globalExtrusionMultiplier>'+"\n")
             fff.append(r'    <fanSpeed>'+"\n")
@@ -437,9 +437,9 @@ def createSimplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight
                 fff.append(r'      <extraRestartDistance>0</extraRestartDistance>'+"\n")
                 fff.append(r'      <retractionZLift>'+str("%.2f" % (currentLayerHeight/2.))+'</retractionZLift>'+"\n")
                 fff.append(r'      <retractionSpeed>'+str(filamentLeft['retractionSpeed']*60)+r'</retractionSpeed>'+"\n")
-                fff.append(r'      <useCoasting>1</useCoasting>'+"\n")
+                fff.append(r'      <useCoasting>'+str(retractValues(filamentLeft)[0])+'</useCoasting>'+"\n")
                 fff.append(r'      <coastingDistance>'+str(coastValue(hotendLeft, filamentLeft))+r'</coastingDistance>'+"\n")
-                fff.append(r'      <useWipe>0</useWipe>'+"\n")
+                fff.append(r'      <useWipe>'+str(retractValues(filamentLeft)[1])+'</useWipe>'+"\n")
                 fff.append(r'      <wipeDistance>'+str(hotendLeft['nozzleSize']*12.5)+r'</wipeDistance>'+"\n")
                 fff.append(r'    </extruder>'+"\n")
             if hotendRight['id'] != 'None':
@@ -454,9 +454,9 @@ def createSimplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight
                 fff.append(r'      <extraRestartDistance>0</extraRestartDistance>'+"\n")
                 fff.append(r'      <retractionZLift>'+str(currentLayerHeight/2)+'</retractionZLift>'+"\n")
                 fff.append(r'      <retractionSpeed>'+str(filamentRight['retractionSpeed']*60)+r'</retractionSpeed>'+"\n")
-                fff.append(r'      <useCoasting>1</useCoasting>'+"\n")
+                fff.append(r'      <useCoasting>'+str(retractValues(filamentRight)[0])+'</useCoasting>'+"\n")
                 fff.append(r'      <coastingDistance>'+str(coastValue(hotendRight, filamentRight))+r'</coastingDistance>'+"\n")
-                fff.append(r'      <useWipe>0</useWipe>'+"\n")
+                fff.append(r'      <useWipe>'+str(retractValues(filamentRight)[1])+'</useWipe>'+"\n")
                 fff.append(r'      <wipeDistance>'+str(hotendRight['nozzleSize']*12.5)+r'</wipeDistance>'+"\n")
                 fff.append(r'    </extruder>'+"\n")
             fff.append(r'    <primaryExtruder>'+str(currentPrimaryExtruder)+r'</primaryExtruder>'+"\n")
@@ -1080,18 +1080,22 @@ def purgeValues(hotend, filament, speed, layerHeight):
 
 def retractValues(filament):
     if filament['isFlexibleMaterial']:
+        useCoasting = 0
+        useWipe = 0
         onlyRetractWhenCrossingOutline = 1
         retractBetweenLayers = 0
         useRetractionMinTravel = 1
         retractWhileWiping = 1
         onlyWipeOutlines = 1
     else:
+        useCoasting = 0
+        useWipe = 0
         onlyRetractWhenCrossingOutline = 1
         retractBetweenLayers = 0
         useRetractionMinTravel = 1
         retractWhileWiping = 1
         onlyWipeOutlines = 1
-    return onlyRetractWhenCrossingOutline, retractBetweenLayers, useRetractionMinTravel, retractWhileWiping, onlyWipeOutlines
+    return useCoasting, useWipe, onlyRetractWhenCrossingOutline, retractBetweenLayers, useRetractionMinTravel, retractWhileWiping, onlyWipeOutlines
 
 def coastValue(hotend, filament):
     return float("%.2f" % ((hotend['nozzleSize']/0.4)**2*filament['purgeLenght']))
