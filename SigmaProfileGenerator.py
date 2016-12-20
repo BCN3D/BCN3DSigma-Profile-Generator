@@ -308,6 +308,7 @@ def createSimplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight
                     else:
                         hotendRightTemperature = hotendLeftTemperature
                     currentPurgeSpeedT0, currentStartPurgeLenghtT0, currentToolChangePurgeLenghtT0 = purgeValues(hotendLeft, filamentLeft, currentDefaultSpeed, currentLayerHeight)
+                    currentPurgeSpeedT1, currentStartPurgeLenghtT1, currentToolChangePurgeLenghtT1 = currentPurgeSpeedT0, currentStartPurgeLenghtT0, currentToolChangePurgeLenghtT0
                 else:
                     # MEX Right
                     currentPrimaryExtruder = 1
@@ -321,6 +322,7 @@ def createSimplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight
                     else:
                         hotendLeftTemperature = hotendRightTemperature
                     currentPurgeSpeedT1, currentStartPurgeLenghtT1, currentToolChangePurgeLenghtT1 = purgeValues(hotendRight, filamentRight, currentDefaultSpeed, currentLayerHeight)
+                    currentPurgeSpeedT0, currentStartPurgeLenghtT0, currentToolChangePurgeLenghtT0 = currentPurgeSpeedT1, currentStartPurgeLenghtT1, currentToolChangePurgeLenghtT1
                 currentInfillExtruder = currentPrimaryExtruder
                 currentSupportExtruder = currentPrimaryExtruder
                 currentBedTemperature = currentFilament['bedTemperature']
@@ -516,15 +518,10 @@ def createSimplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight
                 fff.append(r'      <stabilizeAtStartup>0</stabilizeAtStartup>'+"\n")
                 fff.append(r'      <setpoint layer="1" temperature="'+str(currentBedTemperature)+r'"/>'+"\n")
                 fff.append(r'    </temperatureController>'+"\n")
-            if extruder == 'Left Extruder':
-                fff.append(r'    <startingGcode>M140 S[bed0_temperature],M104 S[extruder0_temperature] T0,M109 S[extruder0_temperature] T0,M190 S[bed0_temperature],G21'+"\t\t"+r';metric values,G90'+"\t\t"+r';absolute positioning,M82'+"\t\t"+r';set extruder to absolute mode,M107'+"\t\t"+r';start with the fan off,G28 X0 Y0'+"\t\t"+r';move X/Y to min endstops,G28 Z0'+"\t\t"+r';move Z to min endstops,T0'+"\t\t"+r';change to active toolhead,G92 E0'+"\t\t"+r';zero the extruded length,G1 Z5 F200'+"\t\t"+r';Safety Z axis movement,G1 F'+str(currentPurgeSpeedT0)+' E'+str(currentStartPurgeLenghtT0)+"\t"+r';extrude '+str(currentStartPurgeLenghtT0)+r'mm of feed stock,G92 E0'+"\t\t"+r';zero the extruded length again,G1 F[travel_speed],</startingGcode>'+"\n")
-                fff.append(r'    <toolChangeGcode/>'+"\n")
-            elif extruder == 'Right Extruder':
-                fff.append(r'    <startingGcode>M140 S[bed0_temperature],M104 S[extruder1_temperature] T1,M109 S[extruder1_temperature] T1,M190 S[bed0_temperature],G21'+"\t\t"+r';metric values,G90'+"\t\t"+r';absolute positioning,M82'+"\t\t"+r';set extruder to absolute mode,M107'+"\t\t"+r';start with the fan off,G28 X0 Y0'+"\t\t"+r';move X/Y to min endstops,G28 Z0'+"\t\t"+r';move Z to min endstops,T1'+"\t\t"+r';change to active toolhead,G92 E0'+"\t\t"+r';zero the extruded length,G1 Z5 F200'+"\t\t"+r';Safety Z axis movement,G1 F'+str(currentPurgeSpeedT1)+' E'+str(currentStartPurgeLenghtT1)+"\t"+r';extrude '+str(currentStartPurgeLenghtT1)+r'mm of feed stock,G92 E0'+"\t\t"+r';zero the extruded length again,G1 F[travel_speed],</startingGcode>'+"\n")
-                fff.append(r'    <toolChangeGcode/>'+"\n")
-            else:
-                fff.append(r'    <startingGcode>M140 S[bed0_temperature],M104 S[extruder0_temperature] T0,M104 S[extruder1_temperature] T1,M109 S[extruder0_temperature] T0,M109 S[extruder1_temperature] T1,M190 S[bed0_temperature],G21'+"\t\t"+r';metric values,G90'+"\t\t"+r';absolute positioning,M107'+"\t\t"+r';start with the fan off,G28 X0 Y0'+"\t\t"+r';move X/Y to min endstops,G28 Z0'+"\t\t"+r';move Z to min endstops,T1'+"\t\t"+r';switch to the 2nd extruder,G92 E0'+"\t\t"+r';zero the extruded length,G1 F'+str(currentPurgeSpeedT1)+' E'+str(currentStartPurgeLenghtT1)+"\t"+r';extrude '+str(currentStartPurgeLenghtT1)+r'mm of feed stock,G92 E0'+"\t\t"+r';zero the extruded length again,G1 F200 E-9,T0'+"\t\t"+r';switch to the 1st extruder,G92 E0'+"\t\t"+r';zero the extruded length,G1 F'+str(currentPurgeSpeedT0)+' E'+str(currentStartPurgeLenghtT0)+"\t"+r';extrude '+str(currentStartPurgeLenghtT0)+r'mm of feed stock,G92 E0'+"\t\t"+r';zero the extruded length again,G1 Z5 F200'+"\t\t"+r';Safety Z axis movement,G1 F[travel_speed]</startingGcode>'+"\n")
+            if hotendLeft['id'] != 'None' and hotendRight['id'] != 'None':
                 fff.append(r'    <toolChangeGcode>{IF NEWTOOL=0} T0'+"\t\t"+r';start tool switch 0,;{IF NEWTOOL=0} G1 X0 Y0 F[travel_speed]'+"\t"+r';travel,{IF NEWTOOL=0} G1 F500 E-0.5'+"\t\t"+r';fast purge,{IF NEWTOOL=0} G1 F'+str(currentPurgeSpeedT0)+' E'+str(currentToolChangePurgeLenghtT0)+"\t"+r';slow purge,{IF NEWTOOL=0} G92 E0'+"\t\t"+r';reset t0,{IF NEWTOOL=0} G1 F3000 E-4.5'+"\t"+r';retract,{IF NEWTOOL=0} G1 F[travel_speed]'+"\t"+r';end tool switch,'+fanActionOnToolChange1+r',{IF NEWTOOL=1} T1'+"\t\t"+r';start tool switch 1,;{IF NEWTOOL=1} G1 X210 Y0 F[travel_speed]'+"\t"+r';travel,{IF NEWTOOL=1} G1 F500 E-0.5'+"\t\t"+r';fast purge,{IF NEWTOOL=1} G1 F'+str(currentPurgeSpeedT1)+' E'+str(currentToolChangePurgeLenghtT1)+"\t"+r';slow purge,{IF NEWTOOL=1} T1'+"\t\t"+r';start tool switch 1,{IF NEWTOOL=1} G92 E0'+"\t\t"+r';reset t1,{IF NEWTOOL=1} G1 F3000 E-4.5'+"\t"+r';retract,{IF NEWTOOL=1} G1 F[travel_speed]'+"\t"+r';end tool switch,'+fanActionOnToolChange2+r',G91,G1 F[travel_speed] Z2,G90</toolChangeGcode>'+"\n")
+            else:
+                fff.append(r'    <toolChangeGcode/>'+"\n")
             fff.append(r'  </autoConfigureQuality>'+"\n")
 
             if dataLog != 'noData' :
@@ -535,14 +532,17 @@ def createSimplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight
 
     if hotendLeft['id'] != 'None':
         fff.append(r'  <autoConfigureExtruders name="Left Extruder Only"  allowedToolheads="1">'+"\n")
+        fff.append(r'    <startingGcode>M140 S[bed0_temperature],M104 S[extruder0_temperature] T0,M109 S[extruder0_temperature] T0,M190 S[bed0_temperature],G21'+"\t\t"+r';metric values,G90'+"\t\t"+r';absolute positioning,M82'+"\t\t"+r';set extruder to absolute mode,M107'+"\t\t"+r';start with the fan off,G28 X0 Y0'+"\t\t"+r';move X/Y to min endstops,G28 Z0'+"\t\t"+r';move Z to min endstops,T0'+"\t\t"+r';change to active toolhead,G92 E0'+"\t\t"+r';zero the extruded length,G1 Z5 F200'+"\t\t"+r';Safety Z axis movement,G1 F'+str(currentPurgeSpeedT0)+' E'+str(currentStartPurgeLenghtT0)+"\t"+r';extrude '+str(currentStartPurgeLenghtT0)+r'mm of feed stock,G92 E0'+"\t\t"+r';zero the extruded length again,G1 F[travel_speed],</startingGcode>'+"\n")
         fff.append(r'    <layerChangeGcode>M104 S0 T1</layerChangeGcode>'+"\n")
         fff.append(r'  </autoConfigureExtruders>'+"\n")
     if hotendRight['id'] != 'None':
         fff.append(r'  <autoConfigureExtruders name="Right Extruder Only"  allowedToolheads="1">'+"\n")
+        fff.append(r'    <startingGcode>M140 S[bed0_temperature],M104 S[extruder1_temperature] T1,M109 S[extruder1_temperature] T1,M190 S[bed0_temperature],G21'+"\t\t"+r';metric values,G90'+"\t\t"+r';absolute positioning,M82'+"\t\t"+r';set extruder to absolute mode,M107'+"\t\t"+r';start with the fan off,G28 X0 Y0'+"\t\t"+r';move X/Y to min endstops,G28 Z0'+"\t\t"+r';move Z to min endstops,T1'+"\t\t"+r';change to active toolhead,G92 E0'+"\t\t"+r';zero the extruded length,G1 Z5 F200'+"\t\t"+r';Safety Z axis movement,G1 F'+str(currentPurgeSpeedT1)+' E'+str(currentStartPurgeLenghtT1)+"\t"+r';extrude '+str(currentStartPurgeLenghtT1)+r'mm of feed stock,G92 E0'+"\t\t"+r';zero the extruded length again,G1 F[travel_speed],</startingGcode>'+"\n")
         fff.append(r'    <layerChangeGcode>M104 S0 T0</layerChangeGcode>'+"\n")
         fff.append(r'  </autoConfigureExtruders>'+"\n")
     if hotendLeft['id'] != 'None' and hotendRight['id'] != 'None':
         fff.append(r'  <autoConfigureExtruders name="Both Extruders"  allowedToolheads="2">'+"\n")
+        fff.append(r'    <startingGcode>M140 S[bed0_temperature],M104 S[extruder0_temperature] T0,M104 S[extruder1_temperature] T1,M109 S[extruder0_temperature] T0,M109 S[extruder1_temperature] T1,M190 S[bed0_temperature],G21'+"\t\t"+r';metric values,G90'+"\t\t"+r';absolute positioning,M107'+"\t\t"+r';start with the fan off,G28 X0 Y0'+"\t\t"+r';move X/Y to min endstops,G28 Z0'+"\t\t"+r';move Z to min endstops,T1'+"\t\t"+r';switch to the 2nd extruder,G92 E0'+"\t\t"+r';zero the extruded length,G1 F'+str(currentPurgeSpeedT1)+' E'+str(currentStartPurgeLenghtT1)+"\t"+r';extrude '+str(currentStartPurgeLenghtT1)+r'mm of feed stock,G92 E0'+"\t\t"+r';zero the extruded length again,G1 F200 E-9,T0'+"\t\t"+r';switch to the 1st extruder,G92 E0'+"\t\t"+r';zero the extruded length,G1 F'+str(currentPurgeSpeedT0)+' E'+str(currentStartPurgeLenghtT0)+"\t"+r';extrude '+str(currentStartPurgeLenghtT0)+r'mm of feed stock,G92 E0'+"\t\t"+r';zero the extruded length again,G1 Z5 F200'+"\t\t"+r';Safety Z axis movement,G1 F[travel_speed]</startingGcode>'+"\n")
         fff.append(r'    <layerChangeGcode></layerChangeGcode>'+"\n")
         fff.append(r'  </autoConfigureExtruders>'+"\n")
 
