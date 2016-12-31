@@ -107,7 +107,7 @@ def createSimplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight
     fff.append(r'  <perimeterOutlines>3</perimeterOutlines>'+"\n")
     fff.append(r'  <printPerimetersInsideOut>1</printPerimetersInsideOut>'+"\n")
     fff.append(r'  <startPointOption>3</startPointOption>'+"\n")
-    fff.append(r'  <startPointOriginX>150</startPointOriginX>'+"\n")
+    fff.append(r'  <startPointOriginX>105</startPointOriginX>'+"\n")
     fff.append(r'  <startPointOriginY>300</startPointOriginY>'+"\n")
     fff.append(r'  <startPointOriginZ>300</startPointOriginZ>'+"\n")
     fff.append(r'  <sequentialIslands>0</sequentialIslands>'+"\n")
@@ -140,7 +140,7 @@ def createSimplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight
     fff.append(r'  <oozeShieldSidewallAngle>30</oozeShieldSidewallAngle>'+"\n")
     fff.append(r'  <oozeShieldSpeedMultiplier>1</oozeShieldSpeedMultiplier>'+"\n")
     fff.append(r'  <infillExtruder>1</infillExtruder>'+"\n")
-    fff.append(r'  <internalInfillPattern>Rectilinear</internalInfillPattern>'+"\n")
+    fff.append(r'  <internalInfillPattern>Grid</internalInfillPattern>'+"\n")
     fff.append(r'  <externalInfillPattern>Rectilinear</externalInfillPattern>'+"\n")
     fff.append(r'  <infillPercentage>20</infillPercentage>'+"\n")
     fff.append(r'  <outlineOverlapPercentage>25</outlineOverlapPercentage>'+"\n")
@@ -148,7 +148,7 @@ def createSimplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight
     fff.append(r'  <minInfillLength>3</minInfillLength>'+"\n")
     fff.append(r'  <infillLayerInterval>1</infillLayerInterval>'+"\n")
     fff.append(r'  <infillAngles>45,-45</infillAngles>'+"\n")
-    fff.append(r'  <overlapInfillAngles>0</overlapInfillAngles>'+"\n")
+    fff.append(r'  <overlapInfillAngles>1</overlapInfillAngles>'+"\n")
     fff.append(r'  <generateSupport>0</generateSupport>'+"\n")
     fff.append(r'  <supportExtruder>0</supportExtruder>'+"\n")
     fff.append(r'  <supportInfillPercentage>25</supportInfillPercentage>'+"\n")
@@ -157,7 +157,7 @@ def createSimplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight
     fff.append(r'  <denseSupportInfillPercentage>75</denseSupportInfillPercentage>'+"\n")
     fff.append(r'  <supportLayerInterval>1</supportLayerInterval>'+"\n")
 
-    fff.append(r'  <supportHorizontalPartOffset>0.2</supportHorizontalPartOffset>'+"\n")
+    fff.append(r'  <supportHorizontalPartOffset>0.7</supportHorizontalPartOffset>'+"\n")
     fff.append(r'  <supportUpperSeparationLayers>1</supportUpperSeparationLayers>'+"\n")
     fff.append(r'  <supportLowerSeparationLayers>1</supportLowerSeparationLayers>'+"\n")
 
@@ -286,8 +286,8 @@ def createSimplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight
     for extruder in extruderPrintOptions:
         for quality in sorted(profilesData['quality'], key=lambda k: k['index']):
             currentInfillLayerInterval = 1
-            currentGenerateSupport = 0
-            currentSupportHorizontalPartOffset = 0.2
+            currentGenerateSupport = 1
+            currentSupportHorizontalPartOffset = 0.7
             currentSupportUpperSeparationLayers = 1
             currentSupportLowerSeparationLayers = 1
             currentAvoidCrossingOutline = 1
@@ -564,7 +564,6 @@ def createCuraProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, qual
     makeSupports = 'None'
     supportDualExtrusion = 'First extruder'
     supportXYDistance = 0.7
-    supportZdistance = 0.2
 
     if hotendLeft['id'] != 'None' and hotendRight['id'] != 'None' and hotendLeft['id'] != hotendRight['id']:
         return
@@ -575,6 +574,7 @@ def createCuraProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, qual
             # MEX Right
             hotend, extruder, currentPrimaryExtruder, currentInfillExtruder, currentSupportExtruder = hotendRight, "Right Extruder", 1, 1, 1, 
             currentLayerHeight = hotend['nozzleSize'] * quality['layerHeightMultiplier']
+            supportZdistance = currentLayerHeight
             fileName = "BCN3D Sigma - Right Extruder "+str(hotendRight['nozzleSize'])+" Only ("+filamentRight['id']+") - "+quality['id']
             extruderPrintOptions = ["Right Extruder"]
             filamentLeft = dict([('id', '')])
@@ -602,6 +602,7 @@ def createCuraProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, qual
         # MEX Left
         hotend, extruder, currentPrimaryExtruder, currentInfillExtruder, currentSupportExtruder = hotendLeft, "Left Extruder", 0, 0, 0
         currentLayerHeight = hotend['nozzleSize'] * quality['layerHeightMultiplier']
+        supportZdistance = currentLayerHeight
         fileName = "BCN3D Sigma - Left Extruder "+str(hotendLeft['nozzleSize'])+" Only ("+filamentLeft['id']+") - "+quality['id']
         extruderPrintOptions = ["Left Extruder"]
         filamentRight = dict([('id', '')])
@@ -629,6 +630,7 @@ def createCuraProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, qual
         # IDEX
         hotend, extruder, currentPrimaryExtruder, currentInfillExtruder, currentSupportExtruder = hotendLeft, "Both Extruders", 0, 0, 0
         currentLayerHeight = hotend['nozzleSize'] * quality['layerHeightMultiplier']
+        supportZdistance = currentLayerHeight
         fileName = "BCN3D Sigma - "+str(hotendLeft['nozzleSize'])+" Left ("+filamentLeft['id']+"), "+str(hotendRight['nozzleSize'])+" Right ("+filamentRight['id']+") - "+quality['id']
         extruderPrintOptions = ["Both Extruders"] 
         if filamentLeft['isSupportMaterial'] != filamentRight['isSupportMaterial']:
@@ -1090,7 +1092,7 @@ def retractValues(filament):
     else:
         useCoasting = 0
         useWipe = 0
-        onlyRetractWhenCrossingOutline = 1
+        onlyRetractWhenCrossingOutline = 0
         retractBetweenLayers = 0
         useRetractionMinTravel = 1
         retractWhileWiping = 1
