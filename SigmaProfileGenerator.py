@@ -19,8 +19,8 @@ def createSimplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight
     fff = []
     fff.append(r'<?xml version="1.0" encoding="utf-8"?>'+"\n")
     for q in profilesData['quality']:
-        if q['id'] == 'Medium':
-            defaultPrintQualityBase = 'Medium'
+        if q['id'] == 'Standard':
+            defaultPrintQualityBase = 'Standard'
             break
         else:
             defaultPrintQualityBase = profilesData['quality'][0]['id']
@@ -285,7 +285,9 @@ def createSimplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight
     # fff.append(r'  <autoConfigureMaterial name="'+str(filamentLeft)+" Left, "+str(filamentRight)+" Right"+r'">'+"\n")
     for extruder in extruderPrintOptions:
         for quality in sorted(profilesData['quality'], key=lambda k: k['index']):
+            currentInfillPercentage = quality['infillPercentage']
             currentInfillLayerInterval = 1
+            currentOverlapInfillAngles = 1
             currentGenerateSupport = 0
             currentSupportHorizontalPartOffset = 0.7
             currentSupportUpperSeparationLayers = 1
@@ -369,10 +371,15 @@ def createSimplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight
                 else:
                     # IDEX, Combined Infill
                     currentAvoidCrossingOutline = 0
+                    if hotendLeft['nozzleSize'] != hotendRight['nozzleSize']:
+                        currentInfillPercentage = 100
+                        currentOverlapInfillAngles = 0
+                        if hotendLeft['nozzleSize'] < hotendRight['nozzleSize']: 
+                            currentToolChangePurgeLenghtT1 = str("%.2f" % (float(currentToolChangePurgeLenghtT1)/4))
+                        else:
+                            currentToolChangePurgeLenghtT0 = str("%.2f" % (float(currentToolChangePurgeLenghtT0)/4))
                     if hotendLeft['nozzleSize'] <= hotendRight['nozzleSize']:
                         # IDEX, Combined Infill (Right Hotend has thicker or equal nozzle)
-                        if quality['infillPercentage'] >= 90:
-                            currentToolChangePurgeLenghtT1 = str("%.2f" % (float(currentToolChangePurgeLenghtT1)/4))
                         currentPrimaryExtruder = 0
                         currentFilament = filamentLeft
                         currentHotend = hotendLeft
@@ -393,7 +400,6 @@ def createSimplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight
                         currentPurgeSpeedT1, currentStartPurgeLenghtT1, currentToolChangePurgeLenghtT1 = purgeValues(hotendRight, filamentRight, currentDefaultSpeed, currentLayerHeight * currentInfillLayerInterval)
                     else:
                         # IDEX, Combined Infill (Left Hotend has thicker nozzle)
-                        currentToolChangePurgeLenghtT0 = str("%.2f" % (float(currentToolChangePurgeLenghtT0)/4))
                         currentPrimaryExtruder = 1
                         currentFilament = filamentRight
                         currentHotend = hotendRight
@@ -472,13 +478,14 @@ def createSimplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight
             fff.append(r'    <topSolidLayers>'+str(currentTopSolidLayers)+r'</topSolidLayers>'+"\n")
             fff.append(r'    <bottomSolidLayers>'+str(currentBottomSolidLayers)+r'</bottomSolidLayers>'+"\n")
             fff.append(r'    <perimeterOutlines>'+str(currentPerimeterOutlines)+r'</perimeterOutlines>'+"\n")
-            fff.append(r'    <infillPercentage>'+str(quality['infillPercentage'])+r'</infillPercentage>'+"\n")
+            fff.append(r'    <infillPercentage>'+str(currentInfillPercentage)+r'</infillPercentage>'+"\n")
             fff.append(r'    <infillLayerInterval>'+str(currentInfillLayerInterval)+r'</infillLayerInterval>'+"\n")
             fff.append(r'    <defaultSpeed>'+str(currentDefaultSpeed)+r'</defaultSpeed>'+"\n")
             fff.append(r'    <firstLayerUnderspeed>'+str(currentFirstLayerUnderspeed)+r'</firstLayerUnderspeed>'+"\n")
             fff.append(r'    <outlineUnderspeed>'+str(currentOutlineUnderspeed)+r'</outlineUnderspeed>'+"\n")
             fff.append(r'    <supportUnderspeed>'+str(currentSupportUnderspeed)+r'</supportUnderspeed>'+"\n")
             fff.append(r'    <avoidCrossingOutline>'+str(currentAvoidCrossingOutline)+'</avoidCrossingOutline>'+"\n")
+            fff.append(r'    <overlapInfillAngles>'+str(currentOverlapInfillAngles)+'</overlapInfillAngles>'+"\n")
             fff.append(r'    <supportHorizontalPartOffset>'+str(currentSupportHorizontalPartOffset)+'</supportHorizontalPartOffset>'+"\n")
             fff.append(r'    <supportUpperSeparationLayers>'+str(currentSupportUpperSeparationLayers)+'</supportUpperSeparationLayers>'+"\n")
             fff.append(r'    <supportLowerSeparationLayers>'+str(currentSupportLowerSeparationLayers)+'</supportLowerSeparationLayers>'+"\n")
@@ -1006,7 +1013,7 @@ def createCuraProfilesBundle(dataLog, profilesCreatedCount):
                 else:                
                     os.mkdir("No Right Hotend")
                     os.chdir("No Right Hotend")
-                for quality in sorted(profilesData['quality'], key=lambda k: k['id']):
+                for quality in sorted(profilesData['quality'], key=lambda k: k['index']):
                     os.mkdir(quality['id'])
                     os.chdir(quality['id'])
                     for filamentLeft in sorted(profilesData['filament'], key=lambda k: k['id']):
@@ -1209,7 +1216,7 @@ def testAllCombinations():
         for hotendRight in sorted(profilesData['hotend'], key=lambda k: k['id']):
             for filamentLeft in sorted(profilesData['filament'], key=lambda k: k['id']):
                 for filamentRight in sorted(profilesData['filament'], key=lambda k: k['id']):
-                    for quality in sorted(profilesData['quality'], key=lambda k: k['id']):
+                    for quality in sorted(profilesData['quality'], key=lambda k: k['index']):
                         createCuraProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, quality, 'noData', 'nothing')
                         combinationCount += 1
                         sys.stdout.write("\r\t\tTesting Cura Profiles: %d%%" % int(float(combinationCount)/totalProfilesAvailable*100))
@@ -1257,10 +1264,10 @@ def selectQuality(header):
     for c in range(len(profilesData['quality'])):
         qualityOptions.append(str(c+1))
     for quality in range(len(profilesData['quality'])):
-        print '\t'+str(quality+1)+'. '+sorted(profilesData['quality'], key=lambda k: k['id'])[quality]['id']
+        print '\t'+str(quality+1)+'. '+sorted(profilesData['quality'], key=lambda k: k['index'])[quality]['id']
     while answer0 not in qualityOptions:
         answer0 = raw_input('\t')
-    print '\tQuality: '+sorted(profilesData['quality'], key=lambda k: k['id'])[int(answer0)-1]['id']
+    print '\tQuality: '+sorted(profilesData['quality'], key=lambda k: k['index'])[int(answer0)-1]['id']
     return int(answer0)-1   
 
 def validArguments():
@@ -1486,7 +1493,7 @@ def main():
                                     clearDisplay()
                                     print GUIHeader
                                     if singleProfileCura:
-                                        print "\n\tYour new Cura profile '"+createCuraProfile(sorted(profilesData['hotend'], key=lambda k: k['id'])[a[0]], sorted(profilesData['hotend'], key=lambda k: k['id'])[b[0]], sorted(profilesData['filament'], key=lambda k: k['id'])[a[1]], sorted(profilesData['filament'], key=lambda k: k['id'])[b[1]], sorted(profilesData['quality'], key=lambda k: k['id'])[c], dataLog, 'createFile')+"' has been created.\n"
+                                        print "\n\tYour new Cura profile '"+createCuraProfile(sorted(profilesData['hotend'], key=lambda k: k['id'])[a[0]], sorted(profilesData['hotend'], key=lambda k: k['id'])[b[0]], sorted(profilesData['filament'], key=lambda k: k['id'])[a[1]], sorted(profilesData['filament'], key=lambda k: k['id'])[b[1]], sorted(profilesData['quality'], key=lambda k: k['index'])[c], dataLog, 'createFile')+"' has been created.\n"
                                         profilesCreatedCount = 1
                     if profilesCreatedCount > 0:
                         while y not in ['Y', 'n']:
