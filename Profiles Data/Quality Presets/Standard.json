@@ -1,0 +1,11 @@
+{
+    "id": "Standard",
+    "index": 3,
+    "layerHeightMultiplier": 0.375,
+    "defaultSpeed": 60,
+    "firstLayerUnderspeed": 0.67,
+    "outlineUnderspeed": 0.58,
+    "topBottomWidth": 0.8,
+    "wallWidth": 1.2,
+    "infillPercentage": 20
+}
