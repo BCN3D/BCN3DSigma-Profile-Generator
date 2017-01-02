@@ -286,7 +286,7 @@ def createSimplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight
     for extruder in extruderPrintOptions:
         for quality in sorted(profilesData['quality'], key=lambda k: k['index']):
             currentInfillLayerInterval = 1
-            currentGenerateSupport = 1
+            currentGenerateSupport = 0
             currentSupportHorizontalPartOffset = 0.7
             currentSupportUpperSeparationLayers = 1
             currentSupportLowerSeparationLayers = 1
