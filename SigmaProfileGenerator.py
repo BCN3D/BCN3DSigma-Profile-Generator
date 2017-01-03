@@ -892,7 +892,7 @@ def createCuraProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, qual
     if createFile == '--no-file':
         print string.join(ini)
     if createFile == '--only-filename':
-        print fileName+'.fff'
+        print fileName+'.ini'
     return fileName+'.ini'
 
 def createSimplify3DProfilesBundle(dataLog, profilesCreatedCount):    
