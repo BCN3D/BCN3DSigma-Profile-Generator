@@ -244,7 +244,7 @@ def createSimplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight
     fff.append(r'  <exportFileFormat>gcode</exportFileFormat>'+"\n")
     fff.append(r'  <celebration>0</celebration>'+"\n")
     fff.append(r'  <celebrationSong></celebrationSong>'+"\n")
-    fff.append(r'  <postProcessing></postProcessing>'+"\n")
+    fff.append(r'  <postProcessing>{REPLACE "; outer perimeter" "; outer perimeter\nM204 S250"},{REPLACE "; inner perimeter" "; inner perimeter\nM204 S2000"},{REPLACE "; solid layer" "; solid layer\nM204 S1500"},{REPLACE "; infill" "; infill\nM204 S2000",{REPLACE "; layer end" "; layer end\nM204 S2000"}</postProcessing>'+"\n")
     fff.append(r'  <defaultSpeed>2400</defaultSpeed>'+"\n")
     fff.append(r'  <outlineUnderspeed>0.85</outlineUnderspeed>'+"\n")
     fff.append(r'  <solidInfillUnderspeed>0.85</solidInfillUnderspeed>'+"\n")
@@ -822,6 +822,7 @@ def createCuraProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, qual
     ini.append('\tG1 F2400 E-4                      ;Retract before printing'+"\n")
     ini.append('\tG1 F{travel_speed}'+"\n")
     ini.append(r'end.gcode = M104 S0'+"\n")
+    ini.append('\tM204 S2000                        ;back to default acceleration'+"\n")
     ini.append('\tM140 S0                           ;heated bed heater off'+"\n")
     ini.append('\tG91                               ;relative positioning'+"\n")
     ini.append('\tG1 Z+0.5 E-5 Y+10 F{travel_speed} ;move Z up a bit and retract filament even more'+"\n")
@@ -1429,7 +1430,8 @@ def main():
                     print '\t2. Generate a bundle of profiles - Cura'
                     print '\t3. Test all combinations'
                     print '\t4. MacOS Only - Slice a model (with Cura)'
-                    print '\t5. Back'
+                    print '\t5. Reduce Ringing'
+                    print '\t6. Back'
                     x2 = 'x'
                     while x2 not in ['1','2','3','4', '5']:
                         x2 = raw_input('\t')
@@ -1457,9 +1459,13 @@ def main():
                         sliceModel = True
                         GUIHeader = '\n Welcome to the BCN3D Sigma Profile Generator \n\n\n\n\n    Experimental features\n\n\n\n\n\n\t   MacOS Only - Slice a model (with Cura)'
                     elif x2 == '5':
+                        reduceRinging = True
+                        GUIHeader = '\n Welcome to the BCN3D Sigma Profile Generator \n\n\n\n\n    Experimental features\n\n\n\n\n\n\n\t   Reduce Ringing'
+                    elif x2 == '6':
                         experimentalMenu = False
                 elif x == '4':
-                    print '\n Until next time!\n'
+                    if platform.system() != 'Windows':
+                        print '\n Until next time!\n'
                     break
 
                 if bundleProfilesSimplify3D or bundleProfilesCura or singleProfileSimplify3D or singleProfileCura:
@@ -1494,7 +1500,9 @@ def main():
                                     print GUIHeader
                                     if singleProfileCura:
                                         print "\n\tYour new Cura profile '"+createCuraProfile(sorted(profilesData['hotend'], key=lambda k: k['id'])[a[0]], sorted(profilesData['hotend'], key=lambda k: k['id'])[b[0]], sorted(profilesData['filament'], key=lambda k: k['id'])[a[1]], sorted(profilesData['filament'], key=lambda k: k['id'])[b[1]], sorted(profilesData['quality'], key=lambda k: k['index'])[c], dataLog, 'createFile')+"' has been created.\n"
+                                        print "\tNOTE: To reduce the Ringing effect go to Experimental features -> Reduce Ringing\n"
                                         profilesCreatedCount = 1
+
                     if profilesCreatedCount > 0:
                         while y not in ['Y', 'n']:
                             y = raw_input('\tSee profile(s) data? (Y/n) ')
@@ -1510,17 +1518,49 @@ def main():
                 elif sliceModel:
                     clearDisplay()
                     print GUIHeader
-                    profileFile = raw_input('\n\t\tDrag & Drop your .ini profile to this window. Then press Enter.\n\t\t')[:-1].replace('\\', '')
-                    stlFile = raw_input('\n\t\tDrag & Drop your .stl model file to this window. Then press Enter.\n\t\t')[:-1].replace('\\', '')
-                    os.chdir('..')
-                    gcodeFile = stlFile[:-4]+'.gcode'
-                    os.system(r'/Applications/Cura/Cura-BCN3D.app/Contents/MacOS/Cura-BCN3D -i "'+profileFile+r'" -s "'+stlFile+r'" -o "'+gcodeFile+r'"')
-                    raw_input("\n\t\tYour gcode file '"+string.split(stlFile, '/')[-1][:-4]+'.gcode'+"' has been created! Find it in the same folder as the .stl file.\n\t\tPress Enter to continue...")
+                    if platform.system() == 'Windows':
+                        raw_input("\n\t\tThis feature is not available yet on Windows.\n\t\tPress Enter to continue...")
+                    else:
+                        if platform.system() == 'Windows':
+                            profileFile = raw_input('\n\t\tDrag & Drop your .ini profile to this window. Then press Enter.\n\t\t')[1:-1]
+                            stlFile = raw_input('\n\t\tDrag & Drop your .stl model file to this window. Then press Enter.\n\t\t')[1:-1]
+                        else:
+                            profileFile = raw_input('\n\t\tDrag & Drop your .ini profile to this window. Then press Enter.\n\t\t')[:-1].replace('\\', '')
+                            stlFile = raw_input('\n\t\tDrag & Drop your .stl model file to this window. Then press Enter.\n\t\t')[:-1].replace('\\', '')
+                        os.chdir('..')
+                        gcodeFile = stlFile[:-4]+'.gcode'
+                        os.system(r'/Applications/Cura/Cura-BCN3D.app/Contents/MacOS/Cura-BCN3D -i "'+profileFile+r'" -s "'+stlFile+r'" -o "'+gcodeFile+r'"')
+                        raw_input("\n\t\tYour gcode file '"+string.split(stlFile, '/')[-1][:-4]+'.gcode'+"' has been created! Find it in the same folder as the .stl file.\n\t\tPress Enter to continue...")
                 elif testComb:
                     clearDisplay()
                     print GUIHeader              
                     testAllCombinations()
                     raw_input("\t\tPress Enter to continue...")
+                elif reduceRinging:
+                    clearDisplay()
+                    print GUIHeader
+                    if platform.system() == 'Windows':
+                        gcodeFile = raw_input('\n\t\tDrag & Drop your .gcode file to this window. Then press Enter.\n\t\t')[1:-1]
+                    else:
+                        gcodeFile = raw_input('\n\t\tDrag & Drop your .gcode file to this window. Then press Enter.\n\t\t')[:-1].replace('\\', '')
+                    originalFile = open(gcodeFile, 'r')
+                    originalLines = originalFile.readlines()
+                    originalFile.close()
+                    newFile = open(gcodeFile, 'w')
+                    for line in originalLines:
+                        line = line.replace('; outer perimeter', '; outer perimeter\nM204 S250')
+                        line = line.replace('; inner perimeter', '; inner perimeter\nM204 S2000')
+                        line = line.replace('; solid layer', '; solid layer\nM204 S1500')
+                        line = line.replace('; infill', '; infill\nM204 S2000')
+                        line = line.replace('; layed end', '; layed end\nM204 S2000')
+
+                        line = line.replace(';TYPE:WALL-INNER', ';TYPE:WALL-INNER\nM204 S2000')
+                        line = line.replace(';TYPE:WALL-OUTER', ';TYPE:WALL-OUTER\nM204 S250')
+                        line = line.replace(';TYPE:SKIN', ';TYPE:SKIN\nM204 S1500')
+                        line = line.replace(';TYPE:FILL', ';TYPE:FILL\nM204 S2000')
+                        newFile.writelines(line)
+                    newFile.close()
+                    raw_input("\n\t\tYour .gcode file will print smoother than ever!\n\t\tPress Enter to continue...")
 
 if __name__ == '__main__':
     main() 
