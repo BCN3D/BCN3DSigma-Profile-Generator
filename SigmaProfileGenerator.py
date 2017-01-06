@@ -1522,8 +1522,8 @@ def main():
                         raw_input("\n\t\tThis feature is not available yet on Windows.\n\t\tPress Enter to continue...")
                     else:
                         if platform.system() == 'Windows':
-                            profileFile = raw_input('\n\t\tDrag & Drop your .ini profile to this window. Then press Enter.\n\t\t')[1:-1]
-                            stlFile = raw_input('\n\t\tDrag & Drop your .stl model file to this window. Then press Enter.\n\t\t')[1:-1]
+                            profileFile = raw_input('\n\t\tDrag & Drop your .ini profile to this window. Then press Enter.\n\t\t')
+                            stlFile = raw_input('\n\t\tDrag & Drop your .stl model file to this window. Then press Enter.\n\t\t')
                         else:
                             profileFile = raw_input('\n\t\tDrag & Drop your .ini profile to this window. Then press Enter.\n\t\t')[:-1].replace('\\', '')
                             stlFile = raw_input('\n\t\tDrag & Drop your .stl model file to this window. Then press Enter.\n\t\t')[:-1].replace('\\', '')
@@ -1540,7 +1540,7 @@ def main():
                     clearDisplay()
                     print GUIHeader
                     if platform.system() == 'Windows':
-                        gcodeFile = raw_input('\n\t\tDrag & Drop your .gcode file to this window. Then press Enter.\n\t\t')[1:-1]
+                        gcodeFile = raw_input('\n\t\tDrag & Drop your .gcode file to this window. Then press Enter.\n\t\t')
                     else:
                         gcodeFile = raw_input('\n\t\tDrag & Drop your .gcode file to this window. Then press Enter.\n\t\t')[:-1].replace('\\', '')
                     originalFile = open(gcodeFile, 'r')
