@@ -1433,10 +1433,10 @@ def main():
                     print '\t5. Reduce Ringing'
                     print '\t6. Back'
                     x2 = 'x'
-                    while x2 not in ['1','2','3','4', '5']:
+                    while x2 not in ['1','2','3','4', '5', '6']:
                         x2 = raw_input('\t')
 
-                singleProfileSimplify3D, singleProfileCura, bundleProfilesSimplify3D, bundleProfilesCura, testComb, sliceModel = False, False, False, False, False, False
+                singleProfileSimplify3D, singleProfileCura, bundleProfilesSimplify3D, bundleProfilesCura, testComb, sliceModel, reduceRinging = False, False, False, False, False, False, False
 
                 if x == '1':
                     singleProfileSimplify3D = True
