@@ -5,15 +5,7 @@
 #Released under GNU LICENSE
 #https://opensource.org/licenses/GPL-3.0
 
-import time
-import math
-import os
-import platform
-import sys
-import json
-import string
-import shutil
-import zipfile
+import time, math, os, platform, sys, json, string, shutil, zipfile
 
 def createSimplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, dataLog, createFile):
     fff = []
@@ -244,7 +236,7 @@ def createSimplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight
     fff.append(r'  <exportFileFormat>gcode</exportFileFormat>'+"\n")
     fff.append(r'  <celebration>0</celebration>'+"\n")
     fff.append(r'  <celebrationSong></celebrationSong>'+"\n")
-    fff.append(r'  <postProcessing>{REPLACE "; outer perimeter" "; outer perimeter\nM204 S250"},{REPLACE "; inner perimeter" "; inner perimeter\nM204 S2000"},{REPLACE "; solid layer" "; solid layer\nM204 S1500"},{REPLACE "; infill" "; infill\nM204 S2000",{REPLACE "; layer end" "; layer end\nM204 S2000"}</postProcessing>'+"\n")
+    fff.append(r'  <postProcessing></postProcessing>'+"\n")
     fff.append(r'  <defaultSpeed>2400</defaultSpeed>'+"\n")
     fff.append(r'  <outlineUnderspeed>0.85</outlineUnderspeed>'+"\n")
     fff.append(r'  <solidInfillUnderspeed>0.85</solidInfillUnderspeed>'+"\n")
@@ -529,6 +521,7 @@ def createSimplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight
                 fff.append(r'    <toolChangeGcode>{IF NEWTOOL=0} T0'+"\t\t"+r';start tool switch 0,;{IF NEWTOOL=0} G1 X0 Y0 F[travel_speed]'+"\t"+r';travel,{IF NEWTOOL=0} G1 F500 E-0.5'+"\t\t"+r';fast purge,{IF NEWTOOL=0} G1 F'+str(currentPurgeSpeedT0)+' E'+str(currentToolChangePurgeLenghtT0)+"\t"+r';slow purge,{IF NEWTOOL=0} G92 E0'+"\t\t"+r';reset t0,{IF NEWTOOL=0} G1 F3000 E-4.5'+"\t"+r';retract,{IF NEWTOOL=0} G1 F[travel_speed]'+"\t"+r';end tool switch,'+fanActionOnToolChange1+r',{IF NEWTOOL=1} T1'+"\t\t"+r';start tool switch 1,;{IF NEWTOOL=1} G1 X210 Y0 F[travel_speed]'+"\t"+r';travel,{IF NEWTOOL=1} G1 F500 E-0.5'+"\t\t"+r';fast purge,{IF NEWTOOL=1} G1 F'+str(currentPurgeSpeedT1)+' E'+str(currentToolChangePurgeLenghtT1)+"\t"+r';slow purge,{IF NEWTOOL=1} T1'+"\t\t"+r';start tool switch 1,{IF NEWTOOL=1} G92 E0'+"\t\t"+r';reset t1,{IF NEWTOOL=1} G1 F3000 E-4.5'+"\t"+r';retract,{IF NEWTOOL=1} G1 F[travel_speed]'+"\t"+r';end tool switch,'+fanActionOnToolChange2+r',G91,G1 F[travel_speed] Z2,G90</toolChangeGcode>'+"\n")
             else:
                 fff.append(r'    <toolChangeGcode/>'+"\n")
+            fff.append(r'    <postProcessing>{REPLACE "; outer perimeter" "; outer perimeter\nM204 S'+str(accelerationForPerimeters(currentHotend['nozzleSize'], currentLayerHeight))+r'"},{REPLACE "; inner perimeter" "; inner perimeter\nM204 S2000"},{REPLACE "; solid layer" "; solid layer\nM204 S1500"},{REPLACE "; infill" "; infill\nM204 S2000",{REPLACE "; support" "; support\nM204 S2000",{REPLACE "; layer end" "; layer end\nM204 S2000"}</postProcessing>'+"\n")
             fff.append(r'  </autoConfigureQuality>'+"\n")
 
             if dataLog != 'noData' :
@@ -822,7 +815,6 @@ def createCuraProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, qual
     ini.append('\tG1 F2400 E-4                      ;Retract before printing'+"\n")
     ini.append('\tG1 F{travel_speed}'+"\n")
     ini.append(r'end.gcode = M104 S0'+"\n")
-    ini.append('\tM204 S2000                        ;back to default acceleration'+"\n")
     ini.append('\tM140 S0                           ;heated bed heater off'+"\n")
     ini.append('\tG91                               ;relative positioning'+"\n")
     ini.append('\tG1 Z+0.5 E-5 Y+10 F{travel_speed} ;move Z up a bit and retract filament even more'+"\n")
@@ -1131,6 +1123,9 @@ def temperatureValue(filament, hotend, layerHeight, speed, base = 5):
     temperature = int(base * round((filament['printTemperature'][0]+flow*float(filament['printTemperature'][1]-filament['printTemperature'][0])/flowValue(hotend, filament))/float(base)))
     return temperature
 
+def accelerationForPerimeters(nozzleSize, layerHeight, base = 5, multiplier = 7500, defaultAcceleration = 2000):
+	return min(defaultAcceleration, int(base * round((nozzleSize * layerHeight * multiplier)/float(base))))
+
 def speedValues(hotendLeft, hotendRight, filamentLeft, filamentRight, quality, action):
     if action == 'MEX Left' or action == 'IDEX, Infill with Right' or action == 'IDEX, Supports with Right':
         currentFilament = filamentLeft
@@ -1430,13 +1425,12 @@ def main():
                     print '\t2. Generate a bundle of profiles - Cura'
                     print '\t3. Test all combinations'
                     print '\t4. MacOS Only - Slice a model (with Cura)'
-                    print '\t5. Reduce Ringing'
-                    print '\t6. Back'
+                    print '\t5. Back'
                     x2 = 'x'
-                    while x2 not in ['1','2','3','4', '5', '6']:
+                    while x2 not in ['1','2','3','4', '5']:
                         x2 = raw_input('\t')
 
-                singleProfileSimplify3D, singleProfileCura, bundleProfilesSimplify3D, bundleProfilesCura, testComb, sliceModel, reduceRinging = False, False, False, False, False, False, False
+                singleProfileSimplify3D, singleProfileCura, bundleProfilesSimplify3D, bundleProfilesCura, testComb, sliceModel = False, False, False, False, False, False
 
                 if x == '1':
                     singleProfileSimplify3D = True
@@ -1500,7 +1494,7 @@ def main():
                                     print GUIHeader
                                     if singleProfileCura:
                                         print "\n\tYour new Cura profile '"+createCuraProfile(sorted(profilesData['hotend'], key=lambda k: k['id'])[a[0]], sorted(profilesData['hotend'], key=lambda k: k['id'])[b[0]], sorted(profilesData['filament'], key=lambda k: k['id'])[a[1]], sorted(profilesData['filament'], key=lambda k: k['id'])[b[1]], sorted(profilesData['quality'], key=lambda k: k['index'])[c], dataLog, 'createFile')+"' has been created.\n"
-                                        print "\tNOTE: To reduce the Ringing effect go to Experimental features -> Reduce Ringing\n"
+                                        print "\tNOTE: To reduce the Ringing effect use the ReduceRinging plugin by BCN3D.\n"
                                         profilesCreatedCount = 1
 
                     if profilesCreatedCount > 0:
@@ -1536,31 +1530,6 @@ def main():
                     print GUIHeader              
                     testAllCombinations()
                     raw_input("\t\tPress Enter to continue...")
-                elif reduceRinging:
-                    clearDisplay()
-                    print GUIHeader
-                    if platform.system() == 'Windows':
-                        gcodeFile = raw_input('\n\t\tDrag & Drop your .gcode file to this window. Then press Enter.\n\t\t')
-                    else:
-                        gcodeFile = raw_input('\n\t\tDrag & Drop your .gcode file to this window. Then press Enter.\n\t\t')[:-1].replace('\\', '')
-                    originalFile = open(gcodeFile, 'r')
-                    originalLines = originalFile.readlines()
-                    originalFile.close()
-                    newFile = open(gcodeFile, 'w')
-                    for line in originalLines:
-                        line = line.replace('; outer perimeter', '; outer perimeter\nM204 S250')
-                        line = line.replace('; inner perimeter', '; inner perimeter\nM204 S2000')
-                        line = line.replace('; solid layer', '; solid layer\nM204 S1500')
-                        line = line.replace('; infill', '; infill\nM204 S2000')
-                        line = line.replace('; layed end', '; layed end\nM204 S2000')
-
-                        line = line.replace(';TYPE:WALL-INNER', ';TYPE:WALL-INNER\nM204 S2000')
-                        line = line.replace(';TYPE:WALL-OUTER', ';TYPE:WALL-OUTER\nM204 S250')
-                        line = line.replace(';TYPE:SKIN', ';TYPE:SKIN\nM204 S1500')
-                        line = line.replace(';TYPE:FILL', ';TYPE:FILL\nM204 S2000')
-                        newFile.writelines(line)
-                    newFile.close()
-                    raw_input("\n\t\tYour .gcode file will print smoother than ever!\n\t\tPress Enter to continue...")
 
 if __name__ == '__main__':
     main() 
