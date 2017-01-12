@@ -50,9 +50,9 @@ Valid parameters for Hotends are filenames in */Profiles Data/Hotends* or 'None'
 
 Generates the file *BCN3D Sigma - 0.4 Left (PLA Colorfila), 0.4 Right (PLA Colorfila).fff*
 
-`python SigmaProfileGenerator.py "0.4 - Brass" "0.4 - Brass" "Colorfila PLA" "Colorfila PLA" "Medium" --cura`
+`python SigmaProfileGenerator.py "0.4 - Brass" "0.4 - Brass" "Colorfila PLA" "Colorfila PLA" "Standard" --cura`
 
-Generates the file *BCN3D Sigma - 0.4 Left (PLA Colorfila), 0.4 Right (PLA Colorfila) - Medium.ini*
+Generates the file *BCN3D Sigma - 0.4 Left (PLA Colorfila), 0.4 Right (PLA Colorfila) - Standard.ini*
 
 
 ## Editing *Profiles Data* files
@@ -78,7 +78,7 @@ Filaments
     "isFlexibleMaterial": false,			// true/false
     "bedTemperature": 50,					// [ºC]
     "printTemperature": [195, 225],			// [ºC],    minimum and maximum print temperatures.
-    "defaultPrintSpeed": 60,				// [mm/s],  default speed when printing Medium quality with 0.4mm Nozzle and 0.2mm layer height.
+    "defaultPrintSpeed": 60,				// [mm/s],  default speed when printing Standard quality with 0.4mm Nozzle and 0.2mm layer height.
     "advisedMaxPrintSpeed": "None",			// [mm/s],  maximum speed recommended by filament's manufacturer. If "None", maxFlow value is needed.
     "maxFlow": 15,							// [mm3/s], maximum flow a default Hotend can print. "None" if unknown.
     "maxFlowForHighFlowHotend": "None",	    // [mm3/s], maximum flow a High Flow Hotend can print. "None" if unknown.
@@ -93,7 +93,7 @@ Filaments
 Quality Preconfigurations
 ```json5
 {
-    "id": "Medium",							// Preconfiguration Name
+    "id": "Standard",							// Preconfiguration Name
     "index": 2,								// Order to show the option in Simplify3D
     "layerHeightMultiplier": 0.5,			// Multiply this value for the nozzle size to get the layer height.
     "defaultSpeed": 60,						// [mm/s],  default speed for PLA
