@@ -552,7 +552,7 @@ def createSimplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight
         f.writelines(fff)
         f.close()
     if createFile == '--no-file':
-        print string.join(fff)
+        print string.join(fff, '')
     if createFile == '--only-filename':
         print fileName+'.fff'
     return fileName+'.fff'
@@ -883,7 +883,7 @@ def createCuraProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, qual
         f.writelines(ini)
         f.close()
     if createFile == '--no-file':
-        print string.join(ini)
+        print string.join(ini, '')
     if createFile == '--only-filename':
         print fileName+'.ini'
     return fileName+'.ini'
