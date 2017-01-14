@@ -1,0 +1,19 @@
+{
+    "id": "Colorfabb XT-CF20",
+    "filamentDiameter": 2.85,
+    "filamentPricePerKg": 66.60,
+    "filamentDensity": 1.36,
+    "isSupportMaterial": false,
+    "isFlexibleMaterial": false,
+    "bedTemperature": 80,
+    "printTemperature": [240, 260],
+    "defaultPrintSpeed": 40,
+    "advisedMaxPrintSpeed": 70,
+    "maxFlow": 7,
+    "maxFlowForHighFlowHotend": "None",
+    "retractionDistance": 4,
+    "retractionSpeed": 40,
+    "fanPercentage": 50,
+    "extrusionMultiplier": 1,
+    "purgeLenght": 1.5
+}

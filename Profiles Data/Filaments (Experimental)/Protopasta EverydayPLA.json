@@ -1,0 +1,19 @@
+{
+    "id": "Protopasta EverydayPLA",
+    "filamentDiameter": 2.85,
+    "filamentPricePerKg": 0,
+    "filamentDensity": 1.25,
+    "isSupportMaterial": false,
+    "isFlexibleMaterial": false,
+    "bedTemperature": 65,
+    "printTemperature": [200, 220],
+    "defaultPrintSpeed": 60,
+    "advisedMaxPrintSpeed": 100,
+    "maxFlow": "None",
+    "maxFlowForHighFlowHotend": "None",
+    "retractionDistance": 4,
+    "retractionSpeed": 40,
+    "fanPercentage": 50,
+    "extrusionMultiplier": 1,
+    "purgeLenght": 1.5
+}
