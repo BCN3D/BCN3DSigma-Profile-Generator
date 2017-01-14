@@ -1425,12 +1425,13 @@ def main():
                     print '\t2. Generate a bundle of profiles - Cura'
                     print '\t3. Test all combinations'
                     print '\t4. MacOS Only - Slice a model (with Cura)'
-                    print '\t5. Back'
+                    print '\t5. Hysteresis Remover'
+                    print '\t6. Back'
                     x2 = 'x'
-                    while x2 not in ['1','2','3','4', '5']:
+                    while x2 not in ['1','2','3','4', '5', '6']:
                         x2 = raw_input('\t')
 
-                singleProfileSimplify3D, singleProfileCura, bundleProfilesSimplify3D, bundleProfilesCura, testComb, sliceModel = False, False, False, False, False, False
+                singleProfileSimplify3D, singleProfileCura, bundleProfilesSimplify3D, bundleProfilesCura, testComb, sliceModel, HysteresisRemover = False, False, False, False, False, False, False
 
                 if x == '1':
                     singleProfileSimplify3D = True
@@ -1453,8 +1454,8 @@ def main():
                         sliceModel = True
                         GUIHeader = '\n Welcome to the BCN3D Sigma Profile Generator \n\n\n\n\n    Experimental features\n\n\n\n\n\n\t   MacOS Only - Slice a model (with Cura)'
                     elif x2 == '5':
-                        reduceRinging = True
-                        GUIHeader = '\n Welcome to the BCN3D Sigma Profile Generator \n\n\n\n\n    Experimental features\n\n\n\n\n\n\n\t   Reduce Ringing'
+                        HysteresisRemover = True
+                        GUIHeader = '\n Welcome to the BCN3D Sigma Profile Generator \n\n\n\n\n    Experimental features\n\n\n\n\n\n\n\t   Hysteresis Remover'
                     elif x2 == '6':
                         experimentalMenu = False
                 elif x == '4':
@@ -1494,7 +1495,7 @@ def main():
                                     print GUIHeader
                                     if singleProfileCura:
                                         print "\n\tYour new Cura profile '"+createCuraProfile(sorted(profilesData['hotend'], key=lambda k: k['id'])[a[0]], sorted(profilesData['hotend'], key=lambda k: k['id'])[b[0]], sorted(profilesData['filament'], key=lambda k: k['id'])[a[1]], sorted(profilesData['filament'], key=lambda k: k['id'])[b[1]], sorted(profilesData['quality'], key=lambda k: k['index'])[c], dataLog, 'createFile')+"' has been created.\n"
-                                        print "\tNOTE: To reduce the Ringing effect use the ReduceRinging plugin by BCN3D.\n"
+                                        print "\tNOTE: To reduce the Ringing effect use the RingingRemover plugin by BCN3D.\n"
                                         profilesCreatedCount = 1
 
                     if profilesCreatedCount > 0:
@@ -1516,8 +1517,8 @@ def main():
                         raw_input("\n\t\tThis feature is not available yet on Windows.\n\t\tPress Enter to continue...")
                     else:
                         if platform.system() == 'Windows':
-                            profileFile = raw_input('\n\t\tDrag & Drop your .ini profile to this window. Then press Enter.\n\t\t')
-                            stlFile = raw_input('\n\t\tDrag & Drop your .stl model file to this window. Then press Enter.\n\t\t')
+                            profileFile = raw_input('\n\t\tDrag & Drop your .ini profile to this window. Then press Enter.\n\t\t').replace('"', '')
+                            stlFile = raw_input('\n\t\tDrag & Drop your .stl model file to this window. Then press Enter.\n\t\t').replace('"', '')
                         else:
                             profileFile = raw_input('\n\t\tDrag & Drop your .ini profile to this window. Then press Enter.\n\t\t')[:-1].replace('\\', '')
                             stlFile = raw_input('\n\t\tDrag & Drop your .stl model file to this window. Then press Enter.\n\t\t')[:-1].replace('\\', '')
@@ -1530,6 +1531,48 @@ def main():
                     print GUIHeader              
                     testAllCombinations()
                     raw_input("\t\tPress Enter to continue...")
+                elif HysteresisRemover:
+                    clearDisplay()
+                    print GUIHeader
+
+                    print '\n\t\tThis algorithm is a work in progress.\n\t\t' #Remove when done
+
+
+                    # if platform.system() == 'Windows':
+                    #     gcodeFile = raw_input('\n\t\tDrag & Drop your .gcode file to this window. Then press Enter.\n\t\t').replace('"', '')
+                    # else:
+                    #     gcodeFile = raw_input('\n\t\tDrag & Drop your .gcode file to this window. Then press Enter.\n\t\t')[:-1].replace('\\', '')
+                    # originalFile = open(gcodeFile, 'r')
+                    # originalLines = originalFile.readlines()
+                    # originalFile.close()
+                    # newFile = open(gcodeFile, 'w')
+                    # for lineIndex in range(len(originalLines)):
+                    #     if originalLines[lineIndex].startswith('G0') or originalLines[lineIndex].startswith('G1'):
+                    #         if originalLines[lineIndex+1].startswith('G0') or originalLines[lineIndex+1].startswith('G1'):
+                    #             if originalLines[lineIndex] > originalLines[lineIndex+1]:
+                    #                 print 'peakMax'
+                    #             elif originalLines[lineIndex] < originalLines[lineIndex+1]:
+                    #                 print 'peakMin'
+
+                    #     else:
+
+                            # line = originalLines[lineIndex]
+
+
+                        # line = line.replace('; outer perimeter', '; outer perimeter\nM204 S250')
+                        # line = line.replace('; inner perimeter', '; inner perimeter\nM204 S2000')
+                        # line = line.replace('; solid layer', '; solid layer\nM204 S1500')
+                        # line = line.replace('; infill', '; infill\nM204 S2000')
+                        # line = line.replace('; layed end', '; layed end\nM204 S2000')
+
+                        # line = line.replace(';TYPE:WALL-INNER', ';TYPE:WALL-INNER\nM204 S2000')
+                        # line = line.replace(';TYPE:WALL-OUTER', ';TYPE:WALL-OUTER\nM204 S250')
+                        # line = line.replace(';TYPE:SKIN', ';TYPE:SKIN\nM204 S1500')
+                        # line = line.replace(';TYPE:FILL', ';TYPE:FILL\nM204 S2000')
+
+                        # newFile.write(line)
+                    newFile.close()
+                    raw_input("\n\t\tYour .gcode has been adapted to your Sigma!\n\t\tPress Enter to continue...")
 
 if __name__ == '__main__':
     main() 
