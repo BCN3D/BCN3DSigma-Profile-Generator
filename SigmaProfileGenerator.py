@@ -285,6 +285,8 @@ def createSimplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight
             currentSupportUpperSeparationLayers = 1
             currentSupportLowerSeparationLayers = 1
             currentSupportAngles = '90'
+            currentSupportInfillPercentage = 25
+            currentDenseSupportInfillPercentage = 75
             currentAvoidCrossingOutline = 1
             fanActionOnToolChange1 = ''
             fanActionOnToolChange2 = ''
@@ -331,6 +333,8 @@ def createSimplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight
                     currentSupportUpperSeparationLayers = 0
                     currentSupportLowerSeparationLayers = 0
                     currentSupportAngles = '90,0'
+                    currentSupportInfillPercentage = 15
+                    currentDenseSupportInfillPercentage = 100
                     if filamentLeft['isSupportMaterial']:
                         # IDEX, Support Material in Left Hotend
                         currentPrimaryExtruder = 1
@@ -478,6 +482,8 @@ def createSimplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight
             fff.append(r'    <firstLayerUnderspeed>'+str(currentFirstLayerUnderspeed)+r'</firstLayerUnderspeed>'+"\n")
             fff.append(r'    <outlineUnderspeed>'+str(currentOutlineUnderspeed)+r'</outlineUnderspeed>'+"\n")
             fff.append(r'    <supportUnderspeed>'+str(currentSupportUnderspeed)+r'</supportUnderspeed>'+"\n")
+            fff.append(r'    <supportInfillPercentage>'+str(currentSupportInfillPercentage)+r'</supportInfillPercentage>'+"\n")
+            fff.append(r'    <denseSupportInfillPercentage>'+str(currentDenseSupportInfillPercentage)+r'</denseSupportInfillPercentage>'+"\n")
             fff.append(r'    <avoidCrossingOutline>'+str(currentAvoidCrossingOutline)+'</avoidCrossingOutline>'+"\n")
             fff.append(r'    <overlapInfillAngles>'+str(currentOverlapInfillAngles)+'</overlapInfillAngles>'+"\n")
             fff.append(r'    <supportHorizontalPartOffset>'+str(currentSupportHorizontalPartOffset)+'</supportHorizontalPartOffset>'+"\n")
