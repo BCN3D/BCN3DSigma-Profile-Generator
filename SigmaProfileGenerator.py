@@ -284,6 +284,7 @@ def createSimplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight
             currentSupportHorizontalPartOffset = 0.7
             currentSupportUpperSeparationLayers = 1
             currentSupportLowerSeparationLayers = 1
+            currentSupportAngles = '90'
             currentAvoidCrossingOutline = 1
             fanActionOnToolChange1 = ''
             fanActionOnToolChange2 = ''
@@ -329,6 +330,7 @@ def createSimplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight
                     currentSupportHorizontalPartOffset = 0.1
                     currentSupportUpperSeparationLayers = 0
                     currentSupportLowerSeparationLayers = 0
+                    currentSupportAngles = '90,0'
                     if filamentLeft['isSupportMaterial']:
                         # IDEX, Support Material in Left Hotend
                         currentPrimaryExtruder = 1
@@ -481,6 +483,7 @@ def createSimplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight
             fff.append(r'    <supportHorizontalPartOffset>'+str(currentSupportHorizontalPartOffset)+'</supportHorizontalPartOffset>'+"\n")
             fff.append(r'    <supportUpperSeparationLayers>'+str(currentSupportUpperSeparationLayers)+'</supportUpperSeparationLayers>'+"\n")
             fff.append(r'    <supportLowerSeparationLayers>'+str(currentSupportLowerSeparationLayers)+'</supportLowerSeparationLayers>'+"\n")
+            fff.append(r'    <supportAngles>'+str(currentSupportAngles)+'</supportAngles>'+"\n")
             fff.append(r'    <onlyRetractWhenCrossingOutline>'+str(onlyRetractWhenCrossingOutline)+'</onlyRetractWhenCrossingOutline>'+"\n")
             fff.append(r'    <retractBetweenLayers>'+str(retractBetweenLayers)+'</retractBetweenLayers>'+"\n")
             fff.append(r'    <useRetractionMinTravel>'+str(useRetractionMinTravel)+'</useRetractionMinTravel>'+"\n")
@@ -562,6 +565,7 @@ def createCuraProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, qual
     #  Attention: hotendLeft and hotendRight must be the same, or "None" 
 
     makeSupports = 'None'
+    supportType = 'Lines'
     supportDualExtrusion = 'First extruder'
     supportXYDistance = 0.7
 
@@ -639,6 +643,7 @@ def createCuraProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, qual
             supportDualExtrusion = 'Second extruder'
             supportXYDistance = 0.2
             supportZdistance = 0
+            supportType = 'Grid'
             if filamentLeft['isSupportMaterial']:
                 # IDEX, Support Material in Left Hotend
                 currentDefaultSpeed, currentFirstLayerUnderspeed, currentOutlineUnderspeed, currentSupportUnderspeed = speedValues(hotendLeft, hotendRight, filamentLeft, filamentRight, quality, 'IDEX, Supports with Left')
@@ -743,7 +748,7 @@ def createCuraProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, qual
     ini.append(r'solid_bottom = True'+"\n")
     ini.append(r'fill_overlap = 15'+"\n")
     ini.append(r'perimeter_before_infill = True'+"\n")
-    ini.append(r'support_type = Lines'+"\n")
+    ini.append(r'support_type = '+str(supportType)+"\n")
     ini.append(r'support_angle = 60'+"\n")
     ini.append(r'support_fill_rate = 40'+"\n")
     ini.append(r'support_xy_distance = '+str(supportXYDistance)+"\n")
