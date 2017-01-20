@@ -409,7 +409,7 @@ def createSimplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight
                     currentInfillExtruder = abs(currentPrimaryExtruder-1)
                     currentSupportExtruder = currentPrimaryExtruder
                 currentBedTemperature = max(filamentLeft['bedTemperature'], filamentRight['bedTemperature'])
-            currentFirstLayerHeightPercentage = int(min(125, flowValue(currentHotend, currentFilament)*100/(currentHotend['nozzleSize']*currentLayerHeight*(currentDefaultSpeed/60)*float(currentFirstLayerUnderspeed))))       
+            currentFirstLayerHeightPercentage = int(min(125, (currentHotend['nozzleSize']/2)/currentLayerHeight*100, flowValue(currentHotend, currentFilament)*100/(currentHotend['nozzleSize']*currentLayerHeight*(currentDefaultSpeed/60)*float(currentFirstLayerUnderspeed))))      
             currentPerimeterOutlines = max(2, int(round(quality['wallWidth'] / currentHotend['nozzleSize']))) #2 minimum Perimeters needed
             currentTopSolidLayers = max(4, int(round(quality['topBottomWidth'] / currentLayerHeight))) #4 minimum layers needed
             currentBottomSolidLayers = currentTopSolidLayers
@@ -587,7 +587,7 @@ def createCuraProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, qual
             filamentFlow = filamentRight['extrusionMultiplier']*100
             retractionSpeed = filamentRight['retractionSpeed']
             retractionAmount = filamentRight['retractionDistance']
-            currentFirstLayerHeightPercentage = int(min(125, flowValue(hotendRight, filamentRight)*100/(hotend['nozzleSize']*currentLayerHeight*(currentDefaultSpeed/60.)*float(currentFirstLayerUnderspeed))))
+            currentFirstLayerHeightPercentage = int(min(125, (hotend['nozzleSize']/2)/currentLayerHeight*100, flowValue(hotendRight, filamentRight)*100/(hotend['nozzleSize']*currentLayerHeight*(currentDefaultSpeed/60.)*float(currentFirstLayerUnderspeed))))
             firstLayerHeight = "%.2f" % (currentLayerHeight * currentFirstLayerHeightPercentage/100.)
             if filamentRight['fanPercentage'] > 0:
                 fanEnabled = 'True'
@@ -615,7 +615,7 @@ def createCuraProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, qual
         filamentFlow = filamentLeft['extrusionMultiplier']*100
         retractionSpeed = filamentLeft['retractionSpeed']
         retractionAmount = filamentLeft['retractionDistance']
-        currentFirstLayerHeightPercentage = int(min(125, flowValue(hotendLeft, filamentLeft)*100/(hotend['nozzleSize']*currentLayerHeight*(currentDefaultSpeed/60.)*float(currentFirstLayerUnderspeed))))
+        currentFirstLayerHeightPercentage = int(min(125, (hotend['nozzleSize']/2)/currentLayerHeight*100, flowValue(hotendLeft, filamentLeft)*100/(hotend['nozzleSize']*currentLayerHeight*(currentDefaultSpeed/60.)*float(currentFirstLayerUnderspeed))))
         firstLayerHeight = "%.2f" % (currentLayerHeight * currentFirstLayerHeightPercentage/100.)
         if filamentLeft['fanPercentage'] > 0:
             fanEnabled = 'True'
@@ -664,7 +664,7 @@ def createCuraProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, qual
         filamentFlow = max(filamentLeft['extrusionMultiplier'], filamentRight['extrusionMultiplier'])*100
         retractionSpeed = max(filamentLeft['retractionSpeed'], filamentRight['retractionSpeed'])
         retractionAmount = max(filamentLeft['retractionDistance'], filamentRight['retractionDistance'])
-        currentFirstLayerHeightPercentage = int(min(125, min(flowValue(hotendLeft, filamentLeft),flowValue(hotendRight, filamentRight))*100/(hotend['nozzleSize']*currentLayerHeight*(currentDefaultSpeed/60)*float(currentFirstLayerUnderspeed))))
+        currentFirstLayerHeightPercentage = int(min(125, (hotend['nozzleSize']/2)/currentLayerHeight*100, min(flowValue(hotendLeft, filamentLeft),flowValue(hotendRight, filamentRight))*100/(hotend['nozzleSize']*currentLayerHeight*(currentDefaultSpeed/60)*float(currentFirstLayerUnderspeed))))
         firstLayerHeight = "%.2f" % (currentLayerHeight * currentFirstLayerHeightPercentage/100.)
         if filamentLeft['fanPercentage'] == 0 or filamentRight['fanPercentage'] == 0:
             fanEnabled = 'False'
