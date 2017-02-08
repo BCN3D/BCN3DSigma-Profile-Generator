@@ -1,0 +1,6 @@
+{
+    "id": "0.8mm - Brass",
+    "nozzleSize": 0.8,
+    "material": "Brass",
+    "hotBlock": "HighFlow"
+}
