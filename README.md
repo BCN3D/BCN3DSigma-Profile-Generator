@@ -1,9 +1,7 @@
 # BCN3DSigma-Profile-Generator
 Profile Generator for Simplify3D & Cura slicing softwares. Specifically designed for the BCN3D Sigma.
 
-The python script is capable of generating profiles according to hotends, filaments and qualities defined in *Profiles Data* folder.
-
-*Note this is an early version of the script. Although profiles are precisely calculated there may be some combinations where quality can still be improved.*
+The official code behind the [Sigma ProGen web interface](https://www.bcn3dtechnologies.com/en/sigma-progen/). It generates profiles according to hotends, filaments and qualities defined in *Profiles Data* folder.
 
 ## Requirements
 
@@ -104,4 +102,8 @@ Quality Preconfigurations
     "infillPercentage": 20					// [0-100]
 }
 ```
+
+## Development branch
+
+Branch where we upload beta versions. Find the latest stable version in the **Master** branch.
  

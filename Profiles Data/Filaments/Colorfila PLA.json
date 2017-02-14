@@ -6,14 +6,14 @@
     "isSupportMaterial": false,
     "isFlexibleMaterial": false,
     "bedTemperature": 65,
-    "printTemperature": [195, 225],
+    "printTemperature": [195, 230],
     "defaultPrintSpeed": 60,
     "advisedMaxPrintSpeed": "None",
     "maxFlow": 15,
-    "maxFlowForHighFlowHotend": 30,
+    "maxFlowForHighFlowHotend": 25,
     "retractionDistance": 4,
     "retractionSpeed": 40,
     "fanPercentage": 50,
     "extrusionMultiplier": 0.95,
-    "purgeLenght": 1.5
+    "purgeLength": 1.5
 }

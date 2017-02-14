@@ -5,7 +5,7 @@
     "filamentDensity": 1.18,
     "isSupportMaterial": false,
     "isFlexibleMaterial": false,
-    "bedTemperature": 110,
+    "bedTemperature": 100,
     "printTemperature": [250, 280],
     "defaultPrintSpeed": 30,
     "advisedMaxPrintSpeed": 50,
@@ -15,5 +15,5 @@
     "retractionSpeed": 40,
     "fanPercentage": 50,
     "extrusionMultiplier": 1,
-    "purgeLenght": 1.5
+    "purgeLength": 1.5
 }

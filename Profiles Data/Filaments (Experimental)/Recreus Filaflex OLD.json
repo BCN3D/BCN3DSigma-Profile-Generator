@@ -15,5 +15,5 @@
     "retractionSpeed": 40,
     "fanPercentage": 50,
     "extrusionMultiplier": 1.15,
-    "purgeLenght": 4.5
+    "purgeLength": 4.5
 }
