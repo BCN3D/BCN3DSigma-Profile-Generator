@@ -6,7 +6,7 @@
     "isSupportMaterial": false,
     "isFlexibleMaterial": false,
     "bedTemperature": 80,
-    "printTemperature": [240, 260],
+    "printTemperature": [285, 285],
     "defaultPrintSpeed": 40,
     "advisedMaxPrintSpeed": 70,
     "maxFlow": 7,
@@ -15,5 +15,5 @@
     "retractionSpeed": 40,
     "fanPercentage": 50,
     "extrusionMultiplier": 1,
-    "purgeLenght": 1.5
+    "purgeLength": 1.5
 }
