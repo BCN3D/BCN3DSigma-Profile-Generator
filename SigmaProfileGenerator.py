@@ -1,9 +1,10 @@
 #!/usr/bin/python -tt
 # coding: utf-8
 
-#Guillem Àvila Padró - October 2016
-#Released under GNU LICENSE
-#https://opensource.org/licenses/GPL-3.0
+# Guillem Àvila Padró - October 2016
+# Released under GNU LICENSE
+# https://opensource.org/licenses/GPL-3.0
+# version 1.0.0
 
 import time, math, os, platform, sys, json, string, shutil, zipfile
 
@@ -297,29 +298,23 @@ def createSimplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight
                     currentPrimaryExtruder = 0
                     currentFilament = filamentLeft
                     currentHotend = hotendLeft
-                    currentLayerHeight = currentHotend['nozzleSize'] * quality['layerHeightMultiplier']
-                    currentDefaultSpeed, currentFirstLayerUnderspeed, currentOutlineUnderspeed, currentSupportUnderspeed = speedValues(hotendLeft, hotendRight, filamentLeft, filamentRight, quality, 'MEX Left')
+                    currentLayerHeight = hotendLeft['nozzleSize'] * quality['layerHeightMultiplier']
+                    currentDefaultSpeed, currentFirstLayerUnderspeed, currentOutlineUnderspeed, currentSupportUnderspeed = speedValues(hotendLeft, hotendRight, filamentLeft, filamentRight, currentLayerHeight, currentInfillLayerInterval, quality, 'MEX Left')
                     hotendLeftTemperature = temperatureValue(filamentLeft, hotendLeft, currentLayerHeight, currentDefaultSpeed)
-                    if hotendRight['id'] != 'None':
-                        hotendRightTemperature = temperatureValue(filamentRight, hotendRight, currentLayerHeight, currentDefaultSpeed)
-                    else:
-                        hotendRightTemperature = hotendLeftTemperature
-                    currentPurgeSpeedT0, currentStartPurgeLenghtT0, currentToolChangePurgeLenghtT0 = purgeValues(hotendLeft, filamentLeft, currentDefaultSpeed, currentLayerHeight)
-                    currentPurgeSpeedT1, currentStartPurgeLenghtT1, currentToolChangePurgeLenghtT1 = currentPurgeSpeedT0, currentStartPurgeLenghtT0, currentToolChangePurgeLenghtT0
+                    hotendRightTemperature = hotendLeftTemperature
+                    currentPurgeSpeedT0, currentStartPurgeLengthT0, currentToolChangePurgeLengthT0 = purgeValues(hotendLeft, filamentLeft, currentDefaultSpeed, currentLayerHeight)
+                    currentPurgeSpeedT1, currentStartPurgeLengthT1, currentToolChangePurgeLengthT1 = currentPurgeSpeedT0, currentStartPurgeLengthT0, currentToolChangePurgeLengthT0
                 else:
                     # MEX Right
                     currentPrimaryExtruder = 1
                     currentFilament = filamentRight
                     currentHotend = hotendRight
-                    currentLayerHeight = currentHotend['nozzleSize'] * quality['layerHeightMultiplier']
-                    currentDefaultSpeed, currentFirstLayerUnderspeed, currentOutlineUnderspeed, currentSupportUnderspeed = speedValues(hotendLeft, hotendRight, filamentLeft, filamentRight, quality, 'MEX Right')
+                    currentLayerHeight = hotendRight['nozzleSize'] * quality['layerHeightMultiplier']
+                    currentDefaultSpeed, currentFirstLayerUnderspeed, currentOutlineUnderspeed, currentSupportUnderspeed = speedValues(hotendLeft, hotendRight, filamentLeft, filamentRight, currentLayerHeight, currentInfillLayerInterval, quality, 'MEX Right')
                     hotendRightTemperature = temperatureValue(filamentRight, hotendRight, currentLayerHeight, currentDefaultSpeed)
-                    if hotendLeft['id'] != 'None':
-                        hotendLeftTemperature = temperatureValue(filamentLeft, hotendLeft, currentLayerHeight, currentDefaultSpeed)
-                    else:
-                        hotendLeftTemperature = hotendRightTemperature
-                    currentPurgeSpeedT1, currentStartPurgeLenghtT1, currentToolChangePurgeLenghtT1 = purgeValues(hotendRight, filamentRight, currentDefaultSpeed, currentLayerHeight)
-                    currentPurgeSpeedT0, currentStartPurgeLenghtT0, currentToolChangePurgeLenghtT0 = currentPurgeSpeedT1, currentStartPurgeLenghtT1, currentToolChangePurgeLenghtT1
+                    hotendLeftTemperature = hotendRightTemperature
+                    currentPurgeSpeedT1, currentStartPurgeLengthT1, currentToolChangePurgeLengthT1 = purgeValues(hotendRight, filamentRight, currentDefaultSpeed, currentLayerHeight)
+                    currentPurgeSpeedT0, currentStartPurgeLengthT0, currentToolChangePurgeLengthT0 = currentPurgeSpeedT1, currentStartPurgeLengthT1, currentToolChangePurgeLengthT1
                 currentInfillExtruder = currentPrimaryExtruder
                 currentSupportExtruder = currentPrimaryExtruder
                 currentBedTemperature = currentFilament['bedTemperature']
@@ -340,82 +335,85 @@ def createSimplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight
                         currentPrimaryExtruder = 1
                         currentFilament = filamentRight
                         currentHotend = hotendRight
+                        currentLayerHeight = min(hotendRight['nozzleSize'] * quality['layerHeightMultiplier'], hotendLeft['nozzleSize']*0.5)
                         supportFilament = filamentLeft
                         supportHotend = hotendLeft
-                        fanActionOnToolChange1 = '{IF NEWTOOL=0} M107'+"\t\t"+r';disable fan for support material,'
-                        fanActionOnToolChange2 = '{IF NEWTOOL=1} M106 S'+str(currentFilament['fanPercentage'])+"\t\t"+r';enable fan for part material,'
                         secondaryExtruderAction = ' (Left Ext. for supports) - '
-                        currentDefaultSpeed, currentFirstLayerUnderspeed, currentOutlineUnderspeed, currentSupportUnderspeed = speedValues(hotendLeft, hotendRight, filamentLeft, filamentRight, quality, 'IDEX, Supports with Left')
-                        currentPurgeSpeedT0, currentStartPurgeLenghtT0, currentToolChangePurgeLenghtT0 = purgeValues(hotendLeft, filamentLeft, currentDefaultSpeed * currentSupportUnderspeed, currentLayerHeight)
-                        currentPurgeSpeedT1, currentStartPurgeLenghtT1, currentToolChangePurgeLenghtT1 = purgeValues(hotendRight, filamentRight, currentDefaultSpeed, currentLayerHeight)
+                        currentDefaultSpeed, currentFirstLayerUnderspeed, currentOutlineUnderspeed, currentSupportUnderspeed = speedValues(hotendLeft, hotendRight, filamentLeft, filamentRight, currentLayerHeight, currentInfillLayerInterval, quality, 'IDEX, Supports with Left')
+                        currentPurgeSpeedT0, currentStartPurgeLengthT0, currentToolChangePurgeLengthT0 = purgeValues(hotendLeft, filamentLeft, currentDefaultSpeed * currentSupportUnderspeed, currentLayerHeight)
+                        currentPurgeSpeedT1, currentStartPurgeLengthT1, currentToolChangePurgeLengthT1 = purgeValues(hotendRight, filamentRight, currentDefaultSpeed, currentLayerHeight)
+                        hotendLeftTemperature = temperatureValue(filamentLeft, hotendLeft, currentLayerHeight, currentDefaultSpeed*currentSupportUnderspeed)
+                        hotendRightTemperature = temperatureValue(filamentRight, hotendRight, currentLayerHeight, currentDefaultSpeed)
+                        fanActionOnToolChange1 = '{IF NEWTOOL=0} M107'+"\t\t"+r';disable fan for support material,'
+                        fanActionOnToolChange2 = '{IF NEWTOOL=1} M106 S'+str(fanSpeed(currentFilament, hotendRightTemperature))+"\t\t"+r';enable fan for part material,'
                     else:
                         # IDEX, Support Material in Right Hotend
                         currentPrimaryExtruder = 0
                         currentFilament = filamentLeft
                         currentHotend = hotendLeft
+                        currentLayerHeight = min(hotendLeft['nozzleSize'] * quality['layerHeightMultiplier'], hotendRight['nozzleSize']*0.5)
                         supportFilament = filamentRight
                         supportHotend = hotendRight
-                        fanActionOnToolChange1 = '{IF NEWTOOL=0} M106 S'+str(currentFilament['fanPercentage'])+"\t\t"+r';enable fan for part material,'
-                        fanActionOnToolChange2 = '{IF NEWTOOL=1} M107'+"\t\t"+r';disable fan for support material,' 
                         secondaryExtruderAction = ' (Right Ext. for supports) - '
-                        currentDefaultSpeed, currentFirstLayerUnderspeed, currentOutlineUnderspeed, currentSupportUnderspeed = speedValues(hotendLeft, hotendRight, filamentLeft, filamentRight, quality, 'IDEX, Supports with Right')
-                        currentPurgeSpeedT0, currentStartPurgeLenghtT0, currentToolChangePurgeLenghtT0 = purgeValues(hotendLeft, filamentLeft, currentDefaultSpeed, currentLayerHeight)
-                        currentPurgeSpeedT1, currentStartPurgeLenghtT1, currentToolChangePurgeLenghtT1 = purgeValues(hotendRight, filamentRight, currentDefaultSpeed * currentSupportUnderspeed, currentLayerHeight)
+                        currentDefaultSpeed, currentFirstLayerUnderspeed, currentOutlineUnderspeed, currentSupportUnderspeed = speedValues(hotendLeft, hotendRight, filamentLeft, filamentRight, currentLayerHeight, currentInfillLayerInterval, quality, 'IDEX, Supports with Right')
+                        currentPurgeSpeedT0, currentStartPurgeLengthT0, currentToolChangePurgeLengthT0 = purgeValues(hotendLeft, filamentLeft, currentDefaultSpeed, currentLayerHeight)
+                        currentPurgeSpeedT1, currentStartPurgeLengthT1, currentToolChangePurgeLengthT1 = purgeValues(hotendRight, filamentRight, currentDefaultSpeed * currentSupportUnderspeed, currentLayerHeight)
+                        hotendLeftTemperature = temperatureValue(filamentLeft, hotendLeft, currentLayerHeight, currentDefaultSpeed)
+                        hotendRightTemperature = temperatureValue(filamentRight, hotendRight, currentLayerHeight, currentDefaultSpeed*currentSupportUnderspeed)
+                        fanActionOnToolChange1 = '{IF NEWTOOL=0} M106 S'+str(fanSpeed(currentFilament, hotendLeftTemperature))+"\t\t"+r';enable fan for part material,'
+                        fanActionOnToolChange2 = '{IF NEWTOOL=1} M107'+"\t\t"+r';disable fan for support material,' 
                     currentInfillExtruder = currentPrimaryExtruder
                     currentSupportExtruder = abs(currentPrimaryExtruder-1)
-                    currentLayerHeight = currentHotend['nozzleSize'] * quality['layerHeightMultiplier']
-                    hotendLeftTemperature = temperatureValue(filamentLeft, hotendLeft, currentLayerHeight, currentDefaultSpeed)
-                    hotendRightTemperature = temperatureValue(filamentRight, hotendRight, currentLayerHeight, currentDefaultSpeed)
                 else:
                     # IDEX, Combined Infill
-                    currentAvoidCrossingOutline = 0
+                    currentAvoidCrossingOutline = 0l
+
+                    # correccions pel combined infil
                     if hotendLeft['nozzleSize'] != hotendRight['nozzleSize']:
-                        currentInfillPercentage = 100
+                        currentInfillPercentage = 100 #canviar?
                         currentOverlapInfillAngles = 0
                         if hotendLeft['nozzleSize'] < hotendRight['nozzleSize']: 
-                            currentToolChangePurgeLenghtT1 = str("%.2f" % (float(currentToolChangePurgeLenghtT1)/4))
+                            currentToolChangePurgeLengthT1 = str("%.2f" % (float(currentToolChangePurgeLengthT1)/4))
                         else:
-                            currentToolChangePurgeLenghtT0 = str("%.2f" % (float(currentToolChangePurgeLenghtT0)/4))
+                            currentToolChangePurgeLengthT0 = str("%.2f" % (float(currentToolChangePurgeLengthT0)/4))
+                    # fi de les correccions
+
                     if hotendLeft['nozzleSize'] <= hotendRight['nozzleSize']:
                         # IDEX, Combined Infill (Right Hotend has thicker or equal nozzle)
                         currentPrimaryExtruder = 0
                         currentFilament = filamentLeft
                         currentHotend = hotendLeft
-                        currentDefaultSpeed, currentFirstLayerUnderspeed, currentOutlineUnderspeed, currentSupportUnderspeed = speedValues(hotendLeft, hotendRight, filamentLeft, filamentRight, quality, 'IDEX, Infill with Right')
-                        if hotendLeft['nozzleSize'] != hotendRight['nozzleSize']:
-                            currentInfillLayerInterval = int(str(min(flowValue(hotendRight, filamentRight)/(max(hotendLeft['nozzleSize'], hotendRight['nozzleSize'])*currentDefaultSpeed/60*quality['layerHeightMultiplier']*min(hotendLeft['nozzleSize'], hotendRight['nozzleSize'])),(max(hotendLeft['nozzleSize'], hotendRight['nozzleSize'])*0.75)/(quality['layerHeightMultiplier']*min(hotendLeft['nozzleSize'], hotendRight['nozzleSize'])))).split('.')[0])
-                        currentLayerHeight = currentHotend['nozzleSize'] * quality['layerHeightMultiplier']
-                        hotendLeftTemperature = temperatureValue(filamentLeft, hotendLeft, currentLayerHeight, currentDefaultSpeed)
-                        if hotendLeft['nozzleSize'] == hotendRight['nozzleSize']:
-                            hotendRightTemperature = temperatureValue(filamentRight, hotendRight, currentLayerHeight, currentDefaultSpeed)
-                        else:
-                            hotendRightTemperature = temperatureValue(filamentRight, hotendRight, currentLayerHeight*currentInfillLayerInterval, currentDefaultSpeed)
+                        currentLayerHeight = min(currentHotend['nozzleSize'] * quality['layerHeightMultiplier'], hotendRight['nozzleSize']*0.5)
+                        currentInfillLayerInterval = int(str((hotendRight['nozzleSize']*0.5)/currentLayerHeight).split('.')[0])
+                        currentDefaultSpeed, currentFirstLayerUnderspeed, currentOutlineUnderspeed, currentSupportUnderspeed = speedValues(hotendLeft, hotendRight, filamentLeft, filamentRight, currentLayerHeight, currentInfillLayerInterval, quality, 'IDEX, Infill with Right')
+                        hotendLeftTemperature = temperatureValue(filamentLeft, hotendLeft, currentLayerHeight, max(currentDefaultSpeed,currentDefaultSpeed*currentOutlineUnderspeed))
+                        hotendRightTemperature = temperatureValue(filamentRight, hotendRight, currentLayerHeight*currentInfillLayerInterval, currentDefaultSpeed)
                         secondaryExtruderAction = ' (Right Ext. for infill) - '
                         if currentFilament['fanPercentage'] != 0:
-                            fanActionOnToolChange1 = '' # '{IF NEWTOOL=0} M106 S'+str(currentFilament['fanPercentage'])+"\t\t"+r';enable fan for perimeters,'
+                            fanActionOnToolChange1 = '' # '{IF NEWTOOL=0} M106 S'+str(fanSpeed(currentFilament, hotendLeftTemperature))+"\t\t"+r';enable fan for perimeters,'
                             fanActionOnToolChange2 = '' # '{IF NEWTOOL=1} M107'+"\t\t"+r';disable fan for infill,'
-                        currentPurgeSpeedT0, currentStartPurgeLenghtT0, currentToolChangePurgeLenghtT0 = purgeValues(hotendLeft, filamentLeft, currentDefaultSpeed, currentLayerHeight)
-                        currentPurgeSpeedT1, currentStartPurgeLenghtT1, currentToolChangePurgeLenghtT1 = purgeValues(hotendRight, filamentRight, currentDefaultSpeed, currentLayerHeight * currentInfillLayerInterval)
+                        currentPurgeSpeedT0, currentStartPurgeLengthT0, currentToolChangePurgeLengthT0 = purgeValues(hotendLeft, filamentLeft, currentDefaultSpeed, currentLayerHeight)
+                        currentPurgeSpeedT1, currentStartPurgeLengthT1, currentToolChangePurgeLengthT1 = purgeValues(hotendRight, filamentRight, currentDefaultSpeed, currentLayerHeight * currentInfillLayerInterval)
                     else:
                         # IDEX, Combined Infill (Left Hotend has thicker nozzle)
                         currentPrimaryExtruder = 1
                         currentFilament = filamentRight
                         currentHotend = hotendRight
-                        currentLayerHeight = currentHotend['nozzleSize'] * quality['layerHeightMultiplier']
-                        currentDefaultSpeed, currentFirstLayerUnderspeed, currentOutlineUnderspeed, currentSupportUnderspeed = speedValues(hotendLeft, hotendRight, filamentLeft, filamentRight, quality, 'IDEX, Infill with Left')
-                        currentInfillLayerInterval = int(str(min(flowValue(hotendLeft, filamentLeft)/(max(hotendLeft['nozzleSize'], hotendRight['nozzleSize'])*currentDefaultSpeed/60*quality['layerHeightMultiplier']*min(hotendLeft['nozzleSize'], hotendRight['nozzleSize'])),(max(hotendLeft['nozzleSize'], hotendRight['nozzleSize'])*0.75)/(quality['layerHeightMultiplier']*min(hotendLeft['nozzleSize'], hotendRight['nozzleSize'])))).split('.')[0])
+                        currentLayerHeight = min(currentHotend['nozzleSize'] * quality['layerHeightMultiplier'], hotendLeft['nozzleSize']*0.5)
+                        currentInfillLayerInterval = int(str((hotendLeft['nozzleSize']*0.5)/currentLayerHeight).split('.')[0])
+                        currentDefaultSpeed, currentFirstLayerUnderspeed, currentOutlineUnderspeed, currentSupportUnderspeed = speedValues(hotendLeft, hotendRight, filamentLeft, filamentRight, currentLayerHeight, currentInfillLayerInterval, quality, 'IDEX, Infill with Left')
                         hotendLeftTemperature = temperatureValue(filamentLeft, hotendLeft, currentLayerHeight*currentInfillLayerInterval, currentDefaultSpeed)
-                        hotendRightTemperature = temperatureValue(filamentRight, hotendRight, currentLayerHeight, currentDefaultSpeed)
+                        hotendRightTemperature = temperatureValue(filamentRight, hotendRight, currentLayerHeight, max(currentDefaultSpeed,currentDefaultSpeed*currentOutlineUnderspeed))
                         secondaryExtruderAction = ' (Left Ext. for infill) - '
                         if currentFilament['fanPercentage'] != 0:
                             fanActionOnToolChange1 = '' # '{IF NEWTOOL=0} M107'+"\t\t"+r';disable fan for infill,'
-                            fanActionOnToolChange2 = '' # '{IF NEWTOOL=1} M106 S'+str(currentFilament['fanPercentage'])+"\t\t"+r';enable fan for perimeters,'
-                        currentPurgeSpeedT0, currentStartPurgeLenghtT0, currentToolChangePurgeLenghtT0 = purgeValues(hotendLeft, filamentLeft, currentDefaultSpeed, currentLayerHeight * currentInfillLayerInterval)
-                        currentPurgeSpeedT1, currentStartPurgeLenghtT1, currentToolChangePurgeLenghtT1 = purgeValues(hotendRight, filamentRight, currentDefaultSpeed, currentLayerHeight)
+                            fanActionOnToolChange2 = '' # '{IF NEWTOOL=1} M106 S'+str(fanSpeed(currentFilament, hotendRightTemperature))+"\t\t"+r';enable fan for perimeters,'
+                        currentPurgeSpeedT0, currentStartPurgeLengthT0, currentToolChangePurgeLengthT0 = purgeValues(hotendLeft, filamentLeft, currentDefaultSpeed, currentLayerHeight * currentInfillLayerInterval)
+                        currentPurgeSpeedT1, currentStartPurgeLengthT1, currentToolChangePurgeLengthT1 = purgeValues(hotendRight, filamentRight, currentDefaultSpeed, currentLayerHeight)
                     currentInfillExtruder = abs(currentPrimaryExtruder-1)
                     currentSupportExtruder = currentPrimaryExtruder
                 currentBedTemperature = max(filamentLeft['bedTemperature'], filamentRight['bedTemperature'])
-            currentFirstLayerHeightPercentage = int(min(125, (currentHotend['nozzleSize']/2)/currentLayerHeight*100, flowValue(currentHotend, currentFilament)*100/(currentHotend['nozzleSize']*currentLayerHeight*(currentDefaultSpeed/60)*float(currentFirstLayerUnderspeed))))      
+            currentFirstLayerHeightPercentage = int(min(125, (currentHotend['nozzleSize']/2)/currentLayerHeight*100, maxFlowValue(currentHotend, currentFilament)*100/(currentHotend['nozzleSize']*currentLayerHeight*(currentDefaultSpeed/60)*float(currentFirstLayerUnderspeed))))      
             currentPerimeterOutlines = max(2, int(round(quality['wallWidth'] / currentHotend['nozzleSize']))) #2 minimum Perimeters needed
             currentTopSolidLayers = max(4, int(round(quality['topBottomWidth'] / currentLayerHeight))) #4 minimum layers needed
             currentBottomSolidLayers = currentTopSolidLayers
@@ -426,7 +424,10 @@ def createSimplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight
             fff.append(r'    <globalExtrusionMultiplier>1</globalExtrusionMultiplier>'+"\n")
             fff.append(r'    <fanSpeed>'+"\n")
             fff.append(r'      <setpoint layer="1" speed="0" />'+"\n")
-            fff.append(r'      <setpoint layer="2" speed="'+str(currentFilament['fanPercentage'])+r'" />'+"\n")
+            if currentPrimaryExtruder == 0:
+                fff.append(r'      <setpoint layer="2" speed="'+str(fanSpeed(currentFilament, hotendLeftTemperature))+r'" />'+"\n")
+            else:
+                fff.append(r'      <setpoint layer="2" speed="'+str(fanSpeed(currentFilament, hotendRightTemperature))+r'" />'+"\n")
             fff.append(r'    </fanSpeed>'+"\n")
             fff.append(r'    <filamentDiameter>'+str(currentFilament['filamentDiameter'])+r'</filamentDiameter>'+"\n")
             fff.append(r'    <filamentPricePerKg>'+str(currentFilament['filamentPricePerKg'])+r'</filamentPricePerKg>'+"\n")
@@ -497,8 +498,9 @@ def createSimplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight
             fff.append(r'    <onlyWipeOutlines>'+str(onlyWipeOutlines)+'</onlyWipeOutlines>'+"\n")
             fff.append(r'    <minBridgingArea>10</minBridgingArea>'+"\n")
             fff.append(r'    <bridgingExtraInflation>0</bridgingExtraInflation>'+"\n")
-            fff.append(r'    <bridgingExtrusionMultiplier>'+str(currentFilament['extrusionMultiplier']-0.05)+'</bridgingExtrusionMultiplier>'+"\n")
-            fff.append(r'    <bridgingSpeedMultiplier>1.5</bridgingSpeedMultiplier>'+"\n")
+            bridgingSpeedMultiplier = 1.5
+            fff.append(r'    <bridgingExtrusionMultiplier>'+str(currentFilament['extrusionMultiplier']*(1/bridgingSpeedMultiplier))+'</bridgingExtrusionMultiplier>'+"\n")
+            fff.append(r'    <bridgingSpeedMultiplier>'+str(bridgingSpeedMultiplier)+'</bridgingSpeedMultiplier>'+"\n")
             if hotendLeft['id'] != 'None':
                 fff.append(r'    <temperatureController name="Left Extruder '+str(hotendLeft['nozzleSize'])+r'">'+"\n")
                 fff.append(r'      <temperatureNumber>0</temperatureNumber>'+"\n")
@@ -526,10 +528,16 @@ def createSimplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight
                 fff.append(r'      <stabilizeAtStartup>0</stabilizeAtStartup>'+"\n")
                 fff.append(r'      <setpoint layer="1" temperature="'+str(currentBedTemperature)+r'"/>'+"\n")
                 fff.append(r'    </temperatureController>'+"\n")
-            if hotendLeft['id'] != 'None' and hotendRight['id'] != 'None':
-                fff.append(r'    <toolChangeGcode>{IF NEWTOOL=0} T0'+"\t\t"+r';start tool switch 0,;{IF NEWTOOL=0} G1 X0 Y0 F[travel_speed]'+"\t"+r';travel,{IF NEWTOOL=0} G1 F500 E-0.5'+"\t\t"+r';fast purge,{IF NEWTOOL=0} G1 F'+str(currentPurgeSpeedT0)+' E'+str(currentToolChangePurgeLenghtT0)+"\t"+r';slow purge,{IF NEWTOOL=0} G92 E0'+"\t\t"+r';reset t0,{IF NEWTOOL=0} G1 F3000 E-4.5'+"\t"+r';retract,{IF NEWTOOL=0} G1 F[travel_speed]'+"\t"+r';end tool switch,'+fanActionOnToolChange1+r',{IF NEWTOOL=1} T1'+"\t\t"+r';start tool switch 1,;{IF NEWTOOL=1} G1 X210 Y0 F[travel_speed]'+"\t"+r';travel,{IF NEWTOOL=1} G1 F500 E-0.5'+"\t\t"+r';fast purge,{IF NEWTOOL=1} G1 F'+str(currentPurgeSpeedT1)+' E'+str(currentToolChangePurgeLenghtT1)+"\t"+r';slow purge,{IF NEWTOOL=1} T1'+"\t\t"+r';start tool switch 1,{IF NEWTOOL=1} G92 E0'+"\t\t"+r';reset t1,{IF NEWTOOL=1} G1 F3000 E-4.5'+"\t"+r';retract,{IF NEWTOOL=1} G1 F[travel_speed]'+"\t"+r';end tool switch,'+fanActionOnToolChange2+r',G91,G1 F[travel_speed] Z2,G90</toolChangeGcode>'+"\n")
+            if hotendLeft['id'] != 'None' and hotendRight['id'] != 'None':                    
+                fff.append(r'    <toolChangeGcode>; To use dynamic purge values:,;    1. Gererate the gcode,;    2. Open the Sigma profile Generator -> 3. Experimental features -> 5. SmartPurge,,{IF NEWTOOL=0} T0'+"\t\t"+r';start tool switch 0,{IF NEWTOOL=0} G1 F500 E-0.5'+"\t\t"+r';fast purge,{IF NEWTOOL=0} G1 F'+str(currentPurgeSpeedT0)+' E'+str(currentToolChangePurgeLengthT0)+"\t"+r';slow purge,{IF NEWTOOL=0} G92 E0'+"\t\t"+r';reset t0,{IF NEWTOOL=0} G1 F3000 E-4.5'+"\t"+r';retract,{IF NEWTOOL=0} G1 F[travel_speed]'+"\t"+r';end tool switch,'+fanActionOnToolChange1+r',{IF NEWTOOL=1} T1'+"\t\t"+r';start tool switch 1,{IF NEWTOOL=1} G1 F500 E-0.5'+"\t\t"+r';fast purge,{IF NEWTOOL=1} G1 F'+str(currentPurgeSpeedT1)+' E'+str(currentToolChangePurgeLengthT1)+"\t"+r';slow purge,{IF NEWTOOL=1} G92 E0'+"\t\t"+r';reset t1,{IF NEWTOOL=1} G1 F3000 E-4.5'+"\t"+r';retract,{IF NEWTOOL=1} G1 F[travel_speed]'+"\t"+r';end tool switch,'+fanActionOnToolChange2+r',G91,G1 F[travel_speed] Z2,G90</toolChangeGcode>'+"\n")
             else:
                 fff.append(r'    <toolChangeGcode/>'+"\n")
+            if extruder == 'Left Extruder':
+                fff.append(r'    <startingGcode>'+firstHeatSequence(hotendLeftTemperature, 0, currentBedTemperature, 'Simplify3D')+',G21'+"\t\t"+r';metric values,G90'+"\t\t"+r';absolute positioning,M82'+"\t\t"+r';set extruder to absolute mode,M107'+"\t\t"+r';start with the fan off,G28 X0 Y0'+"\t\t"+r';move X/Y to min endstops,G28 Z0'+"\t\t"+r';move Z to min endstops,T0'+"\t\t"+r';change to active toolhead,G92 E0'+"\t\t"+r';zero the extruded length,G1 Z5 F200'+"\t\t"+r';Safety Z axis movement,G1 F'+str(currentPurgeSpeedT0)+' E'+str(currentStartPurgeLengthT0)+"\t"+r';extrude '+str(currentStartPurgeLengthT0)+r'mm of feed stock,G92 E0'+"\t\t"+r';zero the extruded length again,G1 F[travel_speed],</startingGcode>'+"\n")
+            elif extruder == 'Right Extruder':
+                fff.append(r'    <startingGcode>'+firstHeatSequence(0, hotendRightTemperature, currentBedTemperature, 'Simplify3D')+',G21'+"\t\t"+r';metric values,G90'+"\t\t"+r';absolute positioning,M82'+"\t\t"+r';set extruder to absolute mode,M107'+"\t\t"+r';start with the fan off,G28 X0 Y0'+"\t\t"+r';move X/Y to min endstops,G28 Z0'+"\t\t"+r';move Z to min endstops,T1'+"\t\t"+r';change to active toolhead,G92 E0'+"\t\t"+r';zero the extruded length,G1 Z5 F200'+"\t\t"+r';Safety Z axis movement,G1 F'+str(currentPurgeSpeedT1)+' E'+str(currentStartPurgeLengthT1)+"\t"+r';extrude '+str(currentStartPurgeLengthT1)+r'mm of feed stock,G92 E0'+"\t\t"+r';zero the extruded length again,G1 F[travel_speed],</startingGcode>'+"\n")
+            else:
+                fff.append(r'    <startingGcode>'+firstHeatSequence(hotendLeftTemperature, hotendRightTemperature, currentBedTemperature, 'Simplify3D')+',G21'+"\t\t"+r';metric values,G90'+"\t\t"+r';absolute positioning,M107'+"\t\t"+r';start with the fan off,G28 X0 Y0'+"\t\t"+r';move X/Y to min endstops,G28 Z0'+"\t\t"+r';move Z to min endstops,T1'+"\t\t"+r';switch to the 2nd extruder,G92 E0'+"\t\t"+r';zero the extruded length,G1 F'+str(currentPurgeSpeedT1)+' E'+str(currentStartPurgeLengthT1)+"\t"+r';extrude '+str(currentStartPurgeLengthT1)+r'mm of feed stock,G92 E0'+"\t\t"+r';zero the extruded length again,G1 F200 E-9,T0'+"\t\t"+r';switch to the 1st extruder,G92 E0'+"\t\t"+r';zero the extruded length,G1 F'+str(currentPurgeSpeedT0)+' E'+str(currentStartPurgeLengthT0)+"\t"+r';extrude '+str(currentStartPurgeLengthT0)+r'mm of feed stock,G92 E0'+"\t\t"+r';zero the extruded length again,G1 Z5 F200'+"\t\t"+r';Safety Z axis movement,G1 F[travel_speed]</startingGcode>'+"\n")
             fff.append(r'    <postProcessing>{REPLACE "; outer perimeter" "; outer perimeter\nM204 S'+str(accelerationForPerimeters(currentHotend['nozzleSize'], currentLayerHeight, int(currentDefaultSpeed/60. * currentOutlineUnderspeed)))+r'"},{REPLACE "; inner perimeter" "; inner perimeter\nM204 S2000"},{REPLACE "; solid layer" "; solid layer\nM204 S2000"},{REPLACE "; infill" "; infill\nM204 S2000",{REPLACE "; support" "; support\nM204 S2000"},{REPLACE "; layer end" "; layer end\nM204 S2000"},{REPLACE "F12000\nG1 Z'+str(round(currentLayerHeight*currentFirstLayerHeightPercentage/100., 3))+r' F1002\nG92 E0" "F12000\nG1 Z'+str(round(currentLayerHeight*currentFirstLayerHeightPercentage/100., 3))+r' F1002\nG1 E0.0000 F720\nG92 E0"}</postProcessing>'+"\n")
             fff.append(r'  </autoConfigureQuality>'+"\n")
 
@@ -541,17 +549,14 @@ def createSimplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight
 
     if hotendLeft['id'] != 'None':
         fff.append(r'  <autoConfigureExtruders name="Left Extruder Only"  allowedToolheads="1">'+"\n")
-        fff.append(r'    <startingGcode>M140 S[bed0_temperature],M104 S[extruder0_temperature] T0,M109 S[extruder0_temperature] T0,M190 S[bed0_temperature],G21'+"\t\t"+r';metric values,G90'+"\t\t"+r';absolute positioning,M82'+"\t\t"+r';set extruder to absolute mode,M107'+"\t\t"+r';start with the fan off,G28 X0 Y0'+"\t\t"+r';move X/Y to min endstops,G28 Z0'+"\t\t"+r';move Z to min endstops,T0'+"\t\t"+r';change to active toolhead,G92 E0'+"\t\t"+r';zero the extruded length,G1 Z5 F200'+"\t\t"+r';Safety Z axis movement,G1 F'+str(currentPurgeSpeedT0)+' E'+str(currentStartPurgeLenghtT0)+"\t"+r';extrude '+str(currentStartPurgeLenghtT0)+r'mm of feed stock,G92 E0'+"\t\t"+r';zero the extruded length again,G1 F[travel_speed],</startingGcode>'+"\n")
         fff.append(r'    <layerChangeGcode>M104 S0 T1</layerChangeGcode>'+"\n")
         fff.append(r'  </autoConfigureExtruders>'+"\n")
     if hotendRight['id'] != 'None':
         fff.append(r'  <autoConfigureExtruders name="Right Extruder Only"  allowedToolheads="1">'+"\n")
-        fff.append(r'    <startingGcode>M140 S[bed0_temperature],M104 S[extruder1_temperature] T1,M109 S[extruder1_temperature] T1,M190 S[bed0_temperature],G21'+"\t\t"+r';metric values,G90'+"\t\t"+r';absolute positioning,M82'+"\t\t"+r';set extruder to absolute mode,M107'+"\t\t"+r';start with the fan off,G28 X0 Y0'+"\t\t"+r';move X/Y to min endstops,G28 Z0'+"\t\t"+r';move Z to min endstops,T1'+"\t\t"+r';change to active toolhead,G92 E0'+"\t\t"+r';zero the extruded length,G1 Z5 F200'+"\t\t"+r';Safety Z axis movement,G1 F'+str(currentPurgeSpeedT1)+' E'+str(currentStartPurgeLenghtT1)+"\t"+r';extrude '+str(currentStartPurgeLenghtT1)+r'mm of feed stock,G92 E0'+"\t\t"+r';zero the extruded length again,G1 F[travel_speed],</startingGcode>'+"\n")
         fff.append(r'    <layerChangeGcode>M104 S0 T0</layerChangeGcode>'+"\n")
         fff.append(r'  </autoConfigureExtruders>'+"\n")
     if hotendLeft['id'] != 'None' and hotendRight['id'] != 'None':
         fff.append(r'  <autoConfigureExtruders name="Both Extruders"  allowedToolheads="2">'+"\n")
-        fff.append(r'    <startingGcode>M140 S[bed0_temperature],M104 S[extruder0_temperature] T0,M104 S[extruder1_temperature] T1,M109 S[extruder0_temperature] T0,M109 S[extruder1_temperature] T1,M190 S[bed0_temperature],G21'+"\t\t"+r';metric values,G90'+"\t\t"+r';absolute positioning,M107'+"\t\t"+r';start with the fan off,G28 X0 Y0'+"\t\t"+r';move X/Y to min endstops,G28 Z0'+"\t\t"+r';move Z to min endstops,T1'+"\t\t"+r';switch to the 2nd extruder,G92 E0'+"\t\t"+r';zero the extruded length,G1 F'+str(currentPurgeSpeedT1)+' E'+str(currentStartPurgeLenghtT1)+"\t"+r';extrude '+str(currentStartPurgeLenghtT1)+r'mm of feed stock,G92 E0'+"\t\t"+r';zero the extruded length again,G1 F200 E-9,T0'+"\t\t"+r';switch to the 1st extruder,G92 E0'+"\t\t"+r';zero the extruded length,G1 F'+str(currentPurgeSpeedT0)+' E'+str(currentStartPurgeLenghtT0)+"\t"+r';extrude '+str(currentStartPurgeLenghtT0)+r'mm of feed stock,G92 E0'+"\t\t"+r';zero the extruded length again,G1 Z5 F200'+"\t\t"+r';Safety Z axis movement,G1 F[travel_speed]</startingGcode>'+"\n")
         fff.append(r'    <layerChangeGcode></layerChangeGcode>'+"\n")
         fff.append(r'  </autoConfigureExtruders>'+"\n")
 
@@ -568,12 +573,12 @@ def createSimplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight
 
 def createCuraProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, quality, dataLog, createFile):
     
-    #  Attention: hotendLeft and hotendRight must be the same, or "None" 
+    #  Attention: hotendLeft and hotendRight must be the same, or "None".
 
     makeSupports = 'None'
     supportType = 'Lines'
     supportDualExtrusion = 'First extruder'
-    supportXYDistance = 0.7
+    supportXYDistance = 1
 
     if hotendLeft['id'] != 'None' and hotendRight['id'] != 'None' and hotendLeft['id'] != hotendRight['id']:
         return
@@ -588,7 +593,7 @@ def createCuraProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, qual
             fileName = "BCN3D Sigma - Right Extruder "+str(hotendRight['nozzleSize'])+" Only ("+filamentRight['id']+") - "+quality['id']
             extruderPrintOptions = ["Right Extruder"]
             filamentLeft = dict([('id', '')])
-            currentDefaultSpeed, currentFirstLayerUnderspeed, currentOutlineUnderspeed, currentSupportUnderspeed = speedValues(hotendLeft, hotendRight, filamentLeft, filamentRight, quality, 'MEX Right')
+            currentDefaultSpeed, currentFirstLayerUnderspeed, currentOutlineUnderspeed, currentSupportUnderspeed = speedValues(hotendLeft, hotendRight, filamentLeft, filamentRight, currentLayerHeight, 1, quality, 'MEX Right')
             printTemperature1 = 0
             printTemperature2 = temperatureValue(filamentRight, hotendRight, currentLayerHeight, currentDefaultSpeed)
             bedTemperature = filamentRight['bedTemperature']
@@ -597,17 +602,17 @@ def createCuraProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, qual
             filamentFlow = filamentRight['extrusionMultiplier']*100
             retractionSpeed = filamentRight['retractionSpeed']
             retractionAmount = filamentRight['retractionDistance']
-            currentFirstLayerHeightPercentage = int(min(125, (hotend['nozzleSize']/2)/currentLayerHeight*100, flowValue(hotendRight, filamentRight)*100/(hotend['nozzleSize']*currentLayerHeight*(currentDefaultSpeed/60.)*float(currentFirstLayerUnderspeed))))
+            currentFirstLayerHeightPercentage = int(min(125, (hotend['nozzleSize']/2)/currentLayerHeight*100, maxFlowValue(hotendRight, filamentRight)*100/(hotend['nozzleSize']*currentLayerHeight*(currentDefaultSpeed/60.)*float(currentFirstLayerUnderspeed))))
             firstLayerHeight = "%.2f" % (currentLayerHeight * currentFirstLayerHeightPercentage/100.)
             if filamentRight['fanPercentage'] > 0:
                 fanEnabled = 'True'
             else:
                 fanEnabled = 'False'
-            fanSpeed = filamentRight['fanPercentage']            
+            fanPercentage = fanSpeed(filamentRight, printTemperature2)            
             hotendLeftTemperature, hotendRightTemperature = 0, printTemperature2
-            currentPurgeSpeed, currentStartPurgeLenght, currentToolChangePurgeLenght = purgeValues(hotendRight, filamentRight, currentDefaultSpeed, currentLayerHeight)       
-            currentPurgeSpeedT0, currentStartPurgeLenghtT0, currentToolChangePurgeLenghtT0 = currentPurgeSpeed, currentStartPurgeLenght, currentToolChangePurgeLenght
-            currentPurgeSpeedT1, currentStartPurgeLenghtT1, currentToolChangePurgeLenghtT1 = currentPurgeSpeed, currentStartPurgeLenght, currentToolChangePurgeLenght
+            currentPurgeSpeed, currentStartPurgeLength, currentToolChangePurgeLength = purgeValues(hotendRight, filamentRight, currentDefaultSpeed, currentLayerHeight)       
+            currentPurgeSpeedT0, currentStartPurgeLengthT0, currentToolChangePurgeLengthT0 = currentPurgeSpeed, currentStartPurgeLength, currentToolChangePurgeLength
+            currentPurgeSpeedT1, currentStartPurgeLengthT1, currentToolChangePurgeLengthT1 = currentPurgeSpeed, currentStartPurgeLength, currentToolChangePurgeLength
     elif hotendRight['id'] == 'None':
         # MEX Left
         hotend, extruder, currentPrimaryExtruder, currentInfillExtruder, currentSupportExtruder = hotendLeft, "Left Extruder", 0, 0, 0
@@ -616,7 +621,7 @@ def createCuraProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, qual
         fileName = "BCN3D Sigma - Left Extruder "+str(hotendLeft['nozzleSize'])+" Only ("+filamentLeft['id']+") - "+quality['id']
         extruderPrintOptions = ["Left Extruder"]
         filamentRight = dict([('id', '')])
-        currentDefaultSpeed, currentFirstLayerUnderspeed, currentOutlineUnderspeed, currentSupportUnderspeed = speedValues(hotendLeft, hotendRight, filamentLeft, filamentRight, quality, 'MEX Left')
+        currentDefaultSpeed, currentFirstLayerUnderspeed, currentOutlineUnderspeed, currentSupportUnderspeed = speedValues(hotendLeft, hotendRight, filamentLeft, filamentRight, currentLayerHeight, 1, quality, 'MEX Left')
         printTemperature1 = temperatureValue(filamentLeft, hotendLeft, currentLayerHeight, currentDefaultSpeed)
         printTemperature2 = 0
         bedTemperature = filamentLeft['bedTemperature']
@@ -625,17 +630,17 @@ def createCuraProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, qual
         filamentFlow = filamentLeft['extrusionMultiplier']*100
         retractionSpeed = filamentLeft['retractionSpeed']
         retractionAmount = filamentLeft['retractionDistance']
-        currentFirstLayerHeightPercentage = int(min(125, (hotend['nozzleSize']/2)/currentLayerHeight*100, flowValue(hotendLeft, filamentLeft)*100/(hotend['nozzleSize']*currentLayerHeight*(currentDefaultSpeed/60.)*float(currentFirstLayerUnderspeed))))
+        currentFirstLayerHeightPercentage = int(min(125, (hotend['nozzleSize']/2)/currentLayerHeight*100, maxFlowValue(hotendLeft, filamentLeft)*100/(hotend['nozzleSize']*currentLayerHeight*(currentDefaultSpeed/60.)*float(currentFirstLayerUnderspeed))))
         firstLayerHeight = "%.2f" % (currentLayerHeight * currentFirstLayerHeightPercentage/100.)
         if filamentLeft['fanPercentage'] > 0:
             fanEnabled = 'True'
         else:
             fanEnabled = 'False'
-        fanSpeed = filamentLeft['fanPercentage']
+        fanPercentage = fanSpeed(filamentLeft, printTemperature1)
         hotendLeftTemperature, hotendRightTemperature = printTemperature1, 0
-        currentPurgeSpeed, currentStartPurgeLenght, currentToolChangePurgeLenght = purgeValues(hotendLeft, filamentLeft, currentDefaultSpeed, currentLayerHeight)
-        currentPurgeSpeedT0, currentStartPurgeLenghtT0, currentToolChangePurgeLenghtT0 = currentPurgeSpeed, currentStartPurgeLenght, currentToolChangePurgeLenght
-        currentPurgeSpeedT1, currentStartPurgeLenghtT1, currentToolChangePurgeLenghtT1 = currentPurgeSpeed, currentStartPurgeLenght, currentToolChangePurgeLenght
+        currentPurgeSpeed, currentStartPurgeLength, currentToolChangePurgeLength = purgeValues(hotendLeft, filamentLeft, currentDefaultSpeed, currentLayerHeight)
+        currentPurgeSpeedT0, currentStartPurgeLengthT0, currentToolChangePurgeLengthT0 = currentPurgeSpeed, currentStartPurgeLength, currentToolChangePurgeLength
+        currentPurgeSpeedT1, currentStartPurgeLengthT1, currentToolChangePurgeLengthT1 = currentPurgeSpeed, currentStartPurgeLength, currentToolChangePurgeLength
     else:
         # IDEX
         hotend, extruder, currentPrimaryExtruder, currentInfillExtruder, currentSupportExtruder = hotendLeft, "Both Extruders", 0, 0, 0
@@ -647,46 +652,48 @@ def createCuraProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, qual
             # IDEX, Support Material
             makeSupports = 'Everywhere'
             supportDualExtrusion = 'Second extruder'
-            supportXYDistance = 0.2
+            supportXYDistance = 1
             supportZdistance = 0
             supportType = 'Grid'
             if filamentLeft['isSupportMaterial']:
-                # IDEX, Support Material in Left Hotend
-                currentDefaultSpeed, currentFirstLayerUnderspeed, currentOutlineUnderspeed, currentSupportUnderspeed = speedValues(hotendLeft, hotendRight, filamentLeft, filamentRight, quality, 'IDEX, Supports with Left')
+                # IDEX, Support Material in Left Hotend. For Cura it's not a correct combination
+                return
             else:
                 # IDEX, Support Material in Right Hotend
                 currentSupportExtruder = 1
-                currentDefaultSpeed, currentFirstLayerUnderspeed, currentOutlineUnderspeed, currentSupportUnderspeed = speedValues(hotendLeft, hotendRight, filamentLeft, filamentRight, quality, 'IDEX, Supports with Right')
+                currentDefaultSpeed, currentFirstLayerUnderspeed, currentOutlineUnderspeed, currentSupportUnderspeed = speedValues(hotendLeft, hotendRight, filamentLeft, filamentRight, currentLayerHeight, 1, quality, 'IDEX, Supports with Right')
+                printTemperature1 = temperatureValue(filamentLeft, hotendLeft, currentLayerHeight, currentDefaultSpeed)
+                printTemperature2 = temperatureValue(filamentRight, hotendRight, currentLayerHeight, currentDefaultSpeed*currentSupportUnderspeed)
         else:
             # IDEX, Dual Color / Material
             makeSupports = 'None'
             supportDualExtrusion = 'Both'
-            currentDefaultSpeedL, currentFirstLayerUnderspeedL, currentOutlineUnderspeedL, currentSupportUnderspeedL = speedValues(hotendLeft, hotendRight, filamentLeft, filamentRight, quality, 'MEX Left')
-            currentDefaultSpeedR, currentFirstLayerUnderspeedR, currentOutlineUnderspeedR, currentSupportUnderspeedR = speedValues(hotendLeft, hotendRight, filamentLeft, filamentRight, quality, 'MEX Right')
+            currentDefaultSpeedL, currentFirstLayerUnderspeedL, currentOutlineUnderspeedL, currentSupportUnderspeedL = speedValues(hotendLeft, hotendRight, filamentLeft, filamentRight, currentLayerHeight, 1, quality, 'MEX Left')
+            currentDefaultSpeedR, currentFirstLayerUnderspeedR, currentOutlineUnderspeedR, currentSupportUnderspeedR = speedValues(hotendLeft, hotendRight, filamentLeft, filamentRight, currentLayerHeight, 1, quality, 'MEX Right')
             currentDefaultSpeed = min(currentDefaultSpeedL, currentDefaultSpeedR)
             currentFirstLayerUnderspeed = min(currentFirstLayerUnderspeedL, currentFirstLayerUnderspeedR)
             currentOutlineUnderspeed = min(currentOutlineUnderspeedL, currentOutlineUnderspeedR)
             currentSupportUnderspeed  = min(currentSupportUnderspeedL, currentSupportUnderspeedR)
-        printTemperature1 = temperatureValue(filamentLeft, hotendLeft, currentLayerHeight, currentDefaultSpeed)
-        printTemperature2 = temperatureValue(filamentRight, hotendRight, currentLayerHeight, currentDefaultSpeed)
+            printTemperature1 = temperatureValue(filamentLeft, hotendLeft, currentLayerHeight, currentDefaultSpeed)
+            printTemperature2 = temperatureValue(filamentRight, hotendRight, currentLayerHeight, currentDefaultSpeed)
         bedTemperature = max(filamentLeft['bedTemperature'], filamentRight['bedTemperature'])
         filamentDiameter1 = filamentLeft['filamentDiameter']
         filamentDiameter2 = filamentRight['filamentDiameter']
         filamentFlow = max(filamentLeft['extrusionMultiplier'], filamentRight['extrusionMultiplier'])*100
         retractionSpeed = max(filamentLeft['retractionSpeed'], filamentRight['retractionSpeed'])
         retractionAmount = max(filamentLeft['retractionDistance'], filamentRight['retractionDistance'])
-        currentFirstLayerHeightPercentage = int(min(125, (hotend['nozzleSize']/2)/currentLayerHeight*100, min(flowValue(hotendLeft, filamentLeft),flowValue(hotendRight, filamentRight))*100/(hotend['nozzleSize']*currentLayerHeight*(currentDefaultSpeed/60)*float(currentFirstLayerUnderspeed))))
+        currentFirstLayerHeightPercentage = int(min(125, (hotend['nozzleSize']/2)/currentLayerHeight*100, min(maxFlowValue(hotendLeft, filamentLeft),maxFlowValue(hotendRight, filamentRight))*100/(hotend['nozzleSize']*currentLayerHeight*(currentDefaultSpeed/60)*float(currentFirstLayerUnderspeed))))
         firstLayerHeight = "%.2f" % (currentLayerHeight * currentFirstLayerHeightPercentage/100.)
         if filamentLeft['fanPercentage'] == 0 or filamentRight['fanPercentage'] == 0:
             fanEnabled = 'False'
         else:
             fanEnabled = 'True'
-        fanSpeed = max(filamentLeft['fanPercentage'], filamentRight['fanPercentage'])
+        fanPercentage = max(fanSpeed(filamentLeft, printTemperature1), fanSpeed(filamentRight, printTemperature2))
         hotendLeftTemperature, hotendRightTemperature = printTemperature1, printTemperature2
 
-        currentPurgeSpeedT0, currentStartPurgeLenghtT0, currentToolChangePurgeLenghtT0 = purgeValues(hotendLeft, filamentLeft, currentDefaultSpeed, currentLayerHeight)
-        currentPurgeSpeedT1, currentStartPurgeLenghtT1, currentToolChangePurgeLenghtT1 = purgeValues(hotendRight, filamentRight, currentDefaultSpeed, currentLayerHeight)
-        currentPurgeSpeed, currentStartPurgeLenght, currentToolChangePurgeLenght = min(currentPurgeSpeedT0, currentPurgeSpeedT1), max(currentStartPurgeLenghtT0, currentStartPurgeLenghtT1), max(currentToolChangePurgeLenghtT0, currentToolChangePurgeLenghtT0)
+        currentPurgeSpeedT0, currentStartPurgeLengthT0, currentToolChangePurgeLengthT0 = purgeValues(hotendLeft, filamentLeft, currentDefaultSpeed, currentLayerHeight)
+        currentPurgeSpeedT1, currentStartPurgeLengthT1, currentToolChangePurgeLengthT1 = purgeValues(hotendRight, filamentRight, currentDefaultSpeed, currentLayerHeight)
+        currentPurgeSpeed, currentStartPurgeLength, currentToolChangePurgeLength = min(currentPurgeSpeedT0, currentPurgeSpeedT1), max(currentStartPurgeLengthT0, currentStartPurgeLengthT1), max(currentToolChangePurgeLengthT0, currentToolChangePurgeLengthT0)
 
     perimeters = 0
     while perimeters*hotend['nozzleSize'] < quality['wallWidth']:
@@ -746,7 +753,7 @@ def createCuraProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, qual
     ini.append(r'skirt_gap = 2'+"\n")
     ini.append(r'skirt_minimal_length = 150.0'+"\n")
     ini.append(r'fan_full_height = 0.5'+"\n")
-    ini.append(r'fan_speed = '+str(fanSpeed)+"\n")
+    ini.append(r'fan_speed = '+str(fanPercentage)+"\n")
     ini.append(r'fan_speed_max = 100'+"\n")
     ini.append(r'cool_min_feedrate = 10'+"\n")
     ini.append(r'cool_head_lift = False'+"\n")
@@ -817,9 +824,10 @@ def createCuraProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, qual
     ini.append('\t;Print time: {print_time}'+"\n")
     ini.append('\t;Filament used: {filament_amount}m {filament_weight}g'+"\n")
     ini.append('\t;Filament cost: {filament_cost}'+"\n")
-    ini.append('\tM104 S0 T'+str(abs(currentPrimaryExtruder-1))+';cooldown left Hotend,'+"\n")
-    ini.append('\tM109 S'+str(max(printTemperature1, printTemperature2))+' T'+str(currentPrimaryExtruder)+';stabilize right Hotend Temperature,'+"\n")
-    ini.append('\tM190 S'+str(bedTemperature)+"\t\t"+r';stabilize bed temperature'+"\n")
+    if hotendLeft['id'] != 'None':
+        ini.append(firstHeatSequence(printTemperature1, 0, bedTemperature, 'Cura'))
+    else:
+        ini.append(firstHeatSequence(0, printTemperature2, bedTemperature, 'Cura'))
     ini.append('\tG21                               ;metric values'+"\n")
     ini.append('\tG90                               ;absolute positioning'+"\n")
     ini.append('\tM82                               ;set extruder to absolute mode'+"\n")
@@ -829,7 +837,7 @@ def createCuraProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, qual
     ini.append('\tT'+str(currentPrimaryExtruder)+'  ;change to active toolhead'+"\n")
     ini.append('\tG92 E0                            ;zero the extruded length'+"\n")
     ini.append('\tG1 Z5 F1200                       ;Safety Z axis movement'+"\n")
-    ini.append('\tG1 F'+str(currentPurgeSpeed)+' E'+str(currentStartPurgeLenght)+' ;extrude '+str(currentStartPurgeLenght)+'mm of feed stock'+"\n")
+    ini.append('\tG1 F'+str(currentPurgeSpeed)+' E'+str(currentStartPurgeLength)+' ;extrude '+str(currentStartPurgeLength)+'mm of feed stock'+"\n")
     ini.append('\tG92 E0                            ;zero the extruded length again'+"\n")
     ini.append('\tG1 F2400 E-4                      ;Retract before printing'+"\n")
     ini.append('\tG1 F{travel_speed}'+"\n")
@@ -846,10 +854,7 @@ def createCuraProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, qual
     ini.append('\t;Print time: {print_time}'+"\n")
     ini.append('\t;Filament used: {filament_amount}m {filament_weight}g'+"\n")
     ini.append('\t;Filament cost: {filament_cost}'+"\n")
-    ini.append('\t;M190 S{print_bed_temperature}    ;Uncomment to add your own bed temperature line'+"\n")
-    ini.append('\t;M104 S{print_temperature}        ;Uncomment to add your own temperature line'+"\n")
-    ini.append('\t;M109 T1 S{print_temperature2}    ;Uncomment to add your own temperature line'+"\n")
-    ini.append('\t;M109 T0 S{print_temperature}     ;Uncomment to add your own temperature line'+"\n")
+    ini.append(firstHeatSequence(printTemperature1, printTemperature2, bedTemperature, 'Cura'))
     ini.append('\tG21                               ;metric values'+"\n")
     ini.append('\tG90                               ;absolute positioning'+"\n")
     ini.append('\tM107                              ;start with the fan off'+"\n")
@@ -857,12 +862,12 @@ def createCuraProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, qual
     ini.append('\tG28 Z0                            ;move Z to min endstops'+"\n")
     ini.append('\tT1                                ;switch to the 2nd extruder'+"\n")
     ini.append('\tG92 E0                            ;zero the extruded length'+"\n")
-    ini.append('\tG1 F'+str(currentPurgeSpeedT1)+' E'+str(currentStartPurgeLenghtT1)+' ;extrude '+str(currentStartPurgeLenghtT1)+'mm of feed stock'+"\n")
+    ini.append('\tG1 F'+str(currentPurgeSpeedT1)+' E'+str(currentStartPurgeLengthT1)+' ;extrude '+str(currentStartPurgeLengthT1)+'mm of feed stock'+"\n")
     ini.append('\tG92 E0                            ;zero the extruded length again'+"\n")
     ini.append('\tG1 F2400 E-{retraction_dual_amount}'+"\n")
     ini.append('\tT0                                ;switch to the 1st extruder'+"\n")
     ini.append('\tG92 E0                            ;zero the extruded length'+"\n")
-    ini.append('\tG1 F'+str(currentPurgeSpeedT0)+' E'+str(currentStartPurgeLenghtT0)+' ;extrude '+str(currentStartPurgeLenghtT0)+'mm of feed stock'+"\n")
+    ini.append('\tG1 F'+str(currentPurgeSpeedT0)+' E'+str(currentStartPurgeLengthT0)+' ;extrude '+str(currentStartPurgeLengthT0)+'mm of feed stock'+"\n")
     ini.append('\tG92 E0                            ;zero the extruded length again'+"\n")
     ini.append('\tG1 Z5 F1200                       ;Safety Z axis movement'+"\n")
     ini.append('\tG1 F{travel_speed}'+"\n")
@@ -885,7 +890,7 @@ def createCuraProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, qual
     ini.append(r'postswitchextruder.gcode =         ;Switch between the current extruder and the next extruder, when printing with multiple extruders.'+"\n")
     ini.append('\t;This code is added after the T(n)'+"\n")
     ini.append('\tG1 F500 E-0.5'+"\n")
-    ini.append('\tG1 F'+str(currentPurgeSpeed)+' E'+str(currentToolChangePurgeLenght)+"\n")
+    ini.append('\tG1 F'+str(currentPurgeSpeed)+' E'+str(currentToolChangePurgeLength)+"\n")
     ini.append('\tG92 E0'+"\n")
     ini.append('\tG1 F2400 E-4'+"\n")
     ini.append('\tG1 F{travel_speed}'+"\n")
@@ -1091,13 +1096,19 @@ def speedMultiplier(hotend, filament):
         return float(filament['defaultPrintSpeed'])/60
 
 def purgeValues(hotend, filament, speed, layerHeight):
-    baseStartLenght04 = 7
-    baseToolChangeLenght04 = 1.5
-    purgeSpeed = float("%.2f" % (speed * hotend['nozzleSize'] * layerHeight / (math.pi * (filament['filamentDiameter']/2.)**2)))
-    startPurgeLenght = float("%.2f" % max(10, ((hotend['nozzleSize']/0.4)**2*baseStartLenght04*filament['purgeLenght']/baseToolChangeLenght04)))
-    toolChangePurgeLenght = float("%.2f" % ((hotend['nozzleSize']/0.4)**2*filament['purgeLenght']))
+    baseStartLength04 = 7
+    baseToolChangeLength04 = 1.5
+    
+    # speed adapted to printed area
+    # purgeSpeed = float("%.2f" % (speed * hotend['nozzleSize'] * layerHeight / (math.pi * (filament['filamentDiameter']/2.)**2)))
+    
+    # speed adapted to improve surplus material storage, 6000 is a experimental value that defines material speed at the nozzle tip
+    purgeSpeed = float("%.2f" % (6000 * hotend['nozzleSize'] / (math.pi * (filament['filamentDiameter']/2.)**2)))
 
-    return purgeSpeed, startPurgeLenght, toolChangePurgeLenght
+    startPurgeLength = float("%.2f" % max(10, ((hotend['nozzleSize']/0.4)**2*baseStartLength04*filament['purgeLength']/baseToolChangeLength04)))
+    toolChangePurgeLength = float("%.2f" % ((hotend['nozzleSize']/0.4)**2*filament['purgeLength']))
+
+    return purgeSpeed, startPurgeLength, toolChangePurgeLength
 
 def retractValues(filament):
     if filament['isFlexibleMaterial']:
@@ -1119,9 +1130,9 @@ def retractValues(filament):
     return useCoasting, useWipe, onlyRetractWhenCrossingOutline, retractBetweenLayers, useRetractionMinTravel, retractWhileWiping, onlyWipeOutlines
 
 def coastValue(hotend, filament):
-    return float("%.2f" % ((hotend['nozzleSize']/0.4)**2*filament['purgeLenght']))
+    return float("%.2f" % ((hotend['nozzleSize']/0.4)**2*filament['purgeLength']))
 
-def flowValue(hotend, filament):
+def maxFlowValue(hotend, filament):
     if hotend['nozzleSize'] <= 0.6:
         if filament['maxFlow'] == 'None':
             return 0.4*0.2*filament['advisedMaxPrintSpeed']
@@ -1139,61 +1150,183 @@ def flowValue(hotend, filament):
 def temperatureValue(filament, hotend, layerHeight, speed, base = 5):
     # adaptative temperature according to flow values. Rounded to base
     flow = hotend['nozzleSize']*layerHeight*float(speed)/60
-    temperature = int(base * round((filament['printTemperature'][0]+flow*float(filament['printTemperature'][1]-filament['printTemperature'][0])/flowValue(hotend, filament))/float(base)))
+
+    # Warning if something is not working properly
+    if int(flow) > int(maxFlowValue(hotend, filament)):
+        print "warning! you're trying to print at higher flow than allowed"
+
+    temperature = int(base * round((filament['printTemperature'][0] + flow/maxFlowValue(hotend, filament) * float(filament['printTemperature'][1]-filament['printTemperature'][0]))/float(base)))
     return temperature
+
+def fanSpeed(filament, temperature, base = 5):
+    # adaptative fan speed according to temperature values. Rounded to base
+    if filament['printTemperature'][1] - filament['printTemperature'][0] == 0 or filament['fanPercentage'] == 0:
+        fanSpeed = filament['fanPercentage']
+    else:
+        fanSpeed = int(base * round((filament['fanPercentage'] + (temperature-filament['printTemperature'][0])/float(filament['printTemperature'][1]-filament['printTemperature'][0])*float(100-filament['fanPercentage']))/float(base)))
+    return fanSpeed
+
+def timeVsTemperature(value, element, action, command):
+    hotendParameter1 = 80
+    hotendParameter2 = 310
+    hotendParameter3 = 25
+    bedParameterA1 = 51
+    bedParameterA2 = 61
+    bedParameterA3 = 19
+    bedParameterB1 = 1000
+    bedParameterB2 = 90
+    bedParameterB3 = 47
+    bedParameterB4 = 10
+
+    # return needed time (sec) to reach Temperature (ºC)
+    if command == 'getTime':
+        temperature = value
+        if action == 'heating':
+            if element == 'M104 ':
+                time = hotendParameter1 * math.log(-(hotendParameter2-hotendParameter3)/(float(temperature)-hotendParameter2))
+            elif element == 'M140 ':
+                if temperature <= 60:
+                    time = bedParameterA1 * math.log(-(bedParameterA2-bedParameterA3)/(float(temperature)-bedParameterA2))
+                else:
+                    time = bedParameterB1 * math.log(-bedParameterB2/(float(temperature)-bedParameterB2-bedParameterB3))+bedParameterB4
+        elif action == 'cooling':
+            time = 0
+        return max(0, time)
+
+    # return temperature (ºC) reached after heating during given time (sec)
+    elif command == 'getTemperature':
+        time = value
+        if action == 'heating':
+            if element == 'M104 ':
+                temperature = hotendParameter2 - (hotendParameter2 - hotendParameter3) * math.exp(-time/hotendParameter1)
+            elif element == 'M140 ':
+                if time <= 180:
+                    temperature = bedParameterA2 - (bedParameterA2 - bedParameterA3) * math.exp(-time/bedParameterA1)
+                else:
+                    temperature = bedParameterB2 + bedParameterB3 - bedParameterB2 * math.exp(-(time - bedParameterB4)/bedParameterB1)
+        elif action == 'cooling':
+            temperature = 0
+        return max(0, temperature)
+
+def firstHeatSequence(leftHotendTemp, rightHotendTemp, bedTemp, software):
+    startSequenceString = '; Start Heating Sequence. If you changed temperatures manually all elements may not heat in sync,'
+    if software == 'Simplify3D':
+        if leftHotendTemp > 0 and rightHotendTemp > 0:
+            # IDEX
+            timeLeftHotend  = (timeVsTemperature(leftHotendTemp,  'M104 ', 'heating', 'getTime'), 'M104 ', 'M109 ', 'S[extruder0_temperature]', ' T0,')
+            timeRightHotend = (timeVsTemperature(rightHotendTemp, 'M104 ', 'heating', 'getTime'), 'M104 ', 'M109 ', 'S[extruder1_temperature]', ' T1,')
+            timeBed         = (timeVsTemperature(bedTemp,         'M140 ', 'heating', 'getTime'), 'M140 ', 'M190 ', 'S[bed0_temperature]',       ',')
+            startTimes = sorted([timeLeftHotend, timeRightHotend, timeBed])
+            startSequenceString += startTimes[-1][-3]+'S'+str(int(timeVsTemperature(startTimes[-1][0]-startTimes[-2][0], startTimes[-1][-4], 'heating', 'getTemperature')))+startTimes[-1][-1]
+            startSequenceString += startTimes[-2][-4]+startTimes[-2][-2]+startTimes[-2][-1]
+            startSequenceString += startTimes[-1][-3]+'S'+str(int(timeVsTemperature(startTimes[-1][0]-startTimes[-3][0], startTimes[-1][-4], 'heating', 'getTemperature')))+startTimes[-1][-1]
+            startSequenceString += startTimes[-3][-4]+startTimes[-3][-2]+startTimes[-3][-1]
+            startSequenceString += startTimes[-1][-3]+startTimes[-1][-2]+startTimes[-1][-1]
+            startSequenceString += startTimes[-2][-3]+startTimes[-2][-2]+startTimes[-2][-1]
+            startSequenceString += startTimes[-3][-3]+startTimes[-3][-2]+startTimes[-3][-1]
+        else:
+            if leftHotendTemp > 0:
+                # MEX Left
+                timeLeftHotend  = (timeVsTemperature(leftHotendTemp,  'M104 ', 'heating', 'getTime'), 'M104 ', 'M109 ', 'S[extruder0_temperature]', ' T0,')
+                timeBed         = (timeVsTemperature(bedTemp,         'M140 ', 'heating', 'getTime'), 'M140 ', 'M190 ', 'S[bed0_temperature]',       ',')
+                startTimes = sorted([timeLeftHotend, timeBed])
+                startSequenceString += startTimes[-1][-3]+'S'+str(int(timeVsTemperature(startTimes[-1][0]-startTimes[-2][0], startTimes[-1][-4], 'heating', 'getTemperature')))+startTimes[-1][-1]
+                startSequenceString += startTimes[-2][-4]+startTimes[-2][-2]+startTimes[-2][-1]
+                startSequenceString += startTimes[-1][-3]+startTimes[-1][-2]+startTimes[-1][-1]
+                startSequenceString += startTimes[-2][-3]+startTimes[-2][-2]+startTimes[-2][-1]
+            else:
+                # MEX Right
+                timeRightHotend = (timeVsTemperature(rightHotendTemp, 'M104 ', 'heating', 'getTime'), 'M104 ', 'M109 ', 'S[extruder1_temperature]', ' T1,')
+                timeBed         = (timeVsTemperature(bedTemp,         'M140 ', 'heating', 'getTime'), 'M140 ', 'M190 ', 'S[bed0_temperature]',       ',')
+                startTimes = sorted([timeRightHotend, timeBed])
+                startSequenceString += startTimes[-1][-3]+'S'+str(int(timeVsTemperature(startTimes[-1][0]-startTimes[-2][0], startTimes[-1][-4], 'heating', 'getTemperature')))+startTimes[-1][-1]
+                startSequenceString += startTimes[-2][-4]+startTimes[-2][-2]+startTimes[-2][-1]
+                startSequenceString += startTimes[-1][-3]+startTimes[-1][-2]+startTimes[-1][-1]
+                startSequenceString += startTimes[-2][-3]+startTimes[-2][-2]+startTimes[-2][-1]
+    elif software == 'Cura':
+        startSequenceString = '\t;' + startSequenceString[2:-1] + '\n'
+        if leftHotendTemp > 0 and rightHotendTemp > 0:
+            # IDEX
+            timeLeftHotend  = (timeVsTemperature(leftHotendTemp,  'M104 ', 'heating', 'getTime'), 'M104 ', 'M109 ', 'S{print_temperature}',     ' T0\n')
+            timeRightHotend = (timeVsTemperature(rightHotendTemp, 'M104 ', 'heating', 'getTime'), 'M104 ', 'M109 ', 'S{print_temperature2}',    ' T1\n')
+            timeBed         = (timeVsTemperature(bedTemp,         'M140 ', 'heating', 'getTime'), 'M140 ', 'M190 ', 'S{print_bed_temperature}', '\n')
+            startTimes = sorted([timeLeftHotend, timeRightHotend, timeBed])
+            startSequenceString += '\t'+startTimes[-1][-3]+'S'+str(int(timeVsTemperature(startTimes[-1][0]-startTimes[-2][0], startTimes[-1][-4], 'heating', 'getTemperature')))+startTimes[-1][-1]
+            startSequenceString += '\t'+startTimes[-2][-4]+startTimes[-2][-2]+startTimes[-2][-1]
+            startSequenceString += '\t'+startTimes[-1][-3]+'S'+str(int(timeVsTemperature(startTimes[-1][0]-startTimes[-3][0], startTimes[-1][-4], 'heating', 'getTemperature')))+startTimes[-1][-1]
+            startSequenceString += '\t'+startTimes[-3][-4]+startTimes[-3][-2]+startTimes[-3][-1]
+            startSequenceString += '\t'+startTimes[-1][-3]+startTimes[-1][-2]+startTimes[-1][-1]
+            startSequenceString += '\t'+startTimes[-2][-3]+startTimes[-2][-2]+startTimes[-2][-1]
+            startSequenceString += '\t'+startTimes[-3][-3]+startTimes[-3][-2]+startTimes[-3][-1]
+        else:
+            if leftHotendTemp > 0:
+                # MEX Left
+                timeLeftHotend = (timeVsTemperature(leftHotendTemp, 'M104 ', 'heating', 'getTime'), 'M104 ', 'M109 ', 'S{print_temperature}',     ' T0\n')
+                timeBed        = (timeVsTemperature(bedTemp,        'M140 ', 'heating', 'getTime'), 'M140 ', 'M190 ', 'S{print_bed_temperature}', '\n')
+                startTimes = sorted([timeLeftHotend, timeBed])
+                startSequenceString += '\t'+startTimes[-1][-3]+'S'+str(int(timeVsTemperature(startTimes[-1][0]-startTimes[-2][0], startTimes[-1][-4], 'heating', 'getTemperature')))+startTimes[-1][-1]
+                startSequenceString += '\t'+startTimes[-2][-4]+startTimes[-2][-2]+startTimes[-2][-1]
+                startSequenceString += '\t'+startTimes[-1][-3]+startTimes[-1][-2]+startTimes[-1][-1]
+                startSequenceString += '\t'+startTimes[-2][-3]+startTimes[-2][-2]+startTimes[-2][-1]
+            else:
+                # MEX Right
+                timeRightHotend = (timeVsTemperature(rightHotendTemp, 'M104 ', 'heating', 'getTime'), 'M104 ', 'M109 ', 'S{print_temperature2}', ' T1\n')
+                timeBed         = (timeVsTemperature(bedTemp,         'M140 ', 'heating', 'getTime'), 'M140 ', 'M190 ', 'S{print_bed_temperature}',       '\n')
+                startTimes = sorted([timeRightHotend, timeBed])
+                startSequenceString += '\t'+startTimes[-1][-3]+'S'+str(int(timeVsTemperature(startTimes[-1][0]-startTimes[-2][0], startTimes[-1][-4], 'heating', 'getTemperature')))+startTimes[-1][-1]
+                startSequenceString += '\t'+startTimes[-2][-4]+startTimes[-2][-2]+startTimes[-2][-1]
+                startSequenceString += '\t'+startTimes[-1][-3]+startTimes[-1][-2]+startTimes[-1][-1]
+                startSequenceString += '\t'+startTimes[-2][-3]+startTimes[-2][-2]+startTimes[-2][-1]
+    return startSequenceString
 
 def accelerationForPerimeters(nozzleSize, layerHeight, outerWallSpeed, base = 5, multiplier = 30000, defaultAcceleration = 2000):
     return min(defaultAcceleration, int(base * round((nozzleSize * layerHeight * multiplier * 1/(outerWallSpeed**(1/2.)))/float(base))))
 
-def speedValues(hotendLeft, hotendRight, filamentLeft, filamentRight, quality, action):
+def speedValues(hotendLeft, hotendRight, filamentLeft, filamentRight, currentLayerHeight, currentInfillLayerInterval, quality, action):
     if action == 'MEX Left' or action == 'IDEX, Infill with Right' or action == 'IDEX, Supports with Right':
-        currentFilament = filamentLeft
         leftExtruderDefaultSpeed = quality['defaultSpeed']*speedMultiplier(hotendLeft, filamentLeft)
-        leftExtruderMaxSpeedAtDefaultTemperature = flowValue(hotendLeft, filamentLeft)/(hotendLeft['nozzleSize']*quality['layerHeightMultiplier']*hotendLeft['nozzleSize'])
+        leftExtruderMaxSpeedAtMaxFlow = maxFlowValue(hotendLeft, filamentLeft)/(hotendLeft['nozzleSize']*currentLayerHeight)
         if action == 'IDEX, Infill with Right':
-            rightExtruderMaxSpeedAtHighTemperature = flowValue(hotendRight, filamentRight)/(hotendRight['nozzleSize']*quality['layerHeightMultiplier']*hotendRight['nozzleSize'])
-            currentDefaultSpeed = int(str(float(min(leftExtruderDefaultSpeed, leftExtruderMaxSpeedAtDefaultTemperature, rightExtruderMaxSpeedAtHighTemperature)*60)).split('.')[0])
+            rightExtruderMaxSpeedAtMaxFlow = maxFlowValue(hotendRight, filamentRight)/(currentInfillLayerInterval*currentLayerHeight*hotendRight['nozzleSize'])
         else:
-            currentDefaultSpeed = int(str(float(min(leftExtruderDefaultSpeed, leftExtruderMaxSpeedAtDefaultTemperature)*60)).split('.')[0])
-        leftExtruderNeededFirstLayerUnderspeed = leftExtruderDefaultSpeed*60*quality['firstLayerUnderspeed']/float(currentDefaultSpeed) 
-        leftExtruderNeededOutlineUnderspeed = leftExtruderDefaultSpeed*60*quality['outlineUnderspeed']/float(currentDefaultSpeed)
-        leftExtruderNeededSupportUnderspeed = leftExtruderDefaultSpeed*60*0.9/float(currentDefaultSpeed)
+            rightExtruderMaxSpeedAtMaxFlow = leftExtruderMaxSpeedAtMaxFlow
+        currentDefaultSpeed = int(str(float(min(leftExtruderDefaultSpeed, leftExtruderMaxSpeedAtMaxFlow, rightExtruderMaxSpeedAtMaxFlow)*60)).split('.')[0])
+        maxAllowedUnderspeed = maxFlowValue(hotendLeft, filamentLeft)/(currentLayerHeight*hotendLeft['nozzleSize']*float(currentDefaultSpeed)/60)
+        
         if filamentLeft['isFlexibleMaterial']:
             currentFirstLayerUnderspeed = 1.00
             currentOutlineUnderspeed = 1.00
         else:
-            currentFirstLayerUnderspeed = float("%.2f" % (min(leftExtruderNeededFirstLayerUnderspeed, 1)))
-            currentOutlineUnderspeed = float("%.2f" % (min(leftExtruderNeededOutlineUnderspeed, 1)))
+            currentFirstLayerUnderspeed = float("%.2f" % min(maxAllowedUnderspeed, (leftExtruderDefaultSpeed*60*quality['firstLayerUnderspeed']/float(currentDefaultSpeed))))
+            currentOutlineUnderspeed    = float("%.2f" % min(maxAllowedUnderspeed, (leftExtruderDefaultSpeed*60*quality['outlineUnderspeed']   /float(currentDefaultSpeed))))
 
         if action == 'IDEX, Supports with Right':
-            currentSupportUnderspeed = float("%.2f" % (flowValue(hotendRight, filamentRight)/float(hotendLeft['nozzleSize'] * quality['layerHeightMultiplier']*hotendRight['nozzleSize']*currentDefaultSpeed/60.)))
+            currentSupportUnderspeed    = float("%.2f" % min((currentDefaultSpeed/60.), (maxFlowValue(hotendRight, filamentRight)/float(hotendLeft['nozzleSize'] * quality['layerHeightMultiplier']*hotendRight['nozzleSize']*currentDefaultSpeed/60.)))) # needs better adjust
         else:
-            currentSupportUnderspeed = float("%.2f" % (min(leftExtruderNeededSupportUnderspeed, 1)))
+            currentSupportUnderspeed    = float("%.2f" % (leftExtruderDefaultSpeed*60*0.9                            /float(currentDefaultSpeed)))
+
     elif action == 'MEX Right' or action == 'IDEX, Infill with Left' or action == 'IDEX, Supports with Left':
-        currentFilament = filamentRight
         rightExtruderDefaultSpeed = quality['defaultSpeed']*speedMultiplier(hotendRight, filamentRight)
-        rightExtruderMaxSpeedAtDefaultTemperature = flowValue(hotendRight, filamentRight)/(hotendRight['nozzleSize']*quality['layerHeightMultiplier']*hotendRight['nozzleSize'])
+        rightExtruderMaxSpeedAtMaxFlow = maxFlowValue(hotendRight, filamentRight)/(hotendRight['nozzleSize']*currentLayerHeight)
         if action == 'IDEX, Infill with Left':
-            leftExtruderMaxSpeedAtHighTemperature = flowValue(hotendLeft, filamentLeft)/(hotendLeft['nozzleSize']*quality['layerHeightMultiplier']*hotendLeft['nozzleSize'])
-            currentDefaultSpeed = int(str(float(min(rightExtruderDefaultSpeed, rightExtruderMaxSpeedAtDefaultTemperature, leftExtruderMaxSpeedAtHighTemperature)*60)).split('.')[0])
+            leftExtruderMaxSpeedAtMaxFlow = maxFlowValue(hotendLeft, filamentLeft)/(currentInfillLayerInterval*currentLayerHeight*hotendLeft['nozzleSize'])
         else:
-            currentDefaultSpeed = int(str(float(min(rightExtruderDefaultSpeed, rightExtruderMaxSpeedAtDefaultTemperature)*60)).split('.')[0])
-        rightExtruderNeededFirstLayerUnderspeed = rightExtruderDefaultSpeed*60*quality['firstLayerUnderspeed']/float(currentDefaultSpeed)
-        rightExtruderNeededOutlineUnderspeed = rightExtruderDefaultSpeed*60*quality['outlineUnderspeed']/float(currentDefaultSpeed)
-        rightExtruderNeededSupportUnderspeed = rightExtruderDefaultSpeed*60*0.9/float(currentDefaultSpeed)
+            leftExtruderMaxSpeedAtMaxFlow = rightExtruderMaxSpeedAtMaxFlow
+        currentDefaultSpeed = int(str(float(min(rightExtruderDefaultSpeed, rightExtruderMaxSpeedAtMaxFlow, leftExtruderMaxSpeedAtMaxFlow)*60)).split('.')[0])
+        maxAllowedUnderspeed = maxFlowValue(hotendRight, filamentRight)/(currentLayerHeight*hotendRight['nozzleSize']*float(currentDefaultSpeed)/60)
+
         if filamentRight['isFlexibleMaterial']:
             currentFirstLayerUnderspeed = 1.00
             currentOutlineUnderspeed = 1.00
         else:
-            currentFirstLayerUnderspeed = float("%.2f" % (min(rightExtruderNeededFirstLayerUnderspeed, 1)))
-            currentOutlineUnderspeed = float("%.2f" % (min(rightExtruderNeededOutlineUnderspeed, 1)))
+            currentFirstLayerUnderspeed = float("%.2f" % min(maxAllowedUnderspeed, (rightExtruderDefaultSpeed*60*quality['firstLayerUnderspeed']/float(currentDefaultSpeed))))
+            currentOutlineUnderspeed    = float("%.2f" % min(maxAllowedUnderspeed, (rightExtruderDefaultSpeed*60*quality['outlineUnderspeed']   /float(currentDefaultSpeed))))
+
         if action == 'IDEX, Supports with Left':
-            currentSupportUnderspeed = float("%.2f" % (flowValue(hotendLeft, filamentLeft)/float(hotendRight['nozzleSize']*quality['layerHeightMultiplier']*hotendLeft['nozzleSize']*currentDefaultSpeed/60.)))
+            currentSupportUnderspeed    = float("%.2f" % min((currentDefaultSpeed/60.), (maxFlowValue(hotendLeft, filamentLeft)/float(hotendRight['nozzleSize']*quality['layerHeightMultiplier']*hotendLeft['nozzleSize']*currentDefaultSpeed/60.)))) # needs better adjust
         else:
-            currentSupportUnderspeed = float("%.2f" % (min(rightExtruderNeededSupportUnderspeed, 1)))
-    if currentFilament['isFlexibleMaterial']:
-        currentFirstLayerUnderspeed = 1.00
-        currentOutlineUnderspeed = 1.00
+            currentSupportUnderspeed    = float("%.2f" % (rightExtruderDefaultSpeed*60*0.9                            /float(currentDefaultSpeed)))
+
     return currentDefaultSpeed, currentFirstLayerUnderspeed, currentOutlineUnderspeed, currentSupportUnderspeed
 
 def testAllCombinations():
@@ -1341,15 +1474,16 @@ def writeData(extruder, currentDefaultSpeed, currentInfillLayerInterval, current
         printA = ""
         printB = "%.2f" % (float(currentDefaultSpeed)/60*currentInfillLayerInterval*currentLayerHeight*hotendRight['nozzleSize'])
     else:
+        # IDEX
         if filamentLeft['isSupportMaterial'] != filamentRight['isSupportMaterial']:
             if filamentLeft['isSupportMaterial']:
-                supportMaterialLoadedLeft = float(currentSupportUnderspeed)
+                supportMaterialLoadedLeft  = float(currentSupportUnderspeed)
                 supportMaterialLoadedRight = 1
             else:
-                supportMaterialLoadedLeft = 1
+                supportMaterialLoadedLeft  = 1
                 supportMaterialLoadedRight = float(currentSupportUnderspeed)
         else:
-            supportMaterialLoadedLeft = 1
+            supportMaterialLoadedLeft  = 1
             supportMaterialLoadedRight = 1
         if hotendLeft['nozzleSize'] != hotendRight['nozzleSize']:
             if currentPrimaryExtruder == 0: 
@@ -1359,8 +1493,15 @@ def writeData(extruder, currentDefaultSpeed, currentInfillLayerInterval, current
                 printA = "%.2f" % (float(currentDefaultSpeed)/60*currentLayerHeight*currentInfillLayerInterval*hotendLeft['nozzleSize']*supportMaterialLoadedLeft)
                 printB = "%.2f" % (float(currentDefaultSpeed)/60*currentLayerHeight*hotendRight['nozzleSize']*supportMaterialLoadedRight)
         else:
-            printA = "%.2f" % (float(currentDefaultSpeed)/60*currentInfillLayerInterval*currentLayerHeight*hotendLeft['nozzleSize']*supportMaterialLoadedLeft)
+            printA = "%.2f" % (float(currentDefaultSpeed)/60*1*currentLayerHeight*hotendLeft['nozzleSize']*supportMaterialLoadedLeft)
             printB = "%.2f" % (float(currentDefaultSpeed)/60*currentInfillLayerInterval*currentLayerHeight*hotendRight['nozzleSize']*supportMaterialLoadedRight)
+
+        if currentPrimaryExtruder == 0:
+            printA = "%.2f" % max(float(printA), float(printA) * currentOutlineUnderspeed, float(printA) * currentFirstLayerHeightPercentage/100. * currentFirstLayerUnderspeed)
+        else:
+            printB = "%.2f" % max(float(printB), float(printB) * currentOutlineUnderspeed, float(printB) * currentFirstLayerHeightPercentage/100. * currentFirstLayerUnderspeed)
+
+
     dataLog.append(filamentLeft['id']+";"+filamentRight['id']+";"+extruder+";"+quality['id']+";"+hotendLeft['id']+";"+hotendRight['id']+";"+'T'+str(currentInfillExtruder)+";"+'T'+str(currentPrimaryExtruder)+";"+'T'+str(currentSupportExtruder)+";"+str(printA)+";"+str(printB)+";"+str(currentInfillLayerInterval)+";"+str("%.2f" % (currentDefaultSpeed/60.))+";"+str(currentFirstLayerUnderspeed)+";"+str(currentOutlineUnderspeed)+";"+str(currentSupportUnderspeed)+";"+str(currentFirstLayerHeightPercentage)+";"+str(hotendLeftTemperature)+";"+str(hotendRightTemperature)+";"+str(currentBedTemperature)+";\n")
 
 def clearDisplay():
@@ -1444,13 +1585,13 @@ def main():
                     print '\t2. Generate a bundle of profiles - Cura'
                     print '\t3. Test all combinations'
                     print '\t4. MacOS Only - Slice a model (with Cura)'
-                    print '\t5. Hysteresis Remover'
+                    print '\t5. Use the SmartPurge algorithm to recalculate purge lengths'
                     print '\t6. Back'
                     x2 = 'x'
                     while x2 not in ['1','2','3','4', '5', '6']:
                         x2 = raw_input('\t')
 
-                singleProfileSimplify3D, singleProfileCura, bundleProfilesSimplify3D, bundleProfilesCura, testComb, sliceModel, HysteresisRemover = False, False, False, False, False, False, False
+                singleProfileSimplify3D, singleProfileCura, bundleProfilesSimplify3D, bundleProfilesCura, testComb, sliceModel, smartPurge = False, False, False, False, False, False, False
 
                 if x == '1':
                     singleProfileSimplify3D = True
@@ -1473,8 +1614,8 @@ def main():
                         sliceModel = True
                         GUIHeader = '\n Welcome to the BCN3D Sigma Profile Generator \n\n\n\n\n    Experimental features\n\n\n\n\n\n\t   MacOS Only - Slice a model (with Cura)'
                     elif x2 == '5':
-                        HysteresisRemover = True
-                        GUIHeader = '\n Welcome to the BCN3D Sigma Profile Generator \n\n\n\n\n    Experimental features\n\n\n\n\n\n\n\t   Hysteresis Remover'
+                        smartPurge = True
+                        GUIHeader = '\n Welcome to the BCN3D Sigma Profile Generator \n\n\n\n\n    Experimental features\n\n\n\n\n\n\n\t   Use the SmartPurge algorithm to recalculate purge lengths'
                     elif x2 == '6':
                         experimentalMenu = False
                 elif x == '4':
@@ -1507,6 +1648,9 @@ def main():
                                 if sorted(profilesData['hotend'], key=lambda k: k['id'])[a[0]]['id'] != 'None' and sorted(profilesData['hotend'], key=lambda k: k['id'])[b[0]]['id'] != 'None':
                                     if sorted(profilesData['hotend'], key=lambda k: k['id'])[a[0]]['nozzleSize'] != sorted(profilesData['hotend'], key=lambda k: k['id'])[b[0]]['nozzleSize']:
                                         raw_input("\n\tSelect two hotends with the same nozzle size to create a Cura profile. Press Enter to continue...")
+                                        makeProfile = False
+                                    elif sorted(profilesData['filament'], key=lambda k: k['id'])[a[1]]['isSupportMaterial'] and not sorted(profilesData['filament'], key=lambda k: k['id'])[b[1]]['isSupportMaterial']:
+                                        raw_input("\n\tTo make IDEX prints with Cura using support material, please load the support material to the Right Extruder. Press Enter to continue...")
                                         makeProfile = False
                                 if makeProfile:
                                     c = selectQuality(GUIHeader)
@@ -1550,48 +1694,11 @@ def main():
                     print GUIHeader              
                     testAllCombinations()
                     raw_input("\t\tPress Enter to continue...")
-                elif HysteresisRemover:
+                elif smartPurge:
                     clearDisplay()
                     print GUIHeader
-
-                    print '\n\t\tThis algorithm is a work in progress.\n\t\t' #Remove when done
-
-
-                    # if platform.system() == 'Windows':
-                    #     gcodeFile = raw_input('\n\t\tDrag & Drop your .gcode file to this window. Then press Enter.\n\t\t').replace('"', '')
-                    # else:
-                    #     gcodeFile = raw_input('\n\t\tDrag & Drop your .gcode file to this window. Then press Enter.\n\t\t')[:-1].replace('\\', '')
-                    # originalFile = open(gcodeFile, 'r')
-                    # originalLines = originalFile.readlines()
-                    # originalFile.close()
-                    # newFile = open(gcodeFile, 'w')
-                    # for lineIndex in range(len(originalLines)):
-                    #     if originalLines[lineIndex].startswith('G0') or originalLines[lineIndex].startswith('G1'):
-                    #         if originalLines[lineIndex+1].startswith('G0') or originalLines[lineIndex+1].startswith('G1'):
-                    #             if originalLines[lineIndex] > originalLines[lineIndex+1]:
-                    #                 print 'peakMax'
-                    #             elif originalLines[lineIndex] < originalLines[lineIndex+1]:
-                    #                 print 'peakMin'
-
-                    #     else:
-
-                            # line = originalLines[lineIndex]
-
-
-                        # line = line.replace('; outer perimeter', '; outer perimeter\nM204 S250')
-                        # line = line.replace('; inner perimeter', '; inner perimeter\nM204 S2000')
-                        # line = line.replace('; solid layer', '; solid layer\nM204 S1500')
-                        # line = line.replace('; infill', '; infill\nM204 S2000')
-                        # line = line.replace('; layed end', '; layed end\nM204 S2000')
-
-                        # line = line.replace(';TYPE:WALL-INNER', ';TYPE:WALL-INNER\nM204 S2000')
-                        # line = line.replace(';TYPE:WALL-OUTER', ';TYPE:WALL-OUTER\nM204 S250')
-                        # line = line.replace(';TYPE:SKIN', ';TYPE:SKIN\nM204 S1500')
-                        # line = line.replace(';TYPE:FILL', ';TYPE:FILL\nM204 S2000')
-
-                        # newFile.write(line)
-                    newFile.close()
-                    raw_input("\n\t\tYour .gcode has been adapted to your Sigma!\n\t\tPress Enter to continue...")
+                    print '\n\t\tWork in progress... Stay tuned!\n\t\t'
+                    raw_input("\t\tPress Enter to continue...")
 
 if __name__ == '__main__':
     main() 
