@@ -91,7 +91,7 @@ Filaments
 Quality Preconfigurations
 ```json5
 {
-    "id": "Standard",							// Preconfiguration Name
+    "id": "Standard",						// Preconfiguration Name
     "index": 2,								// Order to show the option in Simplify3D
     "layerHeightMultiplier": 0.5,			// Multiply this value for the nozzle size to get the layer height.
     "defaultSpeed": 60,						// [mm/s],  default speed for PLA
