@@ -6,12 +6,11 @@
 # https://opensource.org/licenses/GPL-3.0
 # version 1.1.0
 
-# Changelog:
-# v1.1.0
-# - SmartPurge implementation. Needs Firmware v01-1.2.3+ 
-# - Code cleaned up
+# Version Changelog
+# - SmartPurge implementation. Needs Firmware v01-1.2.3+
 # - Start gcodes adjusted for cleaner skirts
-# - improved Layer Fan speeds according to layer height and temperature
+# - Improved Layer Fan speeds according to layer height and temperature
+# - Code cleaned up
 
 import time, math, os, platform, sys, json, string, shutil, zipfile
 
