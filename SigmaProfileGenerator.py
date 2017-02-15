@@ -529,7 +529,7 @@ def createSimplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight
                 fff.append(r'      <setpoint layer="1" temperature="'+str(currentBedTemperature)+r'"/>'+"\n")
                 fff.append(r'    </temperatureController>'+"\n")
             if hotendLeft['id'] != 'None' and hotendRight['id'] != 'None':                    
-                fff.append(r'    <toolChangeGcode>; To use dynamic purge values:,;    1. Gererate the gcode,;    2. Open the Sigma profile Generator -> 3. Experimental features -> 5. SmartPurge,,{IF NEWTOOL=0} T0'+"\t\t"+r';start tool switch 0,{IF NEWTOOL=0} G1 F500 E-0.5'+"\t\t"+r';fast purge,{IF NEWTOOL=0} G1 F'+str(currentPurgeSpeedT0)+' E'+str(currentToolChangePurgeLengthT0)+"\t"+r';slow purge,{IF NEWTOOL=0} G92 E0'+"\t\t"+r';reset t0,{IF NEWTOOL=0} G1 F3000 E-4.5'+"\t"+r';retract,{IF NEWTOOL=0} G1 F[travel_speed]'+"\t"+r';end tool switch,'+fanActionOnToolChange1+r',{IF NEWTOOL=1} T1'+"\t\t"+r';start tool switch 1,{IF NEWTOOL=1} G1 F500 E-0.5'+"\t\t"+r';fast purge,{IF NEWTOOL=1} G1 F'+str(currentPurgeSpeedT1)+' E'+str(currentToolChangePurgeLengthT1)+"\t"+r';slow purge,{IF NEWTOOL=1} G92 E0'+"\t\t"+r';reset t1,{IF NEWTOOL=1} G1 F3000 E-4.5'+"\t"+r';retract,{IF NEWTOOL=1} G1 F[travel_speed]'+"\t"+r';end tool switch,'+fanActionOnToolChange2+r',G91,G1 F[travel_speed] Z2,G90</toolChangeGcode>'+"\n")
+                fff.append(r'    <toolChangeGcode>{IF NEWTOOL=0} T0'+"\t\t"+r';start tool switch 0,{IF NEWTOOL=0} G1 F500 E-0.5'+"\t\t"+r';fast purge,{IF NEWTOOL=0} G1 F'+str(currentPurgeSpeedT0)+' E'+str(currentToolChangePurgeLengthT0)+"\t"+r';slow purge,{IF NEWTOOL=0} G92 E0'+"\t\t"+r';reset t0,{IF NEWTOOL=0} G1 F3000 E-4.5'+"\t"+r';retract,{IF NEWTOOL=0} G1 F[travel_speed]'+"\t"+r';end tool switch,'+fanActionOnToolChange1+r',{IF NEWTOOL=1} T1'+"\t\t"+r';start tool switch 1,{IF NEWTOOL=1} G1 F500 E-0.5'+"\t\t"+r';fast purge,{IF NEWTOOL=1} G1 F'+str(currentPurgeSpeedT1)+' E'+str(currentToolChangePurgeLengthT1)+"\t"+r';slow purge,{IF NEWTOOL=1} G92 E0'+"\t\t"+r';reset t1,{IF NEWTOOL=1} G1 F3000 E-4.5'+"\t"+r';retract,{IF NEWTOOL=1} G1 F[travel_speed]'+"\t"+r';end tool switch,'+fanActionOnToolChange2+r',G91,G1 F[travel_speed] Z2,G90</toolChangeGcode>'+"\n")
             else:
                 fff.append(r'    <toolChangeGcode/>'+"\n")
             if extruder == 'Left Extruder':
@@ -1301,7 +1301,7 @@ def speedValues(hotendLeft, hotendRight, filamentLeft, filamentRight, currentLay
             currentOutlineUnderspeed    = float("%.2f" % min(maxAllowedUnderspeed, (leftExtruderDefaultSpeed*60*quality['outlineUnderspeed']   /float(currentDefaultSpeed))))
 
         if action == 'IDEX, Supports with Right':
-            currentSupportUnderspeed    = float("%.2f" % min((currentDefaultSpeed/60.), (maxFlowValue(hotendRight, filamentRight)/float(hotendLeft['nozzleSize'] * quality['layerHeightMultiplier']*hotendRight['nozzleSize']*currentDefaultSpeed/60.)))) # needs better adjust
+            currentSupportUnderspeed    = float("%.2f" % min(60/(currentDefaultSpeed/60.), (maxFlowValue(hotendRight, filamentRight)/float(hotendLeft['nozzleSize'] * quality['layerHeightMultiplier']*hotendRight['nozzleSize']*currentDefaultSpeed/60.)))) # needs better adjust
         else:
             currentSupportUnderspeed    = float("%.2f" % (leftExtruderDefaultSpeed*60*0.9                            /float(currentDefaultSpeed)))
 
@@ -1323,7 +1323,7 @@ def speedValues(hotendLeft, hotendRight, filamentLeft, filamentRight, currentLay
             currentOutlineUnderspeed    = float("%.2f" % min(maxAllowedUnderspeed, (rightExtruderDefaultSpeed*60*quality['outlineUnderspeed']   /float(currentDefaultSpeed))))
 
         if action == 'IDEX, Supports with Left':
-            currentSupportUnderspeed    = float("%.2f" % min((currentDefaultSpeed/60.), (maxFlowValue(hotendLeft, filamentLeft)/float(hotendRight['nozzleSize']*quality['layerHeightMultiplier']*hotendLeft['nozzleSize']*currentDefaultSpeed/60.)))) # needs better adjust
+            currentSupportUnderspeed    = float("%.2f" % min(60/(currentDefaultSpeed/60.), (maxFlowValue(hotendLeft, filamentLeft)/float(hotendRight['nozzleSize']*quality['layerHeightMultiplier']*hotendLeft['nozzleSize']*currentDefaultSpeed/60.)))) # needs better adjust
         else:
             currentSupportUnderspeed    = float("%.2f" % (rightExtruderDefaultSpeed*60*0.9                            /float(currentDefaultSpeed)))
 
