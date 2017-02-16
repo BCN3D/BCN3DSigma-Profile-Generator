@@ -351,7 +351,7 @@ def createSimplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight
                         hotendLeftTemperature = temperatureValue(filamentLeft, hotendLeft, currentLayerHeight, currentDefaultSpeed*currentSupportUnderspeed)
                         hotendRightTemperature = temperatureValue(filamentRight, hotendRight, currentLayerHeight, currentDefaultSpeed)
                         fanActionOnToolChange1 = '{IF NEWTOOL=0} M107'+"\t\t"+r';disable fan for support material,'
-                        fanActionOnToolChange2 = '{IF NEWTOOL=1} M106 S'+str(fanSpeed(currentFilament, hotendRightTemperature))+"\t\t"+r';enable fan for part material,'
+                        fanActionOnToolChange2 = '{IF NEWTOOL=1} M106 S'+str(fanSpeed(currentFilament, hotendRightTemperature, currentLayerHeight))+"\t\t"+r';enable fan for part material,'
                     else:
                         # IDEX, Support Material in Right Hotend
                         currentPrimaryExtruder = 0
@@ -366,7 +366,7 @@ def createSimplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight
                         purgeValuesT1 = purgeValues(hotendRight, filamentRight, currentDefaultSpeed * currentSupportUnderspeed, currentLayerHeight)
                         hotendLeftTemperature = temperatureValue(filamentLeft, hotendLeft, currentLayerHeight, currentDefaultSpeed)
                         hotendRightTemperature = temperatureValue(filamentRight, hotendRight, currentLayerHeight, currentDefaultSpeed*currentSupportUnderspeed)
-                        fanActionOnToolChange1 = '{IF NEWTOOL=0} M106 S'+str(fanSpeed(currentFilament, hotendLeftTemperature))+"\t\t"+r';enable fan for part material,'
+                        fanActionOnToolChange1 = '{IF NEWTOOL=0} M106 S'+str(fanSpeed(currentFilament, hotendLeftTemperature, currentLayerHeight))+"\t\t"+r';enable fan for part material,'
                         fanActionOnToolChange2 = '{IF NEWTOOL=1} M107'+"\t\t"+r';disable fan for support material,' 
                     currentInfillExtruder = currentPrimaryExtruder
                     currentSupportExtruder = abs(currentPrimaryExtruder-1)
@@ -392,7 +392,7 @@ def createSimplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight
                         hotendRightTemperature = temperatureValue(filamentRight, hotendRight, currentLayerHeight*currentInfillLayerInterval, currentDefaultSpeed)
                         secondaryExtruderAction = ' (Right Ext. for infill) - '
                         if currentFilament['fanPercentage'][1] != 0:
-                            fanActionOnToolChange1 = '' # '{IF NEWTOOL=0} M106 S'+str(fanSpeed(currentFilament, hotendLeftTemperature))+"\t\t"+r';enable fan for perimeters,'
+                            fanActionOnToolChange1 = '' # '{IF NEWTOOL=0} M106 S'+str(fanSpeed(currentFilament, hotendLeftTemperature, currentLayerHeight))+"\t\t"+r';enable fan for perimeters,'
                             fanActionOnToolChange2 = '' # '{IF NEWTOOL=1} M107'+"\t\t"+r';disable fan for infill,'
                         purgeValuesT0 = purgeValues(hotendLeft, filamentLeft, currentDefaultSpeed, currentLayerHeight)
                         purgeValuesT1 = purgeValues(hotendRight, filamentRight, currentDefaultSpeed, currentLayerHeight * currentInfillLayerInterval)
@@ -409,7 +409,7 @@ def createSimplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight
                         secondaryExtruderAction = ' (Left Ext. for infill) - '
                         if currentFilament['fanPercentage'][1] != 0:
                             fanActionOnToolChange1 = '' # '{IF NEWTOOL=0} M107'+"\t\t"+r';disable fan for infill,'
-                            fanActionOnToolChange2 = '' # '{IF NEWTOOL=1} M106 S'+str(fanSpeed(currentFilament, hotendRightTemperature))+"\t\t"+r';enable fan for perimeters,'
+                            fanActionOnToolChange2 = '' # '{IF NEWTOOL=1} M106 S'+str(fanSpeed(currentFilament, hotendRightTemperature, currentLayerHeight))+"\t\t"+r';enable fan for perimeters,'
                         purgeValuesT0 = purgeValues(hotendLeft, filamentLeft, currentDefaultSpeed, currentLayerHeight * currentInfillLayerInterval)
                         purgeValuesT1 = purgeValues(hotendRight, filamentRight, currentDefaultSpeed, currentLayerHeight)
                     currentInfillExtruder = abs(currentPrimaryExtruder-1)
@@ -429,9 +429,9 @@ def createSimplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight
             fff.append('    <fanSpeed>\n')
             fff.append(r'      <setpoint layer="1" speed="0" />'+'\n')
             if currentPrimaryExtruder == 0:
-                fff.append(r'      <setpoint layer="2" speed="'+str(fanSpeed(currentFilament, hotendLeftTemperature))+r'" />'+'\n')
+                fff.append(r'      <setpoint layer="2" speed="'+str(fanSpeed(currentFilament, hotendLeftTemperature, currentLayerHeight))+r'" />'+'\n')
             else:
-                fff.append(r'      <setpoint layer="2" speed="'+str(fanSpeed(currentFilament, hotendRightTemperature))+r'" />'+'\n')
+                fff.append(r'      <setpoint layer="2" speed="'+str(fanSpeed(currentFilament, hotendRightTemperature, currentLayerHeight))+r'" />'+'\n')
             fff.append('    </fanSpeed>\n')
             fff.append('    <filamentDiameter>'+str(currentFilament['filamentDiameter'])+'</filamentDiameter>\n')
             fff.append('    <filamentPricePerKg>'+str(currentFilament['filamentPricePerKg'])+'</filamentPricePerKg>\n')
@@ -612,7 +612,7 @@ def createCuraProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, qual
                 fanEnabled = 'True'
             else:
                 fanEnabled = 'False'
-            fanPercentage = fanSpeed(filamentRight, printTemperature2)            
+            fanPercentage = fanSpeed(filamentRight, printTemperature2, currentLayerHeight)            
             hotendLeftTemperature, hotendRightTemperature = 0, printTemperature2
             purgeValuesGeneral = purgeValues(hotendRight, filamentRight, currentDefaultSpeed, currentLayerHeight)       
             purgeValuesT0 = purgeValuesGeneral
@@ -640,7 +640,7 @@ def createCuraProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, qual
             fanEnabled = 'True'
         else:
             fanEnabled = 'False'
-        fanPercentage = fanSpeed(filamentLeft, printTemperature1)
+        fanPercentage = fanSpeed(filamentLeft, printTemperature1, currentLayerHeight)
         hotendLeftTemperature, hotendRightTemperature = printTemperature1, 0
         purgeValuesGeneral = purgeValues(hotendLeft, filamentLeft, currentDefaultSpeed, currentLayerHeight)       
         purgeValuesT0 = purgeValuesGeneral
@@ -692,7 +692,7 @@ def createCuraProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, qual
             fanEnabled = 'False'
         else:
             fanEnabled = 'True'
-        fanPercentage = max(fanSpeed(filamentLeft, printTemperature1), fanSpeed(filamentRight, printTemperature2))
+        fanPercentage = max(fanSpeed(filamentLeft, printTemperature1, currentLayerHeight), fanSpeed(filamentRight, printTemperature2, currentLayerHeight))
         hotendLeftTemperature, hotendRightTemperature = printTemperature1, printTemperature2
         purgeValuesT0 = purgeValues(hotendLeft, filamentLeft, currentDefaultSpeed, currentLayerHeight)
         purgeValuesT1 = purgeValues(hotendRight, filamentRight, currentDefaultSpeed, currentLayerHeight)
@@ -1106,10 +1106,9 @@ def speedMultiplier(hotend, filament):
     else:
         return float(filament['defaultPrintSpeed'])/60
 
-def purgeValues(hotend, filament, speed, layerHeight):
+def purgeValues(hotend, filament, speed, layerHeight, minPurgeLenght = 5): # purge at least 5mm so the filament weight is enough to stay inside purge container
     baseStartLength04 = 7
     baseToolChangeLength04 = 1.5
-    minimumPurgedLenghtAtNozzle = 10 # purge at least 10mm so the filament has enough consistency to stay inside purge container
     
     # speed adapted to printed area
     purgeSpeed = float("%.2f" % (speed * hotend['nozzleSize'] * layerHeight / (math.pi * (filament['filamentDiameter']/2.)**2)))
@@ -1128,7 +1127,7 @@ def purgeValues(hotend, filament, speed, layerHeight):
     yeldCurve = 1000
     S = float("%.2f" % (math.pi * ((filament['filamentDiameter']/2.)**2 - (hotend['nozzleSize']/2.)**2) * yeldCurve/hotend['nozzleSize']))
 
-    P = float("%.2f" % ((minimumPurgedLenghtAtNozzle*(hotend['nozzleSize']/2.)**2) / ((filament['filamentDiameter']/2.)**2)))
+    P = float("%.2f" % ((minPurgeLenght*(hotend['nozzleSize']/2.)**2) / ((filament['filamentDiameter']/2.)**2)))
 
     return (purgeSpeed, startPurgeLength, E, S, P)
 
@@ -1180,7 +1179,7 @@ def temperatureValue(filament, hotend, layerHeight, speed, base = 5):
     temperature = int(base * round((filament['printTemperature'][0] + flow/maxFlowValue(hotend, filament) * float(filament['printTemperature'][1]-filament['printTemperature'][0]))/float(base)))
     return temperature
 
-def fanSpeed(filament, temperature, base = 5):
+def fanSpeed(filament, temperature, layerHeight, base = 5):
     # adaptative fan speed according to temperature values. Rounded to base
     if filament['printTemperature'][1] - filament['printTemperature'][0] == 0 or filament['fanPercentage'][1] == 0:
         fanSpeed = filament['fanPercentage'][0]
@@ -1393,9 +1392,9 @@ def testAllCombinations():
                     for quality in sorted(profilesData['quality'], key=lambda k: k['index']):
                         createCuraProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, quality, 'noData', 'nothing')
                         combinationCount += 1
-                        sys.stdout.write("\r\t\tTesting Cura Profiles: %d%%" % int(float(combinationCount)/totalProfilesAvailable*100))
+                        sys.stdout.write("\r\t\tTesting Cura Profiles:       %d%%" % int(float(combinationCount)/totalProfilesAvailable*100))
                         sys.stdout.flush()
-    print '\r\t\tTesting Cura Profiles: OK. Profiles Tested:'+str(realCuraProfileaAvailable)
+    print '\r\t\tTesting Cura Profiles:       OK. Profiles Tested: '+str(realCuraProfileaAvailable)
 
     print '\t\tAll '+str(realSimplify3DProfilesAvailable + realCuraProfileaAvailable)+' profiles can be generated!\n'
 
