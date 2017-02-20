@@ -308,7 +308,11 @@ def createSimplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight
                     currentLayerHeight = hotendLeft['nozzleSize'] * quality['layerHeightMultiplier']
                     currentDefaultSpeed, currentFirstLayerUnderspeed, currentOutlineUnderspeed, currentSupportUnderspeed = speedValues(hotendLeft, hotendRight, filamentLeft, filamentRight, currentLayerHeight, currentInfillLayerInterval, quality, 'MEX Left')
                     hotendLeftTemperature = temperatureValue(filamentLeft, hotendLeft, currentLayerHeight, currentDefaultSpeed)
-                    hotendRightTemperature = hotendLeftTemperature
+                    if 'Both Extruders' in extruderPrintOptions:
+                        currentDefaultSpeedTemp, currentFirstLayerUnderspeedTempTemp, currentOutlineUnderspeedTemp, currentSupportUnderspeedTemp = speedValues(hotendLeft, hotendRight, filamentLeft, filamentRight, hotendRight['nozzleSize'] * quality['layerHeightMultiplier'], currentInfillLayerInterval, quality, 'MEX Right')
+                        hotendRightTemperature = temperatureValue(filamentRight, hotendRight, hotendRight['nozzleSize'] * quality['layerHeightMultiplier'], currentDefaultSpeedTemp)
+                    else:
+                        hotendRightTemperature = hotendLeftTemperature
                     purgeValuesT0 = purgeValues(hotendLeft, filamentLeft, currentDefaultSpeed, currentLayerHeight)
                     purgeValuesT1 = purgeValuesT0
                 else:
@@ -319,7 +323,11 @@ def createSimplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight
                     currentLayerHeight = hotendRight['nozzleSize'] * quality['layerHeightMultiplier']
                     currentDefaultSpeed, currentFirstLayerUnderspeed, currentOutlineUnderspeed, currentSupportUnderspeed = speedValues(hotendLeft, hotendRight, filamentLeft, filamentRight, currentLayerHeight, currentInfillLayerInterval, quality, 'MEX Right')
                     hotendRightTemperature = temperatureValue(filamentRight, hotendRight, currentLayerHeight, currentDefaultSpeed)
-                    hotendLeftTemperature = hotendRightTemperature
+                    if 'Both Extruders' in extruderPrintOptions:
+                        currentDefaultSpeedTemp, currentFirstLayerUnderspeedTempTemp, currentOutlineUnderspeedTemp, currentSupportUnderspeedTemp = speedValues(hotendLeft, hotendRight, filamentLeft, filamentRight, hotendLeft['nozzleSize'] * quality['layerHeightMultiplier'], currentInfillLayerInterval, quality, 'MEX Left')
+                        hotendLeftTemperature = temperatureValue(filamentLeft, hotendLeft, hotendLeft['nozzleSize'] * quality['layerHeightMultiplier'], currentDefaultSpeedTemp)
+                    else:
+                        hotendLeftTemperature = hotendRightTemperature
                     purgeValuesT1 = purgeValues(hotendRight, filamentRight, currentDefaultSpeed, currentLayerHeight)
                     purgeValuesT0 = purgeValuesT1
                 currentInfillExtruder = currentPrimaryExtruder
