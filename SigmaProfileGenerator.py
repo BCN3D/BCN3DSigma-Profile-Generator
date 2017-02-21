@@ -4,14 +4,10 @@
 # Guillem Àvila Padró - October 2016
 # Released under GNU LICENSE
 # https://opensource.org/licenses/GPL-3.0
-# version 1.1.0
+# version 1.2.0
 
 # Version Changelog
 # - SmartPurge implementation. Needs Firmware v01-1.2.2+
-# - Start gcodes adjusted for cleaner skirts
-# - Improved Layer Fan speeds according to layer height and temperature
-# - Code cleaned up
-# - S3D: Fixed bug in starting gcode for Dual prints
 
 import time, math, os, platform, sys, json, string, shutil, zipfile
 
