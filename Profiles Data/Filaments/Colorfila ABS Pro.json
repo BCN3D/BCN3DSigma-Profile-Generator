@@ -13,7 +13,7 @@
     "maxFlowForHighFlowHotend": "None",
     "retractionDistance": 4,
     "retractionSpeed": 40,
-    "fanPercentage": 0,
+    "fanPercentage": [0, 0],
     "extrusionMultiplier": 1,
     "purgeLength": 0.375
 }
