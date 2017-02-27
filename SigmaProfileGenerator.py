@@ -343,7 +343,7 @@ def createSimplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight
                     currentSupportUpperSeparationLayers = 0
                     currentSupportLowerSeparationLayers = 0
                     currentSupportAngles = '90,0'
-                    currentSupportInfillPercentage = 15
+                    currentSupportInfillPercentage = 25
                     currentDenseSupportInfillPercentage = 100
                     if filamentLeft['isSupportMaterial']:
                         # IDEX, Support Material in Left Hotend
@@ -381,14 +381,7 @@ def createSimplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight
                     currentSupportExtruder = abs(currentPrimaryExtruder-1)
                 else:
                     # IDEX, Combined Infill
-                    currentAvoidCrossingOutline = 0l
-
-                    # # correccions pel combined infil
-                    # if hotendLeft['nozzleSize'] != hotendRight['nozzleSize']:
-                    #     currentInfillPercentage = 100 #canviar?
-                    #     currentOverlapInfillAngles = 0
-                    # # fi de les correccions
-
+                    currentAvoidCrossingOutline = 0
                     if hotendLeft['nozzleSize'] <= hotendRight['nozzleSize']:
                         # IDEX, Combined Infill (Right Hotend has thicker or equal nozzle)
                         currentPrimaryExtruder = 0
@@ -542,7 +535,7 @@ def createSimplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight
                 fff.append(r'      <setpoint layer="1" temperature="'+str(currentBedTemperature)+r'"/>'+'\n')
                 fff.append('    </temperatureController>\n')
             if hotendLeft['id'] != 'None' and hotendRight['id'] != 'None':                    
-                fff.append('    <toolChangeGcode>{IF NEWTOOL=0} T0\t\t\t;Start tool switch 0,{IF NEWTOOL=0} G1 F2400 E0,{IF NEWTOOL=0} M800 F'+str(currentPurgeSpeedT0)+' E'+str(currentEParameterT0)+' S'+str(currentSParameterT0)+' P'+str(currentPParameterT0)+'\t;SmartPurge,;{IF NEWTOOL=0} G1 F'+str(currentPurgeSpeedT0)+' E'+str(currentToolChangePurgeLengthT0)+'\t\t;Default purge value,'+fanActionOnToolChange1+',{IF NEWTOOL=1} T1\t\t\t;start tool switch 1,{IF NEWTOOL=1} G1 F2400 E0,{IF NEWTOOL=1} M800 F'+str(currentPurgeSpeedT1)+' E'+str(currentEParameterT1)+' S'+str(currentSParameterT1)+' P'+str(currentPParameterT1)+'\t;SmartPurge,;{IF NEWTOOL=1} G1 F'+str(currentPurgeSpeedT1)+' E'+str(currentToolChangePurgeLengthT1)+'\t\t;Default purge,'+fanActionOnToolChange2+",G4 P2000\t\t\t\t;Stabilize Hotend's pressure,G92 E0\t\t\t\t;Zero extruder,G1 F3000 E-4.5\t\t\t\t;Retract,G1 F[travel_speed]\t\t\t;End tool switch,G91,G1 F[travel_speed] Z2,G90</toolChangeGcode>\n")
+                fff.append('    <toolChangeGcode>{IF NEWTOOL=0} T0\t\t\t;Start tool switch 0,{IF NEWTOOL=0} G1 F2400 E0,{IF NEWTOOL=0} M800 F'+str(currentPurgeSpeedT0)+' E'+str(currentEParameterT0)+' S'+str(currentSParameterT0)+' P'+str(currentPParameterT0)+'\t;SmartPurge,;{IF NEWTOOL=0} G1 F'+str(currentPurgeSpeedT0)+' E'+str(currentToolChangePurgeLengthT0)+'\t\t;Default purge value,'+fanActionOnToolChange1+',{IF NEWTOOL=1} T1\t\t\t;Start tool switch 1,{IF NEWTOOL=1} G1 F2400 E0,{IF NEWTOOL=1} M800 F'+str(currentPurgeSpeedT1)+' E'+str(currentEParameterT1)+' S'+str(currentSParameterT1)+' P'+str(currentPParameterT1)+'\t;SmartPurge,;{IF NEWTOOL=1} G1 F'+str(currentPurgeSpeedT1)+' E'+str(currentToolChangePurgeLengthT1)+'\t\t;Default purge,'+fanActionOnToolChange2+",G4 P2000\t\t\t\t;Stabilize Hotend's pressure,G92 E0\t\t\t\t;Zero extruder,G1 F3000 E-4.5\t\t\t\t;Retract,G1 F[travel_speed]\t\t\t;End tool switch,G91,G1 F[travel_speed] Z2,G90</toolChangeGcode>\n")
             else:
                 fff.append('    <toolChangeGcode/>\n')                
             fff.append(r'    <postProcessing>{REPLACE "; outer perimeter" "; outer perimeter\nM204 S'+str(accelerationForPerimeters(currentHotend['nozzleSize'], currentLayerHeight, int(currentDefaultSpeed/60. * currentOutlineUnderspeed)))+r'"},{REPLACE "; inner perimeter" "; inner perimeter\nM204 S2000"},{REPLACE "; solid layer" "; solid layer\nM204 S2000"},{REPLACE "; infill" "; infill\nM204 S2000",{REPLACE "; support" "; support\nM204 S2000"},{REPLACE "; layer end" "; layer end\nM204 S2000"},{REPLACE "F12000\nG1 Z'+str(round(currentLayerHeight*currentFirstLayerHeightPercentage/100., 3))+r' F1002\nG92 E0" "F12000\nG1 Z'+str(round(currentLayerHeight*currentFirstLayerHeightPercentage/100., 3))+r' F1002\nG1 E0.0000 F720\nG92 E0"}</postProcessing>\n')
@@ -557,12 +550,12 @@ def createSimplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight
     # Start gcode must be defined in autoConfigureExtruders. Otherwise you have problems with the first heat sequence in Dual Color prints.
     if hotendLeft['id'] != 'None':
         fff.append(r'  <autoConfigureExtruders name="Left Extruder Only"  allowedToolheads="1">'+'\n')
-        fff.append('    <startingGcode>'+firstHeatSequence(hotendLeftTemperature, 0, currentBedTemperature, 'Simplify3D')+',G21\t\t;metric values,G90\t\t;absolute positioning,M82\t\t;set extruder to absolute mode,M107\t\t;start with the fan off,G28 X0 Y0\t\t;move X/Y to min endstops,G28 Z0\t\t;move Z to min endstops,T0\t\t;change to active toolhead,G92 E0\t\t;zero the extruded length,G1 Z5 F200\t\t;Safety Z axis movement,G1 F'+str(currentPurgeSpeedT0)+' E'+str(currentStartPurgeLengthT0)+'\t;extrude '+str(currentStartPurgeLengthT0)+'mm of feed stock,G92 E0\t\t;zero the extruded length again</startingGcode>\n')
+        fff.append('    <startingGcode>'+firstHeatSequence(hotendLeftTemperature, 0, currentBedTemperature, 'Simplify3D')+',G21\t\t;metric values,G90\t\t;absolute positioning,M82\t\t;set extruder to absolute mode,M107\t\t;start with the fan off,G28 X0 Y0\t\t;move X/Y to min endstops,G28 Z0\t\t;move Z to min endstops,T0\t\t;change to active toolhead,G92 E0\t\t;zero the extruded length,G1 Z5 F12000\t\t;Safety Z axis movement,G1 F'+str(currentPurgeSpeedT0)+' E'+str(currentStartPurgeLengthT0)+'\t;extrude '+str(currentStartPurgeLengthT0)+'mm of feed stock,G92 E0\t\t;zero the extruded length again</startingGcode>\n')
         fff.append('    <layerChangeGcode>M104 S0 T1</layerChangeGcode>\n')
         fff.append('  </autoConfigureExtruders>\n')
     if hotendRight['id'] != 'None':
         fff.append(r'  <autoConfigureExtruders name="Right Extruder Only"  allowedToolheads="1">'+'\n')
-        fff.append('    <startingGcode>'+firstHeatSequence(0, hotendRightTemperature, currentBedTemperature, 'Simplify3D')+',G21\t\t;metric values,G90\t\t;absolute positioning,M82\t\t;set extruder to absolute mode,M107\t\t;start with the fan off,G28 X0 Y0\t\t;move X/Y to min endstops,G28 Z0\t\t;move Z to min endstops,T1\t\t;change to active toolhead,G92 E0\t\t;zero the extruded length,G1 Z5 F200\t\t;Safety Z axis movement,G1 F'+str(currentPurgeSpeedT0)+' E'+str(currentStartPurgeLengthT0)+'\t;extrude '+str(currentStartPurgeLengthT0)+'mm of feed stock,G92 E0\t\t;zero the extruded length again</startingGcode>\n')
+        fff.append('    <startingGcode>'+firstHeatSequence(0, hotendRightTemperature, currentBedTemperature, 'Simplify3D')+',G21\t\t;metric values,G90\t\t;absolute positioning,M82\t\t;set extruder to absolute mode,M107\t\t;start with the fan off,G28 X0 Y0\t\t;move X/Y to min endstops,G28 Z0\t\t;move Z to min endstops,T1\t\t;change to active toolhead,G92 E0\t\t;zero the extruded length,G1 Z5 F12000\t\t;Safety Z axis movement,G1 F'+str(currentPurgeSpeedT0)+' E'+str(currentStartPurgeLengthT0)+'\t;extrude '+str(currentStartPurgeLengthT0)+'mm of feed stock,G92 E0\t\t;zero the extruded length again</startingGcode>\n')
         fff.append('    <layerChangeGcode>M104 S0 T0</layerChangeGcode>\n')
         fff.append('  </autoConfigureExtruders>\n')
     if hotendLeft['id'] != 'None' and hotendRight['id'] != 'None':
@@ -854,9 +847,8 @@ def createCuraProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, qual
     ini.append('\tG1 F'+str(currentPurgeSpeed)+' E'+str(currentStartPurgeLength)+' ;extrude '+str(currentStartPurgeLength)+'mm of feed stock\n')
     ini.append('\tG92 E0                            ;zero the extruded length again\n')
     ini.append('\tG1 F2400 E-4\n')
-    ini.append('\tG1 F{travel_speed}\n')
     ini.append('\tG91\n')
-    ini.append('\tG1 F{travel_speed} Z2\n')
+    ini.append('\tG1 F{travel_speed} Z5\n')
     ini.append('\tG90\n')
     ini.append('end.gcode = M104 S0\n')
     ini.append('\tM140 S0                           ;heated bed heater off\n')
@@ -888,9 +880,8 @@ def createCuraProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, qual
     ini.append('\tG1 F'+str(currentPurgeSpeedT0)+' E'+str(currentStartPurgeLengthT0)+' ;extrude '+str(currentStartPurgeLengthT0)+'mm of feed stock\n')
     ini.append('\tG92 E0                            ;zero the extruded length again\n')
     ini.append('\tG1 F2400 E-4\n')
-    ini.append('\tG1 F{travel_speed}\n')
     ini.append('\tG91\n')
-    ini.append('\tG1 F{travel_speed} Z2\n')
+    ini.append('\tG1 F{travel_speed} Z5\n')
     ini.append('\tG90\n')
     ini.append('end2.gcode = M104 T0 S0\n')
     ini.append('\tM104 T1 S0                        ;extruder heater off\n')
