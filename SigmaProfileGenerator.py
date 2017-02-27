@@ -1123,6 +1123,18 @@ def purgeValues(hotend, filament, speed, layerHeight, minPurgeLenght = 20): # pu
     startPurgeLength = float("%.2f" % max(10, ((hotend['nozzleSize']/0.4)**2*baseStartLength04*filament['purgeLength']/baseToolChangeLength04)))
     toolChangePurgeLength = float("%.2f" % ((hotend['nozzleSize']/0.4)**2*filament['purgeLength']))
 
+    '''
+    SmartPurge Command:
+    M800 S-- A-- B-- T-- P-- E-- L--
+        S - Speed
+        A - bezier parameter P1
+        B - bezier parameter P2
+        T - time to stop losing material
+        P - maximum distance to purge
+        E - default filament purge distance
+        L - minimum distance to purge
+    '''
+
     if hotend['nozzleSize'] >= 0.8:
         maxPurgeLength = 8 + 18 # llargada max highFlow
     else:
