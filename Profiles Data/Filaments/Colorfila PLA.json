@@ -6,7 +6,7 @@
     "isSupportMaterial": false,
     "isFlexibleMaterial": false,
     "bedTemperature": 65,
-    "printTemperature": [190, 210],
+    "printTemperature": [210, 210],
     "defaultPrintSpeed": 60,
     "advisedMaxPrintSpeed": "None",
     "maxFlow": 15,
