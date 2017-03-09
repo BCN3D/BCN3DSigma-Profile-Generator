@@ -4,7 +4,7 @@
 # Guillem Àvila Padró - October 2016
 # Released under GNU LICENSE
 # https://opensource.org/licenses/GPL-3.0
-# version 1.1.1
+# version 1.1.2
 
 # Version Changelog:
 # - Start gcodes adjusted for cleaner skirts
@@ -12,6 +12,7 @@
 # - Code cleaned up
 # - S3D: Fixed bug in starting gcode for Dual prints
 # - Support material speeds bugfixes
+# - S3D: Minor readability fix
 
 import time, math, os, platform, sys, json, string, shutil, zipfile
 
@@ -467,41 +468,41 @@ def createSimplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight
                 fff.append('      <wipeDistance>'+str(hotendLeft['nozzleSize']*12.5)+'</wipeDistance>\n')
                 fff.append('    </extruder>\n')
             if hotendRight['id'] != 'None':
-                fff.append(r'    <extruder name="Right Extruder '+str(hotendRight['nozzleSize'])+r'">'+'\n')
+                fff.append(r'    <extruder name="Right Extruder '+str(hotendRight['nozzleSize'])+r'">\n')
                 fff.append('      <toolheadNumber>1</toolheadNumber>\n')
-                fff.append('      <diameter>'+str(hotendRight['nozzleSize'])+r'</diameter>\n')
+                fff.append('      <diameter>'+str(hotendRight['nozzleSize'])+'</diameter>\n')
                 fff.append('      <autoWidth>0</autoWidth>\n')
-                fff.append('      <width>'+str(hotendRight['nozzleSize'])+r'</width>\n')
-                fff.append('      <extrusionMultiplier>'+str(filamentRight['extrusionMultiplier'])+r'</extrusionMultiplier>\n')
+                fff.append('      <width>'+str(hotendRight['nozzleSize'])+'</width>\n')
+                fff.append('      <extrusionMultiplier>'+str(filamentRight['extrusionMultiplier'])+'</extrusionMultiplier>\n')
                 fff.append('      <useRetract>1</useRetract>\n')
-                fff.append('      <retractionDistance>'+str(filamentRight['retractionDistance'])+r'</retractionDistance>\n')
+                fff.append('      <retractionDistance>'+str(filamentRight['retractionDistance'])+'</retractionDistance>\n')
                 fff.append('      <extraRestartDistance>0</extraRestartDistance>\n')
                 fff.append('      <retractionZLift>'+str(currentLayerHeight/2)+'</retractionZLift>\n')
-                fff.append('      <retractionSpeed>'+str(filamentRight['retractionSpeed']*60)+r'</retractionSpeed>\n')
+                fff.append('      <retractionSpeed>'+str(filamentRight['retractionSpeed']*60)+'</retractionSpeed>\n')
                 fff.append('      <useCoasting>'+str(retractValues(filamentRight)[0])+'</useCoasting>\n')
-                fff.append('      <coastingDistance>'+str(coastValue(hotendRight, filamentRight))+r'</coastingDistance>\n')
+                fff.append('      <coastingDistance>'+str(coastValue(hotendRight, filamentRight))+'</coastingDistance>\n')
                 fff.append('      <useWipe>'+str(retractValues(filamentRight)[1])+'</useWipe>\n')
-                fff.append('      <wipeDistance>'+str(hotendRight['nozzleSize']*12.5)+r'</wipeDistance>\n')
+                fff.append('      <wipeDistance>'+str(hotendRight['nozzleSize']*12.5)+'</wipeDistance>\n')
                 fff.append('    </extruder>\n')
-            fff.append('    <primaryExtruder>'+str(currentPrimaryExtruder)+r'</primaryExtruder>\n')
-            fff.append('    <raftExtruder>'+str(currentRaftExtruder)+r'</raftExtruder>\n')
-            fff.append('    <skirtExtruder>'+str(currentSkirtExtruder)+r'</skirtExtruder>\n')
-            fff.append('    <infillExtruder>'+str(currentInfillExtruder)+r'</infillExtruder>\n')
-            fff.append('    <supportExtruder>'+str(currentSupportExtruder)+r'</supportExtruder>\n')
-            fff.append('    <generateSupport>'+str(currentGenerateSupport)+r'</generateSupport>\n')
-            fff.append('    <layerHeight>'+str(currentLayerHeight)+r'</layerHeight>\n')
-            fff.append('    <firstLayerHeightPercentage>'+str(currentFirstLayerHeightPercentage)+r'</firstLayerHeightPercentage>\n')
-            fff.append('    <topSolidLayers>'+str(currentTopSolidLayers)+r'</topSolidLayers>\n')
-            fff.append('    <bottomSolidLayers>'+str(currentBottomSolidLayers)+r'</bottomSolidLayers>\n')
-            fff.append('    <perimeterOutlines>'+str(currentPerimeterOutlines)+r'</perimeterOutlines>\n')
-            fff.append('    <infillPercentage>'+str(currentInfillPercentage)+r'</infillPercentage>\n')
-            fff.append('    <infillLayerInterval>'+str(currentInfillLayerInterval)+r'</infillLayerInterval>\n')
-            fff.append('    <defaultSpeed>'+str(currentDefaultSpeed)+r'</defaultSpeed>\n')
-            fff.append('    <firstLayerUnderspeed>'+str(currentFirstLayerUnderspeed)+r'</firstLayerUnderspeed>\n')
-            fff.append('    <outlineUnderspeed>'+str(currentOutlineUnderspeed)+r'</outlineUnderspeed>\n')
-            fff.append('    <supportUnderspeed>'+str(currentSupportUnderspeed)+r'</supportUnderspeed>\n')
-            fff.append('    <supportInfillPercentage>'+str(currentSupportInfillPercentage)+r'</supportInfillPercentage>\n')
-            fff.append('    <denseSupportInfillPercentage>'+str(currentDenseSupportInfillPercentage)+r'</denseSupportInfillPercentage>\n')
+            fff.append('    <primaryExtruder>'+str(currentPrimaryExtruder)+'</primaryExtruder>\n')
+            fff.append('    <raftExtruder>'+str(currentRaftExtruder)+'</raftExtruder>\n')
+            fff.append('    <skirtExtruder>'+str(currentSkirtExtruder)+'</skirtExtruder>\n')
+            fff.append('    <infillExtruder>'+str(currentInfillExtruder)+'</infillExtruder>\n')
+            fff.append('    <supportExtruder>'+str(currentSupportExtruder)+'</supportExtruder>\n')
+            fff.append('    <generateSupport>'+str(currentGenerateSupport)+'</generateSupport>\n')
+            fff.append('    <layerHeight>'+str(currentLayerHeight)+'</layerHeight>\n')
+            fff.append('    <firstLayerHeightPercentage>'+str(currentFirstLayerHeightPercentage)+'</firstLayerHeightPercentage>\n')
+            fff.append('    <topSolidLayers>'+str(currentTopSolidLayers)+'</topSolidLayers>\n')
+            fff.append('    <bottomSolidLayers>'+str(currentBottomSolidLayers)+'</bottomSolidLayers>\n')
+            fff.append('    <perimeterOutlines>'+str(currentPerimeterOutlines)+'</perimeterOutlines>\n')
+            fff.append('    <infillPercentage>'+str(currentInfillPercentage)+'</infillPercentage>\n')
+            fff.append('    <infillLayerInterval>'+str(currentInfillLayerInterval)+'</infillLayerInterval>\n')
+            fff.append('    <defaultSpeed>'+str(currentDefaultSpeed)+'</defaultSpeed>\n')
+            fff.append('    <firstLayerUnderspeed>'+str(currentFirstLayerUnderspeed)+'</firstLayerUnderspeed>\n')
+            fff.append('    <outlineUnderspeed>'+str(currentOutlineUnderspeed)+'</outlineUnderspeed>\n')
+            fff.append('    <supportUnderspeed>'+str(currentSupportUnderspeed)+'</supportUnderspeed>\n')
+            fff.append('    <supportInfillPercentage>'+str(currentSupportInfillPercentage)+'</supportInfillPercentage>\n')
+            fff.append('    <denseSupportInfillPercentage>'+str(currentDenseSupportInfillPercentage)+'</denseSupportInfillPercentage>\n')
             fff.append('    <avoidCrossingOutline>'+str(currentAvoidCrossingOutline)+'</avoidCrossingOutline>\n')
             fff.append('    <overlapInfillAngles>'+str(currentOverlapInfillAngles)+'</overlapInfillAngles>\n')
             fff.append('    <supportHorizontalPartOffset>'+str(currentSupportHorizontalPartOffset)+'</supportHorizontalPartOffset>\n')
@@ -516,7 +517,7 @@ def createSimplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight
             fff.append('    <minBridgingArea>10</minBridgingArea>\n')
             fff.append('    <bridgingExtraInflation>0</bridgingExtraInflation>\n')
             bridgingSpeedMultiplier = 1.5
-            fff.append('    <bridgingExtrusionMultiplier>'+str(currentFilament['extrusionMultiplier']*(1/bridgingSpeedMultiplier))+'</bridgingExtrusionMultiplier>\n')
+            fff.append('    <bridgingExtrusionMultiplier>'+str(round(currentFilament['extrusionMultiplier']*(1/bridgingSpeedMultiplier), 2))+'</bridgingExtrusionMultiplier>\n')
             fff.append('    <bridgingSpeedMultiplier>'+str(bridgingSpeedMultiplier)+'</bridgingSpeedMultiplier>\n')
             if hotendLeft['id'] != 'None':
                 fff.append(r'    <temperatureController name="Left Extruder '+str(hotendLeft['nozzleSize'])+r'">'+'\n')
