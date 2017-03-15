@@ -1,0 +1,19 @@
+{
+    "id": "Colorfabb PLA-PHA",
+    "filamentDiameter": 2.85,
+    "filamentPricePerKg": 66.6,
+    "filamentDensity": 3.13,
+    "isSupportMaterial": false,
+    "isFlexibleMaterial": false,
+    "bedTemperature": 65,
+    "printTemperature": [210, 220],
+    "defaultPrintSpeed": 60,
+    "advisedMaxPrintSpeed": 80,
+    "maxFlow": "None",
+    "maxFlowForHighFlowHotend": "None",
+    "retractionDistance": 4,
+    "retractionSpeed": 40,
+    "fanPercentage": [50, 100],
+    "extrusionMultiplier": 1.1,
+    "purgeLength": 2
+}
