@@ -417,7 +417,13 @@ def createSimplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight
                     currentInfillExtruder = abs(currentPrimaryExtruder-1)
                     currentSupportExtruder = currentPrimaryExtruder
                 currentBedTemperature = max(filamentLeft['bedTemperature'], filamentRight['bedTemperature'])
-            currentFirstLayerHeightPercentage = int(min(125, (currentHotend['nozzleSize']/2)/currentLayerHeight*100, maxFlowValue(currentHotend, currentFilament, currentLayerHeight)*100/(currentHotend['nozzleSize']*currentLayerHeight*(currentDefaultSpeed/60)*float(currentFirstLayerUnderspeed))))      
+            currentFirstLayerHeightPercentage = int(min(125, (currentHotend['nozzleSize']/2)/currentLayerHeight*100, maxFlowValue(currentHotend, currentFilament, currentLayerHeight)*100/(currentHotend['nozzleSize']*currentLayerHeight*(currentDefaultSpeed/60)*float(currentFirstLayerUnderspeed))))           
+            
+            # First layer height correction to stay always between 0.1 - 0.2 mm
+            firstLayerHeight = min(max(0.1, (currentLayerHeight * currentFirstLayerHeightPercentage/100.)), 0.2)
+            currentFirstLayerHeightPercentage = int(firstLayerHeight * 100 / float(currentLayerHeight))
+            currentFirstLayerUnderspeed = min(quality['firstLayerUnderspeed'], round(100 / float(currentFirstLayerHeightPercentage), 2))
+
             currentPerimeterOutlines = max(2, int(round(quality['wallWidth'] / currentHotend['nozzleSize']))) # 2 minimum Perimeters needed
             currentTopSolidLayers = max(4, int(round(quality['topBottomWidth'] / currentLayerHeight)))        # 4 minimum layers needed
             currentBottomSolidLayers = currentTopSolidLayers
@@ -607,7 +613,6 @@ def createCuraProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, qual
             retractionSpeed = filamentRight['retractionSpeed']
             retractionAmount = filamentRight['retractionDistance']
             currentFirstLayerHeightPercentage = int(min(125, (hotend['nozzleSize']/2)/currentLayerHeight*100, maxFlowValue(hotendRight, filamentRight, currentLayerHeight)*100/(hotend['nozzleSize']*currentLayerHeight*(currentDefaultSpeed/60.)*float(currentFirstLayerUnderspeed))))
-            firstLayerHeight = "%.2f" % (currentLayerHeight * currentFirstLayerHeightPercentage/100.)
             if filamentRight['fanPercentage'][1] > 0:
                 fanEnabled = 'True'
             else:
@@ -635,7 +640,6 @@ def createCuraProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, qual
         retractionSpeed = filamentLeft['retractionSpeed']
         retractionAmount = filamentLeft['retractionDistance']
         currentFirstLayerHeightPercentage = int(min(125, (hotend['nozzleSize']/2)/currentLayerHeight*100, maxFlowValue(hotendLeft, filamentLeft, currentLayerHeight)*100/(hotend['nozzleSize']*currentLayerHeight*(currentDefaultSpeed/60.)*float(currentFirstLayerUnderspeed))))
-        firstLayerHeight = "%.2f" % (currentLayerHeight * currentFirstLayerHeightPercentage/100.)
         if filamentLeft['fanPercentage'][1] > 0:
             fanEnabled = 'True'
         else:
@@ -668,7 +672,6 @@ def createCuraProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, qual
                 currentDefaultSpeed, currentFirstLayerUnderspeed, currentOutlineUnderspeed, currentSupportUnderspeed = speedValues(hotendLeft, hotendRight, filamentLeft, filamentRight, currentLayerHeight, 1, quality, 'IDEX, Supports with Right')
                 printTemperature1 = temperatureValue(filamentLeft, hotendLeft, currentLayerHeight, currentDefaultSpeed)
                 printTemperature2 = temperatureValue(filamentRight, hotendRight, currentLayerHeight, currentDefaultSpeed*currentSupportUnderspeed)
-
         else:
             # IDEX, Dual Color / Material
             makeSupports = 'None'
@@ -688,7 +691,6 @@ def createCuraProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, qual
         retractionSpeed = max(filamentLeft['retractionSpeed'], filamentRight['retractionSpeed'])
         retractionAmount = max(filamentLeft['retractionDistance'], filamentRight['retractionDistance'])
         currentFirstLayerHeightPercentage = int(min(125, (hotend['nozzleSize']/2)/currentLayerHeight*100, min(maxFlowValue(hotendLeft, filamentLeft, currentLayerHeight),maxFlowValue(hotendRight, filamentRight, currentLayerHeight))*100/(hotend['nozzleSize']*currentLayerHeight*(currentDefaultSpeed/60)*float(currentFirstLayerUnderspeed))))
-        firstLayerHeight = "%.2f" % (currentLayerHeight * currentFirstLayerHeightPercentage/100.)
         if filamentLeft['fanPercentage'][1] == 0 or filamentRight['fanPercentage'][1] == 0:
             fanEnabled = 'False'
         else:
@@ -697,6 +699,12 @@ def createCuraProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, qual
         hotendLeftTemperature, hotendRightTemperature = printTemperature1, printTemperature2
         purgeValuesT0 = purgeValues(hotendLeft, filamentLeft, currentDefaultSpeed, currentLayerHeight)
         purgeValuesT1 = purgeValues(hotendRight, filamentRight, currentDefaultSpeed, currentLayerHeight)
+
+    # First layer height correction to stay always between 0.1 - 0.2 mm
+    firstLayerHeight = "%.2f" % min(max(0.1, (currentLayerHeight * currentFirstLayerHeightPercentage/100.)), 0.2)
+    currentFirstLayerHeightPercentage = int(float(firstLayerHeight) * 100 / float(currentLayerHeight))
+    currentFirstLayerUnderspeed = min(quality['firstLayerUnderspeed'], round(100 / float(currentFirstLayerHeightPercentage), 2))
+
     currentPurgeSpeedT0, currentStartPurgeLengthT0, currentToolChangePurgeLengthT0, currentEParameterT0, currentSParameterT0, currentPParameterT0 = purgeValuesT0
     currentPurgeSpeedT1, currentStartPurgeLengthT1, currentToolChangePurgeLengthT1, currentEParameterT1, currentSParameterT1, currentPParameterT1 = purgeValuesT1
     purgeValuesGeneral = min(currentPurgeSpeedT0, currentPurgeSpeedT1), max(currentStartPurgeLengthT0, currentStartPurgeLengthT1), max(currentToolChangePurgeLengthT0, currentToolChangePurgeLengthT1), max(currentEParameterT0, currentEParameterT1), min(currentSParameterT0, currentSParameterT1), max(currentPParameterT0, currentPParameterT1)
@@ -1605,7 +1613,7 @@ def main():
             experimentalMenu = False
             while True:
                 clearDisplay()
-                print '\n Welcome to the BCN3D Sigma Profile Generator \n'
+                print '\n Welcome to the BCN3D Sigma Profile Generator (1.2.0)\n'
                 print ' Choose one option (1-4):'
                 print ' 1. Profile for Simplify3D'
                 print ' 2. Profile for Cura'
