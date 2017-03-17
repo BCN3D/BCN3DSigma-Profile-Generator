@@ -84,7 +84,7 @@ Filaments
     "retractionSpeed": 40,					// [mm/s]
     "fanPercentage": [50, 100],				// [0-100], minimum and maximum percentage of layer fan power.
     "extrusionMultiplier": 1,				// 1.2 extrudes 120% the needed amount of filament.
-    "purgeLength": 40 						// [mm],    length of filament dropped after 5 minute pause on tool change, for a 0.4mm nozzle.
+    "purgeLength": 40 						// [mm],    length of filament dropped at nozzle tip after 5 minute pause on tool change, for a 0.4mm nozzle.
 }
 ```
 
