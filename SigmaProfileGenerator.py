@@ -1105,10 +1105,7 @@ def purgeValues(hotend, filament, speed, layerHeight, minPurgeLength = 20): # pu
         S - Slope (according to NSize, Flow, Purge@5min)
         E - Maximum distance to purge (according to NSize, Flow)
         P - Minimum distance to purge
-    
-    -> canviar parametres de material 'purgeLenght' pel valor a 5min
-
-    '''    
+    '''
 
     # nozzleSizeBehavior
     maxPurgeLenghtAtHotendTip = 2.25 * filament['purgeLength'] * filament['extrusionMultiplier']
@@ -1130,7 +1127,7 @@ def purgeValues(hotend, filament, speed, layerHeight, minPurgeLength = 20): # pu
     # S - Slope of the SmartPurge function (according to NSize, Flow, PurgeLength)
     distanceAtNozzleTip = hotendPurgeMultiplier * filament['purgeLength'] * filament['extrusionMultiplier']
     slopeCorrection = 0.005 # experimental value
-    S = (distanceAtNozzleTip * (hotend['nozzleSize']/2.)**2) / ((filament['filamentDiameter']/2.)**2) * slopeCorrection
+    S = float("%.4f" % ((distanceAtNozzleTip * (hotend['nozzleSize']/2.)**2) / ((filament['filamentDiameter']/2.)**2) * slopeCorrection))
 
     # E - Maximum distance to purge (according to NSize, Flow)
     if hotend['nozzleSize'] >= 0.8:
@@ -1140,7 +1137,7 @@ def purgeValues(hotend, filament, speed, layerHeight, minPurgeLength = 20): # pu
     E = float("%.2f" % (maxPurgeLength * filament['extrusionMultiplier']))
     
     # P - Minimum distance to purge 
-    P = float("%.4f" % ((minPurgeLength*filament['purgeLength']*(hotend['nozzleSize']/2.)**2) / ((filament['filamentDiameter']/2.)**2)))
+    P = float("%.4f" % ((minPurgeLength*filament['extrusionMultiplier']*(hotend['nozzleSize']/2.)**2) / ((filament['filamentDiameter']/2.)**2)))
 
     return (startPurgeLength, toolChangePurgeLength, F, S, E, P)
 
