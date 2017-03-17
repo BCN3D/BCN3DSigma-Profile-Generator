@@ -1129,7 +1129,7 @@ def purgeValues(hotend, filament, speed, layerHeight, minPurgeLength = 20): # pu
 
     # S - Slope of the SmartPurge function (according to NSize, Flow, PurgeLength)
     distanceAtNozzleTip = hotendPurgeMultiplier * filament['purgeLength'] * filament['extrusionMultiplier']
-    slopeCorrection = 2/300. # experimental value
+    slopeCorrection = 0.005 # experimental value
     S = (distanceAtNozzleTip * (hotend['nozzleSize']/2.)**2) / ((filament['filamentDiameter']/2.)**2) * slopeCorrection
 
     # E - Maximum distance to purge (according to NSize, Flow)
