@@ -1,0 +1,19 @@
+{
+    "id": "Smartfil Medical",
+    "filamentDiameter": 2.85,
+    "filamentPricePerKg": 0,
+    "filamentDensity": 1.05,
+    "isSupportMaterial": false,
+    "isFlexibleMaterial": false,
+    "bedTemperature": 90,
+    "printTemperature": [230, 250],
+    "defaultPrintSpeed": 60,
+    "advisedMaxPrintSpeed": "None",
+    "maxFlow": 20,
+    "maxFlowForHighFlowHotend": "None",
+    "retractionDistance": 4,
+    "retractionSpeed": 40,
+    "fanPercentage": [0, 0],
+    "extrusionMultiplier": 1,
+    "purgeLength": 0.375
+}

@@ -1,0 +1,19 @@
+{
+    "id": "Smartfil Support",
+    "filamentDiameter": 2.85,
+    "filamentPricePerKg": 0,
+    "filamentDensity": 1.05,
+    "isSupportMaterial": true,
+    "isFlexibleMaterial": false,
+    "bedTemperature": 50,
+    "printTemperature": [220, 240],
+    "defaultPrintSpeed": 60,
+    "advisedMaxPrintSpeed": 60,
+    "maxFlow": "None",
+    "maxFlowForHighFlowHotend": "None",
+    "retractionDistance": 4,
+    "retractionSpeed": 40,
+    "fanPercentage": [50, 100],
+    "extrusionMultiplier": 1,
+    "purgeLength": 2.25
+}
