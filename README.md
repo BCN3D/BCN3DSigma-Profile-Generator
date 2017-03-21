@@ -30,7 +30,7 @@ Will ask for a functionality:
 
 In order to add, remove or change a hotend, filament or quality preconfiguration edit the files in *Profiles Data* folder.
 
-### Fast mode (No GUI)
+### Fast mode (No GUI)
 
 To generate a profile without entering the GUI. 
 
