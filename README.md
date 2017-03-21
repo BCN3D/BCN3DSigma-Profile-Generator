@@ -30,7 +30,7 @@ Will ask for a functionality:
 
 In order to add, remove or change a hotend, filament or quality preconfiguration edit the files in *Profiles Data* folder.
 
-### **Fast mode (No GUI)**
+### Fast mode (No GUI)
 
 To generate a profile without entering the GUI. 
 
@@ -58,48 +58,48 @@ Generates the file *BCN3D Sigma - 0.4 Left (PLA Colorfila), 0.4 Right (PLA Color
 Hotends
 ```json5
 {
-    "id": "0.4mm - Brass", 					// Hotend Name
-    "nozzleSize": 0.4,						// [mm]
-    "material": "Brass",					// Nozzle material
-    "hotBlock": "Standard"					// Block style
+    "id": "0.4mm - Brass",               // Hotend Name
+    "nozzleSize": 0.4,                   // [mm]
+    "material": "Brass",                 // Nozzle material
+    "hotBlock": "Standard"               // Block style
 } 
 ```
 
 Filaments
 ```json5
 {
-    "id": "Colorfila PLA",					// Filament Name
-    "filamentDiameter": 2.85,				// [mm]
-    "filamentPricePerKg": 19.95,			// [€]
-    "filamentDensity": 1.25,				// [g/cm3]
-    "isSupportMaterial": false,				// true/false
-    "isFlexibleMaterial": false,			// true/false
-    "bedTemperature": 50,					// [ºC]
-    "printTemperature": [195, 225],			// [ºC],    minimum and maximum print temperatures.
-    "defaultPrintSpeed": 60,				// [mm/s],  default speed when printing Standard quality with 0.4mm Nozzle and 0.2mm layer height.
-    "advisedMaxPrintSpeed": "None",			// [mm/s],  maximum speed recommended by filament's manufacturer. If "None", maxFlow value is needed.
-    "maxFlow": 15,							// [mm3/s], maximum flow a default Hotend can print. "None" if unknown.
-    "maxFlowForHighFlowHotend": "None",	    // [mm3/s], maximum flow a High Flow Hotend can print. "None" if unknown.
-    "retractionDistance": 4,				// [mm]
-    "retractionSpeed": 40,					// [mm/s]
-    "fanPercentage": 100,					// [0-100]
-    "extrusionMultiplier": 1,				// 1.2 extrudes 120% the needed amount of filament.
-    "purgeLenght": 1.5 						// [mm],    lenght to purge at Tool Change with 0.4mm Nozzle.
+    "id": "Colorfila PLA",               // Filament Name
+    "filamentDiameter": 2.85,            // [mm]
+    "filamentPricePerKg": 19.95,         // [€]
+    "filamentDensity": 1.25,             // [g/cm3]
+    "isSupportMaterial": false,          // true/false
+    "isFlexibleMaterial": false,         // true/false
+    "bedTemperature": 50,                // [ºC]
+    "printTemperature": [195, 225],      // [ºC],    minimum and maximum print temperatures.
+    "defaultPrintSpeed": 60,             // [mm/s],  default speed when printing Standard quality with 0.4mm Nozzle and 0.2mm layer height.
+    "advisedMaxPrintSpeed": "None",      // [mm/s],  maximum speed recommended by filament's manufacturer. If "None", maxFlow value is needed.
+    "maxFlow": 15,                       // [mm3/s], maximum flow a default Hotend can print. "None" if unknown.
+    "maxFlowForHighFlowHotend": "None",  // [mm3/s], maximum flow a High Flow Hotend can print. "None" if unknown.
+    "retractionDistance": 4,             // [mm]
+    "retractionSpeed": 40,               // [mm/s]
+    "fanPercentage": 100,                // [0-100]
+    "extrusionMultiplier": 1,            // 1.2 extrudes 120% the needed amount of filament.
+    "purgeLenght": 1.5                   // [mm],    lenght to purge at Tool Change with 0.4mm Nozzle.
 }
 ```
 
 Quality Preconfigurations
 ```json5
 {
-    "id": "Standard",							// Preconfiguration Name
-    "index": 2,								// Order to show the option in Simplify3D
-    "layerHeightMultiplier": 0.5,			// Multiply this value for the nozzle size to get the layer height.
-    "defaultSpeed": 60,						// [mm/s],  default speed for PLA
-    "firstLayerUnderspeed": 0.67,			// [0-1]
-    "outlineUnderspeed": 0.58,				// [0-1]
-    "topBottomWidth": 0.8,					// [mm],    thickness of solid layers at the top and bottom
-    "wallWidth": 1.2,						// [mm],    thickness of walls
-    "infillPercentage": 20					// [0-100]
+    "id": "Standard",                    // Preconfiguration Name
+    "index": 2,                          // Order to show the option in Simplify3D
+    "layerHeightMultiplier": 0.5,        // Multiply this value for the nozzle size to get the layer height.
+    "defaultSpeed": 60,                  // [mm/s],  default speed for PLA
+    "firstLayerUnderspeed": 0.67,        // [0-1]
+    "outlineUnderspeed": 0.58,           // [0-1]
+    "topBottomWidth": 0.8,               // [mm],    thickness of solid layers at the top and bottom
+    "wallWidth": 1.2,                    // [mm],    thickness of walls
+    "infillPercentage": 20               // [0-100]
 }
 ```
 
