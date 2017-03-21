@@ -4,7 +4,7 @@
 # Guillem Àvila Padró - October 2016
 # Released under GNU LICENSE
 # https://opensource.org/licenses/GPL-3.0
-# version 1.1.3
+# version 1.1.4
 
 # Version Changelog:
 # - Start gcodes adjusted for cleaner skirts
@@ -14,6 +14,7 @@
 # - Support material speeds bugfixes
 # - S3D: Minor readability fix
 # - Adjusted first layer heights & speeds
+# - Acceleration reduction disabled when using flexible materials
 
 import time, math, os, platform, sys, json, string, shutil, zipfile
 
@@ -387,14 +388,7 @@ def createSimplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight
                     currentSupportExtruder = abs(currentPrimaryExtruder-1)
                 else:
                     # IDEX, Combined Infill
-                    currentAvoidCrossingOutline = 0l
-
-                    # # correccions pel combined infil
-                    # if hotendLeft['nozzleSize'] != hotendRight['nozzleSize']:
-                    #     currentInfillPercentage = 100 #canviar?
-                    #     currentOverlapInfillAngles = 0
-                    # # fi de les correccions
-
+                    currentAvoidCrossingOutline = 0
                     if hotendLeft['nozzleSize'] <= hotendRight['nozzleSize']:
                         # IDEX, Combined Infill (Right Hotend has thicker or equal nozzle)
                         currentPrimaryExtruder = 0
@@ -445,6 +439,7 @@ def createSimplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight
             useCoasting, useWipe, onlyRetractWhenCrossingOutline, retractBetweenLayers, useRetractionMinTravel, retractWhileWiping, onlyWipeOutlines = retractValues(currentFilament)
             currentPurgeSpeedT0, currentStartPurgeLengthT0, currentToolChangePurgeLengthT0, currentEParameterT0, currentSParameterT0, currentPParameterT0 = purgeValuesT0
             currentPurgeSpeedT1, currentStartPurgeLengthT1, currentToolChangePurgeLengthT1, currentEParameterT1, currentSParameterT1, currentPParameterT1 = purgeValuesT1
+
             fff.append(r'  <autoConfigureQuality name="'+extruder+secondaryExtruderAction+str(quality['id'])+r'">'+'\n')
             fff.append('    <globalExtrusionMultiplier>1</globalExtrusionMultiplier>\n')
             fff.append('    <fanSpeed>\n')
@@ -556,8 +551,13 @@ def createSimplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight
             if hotendLeft['id'] != 'None' and hotendRight['id'] != 'None':                    
                 fff.append('    <toolChangeGcode>{IF NEWTOOL=0} T0\t\t\t;Start tool switch 0,{IF NEWTOOL=0} G1 F2400 E0,;{IF NEWTOOL=0} M800 F'+str(currentPurgeSpeedT0)+' E'+str(currentEParameterT0)+' S'+str(currentSParameterT0)+' P'+str(currentPParameterT0)+'\t;SmartPurge,{IF NEWTOOL=0} G1 F'+str(currentPurgeSpeedT0)+' E'+str(currentToolChangePurgeLengthT0)+'\t\t;Default purge value,'+fanActionOnToolChange1+',{IF NEWTOOL=1} T1\t\t\t;Start tool switch 1,{IF NEWTOOL=1} G1 F2400 E0,;{IF NEWTOOL=1} M800 F'+str(currentPurgeSpeedT1)+' E'+str(currentEParameterT1)+' S'+str(currentSParameterT1)+' P'+str(currentPParameterT1)+'\t;SmartPurge,{IF NEWTOOL=1} G1 F'+str(currentPurgeSpeedT1)+' E'+str(currentToolChangePurgeLengthT1)+'\t\t;Default purge,'+fanActionOnToolChange2+",G4 P2000\t\t\t\t;Stabilize Hotend's pressure,G92 E0\t\t\t\t;Zero extruder,G1 F3000 E-4.5\t\t\t\t;Retract,G1 F[travel_speed]\t\t\t;End tool switch,G91,G1 F[travel_speed] Z2,G90</toolChangeGcode>\n")
             else:
-                fff.append('    <toolChangeGcode/>\n')                
-            fff.append(r'    <postProcessing>{REPLACE "; outer perimeter" "; outer perimeter\nM204 S'+str(accelerationForPerimeters(currentHotend['nozzleSize'], currentLayerHeight, int(currentDefaultSpeed/60. * currentOutlineUnderspeed)))+r'"},{REPLACE "; inner perimeter" "; inner perimeter\nM204 S2000"},{REPLACE "; solid layer" "; solid layer\nM204 S2000"},{REPLACE "; infill" "; infill\nM204 S2000",{REPLACE "; support" "; support\nM204 S2000"},{REPLACE "; layer end" "; layer end\nM204 S2000"},{REPLACE "F12000\nG1 Z'+str(round(currentLayerHeight*currentFirstLayerHeightPercentage/100., 3))+r' F1002\nG92 E0" "F12000\nG1 Z'+str(round(currentLayerHeight*currentFirstLayerHeightPercentage/100., 3))+r' F1002\nG1 E0.0000 F720\nG92 E0"}</postProcessing>\n')
+                fff.append('    <toolChangeGcode/>\n')
+            
+            if currentFilament['isFlexibleMaterial']:
+                reducedAccelerationForPerimeters = 2000
+            else:
+                reducedAccelerationForPerimeters = accelerationForPerimeters(currentHotend['nozzleSize'], currentLayerHeight, int(currentDefaultSpeed/60. * currentOutlineUnderspeed))
+            fff.append(r'    <postProcessing>{REPLACE "; outer perimeter" "; outer perimeter\nM204 S'+str(reducedAccelerationForPerimeters)+r'"},{REPLACE "; inner perimeter" "; inner perimeter\nM204 S2000"},{REPLACE "; solid layer" "; solid layer\nM204 S2000"},{REPLACE "; infill" "; infill\nM204 S2000",{REPLACE "; support" "; support\nM204 S2000"},{REPLACE "; layer end" "; layer end\nM204 S2000"},{REPLACE "F12000\nG1 Z'+str(round(currentLayerHeight*currentFirstLayerHeightPercentage/100., 3))+r' F1002\nG92 E0" "F12000\nG1 Z'+str(round(currentLayerHeight*currentFirstLayerHeightPercentage/100., 3))+r' F1002\nG1 E0.0000 F720\nG92 E0"}</postProcessing>\n')
             fff.append('  </autoConfigureQuality>\n')
 
             if dataLog != 'noData' :
@@ -762,7 +762,7 @@ def createCuraProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, qual
     ini.append('retraction_dual_amount = 8\n')
     ini.append('retraction_min_travel = 1.5\n')
     ini.append('retraction_combing = All\n')
-    ini.append('retraction_minimal_extrusion = 0\n')
+    ini.append('retraction_minimal_extrusion = 0.02\n')
     ini.append('retraction_hop = '+str("%.2f" % (currentLayerHeight/2.))+'\n')
     ini.append('bottom_thickness = '+str(firstLayerHeight)+'\n')
     ini.append('layer0_width_factor = 100\n')
@@ -771,7 +771,7 @@ def createCuraProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, qual
     ini.append('travel_speed = 200\n')
     ini.append('bottom_layer_speed = '+str(bottomLayerSpeed)+'\n')
     ini.append('infill_speed = '+str(currentDefaultSpeed/60)+'\n')
-    ini.append('solidarea_speed = '+str(bottomLayerSpeed)+'\n')
+    ini.append('solidarea_speed = '+str(outerShellSpeed)+'\n')
     ini.append('inset0_speed = '+str(outerShellSpeed)+'\n')
     ini.append('insetx_speed = '+str(innerShellSpeed)+'\n')
     ini.append('cool_min_layer_time = 5\n')
@@ -812,38 +812,20 @@ def createCuraProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, qual
     ini.append('fix_horrible_use_open_bits = False\n')
     ini.append('fix_horrible_extensive_stitching = False\n')
     ini.append('plugin_config = (lp1\n')
-    ini.append('\t(dp2\n')
-    ini.append("\tS'params'\n")
-    ini.append('\tp3\n')
-    ini.append('\t(dp4\n')
-    ini.append("\tsS'filename'\n")
-    ini.append('\tp5\n')
-    ini.append("\tS'RingingRemover.py'\n")
-    ini.append('\tp6\n')
-    ini.append('\tsa.\n')
+    if filamentLeft['id'] != '' and filamentLeft['isFlexibleMaterial'] or filamentRight['id'] != '' and filamentRight['isFlexibleMaterial']:
+        ini.append('\t.\n')
+    else:
+        ini.append('\t(dp2\n')
+        ini.append("\tS'params'\n")
+        ini.append('\tp3\n')
+        ini.append('\t(dp4\n')
+        ini.append("\tsS'filename'\n")
+        ini.append('\tp5\n')
+        ini.append("\tS'RingingRemover.py'\n")
+        ini.append('\tp6\n')
+        ini.append('\tsa.\n')
     ini.append('object_center_x = -1\n')
     ini.append('object_center_y = -1\n')
-    ini.append('quality_fast = False\n')
-    ini.append('quality_standard = False\n')
-    ini.append('quality_high = False\n')
-    ini.append('quality_strong = False\n')
-    ini.append('extruder_left = False\n')
-    ini.append('extruder_right = False\n')
-    ini.append('material_pla = False\n')
-    ini.append('material_abs = False\n')
-    ini.append('material_fila = False\n')
-    ini.append('quality_fast_dual = False\n')
-    ini.append('quality_standard_dual = False\n')
-    ini.append('quality_high_dual = False\n')
-    ini.append('quality_strong_dual = False\n')
-    ini.append('pla_left_dual = False\n')
-    ini.append('abs_left_dual = False\n')
-    ini.append('fila_left_dual = False\n')
-    ini.append('pla_right_dual = False\n')
-    ini.append('abs_right_dual = False\n')
-    ini.append('fila_right_dual = False\n')
-    ini.append('pva_right_dual = False\n')
-    ini.append('dual_support = False\n')
     ini.append('\n')
     ini.append('[alterations]\n')
     ini.append('start.gcode = ;Sliced at: {day} {date} {time}\n')
@@ -1383,7 +1365,6 @@ def speedValues(hotendLeft, hotendRight, filamentLeft, filamentRight, currentLay
             currentSupportUnderspeed    = float("%.2f" % min(maxAllowedUnderspeed, maxFlowValue(hotendLeft, filamentLeft, currentLayerHeight)  /float(hotendRight['nozzleSize']*quality['layerHeightMultiplier']*hotendLeft['nozzleSize']*currentDefaultSpeed/60.)))
         else:
             currentSupportUnderspeed    = float("%.2f" % min(maxAllowedUnderspeed, rightExtruderDefaultSpeed*60*0.9                            /float(currentDefaultSpeed)))
-
     return currentDefaultSpeed, currentFirstLayerUnderspeed, currentOutlineUnderspeed, currentSupportUnderspeed
 
 def testAllCombinations():
