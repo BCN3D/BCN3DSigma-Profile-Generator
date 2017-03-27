@@ -4,7 +4,7 @@
 # Guillem Àvila Padró - October 2016
 # Released under GNU LICENSE
 # https://opensource.org/licenses/GPL-3.0
-# version 1.1.4
+# version 1.1.5
 
 # Version Changelog:
 # - Start gcodes adjusted for cleaner skirts
@@ -15,6 +15,7 @@
 # - S3D: Minor readability fix
 # - Adjusted first layer heights & speeds
 # - Acceleration reduction disabled when using flexible materials
+# - Cura: Retract improvements
 
 import time, math, os, platform, sys, json, string, shutil, zipfile
 
@@ -761,8 +762,11 @@ def createCuraProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, qual
     ini.append('retraction_amount = '+str(retractionAmount)+'\n')
     ini.append('retraction_dual_amount = 8\n')
     ini.append('retraction_min_travel = 1.5\n')
-    ini.append('retraction_combing = All\n')
-    ini.append('retraction_minimal_extrusion = 0.02\n')
+    if filamentLeft['id'] != '' and filamentLeft['isFlexibleMaterial'] or filamentRight['id'] != '' and filamentRight['isFlexibleMaterial']:
+        ini.append('retraction_combing = All\n')
+    else:
+        ini.append('retraction_combing = No Skin\n')
+    ini.append('retraction_minimal_extrusion = 0\n')
     ini.append('retraction_hop = '+str("%.2f" % (currentLayerHeight/2.))+'\n')
     ini.append('bottom_thickness = '+str(firstLayerHeight)+'\n')
     ini.append('layer0_width_factor = 100\n')
