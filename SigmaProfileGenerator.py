@@ -1204,18 +1204,37 @@ def createCura2Files():
                 f.writelines(lines)
 
 def installCura2Files():
+    
+    allowAutoInstall = False
+
     if platform.system() == 'Darwin' and 'Cura.app' in os.listdir('/Applications'):
         allowAutoInstall = True
         root_src_dir = 'resources'
         root_dst_dir = '/Applications/Cura.app/Contents/Resources/resources'
+    
     elif platform.system() == 'Windows':
-        for folder in os.listdir('C:\Program Files'):
+        installedCuras = []
+        for folder in os.listdir('C:\Program Files')[::-1]: # list folders in reversed order to copy files to the most recent Cura version installed
             if 'Cura 2' in folder and 'Cura.exe' in os.listdir('C:\\Program Files\\'+folder):
-                    allowAutoInstall = True
-                    root_src_dir = 'resources'
-                    root_dst_dir = 'C:\\Program Files\\'+folder+'\\resources'
-    else:
-        allowAutoInstall = False
+                    installedCuras.append(folder)
+
+        if len(installedCuras) > 1:
+            print "\n\tYou have more than one Cura 2 installed! Select where you want to add the BCN3D Sigma:"
+            answer0 = ''
+            folderOptions = []
+            for c in range(len(installedCuras)):
+                folderOptions.append(str(c+1))
+                print '\t\t'+str(c+1)+'. '+installedCuras[c]
+            while answer0 not in folderOptions:
+                answer0 = raw_input('\t\t')            
+            allowAutoInstall = True
+            root_src_dir = 'resources'
+            root_dst_dir = 'C:\\Program Files\\'+installedCuras[int(answer0)-1]+'\\resources'
+
+        if len(installedCuras) == 1:
+            allowAutoInstall = True
+            root_src_dir = 'resources'
+            root_dst_dir = 'C:\\Program Files\\'+installedCuras[0]+'\\resources'
 
     if allowAutoInstall:
         for src_dir, dirs, files in os.walk(root_src_dir):
