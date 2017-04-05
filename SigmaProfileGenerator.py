@@ -8,8 +8,9 @@
 SigmaProgenVersion = '1.2.0'
 # Version Changelog
 # - SmartPurge implementation. Needs Firmware v01-1.2.3RC+
+# - Cura 2 Files generation under experimental features
 
-import time, math, os, platform, sys, json, string, shutil, zipfile
+import time, math, os, platform, sys, json, string, shutil, zipfile, uuid
 
 def createSimplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, dataLog, createFile):
     fff = []
@@ -925,6 +926,316 @@ def createCuraProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, qual
         print fileName+'.ini'
     return fileName+'.ini'
 
+def createCura2Files():
+
+    cura2id = 'bcn3dsigma'
+    cura2Name = 'Sigma'
+    cura2Manufacturer = 'BCN3D Technologies'
+    cura2Category = 'BCN3D Technologies'
+    cura2Author = 'Guillem'
+
+    for hotend in sorted(profilesData['hotend'], key=lambda k: k['id']):
+        cura2PreferredVariant = hotend['id'].replace(' ', '_')
+        if '0.4mm - Brass' in hotend['id']:
+            cura2PreferredVariant = hotend['id'].replace(' ', '_')
+            break
+
+    for quality in sorted(profilesData['quality'], key=lambda k: k['index']):
+        cura2PreferredQuality = quality['id'].replace(' ', '_')
+        if 'Standard' in quality['id']:
+            cura2PreferredQuality = quality['id'].replace(' ', '_')
+            break
+
+    if "resources" in os.listdir('.'):
+        shutil.rmtree("resources")
+    os.mkdir('resources')
+    os.mkdir('resources/definitions')
+    with open('resources/definitions/'+cura2id+'.def.json', 'w') as f:
+        lines = []
+        lines.append(r'{'+'\n')
+        lines.append(r'    "id": "'+cura2id+r'",'+'\n')
+        lines.append(r'    "version": 2,'+'\n')
+        lines.append(r'    "name": "'+cura2Name+r'",'+'\n')
+        lines.append(r'    "inherits": "fdmprinter",'+'\n')
+        lines.append(r'    "metadata": {'+'\n')
+        lines.append(r'        "author": "'+cura2Author+r'",'+'\n')
+        lines.append(r'        "manufacturer": "'+cura2Manufacturer+r'",'+'\n')
+        lines.append(r'        "category": "'+cura2Category+r'",'+'\n')
+        lines.append(r'        "visible": true,'+'\n')
+        lines.append(r'        "file_formats": "text/x-gcode",'+'\n')
+        lines.append(r'        "platform": "'+cura2id+r'_bed.obj",'+'\n')
+        lines.append(r'        "platform_offset": [ 0, 0, 0],'+'\n')
+        lines.append(r'        "has_machine_quality": true,'+'\n')
+        lines.append(r'        "has_machine_materials": true,'+'\n')
+        lines.append(r'        "has_variant_materials": true,'+'\n')
+        lines.append(r'        "has_variants": true,'+'\n')
+        lines.append(r'        "preferred_variant": "*'+cura2PreferredVariant+r'*",'+'\n')
+        lines.append(r'        "preferred_quality": "*'+cura2PreferredQuality+r'*",'+'\n')
+        lines.append(r'        "variants_name": "Hotend",'+'\n')
+        lines.append(r'        "machine_extruder_trains":'+'\n')
+        lines.append(r'        {'+'\n')
+        lines.append(r'            "0": "'+cura2id+r'_extruder_left",'+'\n')
+        lines.append(r'            "1": "'+cura2id+r'_extruder_right"'+'\n')
+        lines.append(r'        },'+'\n')
+        lines.append(r'        "supported_actions": ["MachineSettingsAction"]'+'\n')
+        lines.append(r'    },'+'\n')
+        lines.append(r''+'\n')
+        lines.append(r'    "overrides": {'+'\n')
+        lines.append(r'        "machine_name": { "default_value": "'+cura2Name+r'" },'+'\n')
+        lines.append(r'        "machine_width": { "default_value": 210 },'+'\n')
+        lines.append(r'        "machine_depth": { "default_value": 297 },'+'\n')
+        lines.append(r'        "machine_height": { "default_value": 210 },'+'\n')
+        lines.append(r'        "machine_heated_bed": { "default_value": true },'+'\n')
+        lines.append(r'        "machine_gcode_flavor": { "default_value": "RepRap (Marlin/Sprinter)" },'+'\n')
+        lines.append(r'        "machine_extruder_count": { "default_value": 2 },'+'\n')
+        lines.append(r'        "machine_center_is_zero": { "default_value": false },'+'\n')
+        lines.append(r'        "machine_start_gcode": { "default_value": "" },'+'\n')
+        lines.append(r'        "machine_end_gcode": { "default_value": "" },'+'\n')
+        lines.append(r'        "machine_nozzle_heat_up_speed": {"default_value": 20},'+'\n')
+        lines.append(r'        "machine_nozzle_cool_down_speed": {"default_value": 20},'+'\n')
+        lines.append(r'        "machine_min_cool_heat_time_window": {"default_value": 5}'+'\n')
+        lines.append(r'    }'+'\n')
+        lines.append(r'}'+'\n')
+        f.writelines(lines)
+
+    os.mkdir('resources/extruders')
+    with open('resources/extruders/'+cura2id+'_extruder_left.def.json', 'w') as f:
+        lines = []
+        lines.append(r'{'+'\n')
+        lines.append(r'    "id": "'+cura2id+r'_extruder_left",'+'\n')
+        lines.append(r'    "version": 2,'+'\n')
+        lines.append(r'    "name": "Extruder Left",'+'\n')
+        lines.append(r'    "inherits": "fdmextruder",'+'\n')
+        lines.append(r'    "metadata": {'+'\n')
+        lines.append(r'        "machine": "'+cura2id+r'",'+'\n')
+        lines.append(r'        "position": "0"'+'\n')
+        lines.append(r'    },'+'\n')
+        lines.append(r''+'\n')
+        lines.append(r'    "overrides": {'+'\n')
+        lines.append(r'        "extruder_nr": {'+'\n')
+        lines.append(r'            "default_value": 0,'+'\n')
+        lines.append(r'            "maximum_value": "1"'+'\n')
+        lines.append(r'        },'+'\n')
+        lines.append(r'        "machine_nozzle_offset_x": { "default_value": 0.0 },'+'\n')
+        lines.append(r'        "machine_nozzle_offset_y": { "default_value": 0.0 },'+'\n')
+        lines.append(r'        "machine_extruder_start_code": {'+'\n')
+        lines.append(r'          "default_value": "\n;start extruder_0\nM117 Heating nozzles....\nM104 S190 T0\nG1 X70 Y20 F9000\nM109 S190 T0\n\nM117 purging nozzle\nG92 E0\nG1 E6 F90\nG92 E0\nG1 E-2 F300\nG92 E0\nM117 wiping nozzle\nG1 X1 Y28 F3000\nG1 X70 F6000\n\nM117 printing\n"'+'\n')
+        lines.append(r'        },'+'\n')
+        lines.append(r'        "machine_extruder_end_code": {'+'\n')
+        lines.append(r'           "default_value": "\nM104 T0 S155\n;end extruder_0\nM117 temp is {material_print_temp}"'+'\n')
+        lines.append(r'        }'+'\n')
+        lines.append(r'    }'+'\n')
+        lines.append(r'}'+'\n')
+        f.writelines(lines)
+    with open('resources/extruders/'+cura2id+'_extruder_right.def.json', 'w') as f:
+        lines = []
+        lines.append(r'{'+'\n')
+        lines.append(r'    "id": "'+cura2id+r'_extruder_right",'+'\n')
+        lines.append(r'    "version": 2,'+'\n')
+        lines.append(r'    "name": "Extruder Right",'+'\n')
+        lines.append(r'    "inherits": "fdmextruder",'+'\n')
+        lines.append(r'    "metadata": {'+'\n')
+        lines.append(r'        "machine": "'+cura2id+r'",'+'\n')
+        lines.append(r'        "position": "1"'+'\n')
+        lines.append(r'    },'+'\n')
+        lines.append(r''+'\n')
+        lines.append(r'    "overrides": {'+'\n')
+        lines.append(r'        "extruder_nr": {'+'\n')
+        lines.append(r'            "default_value": 1,'+'\n')
+        lines.append(r'            "maximum_value": "1"'+'\n')
+        lines.append(r'        },'+'\n')
+        lines.append(r'        "machine_nozzle_offset_x": { "default_value": 0.0 },'+'\n')
+        lines.append(r'        "machine_nozzle_offset_y": { "default_value": 0.0 },'+'\n')
+        lines.append(r'        "machine_extruder_start_code": {'+'\n')
+        lines.append(r'          "default_value": "\n;start extruder_1\nM117 Heating nozzles....\nM104 S190 T1\nG1 X70 Y20 F9000\nM109 S190 T1\n\nM117 purging nozzle\nG92 E0\nG1 E6 F90\nG92 E0\nG1 E-2 F300\nG92 E0\n\nM117 wiping nozzle\nG1 X1 Y28 F3000\nG1 X70 F6000\n\nM117 printing\n"'+'\n')
+        lines.append(r'        },'+'\n')
+        lines.append(r'        "machine_extruder_end_code": {'+'\n')
+        lines.append(r'           "default_value": "\nM104 T1 S155\n;end extruder_1\n"'+'\n')
+        lines.append(r'        }'+'\n')
+        lines.append(r'    }'+'\n')
+        lines.append(r'}'+'\n')
+        f.writelines(lines)
+
+    os.mkdir('resources/materials')
+    os.mkdir('resources/materials/'+cura2id)
+    for filament in sorted(profilesData['filament'], key=lambda k: k['id']):
+        with open('resources/materials/'+cura2id+'/'+filament['brand'].replace(' ', '_')+'_'+filament['material'].replace(' ', '_')+'.xml.fdm_material', 'w') as f:
+            lines = []
+            lines.append(r'<?xml version="1.0" encoding="UTF-8"?>'+'\n')
+            lines.append(r'<!--'+'\n')
+            lines.append(r'        "print temperature": "default_material_print_temperature",'+'\n')
+            lines.append(r'        "heated bed temperature": "material_bed_temperature",'+'\n')
+            lines.append(r'        "standby temperature": "material_standby_temperature",'+'\n')
+            lines.append(r'        "processing temperature graph": "material_flow_temp_graph",'+'\n')
+            lines.append(r'        "print cooling": "cool_fan_speed",'+'\n')
+            lines.append(r'        "retraction amount": "retraction_amount",'+'\n')
+            lines.append(r'        "retraction speed": "retraction_speed"'+'\n')
+            lines.append(r'-->'+'\n')
+            lines.append(r'<fdmmaterial xmlns="http://www.ultimaker.com/material">'+'\n')
+            lines.append(r'    <metadata>'+'\n')
+            lines.append(r'        <name>'+'\n')
+            lines.append(r'            <brand>'+filament['brand']+'</brand>'+'\n')
+            lines.append(r'            <material>'+filament['material']+'</material>'+'\n')
+            lines.append(r'            <color>'+filament['color']+'</color>'+'\n')
+            lines.append(r'        </name>'+'\n')
+            lines.append(r'        <GUID>'+str(uuid.uuid1())+'</GUID>'+'\n')
+            lines.append(r'        <version>1</version>'+'\n')
+            lines.append(r'        <color_code>'+filament['colorCode']+'</color_code>'+'\n')
+            lines.append(r'    </metadata>'+'\n')
+            lines.append(r'    <properties>'+'\n')
+            lines.append(r'        <density>'+str(filament['filamentDensity'])+'</density>'+'\n')
+            lines.append(r'        <diameter>'+str(filament['filamentDiameter'])+'</diameter>'+'\n')
+            lines.append(r'    </properties>'+'\n')
+            lines.append(r'    <settings>'+'\n')
+            lines.append(r'        <setting key="print temperature">'+str(filament['printTemperature'][0])+'</setting>'+'\n')
+            lines.append(r'        <setting key="heated bed temperature">'+str(filament['bedTemperature'])+'</setting>'+'\n')
+            lines.append(r'        <setting key="standby temperature">175</setting>'+'\n')
+            lines.append(r''+'\n')
+            lines.append(r'        <machine>'+'\n')
+            lines.append(r'           <machine_identifier manufacturer="'+cura2Manufacturer+r'" product="'+cura2id+r'" />'+'\n')
+            lines.append(r'           <setting key="print temperature">'+str(filament['printTemperature'][0])+'</setting>'+'\n')
+            lines.append(r'           <setting key="heated bed temperature">'+str(filament['bedTemperature'])+'</setting>'+'\n')
+            lines.append(r'           <setting key="standby temperature">160</setting>'+'\n')
+            lines.append(r'           <setting key="print cooling">40.0</setting>'+'\n')
+            for hotend in sorted(profilesData['hotend'], key=lambda k: k['id']):
+                if hotend['id'] != 'None':
+                    lines.append(r'           <hotend id="'+hotend['id']+r'" />'+'\n')
+            lines.append(r'       </machine>'+'\n')
+            lines.append(r''+'\n')
+            lines.append(r'    </settings>'+'\n')
+            lines.append(r'</fdmmaterial>'+'\n')
+            f.writelines(lines)
+
+    os.mkdir('resources/meshes')
+    shutil.copyfile('Profiles Data/bcn3dsigma_bed.obj', 'resources/meshes/'+cura2id+'_bed.obj')
+
+    os.mkdir('resources/quality')
+    os.mkdir('resources/quality/'+cura2id)
+    for hotend in sorted(profilesData['hotend'], key=lambda k: k['id']):
+        if hotend['id'] != 'None':
+            for filament in sorted(profilesData['filament'], key=lambda k: k['id']):
+                for quality in sorted(profilesData['quality'], key=lambda k: k['index']):
+                    with open('resources/quality/'+cura2id+'/'+cura2id+'_'+hotend['id'].replace(' ', '_')+'_'+filament['brand'].replace(' ', '_')+'_'+filament['material'].replace(' ', '_')+'_'+quality['id'].replace(' ', '_')+'_Quality.inst.cfg', 'w') as f:
+                        lines = []
+                        lines.append(r'[general]'+'\n')
+                        lines.append(r'version = 2'+'\n')
+                        lines.append(r'name = '+quality['id']+' Quality'+'\n')
+                        lines.append(r'definition = '+cura2id+'\n')
+                        lines.append(r''+'\n')
+                        lines.append(r'[metadata]'+'\n')
+                        lines.append(r'type = quality'+'\n')
+                        lines.append(r'quality_type = '+quality['id'].lower()+'\n')
+                        
+                        lines.append(r'material = '+filament['brand'].replace(' ', '_')+'_'+filament['material'].replace(' ', '_')+'_'+cura2id+'_'+hotend['id'].replace(' ', '_')+'\n')
+                        lines.append(r'weight = '+str(-(quality['index']-3))+'\n')
+                        lines.append(r''+'\n')
+                        lines.append(r'[values]'+'\n')
+                        lines.append(r'layer_height = '+str("%.2f" % (hotend['nozzleSize'] * quality['layerHeightMultiplier']))+'\n')
+                        f.writelines(lines)
+   
+    os.mkdir('resources/variants')
+    for hotend in sorted(profilesData['hotend'], key=lambda k: k['id']):
+        if hotend['id'] != 'None':
+            with open('resources/variants/'+cura2id+'_'+hotend['id'].replace(' ', '_')+'.inst.cfg', 'w') as f:
+                lines = []
+                lines.append('[general]'+'\n')
+                lines.append('name = '+hotend['id']+'\n')
+                lines.append('version = 2'+'\n')
+                lines.append('definition = '+cura2id+'\n')
+                lines.append(''+'\n')
+                lines.append('[metadata]'+'\n')
+                lines.append('author = '+cura2Author+'\n')
+                lines.append('type = variant'+'\n')
+                lines.append(''+'\n')
+                lines.append('[values]'+'\n')
+                lines.append('machine_nozzle_size = '+str(hotend['nozzleSize'])+'\n')
+                lines.append('machine_nozzle_tip_outer_diameter = 1.05'+'\n')
+                lines.append(''+'\n')
+                lines.append('infill_line_width = '+str(hotend['nozzleSize'])+'\n')
+                lines.append(''+'\n')
+                lines.append('wall_thickness = 1'+'\n')
+                lines.append('wall_0_inset = -0.05'+'\n')
+                lines.append('fill_perimeter_gaps = nowhere'+'\n')
+                lines.append('travel_compensate_overlapping_walls_enabled = '+'\n')
+                lines.append(''+'\n')
+                lines.append('infill_sparse_density = 25'+'\n')
+                lines.append('infill_overlap = -50'+'\n')
+                lines.append('skin_overlap = -40'+'\n')
+                lines.append(''+'\n')
+                lines.append('material_print_temperature_layer_0 = =round(material_print_temperature)'+'\n')
+                lines.append('material_initial_print_temperature = =round(material_print_temperature)'+'\n')
+                lines.append('material_diameter = 2.85'+'\n')
+                lines.append('retraction_amount = 1'+'\n')
+                lines.append('retraction_speed = 40'+'\n')
+                lines.append('retraction_prime_speed = =round(retraction_speed / 4)'+'\n')
+                lines.append('retraction_min_travel = =round(line_width * 10)'+'\n')
+                lines.append('switch_extruder_retraction_amount = 2'+'\n')
+                lines.append('switch_extruder_retraction_speeds = 40'+'\n')
+                lines.append('switch_extruder_prime_speed = =round(switch_extruder_retraction_speeds / 4)'+'\n')
+                lines.append(''+'\n')
+                lines.append('speed_print = =50 if layer_height < 0.4 else 30'+'\n')
+                lines.append('speed_infill = =round(speed_print)'+'\n')
+                lines.append('speed_layer_0 = =round(speed_print / 5 * 4)'+'\n')
+                lines.append('speed_wall = =round(speed_print / 2)'+'\n')
+                lines.append('speed_wall_0 = =10 if speed_wall < 11 else (speed_print / 5 *3)'+'\n')
+                lines.append('speed_topbottom = =round(speed_print / 5 * 4)'+'\n')
+                lines.append('speed_slowdown_layers = 1'+'\n')
+                lines.append('speed_travel = =round(speed_print if magic_spiralize else 150)'+'\n')
+                lines.append('speed_travel_layer_0 = =round(speed_travel)'+'\n')
+                lines.append('speed_support_interface = =round(speed_topbottom)'+'\n')
+                lines.append(''+'\n')
+                lines.append('retraction_combing = off'+'\n')
+                lines.append('retraction_hop_enabled = True'+'\n')
+                lines.append('retraction_hop = 1'+'\n')
+                lines.append(''+'\n')
+                lines.append('support_z_distance = 0'+'\n')
+                lines.append('support_xy_distance = 0.5'+'\n')
+                lines.append('support_join_distance = 10'+'\n')
+                lines.append('support_interface_enable = True'+'\n')
+                lines.append(''+'\n')
+                lines.append('adhesion_type = skirt'+'\n')
+                lines.append('skirt_gap = 0.5'+'\n')
+                lines.append('skirt_brim_minimal_length = 50'+'\n')
+                lines.append(''+'\n')
+                lines.append('coasting_enable = True'+'\n')
+                lines.append('coasting_volume = 0.1'+'\n')
+                lines.append('coasting_min_volume = 0.17'+'\n')
+                lines.append('coasting_speed = 90'+'\n')
+                f.writelines(lines)
+
+def installCura2Files():
+    if platform.system() == 'Darwin' and 'Cura.app' in os.listdir('/Applications'):
+        allowAutoInstall = True
+        root_src_dir = 'resources'
+        root_dst_dir = '/Applications/Cura.app/Contents/Resources/resources'
+    elif platform.system() == 'Windows':
+        for folder in os.listdir('C:\Program Files'):
+            if 'Cura 2' in folder and 'Cura.exe' in os.listdir('C:\\Program Files\\'+folder):
+                    allowAutoInstall = True
+                    root_src_dir = 'resources'
+                    root_dst_dir = 'C:\\Program Files\\'+folder+'\\resources'
+    else:
+        allowAutoInstall = False
+
+    if allowAutoInstall:
+        for src_dir, dirs, files in os.walk(root_src_dir):
+            dst_dir = src_dir.replace(root_src_dir, root_dst_dir, 1)
+            if not os.path.exists(dst_dir):
+                os.makedirs(dst_dir)
+            for file_ in files:
+                src_file = os.path.join(src_dir, file_)
+                dst_file = os.path.join(dst_dir, file_)
+                if os.path.exists(dst_file):
+                    os.remove(dst_file)
+                shutil.move(src_file, dst_dir)
+        if "resources" in os.listdir('.'):
+            shutil.rmtree("resources")
+        print '\n\t\tThe BCN3D Sigma has been successfully added to Cura 2. Enjoy!\n'
+    else:
+        print "\n\t\tUnable to install files automatically.\n"
+        print "\t\tA new folder called 'resources' has been created in your working directory."
+        print "\t\tCOMBINE it with the one inside your Cura 2 installation folder. Be careful to NOT replace it!\n"
+
 def createSimplify3DProfilesBundle(dataLog, profilesCreatedCount):    
     y = 'y'
     if getSimplify3DBundleSize()/1024/1024 >= 150: # define Size limit to notice (in MB)
@@ -1105,8 +1416,10 @@ def getCuraBundleSize(oneLineCsvSize = float(10494984)/78480): # experimental va
 def speedMultiplier(hotend, filament):
     if filament['isFlexibleMaterial']:
         return float(filament['defaultPrintSpeed'])/24*hotend['nozzleSize']
+        # 24*hotend['nozzleSize'] -> experimental value that works better with flexibles
     else:
         return float(filament['defaultPrintSpeed'])/60
+        # 60 -> speed for base material (PLA) at base quality (Standard)
 
 def purgeValues(hotend, filament, speed, layerHeight, minPurgeLength = 20): # purge at least 20mm so the filament weight is enough to stay inside the purge container
     
@@ -1640,13 +1953,13 @@ def main():
                     print '\t2. Generate a bundle of profiles - Cura'
                     print '\t3. Test all combinations'
                     print '\t4. MacOS Only - Slice a model (with Cura)'
-                    print '\t5. Use the SmartPurge algorithm to recalculate purge lengths'
+                    print '\t5. Add the Sigma to Cura 2'
                     print '\t6. Back'
                     x2 = 'x'
-                    while x2 not in ['1','2','3','4', '5', '6']:
+                    while x2 not in ['1','2','3','4', '5', '6', '7']:
                         x2 = raw_input('\t')
 
-                singleProfileSimplify3D, singleProfileCura, bundleProfilesSimplify3D, bundleProfilesCura, testComb, sliceModel, smartPurge = False, False, False, False, False, False, False
+                singleProfileSimplify3D, singleProfileCura, bundleProfilesSimplify3D, bundleProfilesCura, testComb, sliceModel, cura2Files = False, False, False, False, False, False, False
 
                 if x == '1':
                     singleProfileSimplify3D = True
@@ -1669,8 +1982,8 @@ def main():
                         sliceModel = True
                         GUIHeader = '\n Welcome to the BCN3D Sigma Profile Generator \n\n\n\n\n    Experimental features\n\n\n\n\n\n\t   MacOS Only - Slice a model (with Cura)'
                     elif x2 == '5':
-                        smartPurge = True
-                        GUIHeader = '\n Welcome to the BCN3D Sigma Profile Generator \n\n\n\n\n    Experimental features\n\n\n\n\n\n\n\t   Use the SmartPurge algorithm to recalculate purge lengths'
+                        cura2Files = True
+                        GUIHeader = '\n Welcome to the BCN3D Sigma Profile Generator \n\n\n\n\n    Experimental features\n\n\n\n\n\n\n\t   Add the Sigma to Cura 2'
                     elif x2 == '6':
                         experimentalMenu = False
                 elif x == '4':
@@ -1749,10 +2062,11 @@ def main():
                     print GUIHeader              
                     testAllCombinations()
                     raw_input("\t\tPress Enter to continue...")
-                elif smartPurge:
+                elif cura2Files:
                     clearDisplay()
                     print GUIHeader
-                    print '\n\t\tWork in progress... Stay tuned!\n\t\t'
+                    createCura2Files()
+                    installCura2Files()
                     raw_input("\t\tPress Enter to continue...")
 
 if __name__ == '__main__':
