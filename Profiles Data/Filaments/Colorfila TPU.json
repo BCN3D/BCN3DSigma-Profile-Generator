@@ -1,5 +1,9 @@
 {
     "id": "Colorfila TPU",
+    "brand": "Colorfila",
+    "material": "TPU",
+    "color": "Generic",
+    "colorCode": "#ffffff",
     "filamentDiameter": 2.85,
     "filamentPricePerKg": 50,
     "filamentDensity": 1.22,

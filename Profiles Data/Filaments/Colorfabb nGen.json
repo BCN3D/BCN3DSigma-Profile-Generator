@@ -1,5 +1,9 @@
 {
     "id": "Colorfabb nGen",
+    "brand": "Colorfabb",
+    "material": "nGen",
+    "color": "Generic",
+    "colorCode": "#ffffff",
     "filamentDiameter": 2.85,
     "filamentPricePerKg": 0,
     "filamentDensity": 0,

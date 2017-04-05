@@ -1,5 +1,9 @@
 {
     "id": "Colorfila PLA",
+    "brand": "Colorfila",
+    "material": "PLA",
+    "color": "Generic",
+    "colorCode": "#ffffff",
     "filamentDiameter": 2.85,
     "filamentPricePerKg": 19.95,
     "filamentDensity": 1.25,
@@ -15,5 +19,5 @@
     "retractionSpeed": 40,
     "fanPercentage": [50, 100],
     "extrusionMultiplier": 1,
-    "purgeLength": 40
+    "purgeLength": 16
 }

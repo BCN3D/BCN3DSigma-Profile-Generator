@@ -1,5 +1,9 @@
 {
     "id": "Techna PET-G",
+    "brand": "Techna",
+    "material": "PET-G",
+    "color": "Generic",
+    "colorCode": "#ffffff",
     "filamentDiameter": 2.85,
     "filamentPricePerKg": 0,
     "filamentDensity": 1.27,

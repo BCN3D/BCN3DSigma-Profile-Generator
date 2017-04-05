@@ -1,5 +1,9 @@
 {
     "id": "Arnitel ID 2045",
+    "brand": "Nexeo Solutions",
+    "material": "Arnitel ID 2045",
+    "color": "Generic",
+    "colorCode": "#ffffff",
     "filamentDiameter": 2.85,
     "filamentPricePerKg": 79.9,
     "filamentDensity": 1.1,

@@ -1,5 +1,9 @@
 {
     "id": "Protopasta EverydayPLA",
+    "brand": "Protopasta",
+    "material": "Everyday PLA",
+    "color": "Generic",
+    "colorCode": "#ffffff",
     "filamentDiameter": 2.85,
     "filamentPricePerKg": 0,
     "filamentDensity": 1.25,
