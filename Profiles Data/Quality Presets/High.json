@@ -1,7 +1,7 @@
 {
     "id": "High",
     "index": 2,
-    "layerHeightMultiplier": 0.25,
+    "layerHeightMultiplier": 0.24,
     "defaultSpeed": 50,
     "firstLayerUnderspeed": 0.7,
     "outlineUnderspeed": 0.4,
