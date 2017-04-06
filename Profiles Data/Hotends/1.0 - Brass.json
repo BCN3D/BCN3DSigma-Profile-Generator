@@ -1,6 +1,9 @@
 {
     "id": "1.0mm - Brass",
     "nozzleSize": 1.0,
+    "nozzleTipOuterDiameter": 1.81,
+    "nozzleHeadDistance": 3.5,
+    "nozzleExpansionAngle": 49.36,
     "material": "Brass",
     "hotBlock": "HighFlow"
 }

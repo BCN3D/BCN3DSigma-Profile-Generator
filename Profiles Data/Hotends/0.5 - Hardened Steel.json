@@ -1,6 +1,9 @@
 {
     "id": "0.5mm - Hardened Steel",
     "nozzleSize": 0.5,
+    "nozzleTipOuterDiameter": 1.09,
+    "nozzleHeadDistance": 3.5,
+    "nozzleExpansionAngle": 47,
     "material": "Hardened Steel",
     "hotBlock": "Standard"
 }
