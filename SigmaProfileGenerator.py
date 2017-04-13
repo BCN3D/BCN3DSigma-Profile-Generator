@@ -520,7 +520,10 @@ def createSimplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight
             fff.append('    <onlyWipeOutlines>'+str(onlyWipeOutlines)+'</onlyWipeOutlines>\n')
             fff.append('    <minBridgingArea>10</minBridgingArea>\n')
             fff.append('    <bridgingExtraInflation>0</bridgingExtraInflation>\n')
-            bridgingSpeedMultiplier = 1.5
+            if currentGenerateSupport == 0:
+                bridgingSpeedMultiplier = 1.5
+            else:
+                bridgingSpeedMultiplier = 1
             fff.append('    <bridgingExtrusionMultiplier>'+str(round(currentFilament['extrusionMultiplier']*(1/bridgingSpeedMultiplier), 2))+'</bridgingExtrusionMultiplier>\n')
             fff.append('    <bridgingSpeedMultiplier>'+str(bridgingSpeedMultiplier)+'</bridgingSpeedMultiplier>\n')
             if hotendLeft['id'] != 'None':
