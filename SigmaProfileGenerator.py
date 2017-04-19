@@ -7,10 +7,11 @@
 
 SigmaProgenVersion = '1.2.0'
 # Version Changelog
-# - SmartPurge implementation. Needs Firmware v01-1.2.3RC+
+# - SmartPurge implementation. Needs Firmware v01-1.2.3
 # - Cura 2 integration (under experimental features)
+# - Raft improvements
 
-import time, math, os, platform, sys, json, string, shutil, zipfile, uuid
+import time, math, os, platform, sys, json, string, shutil, zipfile, uuid, ctypes
 
 def createSimplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, dataLog, createFile):
     fff = []
@@ -51,7 +52,7 @@ def createSimplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight
         fff.append('    <toolheadNumber>0</toolheadNumber>\n')
         fff.append('    <diameter>'+str(hotendLeft['nozzleSize'])+'</diameter>\n')
         fff.append('    <autoWidth>0</autoWidth>\n')
-        fff.append('    <width>'+str(hotendLeft['nozzleSize'])+'</width>\n')
+        fff.append('    <width>'+str(hotendLeft['nozzleSize'] * 0.875)+'</width>\n')
         fff.append('    <extrusionMultiplier>'+str(filamentLeft['extrusionMultiplier'])+'</extrusionMultiplier>\n')
         fff.append('    <useRetract>1</useRetract>\n')
         fff.append('    <retractionDistance>'+str(filamentLeft['retractionDistance'])+'</retractionDistance>\n')
@@ -85,7 +86,7 @@ def createSimplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight
         fff.append('    <toolheadNumber>1</toolheadNumber>\n')
         fff.append('    <diameter>'+str(hotendRight['nozzleSize'])+'</diameter>\n')
         fff.append('    <autoWidth>0</autoWidth>\n')
-        fff.append('    <width>'+str(hotendRight['nozzleSize'])+'</width>\n')
+        fff.append('    <width>'+str(hotendRight['nozzleSize'] * 0.875)+'</width>\n')
         fff.append('    <extrusionMultiplier>'+str(filamentRight['extrusionMultiplier'])+'</extrusionMultiplier>\n')
         fff.append('    <useRetract>1</useRetract>\n')
         fff.append('    <retractionDistance>'+str(filamentRight['retractionDistance'])+'</retractionDistance>\n')
@@ -116,7 +117,7 @@ def createSimplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight
     fff.append('  <raftExtruder>0</raftExtruder>\n')
     fff.append('  <raftLayers>2</raftLayers>\n')
     fff.append('  <raftOffset>3</raftOffset>\n')
-    fff.append('  <raftSeparationDistance>0.1</raftSeparationDistance>\n')
+    fff.append('  <raftSeparationDistance>0.2</raftSeparationDistance>\n')
     fff.append('  <raftInfill>85</raftInfill>\n')
     fff.append('  <disableRaftBaseLayers>0</disableRaftBaseLayers>\n')
     fff.append('  <useSkirt>1</useSkirt>\n')
@@ -237,7 +238,7 @@ def createSimplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight
     fff.append('  <layerChangeGcode></layerChangeGcode>\n')
     fff.append('  <retractionGcode></retractionGcode>\n')
     fff.append('  <toolChangeGcode></toolChangeGcode>\n')
-    fff.append('  <endingGcode>M104 S0 T0,M104 S0 T1,M140 S0\t\t;heated bed heater off,G91\t\t;relative positioning,G1 Z+0.5 E-5 Y+10 F[travel_speed]\t;move Z up a bit and retract filament even more,G28 X0 Y0\t\t;move X/Y to min endstops so the head is out of the way,M84\t\t;steppers off,G90\t\t;absolute positioning,</endingGcode>\n')
+    fff.append('  <endingGcode>M104 S0 T0,M104 S0 T1,M140 S0\t\t;heated bed heater off,G91\t\t;relative positioning,G1 Z+0.5 E-5 Y+10 F[travel_speed]\t;move Z up a bit and retract filament,G28 X0 Y0\t\t;move X/Y to min endstops so the head is out of the way,M84\t\t;steppers off,G90\t\t;absolute positioning,</endingGcode>\n')
     fff.append('  <exportFileFormat>gcode</exportFileFormat>\n')
     fff.append('  <celebration>0</celebration>\n')
     fff.append('  <celebrationSong></celebrationSong>\n')
@@ -450,7 +451,7 @@ def createSimplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight
                 fff.append('      <toolheadNumber>0</toolheadNumber>\n')
                 fff.append('      <diameter>'+str(hotendLeft['nozzleSize'])+'</diameter>\n')
                 fff.append('      <autoWidth>0</autoWidth>\n')
-                fff.append('      <width>'+str(hotendLeft['nozzleSize'])+'</width>\n')
+                fff.append('      <width>'+str(hotendLeft['nozzleSize'] * 0.875)+'</width>\n')
                 fff.append('      <extrusionMultiplier>'+str(filamentLeft['extrusionMultiplier'])+'</extrusionMultiplier>\n')
                 fff.append('      <useRetract>1</useRetract>\n')
                 fff.append('      <retractionDistance>'+str(filamentLeft['retractionDistance'])+'</retractionDistance>\n')
@@ -467,7 +468,7 @@ def createSimplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight
                 fff.append('      <toolheadNumber>1</toolheadNumber>\n')
                 fff.append('      <diameter>'+str(hotendRight['nozzleSize'])+'</diameter>\n')
                 fff.append('      <autoWidth>0</autoWidth>\n')
-                fff.append('      <width>'+str(hotendRight['nozzleSize'])+'</width>\n')
+                fff.append('      <width>'+str(hotendRight['nozzleSize'] * 0.875)+'</width>\n')
                 fff.append('      <extrusionMultiplier>'+str(filamentRight['extrusionMultiplier'])+'</extrusionMultiplier>\n')
                 fff.append('      <useRetract>1</useRetract>\n')
                 fff.append('      <retractionDistance>'+str(filamentRight['retractionDistance'])+'</retractionDistance>\n')
@@ -511,7 +512,10 @@ def createSimplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight
             fff.append('    <onlyWipeOutlines>'+str(onlyWipeOutlines)+'</onlyWipeOutlines>\n')
             fff.append('    <minBridgingArea>10</minBridgingArea>\n')
             fff.append('    <bridgingExtraInflation>0</bridgingExtraInflation>\n')
-            bridgingSpeedMultiplier = 1.5
+            if currentGenerateSupport == 0:
+                bridgingSpeedMultiplier = 1.5
+            else:
+                bridgingSpeedMultiplier = 1
             fff.append('    <bridgingExtrusionMultiplier>'+str(round(currentFilament['extrusionMultiplier']*(1/bridgingSpeedMultiplier), 2))+'</bridgingExtrusionMultiplier>\n')
             fff.append('    <bridgingSpeedMultiplier>'+str(bridgingSpeedMultiplier)+'</bridgingSpeedMultiplier>\n')
             if hotendLeft['id'] != 'None':
@@ -542,7 +546,7 @@ def createSimplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight
                 fff.append(r'      <setpoint layer="1" temperature="'+str(currentBedTemperature)+r'"/>'+'\n')
                 fff.append('    </temperatureController>\n')
             if hotendLeft['id'] != 'None' and hotendRight['id'] != 'None':                    
-                fff.append('    <toolChangeGcode>{IF NEWTOOL=0} T0\t\t\t;Start tool switch 0,{IF NEWTOOL=0} G1 F2400 E0,{IF NEWTOOL=0} M800 F'+str(currentPurgeSpeedT0)+' S'+str(currentSParameterT0)+' E'+str(currentEParameterT0)+' P'+str(currentPParameterT0)+'\t;SmartPurge - Needs Firmware v01-1.2.3RC+,;{IF NEWTOOL=0} G1 F'+str(currentPurgeSpeedT0)+' E'+str(currentToolChangePurgeLengthT0)+'\t\t;Default purge value,'+fanActionOnToolChange1+',{IF NEWTOOL=1} T1\t\t\t;Start tool switch 1,{IF NEWTOOL=1} G1 F2400 E0,{IF NEWTOOL=1} M800 F'+str(currentPurgeSpeedT1)+' S'+str(currentSParameterT1)+' E'+str(currentEParameterT1)+' P'+str(currentPParameterT1)+'\t;SmartPurge - Needs Firmware v01-1.2.3RC+,;{IF NEWTOOL=1} G1 F'+str(currentPurgeSpeedT1)+' E'+str(currentToolChangePurgeLengthT1)+'\t\t;Default purge,'+fanActionOnToolChange2+",G4 P2000\t\t\t\t;Stabilize Hotend's pressure,G92 E0\t\t\t\t;Zero extruder,G1 F3000 E-4.5\t\t\t\t;Retract,G1 F[travel_speed]\t\t\t;End tool switch,G91,G1 F[travel_speed] Z2,G90</toolChangeGcode>\n")
+                fff.append('    <toolChangeGcode>{IF NEWTOOL=0} T0\t\t\t;Start tool switch 0,{IF NEWTOOL=0} G1 F2400 E0,{IF NEWTOOL=0} M800 F'+str(currentPurgeSpeedT0)+' S'+str(currentSParameterT0)+' E'+str(currentEParameterT0)+' P'+str(currentPParameterT0)+'\t;SmartPurge - Needs Firmware v01-1.2.3,;{IF NEWTOOL=0} G1 F'+str(currentPurgeSpeedT0)+' E'+str(currentToolChangePurgeLengthT0)+'\t\t;Default purge value,'+fanActionOnToolChange1+',{IF NEWTOOL=1} T1\t\t\t;Start tool switch 1,{IF NEWTOOL=1} G1 F2400 E0,{IF NEWTOOL=1} M800 F'+str(currentPurgeSpeedT1)+' S'+str(currentSParameterT1)+' E'+str(currentEParameterT1)+' P'+str(currentPParameterT1)+'\t;SmartPurge - Needs Firmware v01-1.2.3,;{IF NEWTOOL=1} G1 F'+str(currentPurgeSpeedT1)+' E'+str(currentToolChangePurgeLengthT1)+'\t\t;Default purge,'+fanActionOnToolChange2+",G4 P2000\t\t\t\t;Stabilize Hotend's pressure,G92 E0\t\t\t\t;Zero extruder,G1 F3000 E-4.5\t\t\t\t;Retract,G1 F[travel_speed]\t\t\t;End tool switch,G91,G1 F[travel_speed] Z2,G90</toolChangeGcode>\n")
             else:
                 fff.append('    <toolChangeGcode/>\n')
             if currentFilament['isFlexibleMaterial']:
@@ -791,17 +795,17 @@ def createCuraProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, qual
     ini.append('spiralize = False\n')
     ini.append('simple_mode = False\n')
     ini.append('brim_line_count = 5\n')
-    ini.append('raft_margin = 5.0\n')
-    ini.append('raft_line_spacing = 3.0\n')
-    ini.append('raft_base_thickness = 0.3\n')
-    ini.append('raft_base_linewidth = 1.0\n')
-    ini.append('raft_interface_thickness = 0.27\n')
-    ini.append('raft_interface_linewidth = 0.4\n')
-    ini.append('raft_airgap_all = 0.0\n')
-    ini.append('raft_airgap = 0.22\n')
-    ini.append('raft_surface_layers = 2\n')
-    ini.append('raft_surface_thickness = 0.27\n')
-    ini.append('raft_surface_linewidth = 0.4\n')
+    ini.append('raft_margin = 3.0\n')                                        # default 5.0
+    ini.append('raft_line_spacing = 2.0\n')                                  # default 3.0
+    ini.append('raft_base_thickness = '+str(currentLayerHeight)+'\n')        # default 0.3
+    ini.append('raft_base_linewidth = '+str(hotend['nozzleSize']*5)+'\n')    # default 1.0
+    ini.append('raft_interface_thickness = '+str(currentLayerHeight)+'\n')   # default 0.27
+    ini.append('raft_interface_linewidth = '+str(hotend['nozzleSize'])+'\n') # default 0.4
+    ini.append('raft_airgap_all = 0.0\n')                                    # default 0.0
+    ini.append('raft_airgap = 0.2\n')                                        # default 0.22
+    ini.append('raft_surface_layers = 2\n')                                  # default 2
+    ini.append('raft_surface_thickness = '+str(currentLayerHeight)+'\n')     # default 0.27
+    ini.append('raft_surface_linewidth = '+str(hotend['nozzleSize'])+'\n')   # default 0.4
     ini.append('fix_horrible_union_all_type_a = True\n')
     ini.append('fix_horrible_union_all_type_b = False\n')
     ini.append('fix_horrible_use_open_bits = False\n')
@@ -852,7 +856,7 @@ def createCuraProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, qual
     ini.append('end.gcode = M104 S0\n')
     ini.append('\tM140 S0                           ;heated bed heater off\n')
     ini.append('\tG91                               ;relative positioning\n')
-    ini.append('\tG1 Z+0.5 E-5 Y+10 F{travel_speed} ;move Z up a bit and retract filament even more\n')
+    ini.append('\tG1 Z+0.5 E-5 Y+10 F{travel_speed} ;move Z up a bit and retract filament\n')
     ini.append('\tG28 X0 Y0                         ;move X/Y to min endstops, so the head is out of the way\n')
     ini.append('\tM84                               ;steppers off\n')
     ini.append('\tG90                               ;absolute positioning\n')
@@ -887,7 +891,7 @@ def createCuraProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, qual
     ini.append('\tM104 T1 S0                        ;extruder heater off\n')
     ini.append('\tM140 S0                           ;heated bed heater off\n')
     ini.append('\tG91                               ;relative positioning\n')
-    ini.append('\tG1 Z+0.5 E-5 Y+10 F{travel_speed} ;move Z up a bit and retract filament even more\n')
+    ini.append('\tG1 Z+0.5 E-5 Y+10 F{travel_speed} ;move Z up a bit and retract filament\n')
     ini.append('\tG28 X0 Y0                         ;move X/Y to min endstops, so the head is out of the way\n')
     ini.append('\tM84                               ;steppers off\n')
     ini.append('\tG90                               ;absolute positioning\n')
@@ -902,7 +906,7 @@ def createCuraProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, qual
     ini.append('postswitchextruder.gcode =         ;Switch between the current extruder and the next extruder, when printing with multiple extruders.\n')
     ini.append('\t;This code is added after the T(n)\n')
     ini.append('\tG1 F2400 E0\n')
-    ini.append('\tM800 F'+str(currentPurgeSpeed)+' S'+str(currentSParameter)+' E'+str(currentEParameter)+' P'+str(currentPParameter)+' ;SmartPurge - Needs Firmware v01-1.2.3RC+\n')
+    ini.append('\tM800 F'+str(currentPurgeSpeed)+' S'+str(currentSParameter)+' E'+str(currentEParameter)+' P'+str(currentPParameter)+' ;SmartPurge - Needs Firmware v01-1.2.3\n')
     ini.append('\t;G1 F'+str(currentPurgeSpeed)+' E'+str(currentToolChangePurgeLength)+' ;Default purge\n')
     ini.append("\tG4 P2000 ;Stabilize Hotend's pressure\n")
     ini.append('\tG92 E0 ;Zero extruder\n')
@@ -927,6 +931,14 @@ def createCuraProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, qual
     return fileName+'.ini'
 
 def createCura2Files():
+
+    '''
+        Values hierarchy:
+            
+            quality->material->variant->definition
+
+            We first ask if the top (user) has the setting value. If not, we continue down. So if the quality sets a value (say fan speed) and material sets it as well, the one set by the quality is used.
+    '''
 
     cura2id = 'bcn3dsigma'
     cura2Name = 'Sigma'
@@ -965,28 +977,28 @@ def createCura2Files():
         lines.append(r'    "inherits": "fdmprinter",'+'\n')
         lines.append(r'    "metadata": {'+'\n')
         lines.append(r'        "author": "'+cura2Author+r'",'+'\n')
-        lines.append(r'        "manufacturer": "'+cura2Manufacturer+r'",'+'\n')
         lines.append(r'        "category": "'+cura2Category+r'",'+'\n')
-        lines.append(r'        "visible": true,'+'\n')
+        lines.append(r'        "manufacturer": "'+cura2Manufacturer+r'",'+'\n')
         lines.append(r'        "file_formats": "text/x-gcode",'+'\n')
         lines.append(r'        "platform": "'+cura2id+r'_bed.obj",'+'\n')
         # lines.append(r'        "platform_texture": "'+cura2id+r'backplate.png",'+'\n')
         lines.append(r'        "platform_offset": [0, 0, 0],'+'\n')
         lines.append(r'        "has_machine_quality": true,'+'\n')
+        lines.append(r'        "visible": true,'+'\n')
         lines.append(r'        "has_materials": true,'+'\n')
         lines.append(r'        "has_machine_materials": true,'+'\n')
         lines.append(r'        "has_variant_materials": true,'+'\n')
         lines.append(r'        "has_variants": true,'+'\n')
+        lines.append(r'        "preferred_material": "*'+cura2PreferredMaterial+r'*",'+'\n')
         lines.append(r'        "preferred_variant": "*'+cura2PreferredVariant+r'*",'+'\n')
         lines.append(r'        "preferred_quality": "*'+cura2PreferredQuality+r'*",'+'\n')
-        lines.append(r'        "preferred_material": "*'+cura2PreferredMaterial+r'*",'+'\n')
         lines.append(r'        "variants_name": "Hotend",'+'\n')
         lines.append(r'        "machine_extruder_trains":'+'\n')
         lines.append(r'        {'+'\n')
         lines.append(r'            "0": "'+cura2id+r'_extruder_left",'+'\n')
         lines.append(r'            "1": "'+cura2id+r'_extruder_right"'+'\n')
         lines.append(r'        },'+'\n')
-        lines.append(r'        "supported_actions": ["MachineSettingsAction"]'+'\n')
+        lines.append(r'        "supported_actions": [ "MachineSettingsAction" ]'+'\n')
         lines.append(r'    },'+'\n')
         lines.append(r'    "overrides": {'+'\n')
         lines.append(r'        "machine_name": { "default_value": "'+cura2Name+r'" },'+'\n')
@@ -994,7 +1006,9 @@ def createCura2Files():
         lines.append(r'        "machine_depth": { "default_value": 297 },'+'\n')
         lines.append(r'        "machine_height": { "default_value": 210 },'+'\n')
         lines.append(r'        "machine_heated_bed": { "default_value": true },'+'\n')
+        lines.append(r'        "machine_extruder_count": { "default_value": 2 },'+'\n')
         lines.append(r'        "machine_center_is_zero": { "default_value": false },'+'\n')
+        lines.append(r'        "machine_gcode_flavor": { "default_value": "RepRap (Marlin/Sprinter)" },'+'\n')
         lines.append(r'        "machine_head_with_fans_polygon":'+'\n')
         lines.append(r'        {'+'\n')
         lines.append(r'            "default_value":'+'\n')
@@ -1005,50 +1019,53 @@ def createCura2Files():
         lines.append(r'                [ 26.2, -58.8 ]'+'\n')
         lines.append(r'            ]'+'\n')
         lines.append(r'        },'+'\n')
-        lines.append(r'        "machine_gcode_flavor": { "default_value": "RepRap (Marlin/Sprinter)" },'+'\n')
+        lines.append(r'        "gantry_height": { "default_value": 210 },'+'\n')
+        lines.append(r'        "extruder_prime_pos_z": { "default_value": 2.0 },'+'\n') # The Z coordinate of the position where the nozzle primes at the start of printing.
+        lines.append(r'        "extruder_prime_pos_abs": { "default_value": false },'+'\n') # Make the extruder prime position absolute rather than relative to the last-known location of the head.
         lines.append(r'        "machine_max_feedrate_x": { "default_value": 200 },'+'\n')
         lines.append(r'        "machine_max_feedrate_y": { "default_value": 200 },'+'\n')
         lines.append(r'        "machine_max_feedrate_z": { "default_value": 15 },'+'\n')
         lines.append(r'        "machine_acceleration": { "default_value": 2000 },'+'\n')
-        lines.append(r'        "gantry_height": { "default_value": 210 },'+'\n')
-        lines.append(r'        "machine_extruder_count": { "default_value": 2 },'+'\n')
-        lines.append(r'        "extruder_prime_pos_abs": { "default_value": true },'+'\n')
-        lines.append(r'        "prime_tower_position_x": { "default_value": 105 },'+'\n')
-        lines.append(r'        "prime_tower_position_y": { "default_value": 250 },'+'\n')
-        lines.append(r'        "prime_tower_wipe_enabled": { "default_value": false },'+'\n')
-        lines.append(r'        "brim_width": { "value": "5" },'+'\n')
-        lines.append(r'        "infill_pattern": { "value": "'+"'triangles'"+r'" },'+'\n')
+        lines.append(r'        "layer_height_0": { "value": "max(0.1, min(0.2, round(layer_height * 1.25, 2)))" },'+'\n')
+        lines.append(r'        "cool_fan_full_at_height": { "value": "layer_height_0 + 4 * layer_height" }'+'\n') # after 5 layers
+
+        # lines.append(r'        "machine_start_gcode": { "default_value": "\n;Sigma ProGen: '+str(SigmaProgenVersion)+r'\n\nG21\t\t;metric values\nG90\t\t;absolute positioning\nM82\t\t;set extruder to absolute mode\nM107\t\t;start with the fan off\nG28 X0 Y0\t\t;move X/Y to min endstops\nG28 Z0\t\t;move Z to min endstops\nG1 Z5 F200\t\t;Safety Z axis movement\n;{extruder_left_start_code}\n;{extruder_right_start_code}\n" },'+'\n')
+        # lines.append(r'        "machine_end_gcode": { "default_value": "\nM104 S0 T0\nM104 S0 T1\nM140 S0\t\t;heated bed heater off\nG91\t\t;relative positioning\nG1 Z+0.5 E-5 Y+10 F12000\t;move Z up a bit and retract filament\nG28 X0 Y0\t\t;move X/Y to min endstops so the head is out of the way\nM84\t\t;steppers off\nG90\t\t;absolute positioning\n" },'+'\n')
+
+        # lines.append(r'        "prime_tower_position_x": { "default_value": 105 },'+'\n')
+        # lines.append(r'        "prime_tower_position_y": { "default_value": 250 },'+'\n')
+        # lines.append(r'        "prime_tower_wipe_enabled": { "default_value": false },'+'\n')
+
+        # lines.append(r'        "brim_width": { "value": "5" },'+'\n')
+        # lines.append(r'        "infill_pattern": { "value": "'+"'triangles'"+r'" },'+'\n')
         # lines.append(r'        "layer_start_x": { "value": "sum(extruderValues('+"'machine_extruder_start_pos_x'"+')) / len(extruderValues('+"'machine_extruder_start_pos_x'"+'))" },'+'\n')
         # lines.append(r'        "layer_start_y": { "value": "sum(extruderValues('+"'machine_extruder_start_pos_y'"+')) / len(extruderValues('+"'machine_extruder_start_pos_y'"+'))" },'+'\n')
-        lines.append(r'        "line_width": { "value": "machine_nozzle_size * 0.875" },'+'\n') # Edit in qualities?
-        lines.append(r'        "material_bed_temperature": { "maximum_value": "110" },'+'\n')
-        lines.append(r'        "material_bed_temperature_layer_0": { "maximum_value": "110" },'+'\n')
-        lines.append(r'        "material_bed_temp_wait": { "value": "False" },'+'\n')
-        lines.append(r'        "material_print_temp_wait": { "value": "False" },'+'\n')
-        lines.append(r'        "material_bed_temp_prepend": { "value": "False" },'+'\n') # Cura 2.5 ignores it
-        lines.append(r'        "material_print_temp_prepend": { "value": "False" },'+'\n') # Cura 2.5 ignores it
-        lines.append(r'        "material_standby_temperature": { "value": "100" },'+'\n')
-        lines.append(r'        "multiple_mesh_overlap": { "value": "0" },'+'\n')
-        lines.append(r'        "prime_tower_enable": { "value": "False" },'+'\n')
-        lines.append(r'        "raft_airgap": { "value": "0" },'+'\n')
-        lines.append(r'        "raft_base_thickness": { "value": "0.3" },'+'\n')
-        lines.append(r'        "raft_interface_line_spacing": { "value": "0.5" },'+'\n')
-        lines.append(r'        "raft_interface_line_width": { "value": "0.5" },'+'\n')
-        lines.append(r'        "raft_interface_thickness": { "value": "0.2" },'+'\n')
-        lines.append(r'        "raft_jerk": { "value": "jerk_layer_0" },'+'\n')
-        lines.append(r'        "raft_margin": { "value": "10" },'+'\n')
-        lines.append(r'        "raft_surface_layers": { "value": "1" },'+'\n')
-        lines.append(r'        "support_angle": { "value": "45" },'+'\n')
-        lines.append(r'        "support_pattern": { "value": "'+"'triangles'"+r'" },'+'\n')
-        lines.append(r'        "support_use_towers": { "value": "False" },'+'\n')
-        lines.append(r'        "support_xy_distance": { "value": "wall_line_width_0 * 2.5" },'+'\n')
-        lines.append(r'        "support_xy_distance_overhang": { "value": "wall_line_width_0" },'+'\n')
-        # lines.append(r'        "switch_extruder_prime_speed": { "value": "15" },'+'\n')
-        lines.append(r'        "switch_extruder_retraction_amount": { "value": "8" },'+'\n')
-        lines.append(r'        "travel_avoid_distance": { "value": "3" },'+'\n')
-        lines.append(r'        "wall_0_inset": { "value": "0" },'+'\n')
-        lines.append(r'        "wall_line_width_x": { "value": "round(line_width * 0.3 / 0.35, 2)" },'+'\n')
-        lines.append(r'        "wall_thickness": { "value": "1" }'+'\n')
+        # lines.append(r'        "material_bed_temperature": { "maximum_value": "110" },'+'\n')
+        # lines.append(r'        "material_bed_temperature_layer_0": { "maximum_value": "110" },'+'\n')
+        # lines.append(r'        "material_bed_temp_wait": { "value": "True" },'+'\n')
+        # lines.append(r'        "material_print_temp_wait": { "value": "True" },'+'\n')
+        # lines.append(r'        "material_bed_temp_prepend": { "value": "True" },'+'\n') # Cura 2.5 ignores it
+        # lines.append(r'        "material_print_temp_prepend": { "value": "True" },'+'\n') # Cura 2.5 ignores it
+        # lines.append(r'        "material_standby_temperature": { "value": "100" },'+'\n')
+        # lines.append(r'        "multiple_mesh_overlap": { "value": "0" },'+'\n')
+        # lines.append(r'        "prime_tower_enable": { "value": "False" },'+'\n')
+        # lines.append(r'        "raft_airgap": { "value": "0" },'+'\n')
+        # lines.append(r'        "raft_base_thickness": { "value": "0.3" },'+'\n')
+        # lines.append(r'        "raft_interface_line_spacing": { "value": "0.5" },'+'\n')
+        # lines.append(r'        "raft_interface_line_width": { "value": "0.5" },'+'\n')
+        # lines.append(r'        "raft_interface_thickness": { "value": "0.2" },'+'\n')
+        # lines.append(r'        "raft_jerk": { "value": "jerk_layer_0" },'+'\n')
+        # lines.append(r'        "raft_margin": { "value": "10" },'+'\n')
+        # lines.append(r'        "raft_surface_layers": { "value": "1" },'+'\n')
+        # lines.append(r'        "support_angle": { "value": "45" },'+'\n')
+        # lines.append(r'        "support_pattern": { "value": "'+"'triangles'"+r'" },'+'\n')
+        # lines.append(r'        "support_use_towers": { "value": "False" },'+'\n')
+        # lines.append(r'        "support_xy_distance": { "value": "wall_line_width_0 * 2.5" },'+'\n')
+        # lines.append(r'        "support_xy_distance_overhang": { "value": "wall_line_width_0" },'+'\n')
+        # # lines.append(r'        "switch_extruder_prime_speed": { "value": "15" },'+'\n')
+        # lines.append(r'        "switch_extruder_retraction_amount": { "value": "8" },'+'\n')
+        # lines.append(r'        "travel_avoid_distance": { "value": "3" },'+'\n')
+        # lines.append(r'        "wall_0_inset": { "value": "0" },'+'\n')
         lines.append(r'    }'+'\n')
         lines.append(r'}'+'\n')
         f.writelines(lines)
@@ -1072,7 +1089,17 @@ def createCura2Files():
         lines.append(r'            "maximum_value": "1"'+'\n')
         lines.append(r'        },'+'\n')
         lines.append(r'        "machine_nozzle_offset_x": { "default_value": 0.0 },'+'\n')
-        lines.append(r'        "machine_nozzle_offset_y": { "default_value": 0.0 }'+'\n')
+        lines.append(r'        "machine_nozzle_offset_y": { "default_value": 0.0 },'+'\n')
+        lines.append(r'        "machine_extruder_start_code": { "default_value": "\n;{extruder_left_change_code}\n" },'+'\n') # Should be set as a quality parameter, but Cura 2.5 doesn't allow it
+        lines.append(r'        "machine_extruder_start_pos_abs": { "default_value": false },'+'\n')
+        lines.append(r'        "machine_extruder_start_pos_x": { "default_value": 0.0 },'+'\n')
+        lines.append(r'        "machine_extruder_start_pos_y": { "default_value": 0.0 },'+'\n')
+        lines.append(r'        "machine_extruder_end_code": { "default_value": "" },'+'\n')
+        lines.append(r'        "machine_extruder_end_pos_abs": { "default_value": false },'+'\n')
+        lines.append(r'        "machine_extruder_end_pos_x": { "default_value": 0.0 },'+'\n')
+        lines.append(r'        "machine_extruder_end_pos_y": { "default_value": 0.0 },'+'\n')
+        lines.append(r'        "extruder_prime_pos_x": { "default_value": 0.0 },'+'\n')
+        lines.append(r'        "extruder_prime_pos_y": { "default_value": 0.0 }'+'\n')
         lines.append(r'    }'+'\n')
         lines.append(r'}'+'\n')
         f.writelines(lines)
@@ -1094,7 +1121,17 @@ def createCura2Files():
         lines.append(r'            "maximum_value": "1"'+'\n')
         lines.append(r'        },'+'\n')
         lines.append(r'        "machine_nozzle_offset_x": { "default_value": 0.0 },'+'\n')
-        lines.append(r'        "machine_nozzle_offset_y": { "default_value": 0.0 }'+'\n')
+        lines.append(r'        "machine_nozzle_offset_y": { "default_value": 0.0 },'+'\n')
+        lines.append(r'        "machine_extruder_start_code": { "default_value": "\n;{extruder_right_change_code}\n" },'+'\n') # Should be set as a quality parameter, but Cura 2.5 doesn't allow it
+        lines.append(r'        "machine_extruder_start_pos_abs": { "default_value": false },'+'\n')
+        lines.append(r'        "machine_extruder_start_pos_x": { "default_value": 0.0 },'+'\n')
+        lines.append(r'        "machine_extruder_start_pos_y": { "default_value": 0.0 },'+'\n')
+        lines.append(r'        "machine_extruder_end_code": { "default_value": "" },'+'\n')
+        lines.append(r'        "machine_extruder_end_pos_abs": { "default_value": false },'+'\n')
+        lines.append(r'        "machine_extruder_end_pos_x": { "default_value": 0.0 },'+'\n')
+        lines.append(r'        "machine_extruder_end_pos_y": { "default_value": 0.0 },'+'\n')
+        lines.append(r'        "extruder_prime_pos_x": { "default_value": 0.0 },'+'\n')
+        lines.append(r'        "extruder_prime_pos_y": { "default_value": 0.0 }'+'\n')
         lines.append(r'    }'+'\n')
         lines.append(r'}'+'\n')
         f.writelines(lines)
@@ -1161,12 +1198,170 @@ def createCura2Files():
                         currentDefaultSpeed, currentFirstLayerUnderspeed, currentOutlineUnderspeed, currentSupportUnderspeed = speedValues(hotend, hotend, filament, filament, currentLayerHeight, 1, quality, 'MEX Left')
                         hotendLeftTemperature = temperatureValue(filament, hotend, currentLayerHeight, currentDefaultSpeed)
                         currentStartPurgeLength, currentToolChangePurgeLength, currentPurgeSpeed, currentSParameter, currentEParameter, currentPParameter = purgeValues(hotend, filament, currentDefaultSpeed, currentLayerHeight)
+                        
+                        lines.append(r'machine_extruder_start_code = ="\nM800 F'+str(currentPurgeSpeed)+' S'+str(currentSParameter)+' E'+str(currentEParameter)+' P'+str(currentPParameter)+r'\t;SmartPurge - Needs Firmware v01-1.2.3\nG4 P2000\t\t\t\t;Stabilize Hotend'+"'"+r's pressure\nG92 E0\t\t\t\t;Zero extruder\nG1 F3000 E-4.5\t\t\t\t;Retract\nG1 F12000\t\t\t;End tool switch\nG91\nG1 F12000 Z2\nG90\n"'+'\n') # Keyword NOT WORKING on Cura 2.5
 
+                        # resolution
                         lines.append(r'layer_height = '+str("%.2f" % layerHeight(hotend, quality))+'\n')
-                        lines.append(r'machine_start_gcode = =";Sigma ProGen: '+str(SigmaProgenVersion)+r'\n'+firstHeatSequence(filament['printTemperature'][0], filament['printTemperature'][0], filament['bedTemperature'], 'Cura2')+r'\nG21\t\t\t\t\t;metric values\nG90\t\t\t\t\t;absolute positioning\nM82\t\t\t\t\t;set extruder to absolute mode\nM107\t\t\t\t;start with the fan off\nG28 X0 Y0\t\t\t;move X/Y to min endstops\nG28 Z0\t\t\t\t;move Z to min endstops\nT0\t\t\t\t\t;change to active toolhead\nG92 E0\t\t\t\t;zero the extruded length\nG1 Z5 F200\t\t\t;Safety Z axis movement\nG1 F'+str(currentPurgeSpeed)+' E'+str(currentStartPurgeLength)+r'\t;extrude '+str(currentStartPurgeLength)+r'mm of feed stock\nG92 E0\t\t\t\t;zero the extruded length again\n"'+'\n')
+                        lines.append(r'line_width = '+str("%.2f" % (hotend['nozzleSize'] * 0.875))+'\n')
+                        lines.append(r'wall_line_width = =line_width'+'\n')
+                        lines.append(r'wall_line_width_0 = =wall_line_width'+'\n')
+                        lines.append(r'wall_line_width_x = '+str("%.2f" % (hotend['nozzleSize'] * 0.85))+'\n')
+                        lines.append(r'skin_line_width = =line_width'+'\n')
+                        lines.append(r'infill_line_width = '+str("%.2f" % (hotend['nozzleSize'] * 1.4))+'\n')
+                        lines.append(r'skirt_brim_line_width = =line_width'+'\n')
+                        lines.append(r'support_line_width = =infill_line_width'+'\n')
+                        lines.append(r'support_interface_line_width = =line_width'+'\n')
+                        lines.append(r'prime_tower_line_width = =line_width'+'\n')
 
+                        #shell
+                        lines.append(r'wall_thickness = '+str("%.2f" % quality['wallWidth'])+'\n') 
+                        lines.append(r'wall_0_wipe_dist = '+str("%.2f" % (hotend['nozzleSize'] / 2.))+'\n') 
+                        lines.append(r'top_bottom_thickness = '+str("%.2f" % quality['topBottomWidth'])+'\n') 
+                        if filament['isFlexibleMaterial']:
+                            lines.append(r'travel_compensate_overlapping_walls_enabled = False'+'\n')
+                        else: 
+                            lines.append(r'travel_compensate_overlapping_walls_enabled = True'+'\n') 
+                        lines.append(r'fill_perimeter_gaps = nowhere'+'\n') 
+                        lines.append(r'xy_offset = -0.1'+'\n') 
+                        lines.append(r'z_seam_type = back'+'\n') 
+                        lines.append(r'z_seam_x = 105'+'\n') 
+                        lines.append(r'z_seam_y = 297'+'\n') 
 
-                        # lines.append(r'        "machine_end_gcode": { "default_value": "" },'+'\n')
+                        # infill
+                        
+
+                        # adjust skirt lenght to make the start purge
+
+                        # lines.append('acceleration_enabled = 0'+'\n')
+                        # lines.append('acceleration_print = 0'+'\n')
+                        # lines.append('acceleration_support = 0'+'\n')
+                        # lines.append('acceleration_support_infill = 0'+'\n')
+                        # lines.append('acceleration_support_interface = 0'+'\n')
+                        # lines.append('adhesion_type = 0'+'\n')
+                        # lines.append('brim_line_count = 0'+'\n')
+                        # lines.append('brim_width = 0'+'\n')
+                        # lines.append('coasting_enable = 0'+'\n')
+                        # lines.append('coasting_min_volume = 0'+'\n')
+                        # lines.append('coasting_speed = 0'+'\n')
+                        # lines.append('coasting_volume = 0'+'\n')
+                        # lines.append('cool_fan_full_at_height = 0'+'\n')
+                        # lines.append('cool_fan_speed = 0'+'\n')
+                        # lines.append('cool_fan_speed_max = 0'+'\n')
+                        # lines.append('cool_fan_speed_min = 0'+'\n')
+                        # lines.append('cool_min_layer_time = 0'+'\n')
+                        # lines.append('cool_min_layer_time_fan_speed_max = 0'+'\n')
+                        # lines.append('cool_min_speed = 0'+'\n')
+                        # lines.append('default_material_print_temperature = 0'+'\n')
+                        # lines.append('gradual_infill_step_height = 0'+'\n')
+                        # lines.append('gradual_infill_steps = 0'+'\n')
+                        # lines.append('infill_before_walls = 0'+'\n')
+                        # lines.append('infill_overlap = 0'+'\n')
+                        # lines.append('infill_overlap_mm = 0'+'\n')
+                        # lines.append('infill_pattern = 0'+'\n')
+                        # lines.append('infill_sparse_density = 0'+'\n')
+                        # lines.append('infill_wipe_dist = 0'+'\n')
+                        # lines.append('jerk_enabled = 0'+'\n')
+                        # lines.append('jerk_print = 0'+'\n')
+                        # lines.append('jerk_support = 0'+'\n')
+                        # lines.append('jerk_support_infill = 0'+'\n')
+                        # lines.append('jerk_support_interface = 0'+'\n')
+                        # lines.append('jerk_topbottom = 0'+'\n')
+                        # lines.append('jerk_wall = 0'+'\n')
+                        # lines.append('jerk_wall_0 = 0'+'\n')
+                        # lines.append('layer_0_z_overlap = 0'+'\n')
+                        # lines.append('layer_height = 0'+'\n')
+                        # lines.append('machine_min_cool_heat_time_window = 0'+'\n')
+                        # lines.append('machine_nozzle_cool_down_speed = 0'+'\n')
+                        # lines.append('machine_nozzle_heat_up_speed = 0'+'\n')
+                        # lines.append('machine_nozzle_size = 0'+'\n')
+                        # lines.append('machine_nozzle_tip_outer_diameter = 0'+'\n')
+                        # lines.append('material_bed_temperature = 0'+'\n')
+                        # lines.append('material_diameter = 0'+'\n')
+                        # lines.append('material_final_print_temperature = 0'+'\n')
+                        # lines.append('material_flow = 0'+'\n')
+                        # lines.append('material_flow_temp_graph = 0'+'\n')
+                        # lines.append('material_initial_print_temperature = 0'+'\n')
+                        # lines.append('material_print_temperature = 0'+'\n')
+                        # lines.append('material_print_temperature_layer_0 = 0'+'\n')
+                        # lines.append('material_standby_temperature = 0'+'\n')
+                        # lines.append('multiple_mesh_overlap = 0'+'\n')
+                        # lines.append('ooze_shield_angle = 0'+'\n')
+                        # lines.append('prime_tower_enable = 0'+'\n')
+                        # lines.append('prime_tower_size = 0'+'\n')
+                        # lines.append('raft_acceleration = 0'+'\n')
+                        # lines.append('raft_airgap = 0'+'\n')
+                        # lines.append('raft_base_line_spacing = 0'+'\n')
+                        # lines.append('raft_base_line_width = 0'+'\n')
+                        # lines.append('raft_base_speed = 0'+'\n')
+                        # lines.append('raft_base_thickness = 0'+'\n')
+                        # lines.append('raft_interface_line_spacing = 0'+'\n')
+                        # lines.append('raft_interface_line_width = 0'+'\n')
+                        # lines.append('raft_interface_speed = 0'+'\n')
+                        # lines.append('raft_interface_thickness = 0'+'\n')
+                        # lines.append('raft_jerk = 0'+'\n')
+                        # lines.append('raft_margin = 0'+'\n')
+                        # lines.append('raft_speed = 0'+'\n')
+                        # lines.append('raft_surface_layers = 0'+'\n')
+                        # lines.append('raft_surface_line_width = 0'+'\n')
+                        # lines.append('raft_surface_thickness = 0'+'\n')
+                        # lines.append('retract_at_layer_change = 0'+'\n')
+                        # lines.append('retraction_amount = 0'+'\n')
+                        # lines.append('retraction_combing = 0'+'\n')
+                        # lines.append('retraction_count_max = 0'+'\n')
+                        # lines.append('retraction_extra_prime_amount = 0'+'\n')
+                        # lines.append('retraction_extrusion_window = 0'+'\n')
+                        # lines.append('retraction_hop = 0'+'\n')
+                        # lines.append('retraction_hop_enabled = 0'+'\n')
+                        # lines.append('retraction_hop_only_when_collides = 0'+'\n')
+                        # lines.append('retraction_min_travel = 0'+'\n')
+                        # lines.append('retraction_prime_speed = 0'+'\n')
+                        # lines.append('retraction_speed = 0'+'\n')
+                        # lines.append('skin_overlap = 0'+'\n')
+                        # lines.append('skirt_brim_minimal_length = 0'+'\n')
+                        # lines.append('skirt_gap = 0'+'\n')
+                        # lines.append('speed_equalize_flow_enabled = 0'+'\n')
+                        # lines.append('speed_infill = 0'+'\n')
+                        # lines.append('speed_layer_0 = 0'+'\n')
+                        # lines.append('speed_print = 0'+'\n')
+                        # lines.append('speed_slowdown_layers = 0'+'\n')
+                        # lines.append('speed_support = 0'+'\n')
+                        # lines.append('speed_support_interface = 0'+'\n')
+                        # lines.append('speed_topbottom = 0'+'\n')
+                        # lines.append('speed_travel = 0'+'\n')
+                        # lines.append('speed_travel_layer_0 = 0'+'\n')
+                        # lines.append('speed_wall = 0'+'\n')
+                        # lines.append('speed_wall_0 = 0'+'\n')
+                        # lines.append('speed_wall_x = 0'+'\n')
+                        # lines.append('support_angle = 0'+'\n')
+                        # lines.append('support_bottom_distance = 0'+'\n')
+                        # lines.append('support_bottom_height = 0'+'\n')
+                        # lines.append('support_bottom_stair_step_height = 0'+'\n')
+                        # lines.append('support_enable = 0'+'\n')
+                        # lines.append('support_infill_rate = 0'+'\n')
+                        # lines.append('support_interface_enable = 0'+'\n')
+                        # lines.append('support_interface_height = 0'+'\n')
+                        # lines.append('support_interface_line_distance = 0'+'\n')
+                        # lines.append('support_interface_pattern = 0'+'\n')
+                        # lines.append('support_join_distance = 0'+'\n')
+                        # lines.append('support_line_distance = 0'+'\n')
+                        # lines.append('support_offset = 0'+'\n')
+                        # lines.append('support_pattern = 0'+'\n')
+                        # lines.append('support_top_distance = 0'+'\n')
+                        # lines.append('support_use_towers = 0'+'\n')
+                        # lines.append('support_xy_distance = 0'+'\n')
+                        # lines.append('support_xy_distance_overhang = 0'+'\n')
+                        # lines.append('support_z_distance = 0'+'\n')
+                        # lines.append('switch_extruder_prime_speed = 0'+'\n')
+                        # lines.append('switch_extruder_retraction_amount = 0'+'\n')
+                        # lines.append('switch_extruder_retraction_speeds = 0'+'\n')
+                        # lines.append('travel_avoid_distance = 0'+'\n')
+                        # lines.append('wall_0_inset = 0'+'\n')
+                        # lines.append('support_infill_extruder_nr = 0'+'\n')
+                        # lines.append('adhesion_extruder_nr = 0'+'\n')
+                        # lines.append('support_extruder_nr = 0'+'\n')
+                        # lines.append('support_interface_extruder_nr = 0'+'\n')
+
                         # lines.append(r'        "acceleration_enabled": { "value": "True" },'+'\n')
                         # lines.append(r'        "acceleration_layer_0": { "value": "acceleration_topbottom" },'+'\n')
                         # lines.append(r'        "acceleration_prime_tower": { "value": "math.ceil(acceleration_print * 2000 / 4000)" },'+'\n')
@@ -1188,11 +1383,8 @@ def createCura2Files():
                         # lines.append(r'        "cool_fan_speed": { "value": "50" },'+'\n')
                         # lines.append(r'        "cool_fan_speed_max": { "value": "100" },'+'\n')
                         # lines.append(r'        "cool_min_speed": { "value": "5" },'+'\n')
-                        # lines.append(r'        "infill_line_width": { "value": "round(line_width * 0.5 / 0.35, 2)" },'+'\n')
                         # lines.append(r'        "infill_overlap": { "value": "0" },'+'\n')
                         # lines.append(r'        "infill_wipe_dist": { "value": "0" },'+'\n')
-                        # lines.append(r'        "layer_height_0": { "value": "round(machine_nozzle_size / 1.5, 2)" },'+'\n')
-                        # lines.append(r'        "cool_fan_full_at_height": { "value": "layer_height_0 + 4 * layer_height" },'+'\n')
                         # lines.append(r'        "default_material_print_temperature": { "value": "200" },'+'\n')
                         # lines.append(r'        "material_print_temperature_layer_0": { "value": "material_print_temperature + 5" },'+'\n')
                         # lines.append(r'        "retraction_amount": { "value": "2" },'+'\n')
@@ -1215,10 +1407,6 @@ def createCura2Files():
                         # lines.append(r'        "speed_wall_0": { "value": "math.ceil(speed_wall * 20 / 30)" },'+'\n')
                         # lines.append(r'        "speed_wall_x": { "value": "speed_wall" },'+'\n')
                         # lines.append(r'        "support_z_distance": { "value": "0" },'+'\n')
-                        # lines.append(r'        "top_bottom_thickness": { "value": "1" },'+'\n')
-
-                        # lines.append(r'        "machine_extruder_start_code": { "default_value": "" },'+'\n')
-                        # lines.append(r'        "machine_extruder_end_code": { "default_value": "" }'+'\n')
 
                         # lines.append(r'        <setting key="print temperature">'+str(filament['printTemperature'][0])+'</setting>'+'\n')
                         # lines.append(r'        <setting key="heated bed temperature">'+str(filament['bedTemperature'])+'</setting>'+'\n')
@@ -1259,6 +1447,19 @@ def createCura2Files():
                         # lines.append('support_join_distance = 10'+'\n')
                         # lines.append('support_interface_enable = True'+'\n')
                         # lines.append(''+'\n')
+                        # lines.append('infill_sparse_density = 25'+'\n')
+                        # lines.append('infill_overlap = -50'+'\n')
+                        # lines.append('skin_overlap = -40'+'\n')
+                        # lines.append(''+'\n')
+                        # lines.append('adhesion_type = skirt'+'\n')
+                        # lines.append('skirt_gap = 0.5'+'\n')
+                        # lines.append('skirt_brim_minimal_length = 50'+'\n')
+                        # lines.append(''+'\n')
+                        # lines.append('coasting_enable = True'+'\n')
+                        # lines.append('coasting_volume = 0.1'+'\n')
+                        # lines.append('coasting_min_volume = 0.17'+'\n')
+                        # lines.append('coasting_speed = 90'+'\n')
+                        # lines.append(''+'\n')
 
                         f.writelines(lines)
    
@@ -1281,31 +1482,13 @@ def createCura2Files():
                 lines.append('machine_nozzle_tip_outer_diameter = '+str(hotend['nozzleTipOuterDiameter'])+'\n') # The outer diameter of the tip of the nozzle.
                 lines.append('machine_nozzle_head_distance = '+str(hotend['nozzleHeadDistance'])+'\n') # The height difference between the tip of the nozzle and the lowest part of the print head.
                 lines.append('machine_nozzle_expansion_angle = '+str(hotend['nozzleExpansionAngle'])+'\n') # The angle between the horizontal plane and the conical part right above the tip of the nozzle.
-                lines.append('machine_heat_zone_length = 15'+'\n') # The distance from the tip of the nozzle in which heat from the nozzle is transferred to the filament.
+                lines.append('machine_heat_zone_length = 8'+'\n') # The distance from the tip of the nozzle in which heat from the nozzle is transferred to the filament.
                 lines.append('machine_nozzle_temp_enabled = True'+'\n') # Whether to control temperature from Cura. Turn this off to control nozzle temperature from outside of Cura.
-                lines.append('machine_nozzle_heat_up_speed = 1.4'+'\n') # The speed (°C/s) by which the nozzle heats up averaged over the window of normal printing temperatures and the standby temperature.
-                lines.append('machine_nozzle_cool_down_speed = 0.8'+'\n') # The speed (°C/s) by which the nozzle cools down averaged over the window of normal printing temperatures and the standby temperature.
-                lines.append('machine_min_cool_heat_time_window = 10'+'\n') # The minimal time an extruder has to be inactive before the nozzle is cooled. Only when an extruder is not used for longer than this time will it be allowed to cool down to the standby temperature.
+                lines.append('machine_nozzle_heat_up_speed = '+str(hotend['heatUpSpeed'])+'\n') # The speed (°C/s) by which the nozzle heats up averaged over the window of normal printing temperatures and the standby temperature.
+                lines.append('machine_nozzle_cool_down_speed = '+str(hotend['coolDownSpeed'])+'\n') # The speed (°C/s) by which the nozzle cools down averaged over the window of normal printing temperatures and the standby temperature.
+                lines.append('machine_min_cool_heat_time_window = '+str(hotend['minimumCoolHeatTimeWindow'])+'\n') # The minimal time an extruder has to be inactive before the nozzle is cooled. Only when an extruder is not used for longer than this time will it be allowed to cool down to the standby temperature.
                 lines.append(''+'\n')
-                lines.append('infill_line_width = '+str(hotend['nozzleSize'])+'\n')
-                lines.append(''+'\n')
-                lines.append('wall_thickness = 1'+'\n')
                 lines.append('wall_0_inset = -0.05'+'\n')
-                lines.append('fill_perimeter_gaps = nowhere'+'\n')
-                lines.append('travel_compensate_overlapping_walls_enabled = '+'\n')
-                lines.append(''+'\n')
-                lines.append('infill_sparse_density = 25'+'\n')
-                lines.append('infill_overlap = -50'+'\n')
-                lines.append('skin_overlap = -40'+'\n')
-                lines.append(''+'\n')
-                lines.append('adhesion_type = skirt'+'\n')
-                lines.append('skirt_gap = 0.5'+'\n')
-                lines.append('skirt_brim_minimal_length = 50'+'\n')
-                lines.append(''+'\n')
-                lines.append('coasting_enable = True'+'\n')
-                lines.append('coasting_volume = 0.1'+'\n')
-                lines.append('coasting_min_volume = 0.17'+'\n')
-                lines.append('coasting_speed = 90'+'\n')
                 f.writelines(lines)
 
 def installCura2Files():
@@ -1318,28 +1501,41 @@ def installCura2Files():
         root_dst_dir = '/Applications/Cura.app/Contents/Resources/resources'
     
     elif platform.system() == 'Windows':
+
         installedCuras = []
+        
         for folder in os.listdir('C:\Program Files'): # add [::-1] to list folders in reverse order
             if 'Cura 2' in folder and 'Cura.exe' in os.listdir('C:\\Program Files\\'+folder):
                     installedCuras.append(folder)
 
-        if len(installedCuras) > 1:
-            print "\n\t\tYou have more than one Cura 2 installed! Select where you want to add the BCN3D Sigma:"
-            answer0 = ''
-            folderOptions = []
-            for c in range(len(installedCuras)):
-                folderOptions.append(str(c+1))
-                print '\t\t'+str(c+1)+'. '+installedCuras[c]
-            while answer0 not in folderOptions:
-                answer0 = raw_input('\t\t')            
-            allowAutoInstall = True
-            root_src_dir = 'resources'
-            root_dst_dir = 'C:\\Program Files\\'+installedCuras[int(answer0)-1]+'\\resources'
+        if len(installedCuras) >= 1:
 
-        if len(installedCuras) == 1:
-            allowAutoInstall = True
-            root_src_dir = 'resources'
-            root_dst_dir = 'C:\\Program Files\\'+installedCuras[0]+'\\resources'
+            # check permissions for Windows 10
+            if platform.release() == '10':
+                if is_admin():
+                    allowAutoInstall = True
+                else:
+                    pass
+            else:
+                allowAutoInstall = True
+            
+            if allowAutoInstall:
+                if len(installedCuras) > 1:
+                    print "\n\t\tYou have more than one Cura 2 installed! Select where you want to add the BCN3D Sigma:"
+                    answer0 = ''
+                    folderOptions = []
+                    for c in range(len(installedCuras)):
+                        folderOptions.append(str(c+1))
+                        print '\t\t'+str(c+1)+'. '+installedCuras[c]
+                    while answer0 not in folderOptions:
+                        answer0 = raw_input('\t\t')            
+                    allowAutoInstall = True
+                    root_src_dir = 'resources'
+                    root_dst_dir = 'C:\\Program Files\\'+installedCuras[int(answer0)-1]+'\\resources'
+                else:
+                    allowAutoInstall = True
+                    root_src_dir = 'resources'
+                    root_dst_dir = 'C:\\Program Files\\'+installedCuras[0]+'\\resources'
 
     if allowAutoInstall:
         for src_dir, dirs, files in os.walk(root_src_dir):
@@ -1359,6 +1555,12 @@ def installCura2Files():
         print "\n\t\tUnable to install files automatically.\n"
         print "\t\tA new folder called 'resources' has been created in your working directory."
         print "\t\tCOMBINE it with the one inside your Cura 2 installation folder. Be careful to NOT replace it!\n"
+
+def is_admin():
+    try:
+        return ctypes.windll.shell32.IsUserAnAdmin()
+    except:
+        return False
 
 def createSimplify3DProfilesBundle(dataLog, profilesCreatedCount):    
     y = 'y'
@@ -1776,6 +1978,13 @@ def firstHeatSequence(leftHotendTemp, rightHotendTemp, bedTemp, software):
                 startSequenceString += '\t'+startTimes[-1][-3]+startTimes[-1][-2]+startTimes[-1][-1]
                 startSequenceString += '\t'+startTimes[-2][-3]+startTimes[-2][-2]+startTimes[-2][-1]
     elif software == 'Cura2':
+
+        # Using Cura 2.5.0 the only labels we know to point to extruder being used are:
+        #   adhesion_extruder_nr
+        #   support_infill_extruder_nr
+        #   support_extruder_nr
+        #   support_interface_extruder_nr
+
         startSequenceString = r'\n;' + startSequenceString[2:-1] + r'\n'
         if leftHotendTemp > 0 and rightHotendTemp > 0:
             # IDEX
@@ -1793,7 +2002,7 @@ def firstHeatSequence(leftHotendTemp, rightHotendTemp, bedTemp, software):
         else:
             if leftHotendTemp > 0:
                 # MEX Left
-                timeLeftHotend = (timeVsTemperature(leftHotendTemp, 'M104 ', 'heating', 'getTime'), 'M104 ', 'M109 ', 'S{material_print_temperature_layer_0}',     r' T0\n')
+                timeLeftHotend = (timeVsTemperature(leftHotendTemp, 'M104 ', 'heating', 'getTime'), 'M104 ', 'M109 ', 'S{material_print_temperature_layer_0}',     r' T{adhesion_extruder_nr}\n')
                 timeBed        = (timeVsTemperature(bedTemp,        'M140 ', 'heating', 'getTime'), 'M140 ', 'M190 ', 'S{material_bed_temperature}', r'\n')
                 startTimes = sorted([timeLeftHotend, timeBed])
                 startSequenceString += startTimes[-1][-3]+'S'+str(int(timeVsTemperature(startTimes[-1][0]-startTimes[-2][0], startTimes[-1][-4], 'heating', 'getTemperature')))+startTimes[-1][-1]
@@ -1802,7 +2011,7 @@ def firstHeatSequence(leftHotendTemp, rightHotendTemp, bedTemp, software):
                 startSequenceString += startTimes[-2][-3]+startTimes[-2][-2]+startTimes[-2][-1]
             else:
                 # MEX Right
-                timeRightHotend = (timeVsTemperature(rightHotendTemp, 'M104 ', 'heating', 'getTime'), 'M104 ', 'M109 ', 'S{material_print_temperature_layer_0}', r' T1\n')
+                timeRightHotend = (timeVsTemperature(rightHotendTemp, 'M104 ', 'heating', 'getTime'), 'M104 ', 'M109 ', 'S{material_print_temperature_layer_0}', r' T{adhesion_extruder_nr}\n')
                 timeBed         = (timeVsTemperature(bedTemp,         'M140 ', 'heating', 'getTime'), 'M140 ', 'M190 ', 'S{material_bed_temperature}',       r'\n')
                 startTimes = sorted([timeRightHotend, timeBed])
                 startSequenceString += startTimes[-1][-3]+'S'+str(int(timeVsTemperature(startTimes[-1][0]-startTimes[-2][0], startTimes[-1][-4], 'heating', 'getTemperature')))+startTimes[-1][-1]
@@ -2117,7 +2326,7 @@ def main():
                     clearDisplay()
                     print '\n Welcome to the BCN3D Sigma Profile Generator \n\n\n\n'
                     print '    Experimental features'
-                    print '\n\tChoose one option (1-5):'
+                    print '\n\tChoose one option (1-6):'
                     print '\t1. Generate a bundle of profiles - Simplify3D'
                     print '\t2. Generate a bundle of profiles - Cura'
                     print '\t3. Test all combinations'
@@ -2236,6 +2445,14 @@ def main():
                     print GUIHeader
                     createCura2Files()
                     installCura2Files()
+
+                    # #remove after debug
+                    # if platform.system() == 'Darwin':
+                    #     if "cura.log" in os.listdir('/Users/Guillem/Library/Application Support/cura'):             
+                    #         os.remove('/Users/Guillem/Library/Application Support/cura/cura.log')
+                    #     return
+                    # #remove after debug
+                    
                     raw_input("\t\tPress Enter to continue...")
 
 if __name__ == '__main__':
