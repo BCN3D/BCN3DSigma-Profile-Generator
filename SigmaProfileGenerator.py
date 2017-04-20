@@ -1313,15 +1313,15 @@ def createCura2Files():
                         lines.append(r'jerk_enabled = True'+'\n')
                         lines.append(r'jerk_print = =15'+'\n') # Adjust all jerk
                         lines.append(r'jerk_infill = =jerk_print'+'\n')
-                        lines.append(r'jerk_wall = =jerk_print * 0.4'+'\n')
+                        lines.append(r'jerk_wall = =jerk_print * 0.75'+'\n')
                         lines.append(r'jerk_wall_0 = =jerk_wall * 0.5'+'\n')
                         lines.append(r'jerk_wall_x = =jerk_wall'+'\n')
-                        lines.append(r'jerk_topbottom = =jerk_print * 0.2'+'\n')
-                        lines.append(r'jerk_support = =jerk_print * 0.6'+'\n')
+                        lines.append(r'jerk_topbottom = =jerk_print * 0.5'+'\n')
+                        lines.append(r'jerk_support = =jerk_print * 0.75'+'\n')
                         lines.append(r'jerk_support_infill = =jerk_support'+'\n')
                         lines.append(r'jerk_support_interface = =jerk_topbottom'+'\n')
-                        lines.append(r'jerk_prime_tower = =jerk_print * 0.6'+'\n')
-                        lines.append(r'jerk_travel = jerk_print if magic_spiralize else 30'+'\n')
+                        lines.append(r'jerk_prime_tower = =jerk_print * 0.75'+'\n')
+                        lines.append(r'jerk_travel = =jerk_print if magic_spiralize else 15'+'\n')
                         lines.append(r'jerk_layer_0 = =jerk_topbottom'+'\n')
                         lines.append(r'jerk_print_layer_0 = =jerk_layer_0'+'\n')
                         lines.append(r'jerk_travel_layer_0 = =jerk_layer_0 * jerk_travel / jerk_print'+'\n')
@@ -2426,12 +2426,12 @@ def main():
                     createCura2Files()
                     installCura2Files()
 
-                    # #remove after debug
-                    # if platform.system() == 'Darwin':
-                    #     if "cura.log" in os.listdir('/Users/Guillem/Library/Application Support/cura'):             
-                    #         os.remove('/Users/Guillem/Library/Application Support/cura/cura.log')
-                    #     return
-                    # #remove after debug
+                    #remove after debug
+                    if platform.system() == 'Darwin':
+                        if "cura.log" in os.listdir('/Users/Guillem/Library/Application Support/cura'):             
+                            os.remove('/Users/Guillem/Library/Application Support/cura/cura.log')
+                        return
+                    #remove after debug
                     
                     raw_input("\t\tPress Enter to continue...")
 
