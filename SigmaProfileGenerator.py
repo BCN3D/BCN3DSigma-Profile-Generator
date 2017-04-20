@@ -11,7 +11,7 @@ SigmaProgenVersion = '1.2.0'
 # - Cura 2 integration (under experimental features)
 # - Raft improvements
 
-import time, math, os, platform, sys, json, string, shutil, zipfile, uuid, ctypes
+import time, math, os, platform, sys, json, string, shutil, zipfile, uuid, ctypes, glob
 
 def createSimplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, dataLog, createFile):
     fff = []
@@ -1179,6 +1179,26 @@ def createCura2Files():
         if hotend['id'] != 'None':
             for filament in sorted(profilesData['filament'], key=lambda k: k['id']):
                 for quality in sorted(profilesData['quality'], key=lambda k: k['index']):
+
+                    # Create a new global quality for the new layer height
+                    if cura2id+'_global_Layer_'+str("%.2f" % layerHeight(hotend, quality))+'_mm_Quality.inst.cfg' not in os.listdir('resources/quality/'+cura2id):
+                        with open('resources/quality/'+cura2id+'/'+cura2id+'_global_Layer_'+str("%.2f" % layerHeight(hotend, quality))+'_mm_Quality.inst.cfg', 'w') as f:
+                            lines = []
+                            lines.append(r'[general]'+'\n')
+                            lines.append(r'version = 2'+'\n')
+                            lines.append(r'name = Global Layer '+str("%.2f" % layerHeight(hotend, quality))+' mm'+'\n')
+                            lines.append(r'definition = '+cura2id+'\n')
+                            lines.append(r''+'\n')
+                            lines.append(r'[metadata]'+'\n')
+                            lines.append(r'type = quality'+'\n')
+                            lines.append(r'quality_type = layer'+str("%.2f" % layerHeight(hotend, quality))+'mm'+'\n')
+                            lines.append(r'global_quality = True'+'\n')
+                            lines.append(r'weight = '+str(len(glob.glob('resources/quality/'+cura2id+'/'+cura2id+'_global_Layer_*')))+'\n')
+                            lines.append(r''+'\n')
+                            lines.append(r'[values]'+'\n')
+                            lines.append(r'layer_height = '+str("%.2f" % layerHeight(hotend, quality))+'\n')
+                            f.writelines(lines)
+
                     with open('resources/quality/'+cura2id+'/'+cura2id+'_'+hotend['id'].replace(' ', '_')+'_'+filament['brand'].replace(' ', '_')+'_'+filament['material'].replace(' ', '_')+'_'+quality['id'].replace(' ', '_')+'_Quality.inst.cfg', 'w') as f:
                         lines = []
                         lines.append(r'[general]'+'\n')
@@ -1229,7 +1249,7 @@ def createCura2Files():
                         lines.append(r'z_seam_y = 297'+'\n') 
 
                         # infill
-                        
+
 
                         # adjust skirt lenght to make the start purge
 
