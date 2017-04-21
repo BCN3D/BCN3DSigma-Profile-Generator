@@ -9,6 +9,7 @@
     "filamentDensity": 1.18,
     "isSupportMaterial": false,
     "isFlexibleMaterial": false,
+    "isAbrasiveMaterial": false,
     "bedTemperature": 100,
     "printTemperature": [250, 280],
     "defaultPrintSpeed": 40,
