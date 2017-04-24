@@ -1032,18 +1032,14 @@ def createCura2Files():
         # lines.append(r'            "default_value": false,'+'\n')
         # lines.append(r'            "resolve": "'+"'True' if 'True' in extruderValues('support_enable') else 'False'"+r'"'+'\n') # Not working
         # lines.append(r'        }'+'\n')
-
-        # lines.append(r'        "machine_start_gcode": { "default_value": "\n;Sigma ProGen: '+str(SigmaProgenVersion)+r'\n\nG21\t\t;metric values\nG90\t\t;absolute positioning\nM82\t\t;set extruder to absolute mode\nM107\t\t;start with the fan off\nG28 X0 Y0\t\t;move X/Y to min endstops\nG28 Z0\t\t;move Z to min endstops\nG1 Z5 F200\t\t;Safety Z axis movement\n;{extruder_left_start_code}\n;{extruder_right_start_code}\n" },'+'\n')
-        # lines.append(r'        "machine_end_gcode": { "default_value": "\nM104 S0 T0\nM104 S0 T1\nM140 S0\t\t;heated bed heater off\nG91\t\t;relative positioning\nG1 Z+0.5 E-5 Y+10 F12000\t;move Z up a bit and retract filament\nG28 X0 Y0\t\t;move X/Y to min endstops so the head is out of the way\nM84\t\t;steppers off\nG90\t\t;absolute positioning\n" },'+'\n')
-
+        lines.append(r'        "machine_start_gcode": { "default_value": "\n;Sigma ProGen: '+str(SigmaProgenVersion)+r'\n\nG21\t\t;metric values\nG90\t\t;absolute positioning\nM82\t\t;set extruder to absolute mode\nM107\t\t;start with the fan off\nG28 X0 Y0\t\t;move X/Y to min endstops\nG28 Z0\t\t;move Z to min endstops\nG1 Z5 F200\t\t;Safety Z axis movement\n;{extruder_left_start_code}\n;{extruder_right_start_code}\n" },'+'\n')
+        lines.append(r'        "machine_end_gcode": { "default_value": "\nM104 S0 T0\nM104 S0 T1\nM140 S0\t\t;heated bed heater off\nG91\t\t;relative positioning\nG1 Z+0.5 E-5 Y+10 F12000\t;move Z up a bit and retract filament\nG28 X0 Y0\t\t;move X/Y to min endstops so the head is out of the way\nM84\t\t;steppers off\nG90\t\t;absolute positioning\n" },'+'\n')
         lines.append(r'        "prime_tower_position_x": { "default_value": 105 },'+'\n')
         lines.append(r'        "prime_tower_position_y": { "default_value": 250 },'+'\n')
-
-        # lines.append(r'        "material_bed_temp_wait": { "value": "True" },'+'\n')
-        # lines.append(r'        "material_print_temp_wait": { "value": "True" },'+'\n')
-        # lines.append(r'        "material_bed_temp_prepend": { "value": "True" },'+'\n') # Cura 2.5 ignores it
-        # lines.append(r'        "material_print_temp_prepend": { "value": "True" },'+'\n') # Cura 2.5 ignores it
-        # lines.append(r'        "wall_0_inset": { "value": "0" },'+'\n')
+        lines.append(r'        "material_bed_temp_wait": { "value": "True" },'+'\n')
+        lines.append(r'        "material_print_temp_wait": { "value": "True" },'+'\n')
+        lines.append(r'        "material_bed_temp_prepend": { "value": "False" },'+'\n') # Cura 2.5 ignores it
+        lines.append(r'        "material_print_temp_prepend": { "value": "False" },'+'\n') # Cura 2.5 ignores it
         lines.append(r'    }'+'\n')
         lines.append(r'}'+'\n')
         f.writelines(lines)
