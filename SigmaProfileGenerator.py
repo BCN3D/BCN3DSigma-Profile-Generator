@@ -1032,7 +1032,7 @@ def createCura2Files():
         # lines.append(r'            "default_value": false,'+'\n')
         # lines.append(r'            "resolve": "'+"'True' if 'True' in extruderValues('support_enable') else 'False'"+r'"'+'\n') # Not working
         # lines.append(r'        },'+'\n')
-        lines.append(r'        "machine_start_gcode": { "default_value": "\n;Sigma ProGen: '+str(SigmaProgenVersion)+r'\n\nG21\t\t;metric values\nG90\t\t;absolute positioning\nM82\t\t;set extruder to absolute mode\nM107\t\t;start with the fan off\nG28 X0 Y0\t\t;move X/Y to min endstops\nG28 Z0\t\t;move Z to min endstops\nG1 Z5 F200\t\t;Safety Z axis movement\n;{extruder_left_start_code}\n;{extruder_right_start_code}\n" },'+'\n')
+        lines.append(r'        "machine_start_gcode": { "default_value": "\n;Sigma ProGen: '+str(SigmaProgenVersion)+r'\n\nG21\t\t;metric values\nG90\t\t;absolute positioning\nM82\t\t;set extruder to absolute mode\nM107\t\t;start with the fan off\nG28 X0 Y0\t\t;move X/Y to min endstops\nG28 Z0\t\t;move Z to min endstops\nG1 Z5 F200\t\t;Safety Z axis movement\nT1\nG92 E0\nT0\nG92 E0\n;{extruder_left_start_code}\n;{extruder_right_start_code}\n" },'+'\n')
         lines.append(r'        "machine_end_gcode": { "default_value": "\nM104 S0 T0\nM104 S0 T1\nM140 S0\t\t;heated bed heater off\nG91\t\t;relative positioning\nG1 Z+0.5 E-5 Y+10 F12000\t;move Z up a bit and retract filament\nG28 X0 Y0\t\t;move X/Y to min endstops so the head is out of the way\nM84\t\t;steppers off\nG90\t\t;absolute positioning\n" },'+'\n')
         lines.append(r'        "prime_tower_position_x": { "default_value": 105 },'+'\n')
         lines.append(r'        "prime_tower_position_y": { "default_value": 250 },'+'\n')
@@ -1276,7 +1276,7 @@ def createCura2Files():
                         # lines.append(r'sub_div_rad_mult = 100'+'\n')
                         # lines.append(r'sub_div_rad_add = =wall_line_width_x'+'\n')
                         # lines.append(r'infill_overlap = =10 if infill_sparse_density < 95 and infill_pattern != '+"'"+'concentric'+"'"+r' else 0'+'\n')
-                        lines.append("skin_overlap = =5 if top_bottom_pattern != 'concentric' else 0"+'\n')                        
+                        lines.append("skin_overlap = =5 if top_bottom_pattern != 'concentric' else 0"+'\n')
                         # lines.append(r'infill_wipe_dist = =wall_line_width_0 / 4 if wall_line_count == 1 else wall_line_width_x / 4'+'\n')
                         lines.append(r'infill_sparse_thickness = =layer_height'+'\n')
                         # lines.append(r'gradual_infill_steps = 0'+'\n')
@@ -1369,8 +1369,8 @@ def createCura2Files():
                         # lines.append(r'travel_avoid_other_parts = True'+'\n')
                         # lines.append(r'travel_avoid_distance = =machine_nozzle_tip_outer_diameter / 2 * 1.25'+'\n')
                         # lines.append(r'start_layers_at_same_position = False'+'\n') # different than z_seam
-                        lines.append(r'layer_start_x = 105'+'\n') # different than z_seam
-                        lines.append(r'layer_start_y = 297'+'\n') # different than z_seam
+                        # lines.append(r'layer_start_x = 105'+'\n') # different than z_seam
+                        # lines.append(r'layer_start_y = 297'+'\n') # different than z_seam
                         lines.append(r'retraction_hop_enabled = True'+'\n')
                         lines.append(r'retraction_hop_only_when_collides = True'+'\n')
                         # lines.append(r'retraction_hop = =0.75 * machine_nozzle_size'+'\n')
@@ -1427,7 +1427,7 @@ def createCura2Files():
                         lines.append(r'support_interface_pattern = lines'+'\n')
                         # lines.append(r'support_use_towers = True'+'\n')
                         # lines.append(r'support_tower_diameter = 3.0'+'\n')
-                        lines.append(r'support_minimal_diameter = 5.0'+'\n')
+                        lines.append(r'support_minimal_diameter = 1.0'+'\n')
                         # lines.append(r'support_tower_roof_angle = 65'+'\n')
 
                         # platform_adhesion
