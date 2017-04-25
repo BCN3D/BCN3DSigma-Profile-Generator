@@ -12,6 +12,7 @@
     "isAbrasiveMaterial": false,
     "bedTemperature": 70,
     "printTemperature": [210, 210],
+    "standbyTemperature": 150,
     "defaultPrintSpeed": 60,
     "advisedMaxPrintSpeed": 60,
     "maxFlow": "None",
