@@ -4,20 +4,10 @@
 # Guillem Àvila Padró - October 2016
 # Released under GNU LICENSE
 # https://opensource.org/licenses/GPL-3.0
-SigmaProgenVersion = '1.1.7'
+SigmaProgenVersion = '1.1.8'
 
 # Version Changelog:
-# - Start gcodes adjusted for cleaner skirts
-# - Improved Layer Fan speeds according to layer height and temperature
-# - Code cleaned up
-# - S3D: Fixed bug in starting gcode for Dual prints
-# - Support material speeds bugfixes
-# - S3D: Minor readability fix
-# - Adjusted first layer heights & speeds
-# - Acceleration reduction disabled when using flexible materials
-# - Cura: Retract improvements
-# - Added ProGen version info to profiles (at Starting GCode)
-# - Minor corrections
+# - Cura: Minor start gcode fix
 
 import time, math, os, platform, sys, json, string, shutil, zipfile
 
@@ -852,15 +842,12 @@ def createCuraProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, qual
     ini.append('\tM107                              ;start with the fan off\n')
     ini.append('\tG28 X0 Y0                         ;move X/Y to min endstops\n')
     ini.append('\tG28 Z0                            ;move Z to min endstops\n')
+    ini.append('\tG1 Z5 F200                        ;Safety Z axis movement\n')
     ini.append('\tT'+str(currentPrimaryExtruder)+'  ;change to active toolhead\n')
     ini.append('\tG92 E0                            ;zero the extruded length\n')
-    ini.append('\tG1 Z5 F1200                       ;Safety Z axis movement\n')
     ini.append('\tG1 F'+str(currentPurgeSpeed)+' E'+str(currentStartPurgeLength)+' ;extrude '+str(currentStartPurgeLength)+'mm of feed stock\n')
     ini.append('\tG92 E0                            ;zero the extruded length again\n')
     ini.append('\tG1 F2400 E-4\n')
-    ini.append('\tG91\n')
-    ini.append('\tG1 F{travel_speed} Z5\n')
-    ini.append('\tG90\n')
     ini.append('end.gcode = M104 S0\n')
     ini.append('\tM140 S0                           ;heated bed heater off\n')
     ini.append('\tG91                               ;relative positioning\n')
@@ -882,6 +869,7 @@ def createCuraProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, qual
     ini.append('\tM107                              ;start with the fan off\n')
     ini.append('\tG28 X0 Y0                         ;move X/Y to min endstops\n')
     ini.append('\tG28 Z0                            ;move Z to min endstops\n')
+    ini.append('\tG1 Z5 F200                        ;Safety Z axis movement\n')
     ini.append('\tT1                                ;switch to the 2nd extruder\n')
     ini.append('\tG92 E0                            ;zero the extruded length\n')
     ini.append('\tG1 F'+str(currentPurgeSpeedT1)+' E'+str(currentStartPurgeLengthT1)+' ;extrude '+str(currentStartPurgeLengthT1)+'mm of feed stock\n')
@@ -892,9 +880,6 @@ def createCuraProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, qual
     ini.append('\tG1 F'+str(currentPurgeSpeedT0)+' E'+str(currentStartPurgeLengthT0)+' ;extrude '+str(currentStartPurgeLengthT0)+'mm of feed stock\n')
     ini.append('\tG92 E0                            ;zero the extruded length again\n')
     ini.append('\tG1 F2400 E-4\n')
-    ini.append('\tG91\n')
-    ini.append('\tG1 F{travel_speed} Z5\n')
-    ini.append('\tG90\n')
     ini.append('end2.gcode = M104 T0 S0\n')
     ini.append('\tM104 T1 S0                        ;extruder heater off\n')
     ini.append('\tM140 S0                           ;heated bed heater off\n')
