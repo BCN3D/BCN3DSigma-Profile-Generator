@@ -863,7 +863,12 @@ def createCuraProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, qual
     ini.append('\t;Print time: {print_time}\n')
     ini.append('\t;Filament used: {filament_amount}m {filament_weight}g\n')
     ini.append('\t;Filament cost: {filament_cost}\n')
-    ini.append(firstHeatSequence(printTemperature1, printTemperature2, bedTemperature, 'Cura'))
+    if printTemperature1 == 0:
+        ini.append(firstHeatSequence(printTemperature2, printTemperature2, bedTemperature, 'Cura'))
+    elif printTemperature2 == 0:
+        ini.append(firstHeatSequence(printTemperature1, printTemperature1, bedTemperature, 'Cura'))
+    else:
+        ini.append(firstHeatSequence(printTemperature1, printTemperature2, bedTemperature, 'Cura'))
     ini.append('\tG21                               ;metric values\n')
     ini.append('\tG90                               ;absolute positioning\n')
     ini.append('\tM107                              ;start with the fan off\n')
