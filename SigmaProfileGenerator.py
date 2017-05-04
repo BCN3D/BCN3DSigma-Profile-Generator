@@ -1277,7 +1277,7 @@ def createCura2Files():
 
                         # infill
                         lines.append(r'infill_sparse_density = ='+("%.2f" % min(100, quality['infillPercentage'] * 1.25))+' if infill_pattern == '+"'"+'cubicsubdiv'+"'"+r' else '+("%.2f" % quality['infillPercentage'])+'\n') # 'if' is not working...
-                        lines.append(r'infill_pattern = cubicsubdiv'+'\n')
+                        lines.append(r'infill_pattern = cubic'+'\n')
                         # lines.append(r'sub_div_rad_mult = 100'+'\n')
                         # lines.append(r'sub_div_rad_add = =wall_line_width_x'+'\n')
                         # lines.append(r'infill_overlap = =10 if infill_sparse_density < 95 and infill_pattern != '+"'"+'concentric'+"'"+r' else 0'+'\n')
@@ -1612,7 +1612,7 @@ def createCura2Files():
         lines.append(r'                "fixToolChangeZHop":'+'\n')
         lines.append(r'                {'+'\n')
         lines.append(r'                    "label": "Fix Tool Change Z Hop",'+'\n')
-        lines.append(r'                    "description": "When changing between toolheads, first move X/Y and then lift Z.",'+'\n')
+        lines.append(r'                    "description": "When changing between toolheads, first move X/Y and then move Z.",'+'\n')
         lines.append(r'                    "type": "bool",'+'\n')
         lines.append(r'                    "default_value": true'+'\n')
         lines.append(r'                },'+'\n')
