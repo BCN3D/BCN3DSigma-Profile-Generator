@@ -935,6 +935,12 @@ def createCuraProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, qual
 def createCura2Files():
 
     '''
+
+    ToDo:
+
+    - Fix support settings not applying
+    - Move all possible options to machine definition instead of quality
+
         Values hierarchy:
             
             quality->material->variant->definition
@@ -1238,7 +1244,7 @@ def createCura2Files():
                         lines.append(r'[values]'+'\n')
 
                         
-                        lines.append(r'machine_extruder_start_code = ="\nM800 F'+str(currentPurgeSpeed)+' S'+str(currentSParameter)+' E'+str(currentEParameter)+' P'+str(currentPParameter)+r'\t;SmartPurge - Needs Firmware v01-1.2.3\nG4 P2000\t\t\t\t;Stabilize Hotend'+"'"+r's pressure\nG92 E0\t\t\t\t;Zero extruder\nG1 F3000 E-4.5\t\t\t\t;Retract\nG1 F12000\t\t\t;End tool switch\nG91\nG1 F12000 Z2\nG90\n"'+'\n') # Keyword NOT WORKING on Cura 2.5
+                        # lines.append(r'machine_extruder_start_code = ="\nM800 F'+str(currentPurgeSpeed)+' S'+str(currentSParameter)+' E'+str(currentEParameter)+' P'+str(currentPParameter)+r'\t;SmartPurge - Needs Firmware v01-1.2.3\nG4 P2000\t\t\t\t;Stabilize Hotend'+"'"+r's pressure\nG92 E0\t\t\t\t;Zero extruder\nG1 F3000 E-4.5\t\t\t\t;Retract\nG1 F12000\t\t\t;End tool switch\nG91\nG1 F12000 Z2\nG90\n"'+'\n') # Keyword NOT WORKING on Cura 2.5
 
                         # resolution
                         lines.append(r'layer_height = '+("%.2f" % currentLayerHeight)+'\n')
@@ -1398,16 +1404,15 @@ def createCura2Files():
 
                         # support
                         if filament['isSupportMaterial']:
-                            lines.append(r'support_enable = True'+'\n') # Not working
+                            # lines.append(r'support_enable = True'+'\n') # Not working
                             lines.append(r'support_infill_rate = 25'+'\n')
                             lines.append(r'support_xy_distance = 0.5'+'\n')
                             lines.append(r'support_z_distance = 0'+'\n')
                             lines.append(r'support_interface_density = 100'+'\n')
                             lines.append(r'support_conical_enabled = False'+'\n')
                             # lines.append(r'support_conical_angle = 30'+'\n')
-                        else:                        
-
-                            lines.append(r'support_enable = False'+'\n')
+                        else:
+                            # lines.append(r'support_enable = False'+'\n')
                             lines.append(r'support_infill_rate = 15'+'\n')
                             lines.append(r'support_xy_distance = 0.7'+'\n')
                             lines.append(r'support_z_distance = =layer_height'+'\n')
@@ -1425,8 +1430,8 @@ def createCura2Files():
                         lines.append(r'support_join_distance = 10'+'\n')
                         lines.append(r'support_offset = 1'+'\n')
                         lines.append(r'support_interface_enable = True'+'\n')
-                        # lines.append("support_interface_height = =3 * layer_height"+'\n')
-                        lines.append("support_roof_height =4 * layer_height"+'\n')
+                        lines.append("support_interface_height = =5 * layer_height"+'\n')
+                        # lines.append("support_roof_height =extruderValue(support_interface_extruder_nr, 'support_interface_height')"+'\n')
                         # lines.append("support_bottom_height = =extruderValue(support_interface_extruder_nr, 'support_interface_height')"+'\n')
                         lines.append(r'support_interface_skip_height = =layer_height'+'\n')
                         lines.append(r'support_interface_pattern = lines'+'\n')
