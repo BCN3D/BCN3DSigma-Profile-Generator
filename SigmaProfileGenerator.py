@@ -426,8 +426,8 @@ def createSimplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight
             currentFirstLayerHeightPercentage = int(firstLayerHeight * 100 / float(currentLayerHeight))
             currentFirstLayerUnderspeed = min(quality['firstLayerUnderspeed'], round(100 / float(currentFirstLayerHeightPercentage), 2))
 
-            currentPerimeterOutlines = max(2, int(round(quality['wallWidth'] / currentHotend['nozzleSize']))) # 2 minimum Perimeters needed
-            currentTopSolidLayers = max(4, int(round(quality['topBottomWidth'] / currentLayerHeight)))        # 4 minimum layers needed
+            currentPerimeterOutlines = max(3, int(round(quality['wallWidth'] / currentHotend['nozzleSize']))) # 3 minimum Perimeters needed
+            currentTopSolidLayers = max(5, int(round(quality['topBottomWidth'] / currentLayerHeight)))        # 5 minimum layers needed
             currentBottomSolidLayers = currentTopSolidLayers
             currentRaftExtruder = currentPrimaryExtruder
             currentSkirtExtruder = currentPrimaryExtruder
@@ -729,9 +729,9 @@ def createCuraProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, qual
     ini = []
     ini.append('[profile]\n')
     ini.append('layer_height = '+str(currentLayerHeight)+'\n')
-    ini.append('wall_thickness = '+str(currentWallThickness)+'\n')
+    ini.append('wall_thickness = '+str(max( 3 * hotend['nozzleSize'], currentWallThickness))+'\n')              # 3 minimum Perimeters needed
     ini.append('retraction_enable = True\n')
-    ini.append('solid_layer_thickness = '+str(quality['topBottomWidth'])+'\n')
+    ini.append('solid_layer_thickness = '+str(max( 5 * currentLayerHeight, quality['topBottomWidth']))+'\n')    # 5 minimum layers needed
     ini.append('fill_density = '+str(quality['infillPercentage'])+'\n')
     ini.append('nozzle_size = '+str(hotend['nozzleSize'])+'\n')
     ini.append('print_speed = '+str(currentDefaultSpeed/60)+'\n')
@@ -1038,7 +1038,7 @@ def createCura2Files():
         # lines.append(r'            "default_value": false,'+'\n')
         # lines.append(r'            "resolve": "'+"'True' if 'True' in extruderValues('support_enable') else 'False'"+r'"'+'\n') # Not working
         # lines.append(r'        },'+'\n')
-        lines.append(r'        "machine_start_gcode": { "default_value": "\n;Sigma ProGen: '+str(SigmaProgenVersion)+r'\n\nG21\t\t;metric values\nG90\t\t;absolute positioning\nM82\t\t;set extruder to absolute mode\nM107\t\t;start with the fan off\nG28 X0 Y0\t\t;move X/Y to min endstops\nG28 Z0\t\t;move Z to min endstops\nG1 Z5 F200\t\t;safety Z axis movement\nT1\t\t;switch to the right extruder\nG92 E0\t\t;zero the extruded length\nG1 E10 F200\t\t;extrude 10mm of feed stock\nG92 E0\t\t;zero the extruded length\nT0\t\t;switch to the left extruder\nG92 E0\t\t;zero the extruded length\nG1 E10 F200\t\t;extrude 10mm of feed stock\nG92 E0\t\t;zero the extruded length\nG4 P2000\t\t;stabilize hotend'+"'"+r's pressure\n" },'+'\n')
+        lines.append(r'        "machine_start_gcode": { "default_value": "\n;Sigma ProGen: '+str(SigmaProgenVersion)+r'\n\nG21\t\t;metric values\nG90\t\t;absolute positioning\nM82\t\t;set extruder to absolute mode\nM107\t\t;start with the fan off\nG28 X0 Y0\t\t;move X/Y to min endstops\nG28 Z0\t\t;move Z to min endstops\nG1 Z5 F200\t\t;safety Z axis movement\nT1\t\t;switch to the right extruder\nG92 E0\t\t;zero the extruded length\nG1 E10 F200\t\t;extrude 10mm of feed stock\nG92 E0\t\t;zero the extruded length\nT0\t\t;switch to the left extruder\nG92 E0\t\t;zero the extruded length\nG1 E10 F200\t\t;extrude 10mm of feed stock\nG92 E0\t\t;zero the extruded length\nG4 P2000\t\t;stabilize hotend'+"'"+r's pressure\nG1 F2400 E-8\t\t;retract\n" },'+'\n')
         lines.append(r'        "machine_end_gcode": { "default_value": "\nM104 S0 T0\t\t;left extruder heater off\nM104 S0 T1\t\t;right extruder heater off\nM140 S0\t\t;heated bed heater off\nG91\t\t;relative positioning\nG1 Z+0.5 E-5 Y+10 F12000\t;move Z up a bit and retract filament\nG28 X0 Y0\t\t;move X/Y to min endstops so the head is out of the way\nM84\t\t;steppers off\nG90\t\t;absolute positioning\n" },'+'\n')
         lines.append(r'        "prime_tower_position_x": { "default_value": 105 },'+'\n')
         lines.append(r'        "prime_tower_position_y": { "default_value": 250 },'+'\n')
@@ -1247,16 +1247,16 @@ def createCura2Files():
                         # lines.append(r'wall_line_width_0 = =wall_line_width'+'\n')
                         lines.append(r'wall_line_width_x = =machine_nozzle_size * 0.85'+'\n')
                         # lines.append(r'skin_line_width = =line_width'+'\n')
-                        lines.append(r'infill_line_width = =machine_nozzle_size * 1.4'+'\n')
+                        lines.append(r'infill_line_width = =machine_nozzle_size * 1.25'+'\n')
                         # lines.append(r'skirt_brim_line_width = =line_width'+'\n')
                         lines.append(r'support_line_width = =infill_line_width'+'\n')
                         # lines.append(r'support_interface_line_width = =line_width'+'\n')
                         # lines.append(r'prime_tower_line_width = =line_width'+'\n')
 
                         #shell
-                        lines.append(r'wall_thickness = '+("%.2f" % quality['wallWidth'])+'\n') 
+                        lines.append(r'wall_thickness = =max( 3 * machine_nozzle_size, '+("%.2f" % quality['wallWidth'])+')'+'\n')     # 3 minimum Perimeters needed
                         lines.append(r'wall_0_wipe_dist = 0'+'\n')
-                        lines.append(r'top_bottom_thickness = '+("%.2f" % quality['topBottomWidth'])+'\n')
+                        lines.append(r'top_bottom_thickness = =max( 5 * layer_height, '+("%.2f" % quality['topBottomWidth'])+')'+'\n') # 5 minimum layers needed
                         # lines.append(r'top_thickness = =top_bottom_thickness'+'\n')
                         # lines.append(r'bottom_thickness = =top_bottom_thickness'+'\n')
                         # lines.append(r'top_bottom_pattern = =lines'+'\n')
@@ -1296,8 +1296,8 @@ def createCura2Files():
                         lines.append(r'default_material_print_temperature = '+str(round((filament['printTemperature'][1]-filament['printTemperature'][0])/2.+filament['printTemperature'][0]))+'\n')
                         # lines.append(r'material_print_temperature = =default_material_print_temperature'+'\n')
                         # lines.append(r'material_print_temperature_layer_0 = =material_print_temperature'+'\n')
-                        lines.append(r'material_initial_print_temperature = =max(-273.15, material_print_temperature - 5)'+'\n')
-                        # lines.append(r'material_final_print_temperature = =max(-273.15, material_print_temperature - 15)'+'\n')
+                        lines.append(r'material_initial_print_temperature = =max(-273.15, material_print_temperature - 0)'+'\n')
+                        lines.append(r'material_final_print_temperature = =max(-273.15, material_print_temperature - 10)'+'\n')
                         lines.append(r'material_flow_temp_graph = [[1.0,'+str(filament['printTemperature'][0])+'], ['+str(maxFlowValue(hotend, filament, currentLayerHeight))+','+str(filament['printTemperature'][1])+']]'+'\n')
                         # lines.append(r'material_extrusion_cool_down_speed = 0.7'+'\n') # this value depends on extruded flow (not material_flow)
                         lines.append(r'material_bed_temperature = '+("%.2f" % filament['bedTemperature'])+'\n')
@@ -2111,6 +2111,17 @@ def createCura2Files():
         lines.append(r'                            text: catalog.i18nc("@label", "mm")'+'\n')
         lines.append(r'                        }'+'\n')
         lines.append(r'                    }'+'\n')
+        lines.append(r''+'\n')
+        lines.append(r'                    Column'+'\n')
+        lines.append(r'                    {'+'\n')
+        lines.append(r'                        CheckBox'+'\n')
+        lines.append(r'                        {'+'\n')
+        lines.append(r'                            id: printOneAtATimeCheckBox'+'\n')
+        lines.append(r'                            text: catalog.i18nc("@option:check", "Enable Print one at a time")'+'\n')
+        lines.append( "                            checked: String(machinePrintOneAtATimeProvider.properties.value).toLowerCase() != 'false'"+'\n')
+        lines.append(r'                            onClicked: machinePrintOneAtATimeProvider.setPropertyValue("enabled", checked)'+'\n')
+        lines.append(r'                        }'+'\n')
+        lines.append(r'                    }'+'\n')
         lines.append(r'                }'+'\n')
         lines.append(r''+'\n')
         lines.append(r'                Column'+'\n')
@@ -2337,51 +2348,11 @@ def createCura2Files():
         lines.append(r''+'\n')
         lines.append(r'    UM.SettingPropertyProvider'+'\n')
         lines.append(r'    {'+'\n')
-        lines.append(r'        id: machineShapeProvider'+'\n')
+        lines.append(r'        id: machinePrintOneAtATimeProvider'+'\n')
         lines.append(r''+'\n')
         lines.append(r'        containerStackId: Cura.MachineManager.activeMachineId'+'\n')
-        lines.append(r'        key: "machine_shape"'+'\n')
-        lines.append(r'        watchedProperties: [ "value", "options" ]'+'\n')
-        lines.append(r'        storeIndex: manager.containerIndex'+'\n')
-        lines.append(r'    }'+'\n')
-        lines.append(r''+'\n')
-        lines.append(r'    UM.SettingPropertyProvider'+'\n')
-        lines.append(r'    {'+'\n')
-        lines.append(r'        id: machineHeatedBedProvider'+'\n')
-        lines.append(r''+'\n')
-        lines.append(r'        containerStackId: Cura.MachineManager.activeMachineId'+'\n')
-        lines.append(r'        key: "machine_heated_bed"'+'\n')
-        lines.append(r'        watchedProperties: [ "value" ]'+'\n')
-        lines.append(r'        storeIndex: manager.containerIndex'+'\n')
-        lines.append(r'    }'+'\n')
-        lines.append(r''+'\n')
-        lines.append(r'    UM.SettingPropertyProvider'+'\n')
-        lines.append(r'    {'+'\n')
-        lines.append(r'        id: machineCenterIsZeroProvider'+'\n')
-        lines.append(r''+'\n')
-        lines.append(r'        containerStackId: Cura.MachineManager.activeMachineId'+'\n')
-        lines.append(r'        key: "machine_center_is_zero"'+'\n')
-        lines.append(r'        watchedProperties: [ "value" ]'+'\n')
-        lines.append(r'        storeIndex: manager.containerIndex'+'\n')
-        lines.append(r'    }'+'\n')
-        lines.append(r''+'\n')
-        lines.append(r'    UM.SettingPropertyProvider'+'\n')
-        lines.append(r'    {'+'\n')
-        lines.append(r'        id: machineGCodeFlavorProvider'+'\n')
-        lines.append(r''+'\n')
-        lines.append(r'        containerStackId: Cura.MachineManager.activeMachineId'+'\n')
-        lines.append(r'        key: "machine_gcode_flavor"'+'\n')
-        lines.append(r'        watchedProperties: [ "value", "options" ]'+'\n')
-        lines.append(r'        storeIndex: manager.containerIndex'+'\n')
-        lines.append(r'    }'+'\n')
-        lines.append(r''+'\n')
-        lines.append(r'    UM.SettingPropertyProvider'+'\n')
-        lines.append(r'    {'+'\n')
-        lines.append(r'        id: machineNozzleSizeProvider'+'\n')
-        lines.append(r''+'\n')
-        lines.append(r'        containerStackId: Cura.MachineManager.activeMachineId'+'\n')
-        lines.append(r'        key: "machine_nozzle_size"'+'\n')
-        lines.append(r'        watchedProperties: [ "value" ]'+'\n')
+        lines.append(r'        key: "print_sequence"'+'\n')
+        lines.append(r'        watchedProperties: [ "enabled" ]'+'\n')
         lines.append(r'        storeIndex: manager.containerIndex'+'\n')
         lines.append(r'    }'+'\n')
         lines.append(r''+'\n')
@@ -2817,8 +2788,8 @@ def fanSpeed(filament, temperature, layerHeight, base = 5):
 def timeVsTemperature(element, value, action, command):
 
     if element['id'] != 'bed':
-        hotendParameter1 = element['timeToHeatUpTo300'] * 1.25
-        hotendParameter1c = element['timeToCoolDownTo100'] * 0.73
+        hotendParameter1 = element['timeToHeatUp150To300'] * 2.05
+        hotendParameter1c = element['timeToCoolDown300To150'] * 1.16
     hotendParameter2 = 575 
     hotendParameter2c = 325
     hotendParameter3 = 25
@@ -3288,6 +3259,18 @@ def main():
                             lines.append(r'        2 - Restart Cura 2'+'\n')
                             f.writelines(lines)
                         shutil.make_archive('BCN3D Sigma - Cura 2', 'zip', 'Cura 2')
+
+                        # # Copy files to BCN3D Utilities repository
+                        # try:
+                        #     if "MacOS" in os.listdir("../BCN3D-Utilities/Sigma - Cura 2"):
+                        #         shutil.rmtree("../BCN3D-Utilities/Sigma - Cura 2/MacOS")
+                        #     shutil.copytree("Cura 2/MacOS", "../BCN3D-Utilities/Sigma - Cura 2/MacOS")
+                        #     if "Windows" in os.listdir("../BCN3D-Utilities/Sigma - Cura 2"):
+                        #         shutil.rmtree("../BCN3D-Utilities/Sigma - Cura 2/Windows")
+                        #     shutil.copytree("Cura 2/Windows", "../BCN3D-Utilities/Sigma - Cura 2/Windows")
+                        # except:
+                        #     pass
+                            
                         shutil.rmtree("Cura 2")
                         raw_input("\n\tEaster egg. Cura 2 files created and zipped to share ;) Press Enter to continue...")
 
