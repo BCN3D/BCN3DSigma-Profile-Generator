@@ -6,7 +6,7 @@
     "nozzleExpansionAngle": 46.68,
     "material": "Brass",
     "hotBlock": "Standard",
-    "timeToHeatUpTo300": 140,
-    "timeToCoolDownTo100": 150,
-    "minimumCoolHeatTimeWindow": 5
+    "timeToHeatUp150To300": 99,
+    "timeToCoolDown300To150": 69,
+    "minimumCoolHeatTimeWindow": 50
 }
