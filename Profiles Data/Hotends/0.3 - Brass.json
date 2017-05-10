@@ -5,8 +5,9 @@
     "nozzleHeadDistance": 3.5,
     "nozzleExpansionAngle": 46.33,
     "material": "Brass",
+    "temperatureCompensation": 0,
     "hotBlock": "Standard",
     "timeToHeatUp150To300": 99,
     "timeToCoolDown300To150": 69,
-    "minimumCoolHeatTimeWindow": 50
+    "minimumCoolHeatTimeWindow": 5
 }
