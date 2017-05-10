@@ -2117,8 +2117,8 @@ def createCura2Files():
         lines.append(r'                        CheckBox'+'\n')
         lines.append(r'                        {'+'\n')
         lines.append(r'                            id: printOneAtATimeCheckBox'+'\n')
-        lines.append(r'                            text: catalog.i18nc("@option:check", "Enable Print one at a time")'+'\n')
-        lines.append( "                            checked: String(machinePrintOneAtATimeProvider.properties.value).toLowerCase() != 'false'"+'\n')
+        lines.append(r'                            text: catalog.i18nc("@option:check", "Enable setting: Print Sequence")'+'\n')
+        lines.append( "                            checked: String(machinePrintOneAtATimeProvider.properties.enabled).toLowerCase() != 'false'"+'\n')
         lines.append(r'                            onClicked: machinePrintOneAtATimeProvider.setPropertyValue("enabled", checked)'+'\n')
         lines.append(r'                        }'+'\n')
         lines.append(r'                    }'+'\n')
@@ -3270,7 +3270,7 @@ def main():
                         #     shutil.copytree("Cura 2/Windows", "../BCN3D-Utilities/Sigma - Cura 2/Windows")
                         # except:
                         #     pass
-                            
+
                         shutil.rmtree("Cura 2")
                         raw_input("\n\tEaster egg. Cura 2 files created and zipped to share ;) Press Enter to continue...")
 
