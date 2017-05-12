@@ -5,7 +5,7 @@
     "nozzleHeadDistance": 3.5,
     "nozzleExpansionAngle": 47,
     "material": "Hardened Steel",
-    "temperatureCompensation": 15,
+    "temperatureCompensation": 5,
     "hotBlock": "Standard",
     "timeToHeatUp150To300": 90,
     "timeToCoolDown300To150": 90,
