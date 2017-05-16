@@ -12,10 +12,11 @@ import platform
 import time
 import ctypes
 
+import ProgenSettings as PS
 import ProgenEngine
 
-def simplify3D(hotendLeft, hotendRight, filamentLeft, filamentRight, dataLog, fileAction, engineData):
-    fileName, fileContent = ProgenEngine.simplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, dataLog, engineData)
+def simplify3D(hotendLeft, hotendRight, filamentLeft, filamentRight, fileAction):
+    fileName, fileContent = ProgenEngine.simplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight)
     if fileAction == '--file':
         with open(fileName, "w") as f:
             f.write(fileContent)
@@ -25,8 +26,8 @@ def simplify3D(hotendLeft, hotendRight, filamentLeft, filamentRight, dataLog, fi
         print fileName
     return fileName
 
-def cura(hotendLeft, hotendRight, filamentLeft, filamentRight, quality, dataLog, fileAction, engineData):
-    fileName, fileContent = ProgenEngine.curaProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, quality, dataLog, engineData)
+def cura(hotendLeft, hotendRight, filamentLeft, filamentRight, quality, fileAction):
+    fileName, fileContent = ProgenEngine.curaProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, quality)
     if fileAction == '--file':
         with open(fileName, "w") as f:
             f.write(fileContent)
@@ -36,12 +37,8 @@ def cura(hotendLeft, hotendRight, filamentLeft, filamentRight, quality, dataLog,
         print fileName
     return fileName
 
-def cura2(fileAction, engineData):
+def cura2(fileAction):
 
-    cura2id = 'bcn3dsigma'
-    machineSettingsPluginName = 'SigmaSettingsAction'
-
-    # Create Folders structure
     if "Cura 2" in os.listdir('.'):
         shutil.rmtree("Cura 2")
     os.mkdir('Cura 2')
@@ -49,18 +46,18 @@ def cura2(fileAction, engineData):
     os.mkdir('Cura 2/resources/definitions')
     os.mkdir('Cura 2/resources/extruders')
     os.mkdir('Cura 2/resources/materials')
-    os.mkdir('Cura 2/resources/materials/'+cura2id)
+    os.mkdir('Cura 2/resources/materials/'+PS.cura2id)
     os.mkdir('Cura 2/resources/meshes')
-    shutil.copyfile('resources/meshes/bcn3dsigma_bed.obj', 'Cura 2/resources/meshes/'+cura2id+'_bed.obj')
+    shutil.copyfile('resources/meshes/bcn3dsigma_bed.obj', 'Cura 2/resources/meshes/'+PS.cura2id+'_bed.obj')
     os.mkdir('Cura 2/resources/quality')
-    os.mkdir('Cura 2/resources/quality/'+cura2id)
+    os.mkdir('Cura 2/resources/quality/'+PS.cura2id)
     os.mkdir('Cura 2/resources/variants')
     os.mkdir('Cura 2/plugins')
     os.mkdir('Cura 2/plugins/PostProcessingPlugin')
     os.mkdir('Cura 2/plugins/PostProcessingPlugin/scripts')
-    os.mkdir('Cura 2/plugins/'+machineSettingsPluginName)
+    os.mkdir('Cura 2/plugins/'+PS.machineSettingsPluginName)
 
-    for fileName, fileContent in ProgenEngine.cura2Profile(engineData):
+    for fileName, fileContent in ProgenEngine.cura2Profile():
         if fileAction == '--file':
             with open(fileName, "w") as f:
                 f.write(fileContent)
@@ -149,12 +146,11 @@ def is_admin():
     except:
         return False
 
-def simplify3DProfilesBundle(dataLog, profilesCreatedCount, engineData):
-    profilesData = engineData[0]
+def simplify3DProfilesBundle(profilesCreatedCount):
     y = 'y'
-    if getSimplify3DBundleSize(engineData)/1024/1024 >= 150: # define Size limit to notice (in MB)
-        print '\t\tEstimated space needed during the process: '+str(int(getSimplify3DBundleSize(engineData)*1.075/1024/1024))+' MB.'
-        print '\t\tEstimated final bundle size: '+str(int(getSimplify3DBundleSize(engineData)*0.075/1024/1024))+' MB.'
+    if getSimplify3DBundleSize()/1024/1024 >= 150: # define Size limit to notice (in MB)
+        print '\t\tEstimated space needed during the process: '+str(int(getSimplify3DBundleSize()*1.075/1024/1024))+' MB.'
+        print '\t\tEstimated final bundle size: '+str(int(getSimplify3DBundleSize()*0.075/1024/1024))+' MB.'
         print '\t\tDo you want to continue? (Y/n)'
         while y not in ['Y', 'n']:
             y = raw_input('\t\t')
@@ -162,33 +158,33 @@ def simplify3DProfilesBundle(dataLog, profilesCreatedCount, engineData):
     else:
         y = 'Y'
     if y == 'Y':
-        totalSmaProfiles = (len(profilesData['hotend'])-1) *  len(profilesData['filament']) * 2
-        totalBigProfiles = (len(profilesData['hotend'])-1)**2 * len(profilesData['filament'])**2
+        totalSmaProfiles = (len(PS.profilesData['hotend'])-1) *  len(PS.profilesData['filament']) * 2
+        totalBigProfiles = (len(PS.profilesData['hotend'])-1)**2 * len(PS.profilesData['filament'])**2
         totalProfilesAvailable = totalSmaProfiles + totalBigProfiles
         if ".BCN3D Sigma - Simplify3D Profiles temp" in os.listdir('.'):
             shutil.rmtree(".BCN3D Sigma - Simplify3D Profiles temp")
         os.mkdir(".BCN3D Sigma - Simplify3D Profiles temp")
         os.chdir(".BCN3D Sigma - Simplify3D Profiles temp")
-        for hotendLeft in sorted(profilesData['hotend'], key=lambda k: k['id']):
+        for hotendLeft in sorted(PS.profilesData['hotend'], key=lambda k: k['id']):
             if hotendLeft['id'] != 'None':
                 os.mkdir("Left Hotend "+hotendLeft['id'])
                 os.chdir("Left Hotend "+hotendLeft['id'])
             else:
                 os.mkdir("No Left Hotend")
                 os.chdir("No Left Hotend")
-            for hotendRight in sorted(profilesData['hotend'], key=lambda k: k['id']):
+            for hotendRight in sorted(PS.profilesData['hotend'], key=lambda k: k['id']):
                 if hotendRight['id'] != 'None':
                     os.mkdir("Right Hotend "+hotendRight['id'])
                     os.chdir("Right Hotend "+hotendRight['id'])
                 else:                
                     os.mkdir("No Right Hotend")
                     os.chdir("No Right Hotend")
-                for filamentLeft in sorted(profilesData['filament'], key=lambda k: k['id']):
-                    for filamentRight in sorted(profilesData['filament'], key=lambda k: k['id']):
+                for filamentLeft in sorted(PS.profilesData['filament'], key=lambda k: k['id']):
+                    for filamentRight in sorted(PS.profilesData['filament'], key=lambda k: k['id']):
                         if hotendRight['id'] == 'None' and hotendLeft['id'] == 'None':
                             break
                         profilesCreatedCount += 1
-                        simplify3D(hotendLeft, hotendRight, filamentLeft, filamentRight, dataLog, '--file' , engineData)
+                        simplify3D(hotendLeft, hotendRight, filamentLeft, filamentRight, '--file' )
                         sys.stdout.write("\r\t\tProgress: %d%%" % int(float(profilesCreatedCount)/totalProfilesAvailable*100))
                         sys.stdout.flush()
                         if hotendRight['id'] == 'None':
@@ -198,7 +194,7 @@ def simplify3DProfilesBundle(dataLog, profilesCreatedCount, engineData):
                 os.chdir('..')
             os.chdir('..')
         csv = open("BCN3D Sigma - Simplify3D Profiles.csv", "w")
-        csv.writelines(dataLog)
+        # csv.writelines(dataLog)
         csv.close()
         os.chdir('..')
         sys.stdout.write("\r\t\tProgress: Creating the zip file...")
@@ -210,32 +206,30 @@ def simplify3DProfilesBundle(dataLog, profilesCreatedCount, engineData):
     else:
         return 0
 
-def getSimplify3DBundleSize(engineData, oneLineCsvSize = float(10494984)/78480): # experimental value
-    profilesData = engineData[0]
+def getSimplify3DBundleSize(oneLineCsvSize = float(10494984)/78480): # experimental value
     if ".BCN3D Sigma - Simplify3D Profiles temp" in os.listdir('.'):
         shutil.rmtree(".BCN3D Sigma - Simplify3D Profiles temp")
     os.mkdir(".BCN3D Sigma - Simplify3D Profiles temp")
     os.chdir(".BCN3D Sigma - Simplify3D Profiles temp")
     
-    totalSmaProfiles = (len(profilesData['hotend'])-1) *  len(profilesData['filament']) * 2
-    totalBigProfiles = (len(profilesData['hotend'])-1)**2 * len(profilesData['filament'])**2
+    totalSmaProfiles = (len(PS.profilesData['hotend'])-1) *  len(PS.profilesData['filament']) * 2
+    totalBigProfiles = (len(PS.profilesData['hotend'])-1)**2 * len(PS.profilesData['filament'])**2
 
-    fileNameBig = simplify3D(profilesData['hotend'][0], profilesData['hotend'][0], profilesData['filament'][0], profilesData['filament'][0], 'noData', '--file', engineData)
-    fileNameSmall = simplify3D(profilesData['hotend'][0], profilesData['hotend'][-1], profilesData['filament'][0], profilesData['filament'][0], 'noData', '--file', engineData)
+    fileNameBig = simplify3D(PS.profilesData['hotend'][0], PS.profilesData['hotend'][0], PS.profilesData['filament'][0], PS.profilesData['filament'][0], 'noData', '--file')
+    fileNameSmall = simplify3D(PS.profilesData['hotend'][0], PS.profilesData['hotend'][-1], PS.profilesData['filament'][0], PS.profilesData['filament'][0], 'noData', '--file')
     
-    csvSize = oneLineCsvSize * (totalSmaProfiles*len(profilesData['quality']) + totalBigProfiles*len(profilesData['quality'])*3)
+    csvSize = oneLineCsvSize * (totalSmaProfiles*len(PS.profilesData['quality']) + totalBigProfiles*len(PS.profilesData['quality'])*3)
     bundleSize = totalSmaProfiles*os.path.getsize(fileNameSmall)+totalBigProfiles*os.path.getsize(fileNameBig) + csvSize
 
     os.chdir('..')
     shutil.rmtree(".BCN3D Sigma - Simplify3D Profiles temp")
     return bundleSize*1.05
 
-def curaProfilesBundle(dataLog, profilesCreatedCount, engineData):  
-    profilesData = engineData[0]
+def curaProfilesBundle(profilesCreatedCount):  
     y = 'y'
-    if getCuraBundleSize(engineData)/1024/1024 >= 150: # define Size limit to notice (in MB)
-        print '\t\tEstimated space needed during the process: '+str(int(getCuraBundleSize(engineData)*1.075/1024/1024))+' MB.'
-        print '\t\tEstimated final bundle size: '+str(int(getCuraBundleSize(engineData)*0.075/1024/1024))+' MB.'
+    if getCuraBundleSize()/1024/1024 >= 150: # define Size limit to notice (in MB)
+        print '\t\tEstimated space needed during the process: '+str(int(getCuraBundleSize()*1.075/1024/1024))+' MB.'
+        print '\t\tEstimated final bundle size: '+str(int(getCuraBundleSize()*0.075/1024/1024))+' MB.'
         print '\t\tDo you want to continue? (Y/n)'
         while y not in ['Y', 'n']:
             y = raw_input('\t\t')
@@ -244,37 +238,37 @@ def curaProfilesBundle(dataLog, profilesCreatedCount, engineData):
         y = 'Y'
     if y == 'Y':
         nozzleSizes = []
-        for hotend in sorted(profilesData['hotend'], key=lambda k: k['id'])[:-1]:
+        for hotend in sorted(PS.profilesData['hotend'], key=lambda k: k['id'])[:-1]:
             nozzleSizes.append(hotend['nozzleSize'])
         curaGroupedSizes = {x:nozzleSizes.count(x) for x in nozzleSizes}
         curaIDEXHotendsCombinations = 0
         for size in curaGroupedSizes:
             curaIDEXHotendsCombinations += curaGroupedSizes[size]**2
-        totalProfilesAvailable = ((len(profilesData['hotend'])-1) *  len(profilesData['filament']) * 2 + curaIDEXHotendsCombinations * len(profilesData['filament'])**2) * len(profilesData['quality'])
+        totalProfilesAvailable = ((len(PS.profilesData['hotend'])-1) *  len(PS.profilesData['filament']) * 2 + curaIDEXHotendsCombinations * len(PS.profilesData['filament'])**2) * len(PS.profilesData['quality'])
         if ".BCN3D Sigma - Cura Profiles temp" in os.listdir('.'):
             shutil.rmtree(".BCN3D Sigma - Cura Profiles temp")
         os.mkdir(".BCN3D Sigma - Cura Profiles temp")
         os.chdir(".BCN3D Sigma - Cura Profiles temp")
 
-        for hotendLeft in sorted(profilesData['hotend'], key=lambda k: k['id']):
+        for hotendLeft in sorted(PS.profilesData['hotend'], key=lambda k: k['id']):
             if hotendLeft['id'] != 'None':
                 os.mkdir("Left Hotend "+hotendLeft['id'])
                 os.chdir("Left Hotend "+hotendLeft['id'])
             else:
                 os.mkdir("No Left Hotend")
                 os.chdir("No Left Hotend")
-            for hotendRight in sorted(profilesData['hotend'], key=lambda k: k['id']):
+            for hotendRight in sorted(PS.profilesData['hotend'], key=lambda k: k['id']):
                 if hotendRight['id'] != 'None':
                     os.mkdir("Right Hotend "+hotendRight['id'])
                     os.chdir("Right Hotend "+hotendRight['id'])
                 else:                
                     os.mkdir("No Right Hotend")
                     os.chdir("No Right Hotend")
-                for quality in sorted(profilesData['quality'], key=lambda k: k['index']):
+                for quality in sorted(PS.profilesData['quality'], key=lambda k: k['index']):
                     os.mkdir(quality['id'])
                     os.chdir(quality['id'])
-                    for filamentLeft in sorted(profilesData['filament'], key=lambda k: k['id']):
-                        for filamentRight in sorted(profilesData['filament'], key=lambda k: k['id']):
+                    for filamentLeft in sorted(PS.profilesData['filament'], key=lambda k: k['id']):
+                        for filamentRight in sorted(PS.profilesData['filament'], key=lambda k: k['id']):
                             if hotendRight['id'] == 'None' and hotendLeft['id'] == 'None':
                                 break
                             if hotendLeft['id'] != 'None' and hotendRight['id'] != 'None':
@@ -282,7 +276,7 @@ def curaProfilesBundle(dataLog, profilesCreatedCount, engineData):
                                     break
                             profilesCreatedCount += 1
                             try:
-                                cura(hotendLeft, hotendRight, filamentLeft, filamentRight, quality, dataLog, '--file', engineData)
+                                cura(hotendLeft, hotendRight, filamentLeft, filamentRight, quality, '--file')
                             except:
                                 pass
                             sys.stdout.write("\r\t\tProgress: %d%%" % int(float(profilesCreatedCount)/totalProfilesAvailable*100))
@@ -295,7 +289,7 @@ def curaProfilesBundle(dataLog, profilesCreatedCount, engineData):
                 os.chdir('..')
             os.chdir('..')
         csv = open("BCN3D Sigma - Cura Profiles.csv", "w")
-        csv.writelines(dataLog)
+        # csv.writelines(dataLog)
         csv.close()
         os.chdir('..')
         sys.stdout.write("\r\t\tProgress: Creating the zip file...")
@@ -307,24 +301,23 @@ def curaProfilesBundle(dataLog, profilesCreatedCount, engineData):
     else:
         return 0
 
-def getCuraBundleSize(engineData, oneLineCsvSize = float(10494984)/78480): # experimental value
-    profilesData = engineData[0]
+def getCuraBundleSize(oneLineCsvSize = float(10494984)/78480): # experimental value
     if ".BCN3D Sigma - Cura Profiles temp" in os.listdir('.'):
         shutil.rmtree(".BCN3D Sigma - Cura Profiles temp")
     os.mkdir(".BCN3D Sigma - Cura Profiles temp")
     os.chdir(".BCN3D Sigma - Cura Profiles temp")
 
     nozzleSizes = []
-    for hotend in sorted(profilesData['hotend'], key=lambda k: k['id'])[:-1]:
+    for hotend in sorted(PS.profilesData['hotend'], key=lambda k: k['id'])[:-1]:
         nozzleSizes.append(hotend['nozzleSize'])
     curaGroupedSizes = {x:nozzleSizes.count(x) for x in nozzleSizes}
     curaIDEXHotendsCombinations = 0
     for size in curaGroupedSizes:
         curaIDEXHotendsCombinations += curaGroupedSizes[size]**2
 
-    totalProfiles = ((len(profilesData['hotend'])-1) *  len(profilesData['filament']) * 2 + curaIDEXHotendsCombinations * len(profilesData['filament'])**2) * len(profilesData['quality'])
+    totalProfiles = ((len(PS.profilesData['hotend'])-1) *  len(PS.profilesData['filament']) * 2 + curaIDEXHotendsCombinations * len(PS.profilesData['filament'])**2) * len(PS.profilesData['quality'])
 
-    fileName = cura(profilesData['hotend'][0], profilesData['hotend'][0], profilesData['filament'][0], profilesData['filament'][0], profilesData['quality'][0], 'noData', '--file', engineData)
+    fileName = cura(PS.profilesData['hotend'][0], PS.profilesData['hotend'][0], PS.profilesData['filament'][0], PS.profilesData['filament'][0], PS.profilesData['quality'][0], 'noData', '--file')
     
     csvSize = oneLineCsvSize * totalProfiles
     bundleSize = totalProfiles*os.path.getsize(fileName) + csvSize
@@ -333,8 +326,8 @@ def getCuraBundleSize(engineData, oneLineCsvSize = float(10494984)/78480): # exp
     shutil.rmtree(".BCN3D Sigma - Cura Profiles temp")
     return bundleSize*1.05
 
-def cura2FilesBundle(engineData):
-    cura2('--file', engineData)
+def cura2FilesBundle():
+    cura2('--file')
     with open('Cura 2/Readme.txt', 'w') as f:
         lines = []
         lines.append(r'Bundle make time:'+'\n')
