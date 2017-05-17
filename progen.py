@@ -162,10 +162,10 @@ def main():
             while True:
                 clearDisplay()
                 print title
-                print ' Choose one option (1-4):'
+                print ' Choose one option (1-5):'
                 print ' 1. Profile for Simplify3D'
                 print ' 2. Profile for Cura'
-                print ' 3. Profile for Cura 2'
+                print ' 3. Profile for Cura 2 [Beta]'
                 print ' 4. Experimental features'
                 print ' 5. Exit'
                 if experimentalMenu:
@@ -184,7 +184,7 @@ def main():
                     print '\n\tChoose one option (1-6):'
                     print '\t1. Generate a bundle of profiles - Simplify3D'
                     print '\t2. Generate a bundle of profiles - Cura'
-                    print '\t3. Generate profile files bundle - Cura 2'
+                    print '\t3. Generate profile files bundle - Cura 2 [Beta]'
                     print '\t4. Test all combinations'
                     print '\t5. MacOS Only - Slice a model (with Cura)'
                     print '\t6. Back'
@@ -202,7 +202,7 @@ def main():
                     GUIHeader = title+'\n\n\n    Profile for Cura'
                 elif x == '3':
                     cura2Files = True
-                    GUIHeader = title+'\n\n\n\n    Profile for Cura 2'
+                    GUIHeader = title+'\n\n\n\n    Profile for Cura 2 [Beta]'
                 elif x == '4':
                     experimentalMenu = True               
                     if x2 == '1':
@@ -213,7 +213,7 @@ def main():
                         GUIHeader = title+'\n\n\n\n\n    Experimental features\n\n\n\n\t   Generate a bundle of profiles - Cura\n'
                     elif x2 == '3':                        
                         cura2FilesBundle = True
-                        GUIHeader = title+'\n\n\n\n\n    Experimental features\n\n\n\n\n\t   Generate profile files bundle - Cura 2\n'
+                        GUIHeader = title+'\n\n\n\n\n    Experimental features\n\n\n\n\n\t   Generate profile files bundle - Cura 2 [Beta]\n'
                     elif x2 == '4':
                         testComb = True
                         GUIHeader = title+'\n\n\n\n\n    Experimental features\n\n\n\n\n\n\t   Test all combinations\n'

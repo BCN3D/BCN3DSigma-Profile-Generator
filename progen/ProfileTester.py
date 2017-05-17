@@ -30,7 +30,7 @@ def testSimplify3D():
         for hotendRight in sorted(PS.profilesData['hotend'], key=lambda k: k['id']):
             for filamentLeft in sorted(PS.profilesData['filament'], key=lambda k: k['id']):
                 for filamentRight in sorted(PS.profilesData['filament'], key=lambda k: k['id']):
-                    ProgenEngine.simplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, '--no-data')
+                    ProgenEngine.simplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight)
                     combinationCount += 1
                     sys.stdout.write("\r\t\tTesting Simplify3D Profiles: %d%%" % int(float(combinationCount)/totalSimplify3DProfilesAvailable*100))
                     sys.stdout.flush()
@@ -59,7 +59,7 @@ def testCura():
             for filamentLeft in sorted(PS.profilesData['filament'], key=lambda k: k['id']):
                 for filamentRight in sorted(PS.profilesData['filament'], key=lambda k: k['id']):
                     for quality in sorted(PS.profilesData['quality'], key=lambda k: k['index']):
-                        ProgenEngine.curaProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, quality, '--no-data')
+                        ProgenEngine.curaProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, quality)
                         combinationCount += 1
                         sys.stdout.write("\r\t\tTesting Cura Profiles:       %d%%" % int(float(combinationCount)/totalProfilesAvailable*100))
                         sys.stdout.flush()
@@ -72,7 +72,7 @@ def testCura2():
     realCura2ProfilesAvailable = 1
 
     # Start iteration
-    print ProgenEngine.cura2Profile()
+    ProgenEngine.cura2Profile()
     print '\r\t\tTesting Cura 2 Profiles:     OK. Profiles Tested: '+str(realCura2ProfilesAvailable)
     return realCura2ProfilesAvailable
     
