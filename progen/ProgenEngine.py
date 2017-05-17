@@ -1271,11 +1271,17 @@ def cura2Profile():
                     qualityFile.append(r'default_material_print_temperature = '+str(round((getTemperature(hotend, filament, 'highTemperature')-getTemperature(hotend, filament, 'lowTemperature'))/2.+getTemperature(hotend, filament, 'lowTemperature'))))
                     # qualityFile.append(r'material_print_temperature = =default_material_print_temperature')                        
                     qualityFile.append(r'material_print_temperature_layer_0 = ='+str(round((getTemperature(hotend, filament, 'highTemperature')))))
-                    temperatureInertiaInitialFix = 5
+                    temperatureInertiaInitialFix = 0
                     qualityFile.append(r'material_initial_print_temperature = =max(-273.15, material_print_temperature - '+str(temperatureInertiaInitialFix)+')')
                     temperatureInertiaFinalFix = 2.5
                     qualityFile.append(r'material_final_print_temperature = =max(-273.15, material_print_temperature - '+str(temperatureInertiaFinalFix)+')')
-                    qualityFile.append(r'material_flow_temp_graph = [[1.0,'+str(getTemperature(hotend, filament, 'lowTemperature'))+'], ['+str(maxFlowValue(hotend, filament, layerHeight))+','+str(getTemperature(hotend, filament, 'highTemperature'))+']]')
+                    minFlow = 0.3 * 0.05 * 10
+                    minTemp = getTemperature(hotend, filament, 'lowTemperature')
+                    maxFlow = maxFlowValue(hotend, filament, layerHeight)
+                    maxTemp = getTemperature(hotend, filament, 'highTemperature')
+                    stdFlow = 0.4 * 0.15 * 60
+                    stdTemp = (minTemp + maxTemp) /2.
+                    qualityFile.append(r'material_flow_temp_graph = [['+str(minFlow)+','+str(minTemp)+'], ['+str(stdFlow)+','+str(stdTemp)+'], ['+str(maxFlow)+','+str(maxTemp)+']]')
                     # qualityFile.append(r'material_extrusion_cool_down_speed = 0.7') # this value depends on extruded flow (not material_flow)
                     qualityFile.append(r'material_bed_temperature = '+("%.2f" % filament['bedTemperature']))
                     qualityFile.append(r'material_diameter = '+("%.2f" % filament['filamentDiameter']))
