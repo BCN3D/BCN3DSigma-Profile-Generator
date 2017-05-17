@@ -7,11 +7,15 @@
 
 import os
 import json
+import time
+import string
 
 def init():
     # Generic
-    global SigmaProgenVersion
-    SigmaProgenVersion = '2.0.0'
+    global progenVersionNumber
+    progenVersionNumber = '2.0.0'
+    global progenBuildNumber
+    progenBuildNumber = time.strftime("%d")+string.uppercase[int(time.strftime("%m"))]+string.uppercase[int(time.strftime("%y")[-1])]+time.strftime("%H")+time.strftime("%M")
     global profilesData
     profilesData = readProfilesData()
     global loggedData
