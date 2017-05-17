@@ -158,9 +158,10 @@ def main():
     else:
         if len(sys.argv) == 1:
             experimentalMenu = False
+            title = '\n Welcome to the BCN3D Sigma ProGen '+PS.progenVersionNumber+' (Build '+PS.progenBuildNumber+') \n'
             while True:
                 clearDisplay()
-                print '\n Welcome to the BCN3D Sigma Profile Generator ('+str(PS.SigmaProgenVersion)+') \n'
+                print title
                 print ' Choose one option (1-4):'
                 print ' 1. Profile for Simplify3D'
                 print ' 2. Profile for Cura'
@@ -178,7 +179,7 @@ def main():
 
                 if x == '4':
                     clearDisplay()
-                    print '\n Welcome to the BCN3D Sigma Profile Generator \n\n\n\n\n'
+                    print title+'\n\n\n\n'
                     print '    Experimental features'
                     print '\n\tChoose one option (1-6):'
                     print '\t1. Generate a bundle of profiles - Simplify3D'
@@ -195,30 +196,30 @@ def main():
 
                 if x == '1':
                     singleProfileSimplify3D = True
-                    GUIHeader = '\n Welcome to the BCN3D Sigma Profile Generator \n\n\n    Profile for Simplify3D'
+                    GUIHeader = title+'\n\n    Profile for Simplify3D'
                 elif x == '2':
                     singleProfileCura = True
-                    GUIHeader = '\n Welcome to the BCN3D Sigma Profile Generator \n\n\n\n    Profile for Cura'
+                    GUIHeader = title+'\n\n\n    Profile for Cura'
                 elif x == '3':
                     cura2Files = True
-                    GUIHeader = '\n Welcome to the BCN3D Sigma Profile Generator \n\n\n\n\n    Profile for Cura 2'
+                    GUIHeader = title+'\n\n\n\n    Profile for Cura 2'
                 elif x == '4':
                     experimentalMenu = True               
                     if x2 == '1':
                         bundleProfilesSimplify3D = True
-                        GUIHeader = '\n Welcome to the BCN3D Sigma Profile Generator \n\n\n\n\n\n    Experimental features\n\n\n\t   Generate a bundle of profiles - Simplify3D\n'
+                        GUIHeader = title+'\n\n\n\n\n    Experimental features\n\n\n\t   Generate a bundle of profiles - Simplify3D\n'
                     elif x2 == '2':
                         bundleProfilesCura = True
-                        GUIHeader = '\n Welcome to the BCN3D Sigma Profile Generator \n\n\n\n\n\n    Experimental features\n\n\n\n\t   Generate a bundle of profiles - Cura\n'
+                        GUIHeader = title+'\n\n\n\n\n    Experimental features\n\n\n\n\t   Generate a bundle of profiles - Cura\n'
                     elif x2 == '3':                        
                         cura2FilesBundle = True
-                        GUIHeader = '\n Welcome to the BCN3D Sigma Profile Generator \n\n\n\n\n\n    Experimental features\n\n\n\n\n\t   Generate profile files bundle - Cura 2\n'
+                        GUIHeader = title+'\n\n\n\n\n    Experimental features\n\n\n\n\n\t   Generate profile files bundle - Cura 2\n'
                     elif x2 == '4':
                         testComb = True
-                        GUIHeader = '\n Welcome to the BCN3D Sigma Profile Generator \n\n\n\n\n\n    Experimental features\n\n\n\n\n\n\t   Test all combinations\n'
+                        GUIHeader = title+'\n\n\n\n\n    Experimental features\n\n\n\n\n\n\t   Test all combinations\n'
                     elif x2 == '5':
                         sliceModel = True
-                        GUIHeader = '\n Welcome to the BCN3D Sigma Profile Generator \n\n\n\n\n\n    Experimental features\n\n\n\n\n\n\n\t   MacOS Only - Slice a model (with Cura)'
+                        GUIHeader = title+'\n\n\n\n\n    Experimental features\n\n\n\n\n\n\n\t   MacOS Only - Slice a model (with Cura)'
                     elif x2 == '6':
                         experimentalMenu = False
 
