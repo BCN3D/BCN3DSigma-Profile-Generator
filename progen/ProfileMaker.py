@@ -330,9 +330,7 @@ def cura2FilesBundle():
     cura2('--file')
     with open('Cura 2/Readme.txt', 'w') as f:
         lines = []
-        lines.append(r'Bundle make time:'+'\n')
-        lines.append(r''+'\n')
-        lines.append(r'    '+time.strftime("%Y-%m-%d")+" "+time.strftime("%H:%M:%S")+'\n')
+        lines.append(r'Build '+PS.progenBuildNumber+'\n')
         lines.append(r''+'\n')
         lines.append(r'Instructions:'+'\n')
         lines.append(r''+'\n')
