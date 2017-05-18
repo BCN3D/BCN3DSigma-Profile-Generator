@@ -9,7 +9,6 @@ import os
 import sys
 import shutil
 import platform
-import time
 import ctypes
 
 import ProgenSettings as PS
