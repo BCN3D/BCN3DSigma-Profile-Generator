@@ -7,7 +7,7 @@
     "material": "Hardened Steel",
     "temperatureCompensation": 5,
     "hotBlock": "Standard",
-    "timeToHeatUp150To300": 90,
-    "timeToCoolDown300To150": 90,
+    "heatUpSpeed": 4.3,
+    "coolDownSpeed": 1.67,
     "minimumCoolHeatTimeWindow": 5
 }

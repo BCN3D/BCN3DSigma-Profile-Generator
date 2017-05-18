@@ -7,7 +7,7 @@
     "material": "Brass",
     "temperatureCompensation": 0,
     "hotBlock": "HighFlow",
-    "timeToHeatUp150To300": 88,
-    "timeToCoolDown300To150": 60,
+    "heatUpSpeed": 5.2,
+    "coolDownSpeed": 2.14,
     "minimumCoolHeatTimeWindow": 5
 }
