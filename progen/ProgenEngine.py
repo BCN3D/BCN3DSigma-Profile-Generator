@@ -1012,7 +1012,7 @@ def cura2Profile():
     # definition.append(r'            "default_value": false,')
     # definition.append(r'            "resolve": "'+"'True' if 'True' in extruderValues('support_enable') else 'False'"+r'"') # Not working
     # definition.append(r'        },')
-    definition.append(r'        "machine_start_gcode": { "default_value": "\n;Sigma ProGen '+PS.progenVersionNumber+' (Build '+PS.progenBuildNumber+r')\n\nG21\t\t;metric values\nG90\t\t;absolute positioning\nM82\t\t;set extruder to absolute mode\nM107\t\t;start with the fan off\nG28 X0 Y0\t\t;move X/Y to min endstops\nG28 Z0\t\t;move Z to min endstops\nG1 Z5 F200\t\t;safety Z axis movement\nT1\t\t;switch to the right extruder\nG92 E0\t\t;zero the extruded length\nG1 E10 F200\t\t;extrude 10mm of feed stock\nG92 E0\t\t;zero the extruded length\nG4 P2000\t\t;stabilize hotend'+"'"+r's pressure\nG1 F2400 E-8\t\t;retract\nT0\t\t;switch to the left extruder\nG92 E0\t\t;zero the extruded length\nG1 E10 F200\t\t;extrude 10mm of feed stock\nG92 E0\t\t;zero the extruded length\nG4 P2000\t\t;stabilize hotend'+"'"+r's pressure\nG1 F2400 E-8\t\t;retract\n" },')
+    definition.append(r'        "machine_start_gcode": { "default_value": "\n;Sigma ProGen '+PS.progenVersionNumber+' (Build '+PS.progenBuildNumber+r')\n\nG21\t\t;metric values\nG90\t\t;absolute positioning\nM82\t\t;set extruder to absolute mode\nM107\t\t;start with the fan off\nG28 X0 Y0\t\t;move X/Y to min endstops\nG28 Z0\t\t;move Z to min endstops\nG1 Z5 F200\t\t;safety Z axis movement\nT1\t\t;switch to the right extruder\nG92 E0\t\t;zero the extruded length\nG1 E20 F100\t\t;extrude 20mm of feed stock\nG92 E0\t\t;zero the extruded length\nG4 P2000\t\t;stabilize hotend'+"'"+r's pressure\nG1 F2400 E-8\t\t;retract\nT0\t\t;switch to the left extruder\nG92 E0\t\t;zero the extruded length\nG1 E20 F100\t\t;extrude 20mm of feed stock\nG92 E0\t\t;zero the extruded length\nG4 P2000\t\t;stabilize hotend'+"'"+r's pressure\nG1 F2400 E-8\t\t;retract\n" },')
     definition.append(r'        "machine_end_gcode": { "default_value": "\nM104 S0 T0\t\t;left extruder heater off\nM104 S0 T1\t\t;right extruder heater off\nM140 S0\t\t;heated bed heater off\nG91\t\t;relative positioning\nG1 Z+0.5 E-5 Y+10 F12000\t;move Z up a bit and retract filament\nG28 X0 Y0\t\t;move X/Y to min endstops so the head is out of the way\nM84\t\t;steppers off\nG90\t\t;absolute positioning\n" },')
     definition.append(r'        "prime_tower_position_x": { "default_value": 105 },')
     definition.append(r'        "prime_tower_position_y": { "default_value": 250 },')
@@ -1294,7 +1294,7 @@ def cura2Profile():
                     # qualityFile.append(r'retraction_prime_speed = =retraction_speed')
                     # qualityFile.append(r'retraction_extra_prime_amount = 0') # Adjust for flex materials
                     # qualityFile.append(r'retraction_min_travel = =line_width * 2') # if this value works better, update Cura & S3D
-                    # qualityFile.append(r'retraction_count_max = 90')
+                    qualityFile.append(r'retraction_count_max = '+str(int(filament['retractionCount'])))
                     # qualityFile.append(r'retraction_extrusion_window = =retraction_amount')
                     standbyTemperature = getTemperature(hotend, filament, 'standbyTemperature')
                     qualityFile.append(r'material_standby_temperature = '+("%.2f" % standbyTemperature))
@@ -1554,8 +1554,8 @@ def cura2Profile():
             variant.append('machine_nozzle_head_distance = '+str(hotend['nozzleHeadDistance']))
             variant.append('machine_nozzle_expansion_angle = '+str(hotend['nozzleExpansionAngle']))
             variant.append('machine_heat_zone_length = 8')
-            variant.append('machine_nozzle_heat_up_speed = =(material_print_temperature-material_standby_temperature)/('+timeVsTemperature(hotend, 'material_print_temperature', 'heating', 'getTime')+'-'+timeVsTemperature(hotend, 'material_standby_temperature', 'heating', 'getTime')+')')
-            variant.append('machine_nozzle_cool_down_speed = =(material_print_temperature-material_standby_temperature)/('+timeVsTemperature(hotend, 'material_standby_temperature', 'cooling', 'getTime')+'-'+timeVsTemperature(hotend, 'material_print_temperature', 'cooling', 'getTime')+')')
+            variant.append('machine_nozzle_heat_up_speed = '+str(hotend['heatUpSpeed']))
+            variant.append('machine_nozzle_cool_down_speed = '+str(hotend['coolDownSpeed']))
             variant.append('machine_min_cool_heat_time_window = '+str(hotend['minimumCoolHeatTimeWindow']))
             fileContent = '\n'.join(variant)
             filesList.append((fileName, fileContent))
@@ -2713,16 +2713,9 @@ def fanSpeed(hotend, filament, temperature, layerHeight, base = 5):
         fanSpeed = max(fanSpeedForTemperature, fanSpeedForLayerHeight)
     return min(fanSpeed, 100) # Repassar. Aquest 100 no hauria de ser necessari
 
-def timeVsTemperature(element, value, action, command):
+def timeVsTemperature(element, value, command):
 
-    if element['id'] != 'bed':
-        hotendParameter1 = element['timeToHeatUp150To300'] * 2.05
-        hotendParameter1c = element['timeToCoolDown300To150'] * 1.16
-    hotendParameter2 = 575 
-    hotendParameter2c = 325
-    hotendParameter3 = 25
-    hotendParameter3c = hotendParameter3
-
+    # bed heating curve parameters
     bedParameterA1 = 51
     bedParameterA2 = 61
     bedParameterA3 = 19
@@ -2733,44 +2726,26 @@ def timeVsTemperature(element, value, action, command):
 
     # return needed time (sec) to reach Temperature (ºC)
     if command == 'getTime':
-        if type(value) == str:
-            if action == 'heating':
-                time = '(' + str(hotendParameter1) + '*math.log(-' + str(hotendParameter2-hotendParameter3) + '/('+ value +'-' + str(float(hotendParameter2)) + ')))'
-            elif action == 'cooling':
-                time = '(-' + str(hotendParameter1c) + '*math.log(('+ value +'-' + str(float(hotendParameter3c))+')/(' + str(float(hotendParameter2c-hotendParameter3c)) + ')))'
+        temperature = value
+        if element['id'] == 'bed':
+            if temperature <= 60:
+                time = bedParameterA1 * math.log(-(bedParameterA2-bedParameterA3)/(float(temperature)-bedParameterA2))
+            else:
+                time = bedParameterB1 * math.log(-bedParameterB2/(float(temperature)-bedParameterB2-bedParameterB3))+bedParameterB4
         else:
-            temperature = value
-            if action == 'heating':
-                if element['id'] == 'bed':
-                    if temperature <= 60:
-                        time = bedParameterA1 * math.log(-(bedParameterA2-bedParameterA3)/(float(temperature)-bedParameterA2))
-                    else:
-                        time = bedParameterB1 * math.log(-bedParameterB2/(float(temperature)-bedParameterB2-bedParameterB3))+bedParameterB4
-                else:
-                    time = hotendParameter1 * math.log(-(hotendParameter2-hotendParameter3)/(float(temperature)-hotendParameter2))
-            elif action == 'cooling':
-                if element['id'] == 'bed':
-                    time = 0
-                else:
-                    time = - hotendParameter1c * math.log((float(temperature)-hotendParameter3c)/(hotendParameter2c-hotendParameter3c))
+            time = temperature / float(element['heatUpSpeed'])
         return max(0, time)
 
     # return temperature (ºC) reached after heating during given time (sec)
     elif command == 'getTemperature':
         time = value
-        if action == 'heating':
-            if element['id'] == 'bed':
-                if time <= 180:
-                    temperature = bedParameterA2 - (bedParameterA2 - bedParameterA3) * math.exp(-time/bedParameterA1)
-                else:
-                    temperature = bedParameterB2 + bedParameterB3 - bedParameterB2 * math.exp(-(time - bedParameterB4)/bedParameterB1)
+        if element['id'] == 'bed':
+            if time <= 180:
+                temperature = bedParameterA2 - (bedParameterA2 - bedParameterA3) * math.exp(-time/bedParameterA1)
             else:
-                temperature = hotendParameter2 - (hotendParameter2 - hotendParameter3) * math.exp(-time/hotendParameter1)
-        elif action == 'cooling':
-            if element['id'] == 'bed':
-                temperature = 0
-            else:
-                temperature = hotendParameter2c + (hotendParameter2c - hotendParameter3c) * math.exp(-time/hotendParameter1c)
+                temperature = bedParameterB2 + bedParameterB3 - bedParameterB2 * math.exp(-(time - bedParameterB4)/bedParameterB1)
+        else:
+            temperature = time * element['heatUpSpeed']
         return max(0, temperature)
 
 def firstHeatSequence(hotendLeft, hotendRight, leftHotendTemp, rightHotendTemp, bedTemp, software):
@@ -2778,17 +2753,17 @@ def firstHeatSequence(hotendLeft, hotendRight, leftHotendTemp, rightHotendTemp, 
     bed = dict([('id', 'bed')])
     if software == 'Simplify3D':
         if hotendLeft['id'] != 'None':
-            timeLeftHotend  = (timeVsTemperature(hotendLeft, leftHotendTemp,  'heating', 'getTime'), '', hotendLeft, 'M104 ', 'M109 ', 'S[extruder0_temperature]', ' T0,')
+            timeLeftHotend  = (timeVsTemperature(hotendLeft, leftHotendTemp, 'getTime'), '', hotendLeft, 'M104 ', 'M109 ', 'S[extruder0_temperature]', ' T0,')
         if hotendRight['id'] != 'None':
-            timeRightHotend = (timeVsTemperature(hotendRight, rightHotendTemp, 'heating', 'getTime'), '', hotendRight, 'M104 ', 'M109 ', 'S[extruder1_temperature]', ' T1,')
-        timeBed         = (timeVsTemperature(bed, bedTemp, 'heating', 'getTime'), '', bed, 'M140 ', 'M190 ', 'S[bed0_temperature]',       ',')
+            timeRightHotend = (timeVsTemperature(hotendRight, rightHotendTemp, 'getTime'), '', hotendRight, 'M104 ', 'M109 ', 'S[extruder1_temperature]', ' T1,')
+        timeBed         = (timeVsTemperature(bed, bedTemp, 'getTime'), '', bed, 'M140 ', 'M190 ', 'S[bed0_temperature]',       ',')
     elif software == 'Cura':
         startSequenceString = '\t;' + startSequenceString[2:-1] + '\n'
         if hotendLeft['id'] != 'None':
-            timeLeftHotend  = (timeVsTemperature(hotendLeft, leftHotendTemp,  'heating', 'getTime'), '\t', hotendLeft, 'M104 ', 'M109 ', 'S{print_temperature}',     ' T0\n')
+            timeLeftHotend  = (timeVsTemperature(hotendLeft, leftHotendTemp, 'getTime'), '\t', hotendLeft, 'M104 ', 'M109 ', 'S{print_temperature}',     ' T0\n')
         if hotendRight['id'] != 'None':
-            timeRightHotend = (timeVsTemperature(hotendRight, rightHotendTemp, 'heating', 'getTime'), '\t', hotendRight, 'M104 ', 'M109 ', 'S{print_temperature2}',    ' T1\n')
-        timeBed         = (timeVsTemperature(bed, bedTemp, 'heating', 'getTime'), '\t', bed, 'M140 ', 'M190 ', 'S{print_bed_temperature}', '\n')
+            timeRightHotend = (timeVsTemperature(hotendRight, rightHotendTemp, 'getTime'), '\t', hotendRight, 'M104 ', 'M109 ', 'S{print_temperature2}',    ' T1\n')
+        timeBed         = (timeVsTemperature(bed, bedTemp, 'getTime'), '\t', bed, 'M140 ', 'M190 ', 'S{print_bed_temperature}', '\n')
     elif software == 'Cura2':
         # Using Cura 2.5.0 the only labels we know to point to extruder being used are:
         #   adhesion_extruder_nr
@@ -2797,17 +2772,17 @@ def firstHeatSequence(hotendLeft, hotendRight, leftHotendTemp, rightHotendTemp, 
         #   support_interface_extruder_nr
         startSequenceString = r'\n;' + startSequenceString[2:-1] + r'\n'
         if hotendLeft['id'] != 'None':
-            timeLeftHotend  = (timeVsTemperature(hotendLeft, leftHotendTemp, 'heating', 'getTime'), '', hotendLeft, 'M104 ', 'M109 ', 'S{material_print_temperature_layer_0}',     r' T0\n')
+            timeLeftHotend  = (timeVsTemperature(hotendLeft, leftHotendTemp, 'getTime'), '', hotendLeft, 'M104 ', 'M109 ', 'S{material_print_temperature_layer_0}',     r' T0\n')
         if hotendRight['id'] != 'None':
-            timeRightHotend = (timeVsTemperature(hotendRight, rightHotendTemp, 'heating', 'getTime'), '', hotendRight, 'M104 ', 'M109 ', 'S{material_print_temperature_layer_0}',    r' T1\n')
-        timeBed         = (timeVsTemperature(bed, bedTemp, 'heating', 'getTime'), '', bed, 'M140 ', 'M190 ', 'S{material_bed_temperature}', r'\n')
+            timeRightHotend = (timeVsTemperature(hotendRight, rightHotendTemp, 'getTime'), '', hotendRight, 'M104 ', 'M109 ', 'S{material_print_temperature_layer_0}',    r' T1\n')
+        timeBed         = (timeVsTemperature(bed, bedTemp, 'getTime'), '', bed, 'M140 ', 'M190 ', 'S{material_bed_temperature}', r'\n')
 
     if hotendLeft['id'] != 'None' and hotendRight['id'] != 'None':
         # IDEX
         startTimes = sorted([timeLeftHotend, timeRightHotend, timeBed])
-        startSequenceString += startTimes[-1][-6]+startTimes[-1][-3]+'S'+str(int(timeVsTemperature(startTimes[-1][-5], startTimes[-1][0]-startTimes[-2][0], 'heating', 'getTemperature')))+startTimes[-1][-1]
+        startSequenceString += startTimes[-1][-6]+startTimes[-1][-3]+'S'+str(int(timeVsTemperature(startTimes[-1][-5], startTimes[-1][0]-startTimes[-2][0], 'getTemperature')))+startTimes[-1][-1]
         startSequenceString += startTimes[-1][-6]+startTimes[-2][-4]+startTimes[-2][-2]+startTimes[-2][-1]
-        startSequenceString += startTimes[-1][-6]+startTimes[-1][-3]+'S'+str(int(timeVsTemperature(startTimes[-1][-5], startTimes[-1][0]-startTimes[-3][0], 'heating', 'getTemperature')))+startTimes[-1][-1]
+        startSequenceString += startTimes[-1][-6]+startTimes[-1][-3]+'S'+str(int(timeVsTemperature(startTimes[-1][-5], startTimes[-1][0]-startTimes[-3][0], 'getTemperature')))+startTimes[-1][-1]
         startSequenceString += startTimes[-1][-6]+startTimes[-3][-4]+startTimes[-3][-2]+startTimes[-3][-1]
         startSequenceString += startTimes[-1][-6]+startTimes[-1][-3]+startTimes[-1][-2]+startTimes[-1][-1]
         startSequenceString += startTimes[-1][-6]+startTimes[-2][-3]+startTimes[-2][-2]+startTimes[-2][-1]
@@ -2816,14 +2791,14 @@ def firstHeatSequence(hotendLeft, hotendRight, leftHotendTemp, rightHotendTemp, 
         if hotendRight['id'] == 'None':
             # MEX Left
             startTimes = sorted([timeLeftHotend, timeBed])
-            startSequenceString += startTimes[-1][-6]+startTimes[-1][-3]+'S'+str(int(timeVsTemperature(startTimes[-1][-5], startTimes[-1][0]-startTimes[-2][0], 'heating', 'getTemperature')))+startTimes[-1][-1]
+            startSequenceString += startTimes[-1][-6]+startTimes[-1][-3]+'S'+str(int(timeVsTemperature(startTimes[-1][-5], startTimes[-1][0]-startTimes[-2][0], 'getTemperature')))+startTimes[-1][-1]
             startSequenceString += startTimes[-1][-6]+startTimes[-2][-4]+startTimes[-2][-2]+startTimes[-2][-1]
             startSequenceString += startTimes[-1][-6]+startTimes[-1][-3]+startTimes[-1][-2]+startTimes[-1][-1]
             startSequenceString += startTimes[-1][-6]+startTimes[-2][-3]+startTimes[-2][-2]+startTimes[-2][-1]
         else:
             # MEX Right
             startTimes = sorted([timeRightHotend, timeBed])
-            startSequenceString += startTimes[-1][-6]+startTimes[-1][-3]+'S'+str(int(timeVsTemperature(startTimes[-1][-5], startTimes[-1][0]-startTimes[-2][0], 'heating', 'getTemperature')))+startTimes[-1][-1]
+            startSequenceString += startTimes[-1][-6]+startTimes[-1][-3]+'S'+str(int(timeVsTemperature(startTimes[-1][-5], startTimes[-1][0]-startTimes[-2][0], 'getTemperature')))+startTimes[-1][-1]
             startSequenceString += startTimes[-1][-6]+startTimes[-2][-4]+startTimes[-2][-2]+startTimes[-2][-1]
             startSequenceString += startTimes[-1][-6]+startTimes[-1][-3]+startTimes[-1][-2]+startTimes[-1][-1]
             startSequenceString += startTimes[-1][-6]+startTimes[-2][-3]+startTimes[-2][-2]+startTimes[-2][-1]
