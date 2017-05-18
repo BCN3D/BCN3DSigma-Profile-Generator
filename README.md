@@ -1,6 +1,6 @@
 # BCN3DSigma-ProGen
 
-*NOTE this is a development Branch where we upload beta versions. Find the latest stable version in the **Master** branch.*
+*NOTE: This is a development Branch where we upload beta versions. Find the latest stable version in the [Master](https://github.com/BCN3D/BCN3DSigma-Profile-Generator/tree/master) branch.*
 
 Profile Generator for Simplify3D, Cura & Cura 2 slicing softwares. Specifically designed for the BCN3D Sigma.
 
@@ -60,7 +60,7 @@ Generates the file *BCN3D Sigma - 0.4 Left (PLA Colorfila), 0.4 Right (PLA Color
 Generates the file *BCN3D Sigma - 0.4 Left (PLA Colorfila), 0.4 Right (PLA Colorfila) - Standard.ini*
 
 
-## Editing *Profiles Data* files
+## Editing *resources* files
 
 Hotends
 ```json5
