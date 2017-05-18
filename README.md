@@ -73,8 +73,8 @@ Hotends
     "material": "Brass",            //         Nozzle material
     "temperatureCompensation": 0,   // [C]     Temperature compensation for this hotend, sometimes the hotend needs to print always some degrees higher or lower
     "hotBlock": "Standard",         //         Block style
-    "timeToHeatUp150To300": 99,     // [s]     Time to heat from 150C to 300C
-    "timeToCoolDown300To150": 69,   // [s]     Time to cooldown from 300C to 150C
+    "heatUpSpeed": 4.3,             // [C/s]
+    "coolDownSpeed": 2.14,          // [C/s]
     "minimumCoolHeatTimeWindow": 5  // [s]     Minimal time an extruder has to be inactive before the nozzle is cooled
 }
 ```
@@ -98,10 +98,11 @@ Filaments
     "standbyTemperature": 150,      // [C]     Temperature while not printing
     "defaultPrintSpeed": 60,        // [mm/s]  Default speed when printing Standard quality with 0.4mm Nozzle and 0.2mm layer height
     "advisedMaxPrintSpeed": "None", // [mm/s]  Maximum speed recommended by filament's manufacturer. If "None", maxFlow value is needed
-    "maxFlow": 15,                  // [mm3/s] Maximum flow a default Hotend can print. "None" if unknown
+    "maxFlow": 15,                  // [mm3/s] Maximum flow a Standard Hotend can print. "None" if unknown
     "maxFlowForHighFlowHotend": 18, // [mm3/s] Maximum flow a High Flow Hotend can print. "None" if unknown
     "retractionDistance": 4,        // [mm]
     "retractionSpeed": 40,          // [mm/s]
+    "retractionCount": 90,          //         Maximum number of retractions occurring within the retractionDistance
     "fanPercentage": [50, 100],     // (0-100) Standard and maximum fan speeds
     "extrusionMultiplier": 1,       //         1.2 extrudes 120% the needed amount of filament
     "purgeLenght": 16               // [mm]    Lenght to purge at Tool Change with 0.4mm Nozzle
