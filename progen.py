@@ -7,13 +7,16 @@
 
 # Version Changelog
 # - Internal structure major changes and code clean up & optimization
-# - SmartPurge activated by default. Needs Firmware v01-1.2.3
 # - Cura 2 integration
+# - SmartPurge activated by default. Needs Firmware v01-1.2.3
 # - Raft improvements
 # - First layer improvements
+# - Layer height standarization
 
 # ToDo:
-# - update readme
+# - Sigma Vitamins:
+#  - SmartPurge: define purge distance
+#  - SmartPurge: look for toolchange retract value
 # - document version changes
 # - rewrite Logger.py
 
