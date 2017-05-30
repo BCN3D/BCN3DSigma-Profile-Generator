@@ -478,6 +478,7 @@ def simplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight):
                 fff.append('    </extruder>')
             fff.append('    <primaryExtruder>'+str(primaryExtruder)+'</primaryExtruder>')
             fff.append('    <raftExtruder>'+str(raftExtruder)+'</raftExtruder>')
+            fff.append('    <raftSeparationDistance>'+str(primaryHotend['nozzleSize'] * 0.55)+'</raftSeparationDistance>')
             fff.append('    <skirtExtruder>'+str(skirtExtruder)+'</skirtExtruder>')
             fff.append('    <infillExtruder>'+str(infillExtruder)+'</infillExtruder>')
             fff.append('    <supportExtruder>'+str(supportExtruder)+'</supportExtruder>')
@@ -784,17 +785,17 @@ def curaProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, quality):
     ini.append('spiralize = False')
     ini.append('simple_mode = False')
     ini.append('brim_line_count = 5')
-    ini.append('raft_margin = 3.0')                                     # default 5.0
-    ini.append('raft_line_spacing = 2.0')                               # default 3.0
-    ini.append('raft_base_thickness = '+str(layerHeight))               # default 0.3
-    ini.append('raft_base_linewidth = '+str(hotend['nozzleSize']*5))    # default 1.0
-    ini.append('raft_interface_thickness = '+str(layerHeight))          # default 0.27
-    ini.append('raft_interface_linewidth = '+str(hotend['nozzleSize'])) # default 0.4
-    ini.append('raft_airgap_all = 0.0')                                 # default 0.0
-    ini.append('raft_airgap = 0.2')                                     # default 0.22
-    ini.append('raft_surface_layers = 2')                               # default 2
-    ini.append('raft_surface_thickness = '+str(layerHeight))            # default 0.27
-    ini.append('raft_surface_linewidth = '+str(hotend['nozzleSize']))   # default 0.4
+    ini.append('raft_margin = 3.0')
+    ini.append('raft_line_spacing = '+str(round(hotend['nozzleSize']*7.5, 2)))
+    ini.append('raft_base_thickness = '+str(round(hotend['nozzleSize']*0.75, 2)))
+    ini.append('raft_base_linewidth = '+str(round(hotend['nozzleSize']*2.5, 2)))
+    ini.append('raft_interface_thickness = '+str(round(hotend['nozzleSize']*0.7, 2)))
+    ini.append('raft_interface_linewidth = '+str(round(hotend['nozzleSize']*1.5, 2)))
+    ini.append('raft_airgap_all = 0.0')
+    ini.append('raft_airgap = '+str(round(hotend['nozzleSize']*0.55, 2)))
+    ini.append('raft_surface_layers = 2')
+    ini.append('raft_surface_thickness = '+str(layerHeight))
+    ini.append('raft_surface_linewidth = '+str(hotend['nozzleSize']))
     ini.append('fix_horrible_union_all_type_a = True')
     ini.append('fix_horrible_union_all_type_b = False')
     ini.append('fix_horrible_use_open_bits = False')
@@ -1438,19 +1439,19 @@ def cura2Profile():
                     qualityFile.append("skirt_brim_minimal_length = =round((material_diameter/2)**2 / (extruderValue(adhesion_extruder_nr, 'machine_nozzle_size')/2)**2 *"+str(startPurgeLength)+', 2)')
                     # qualityFile.append('brim_width = 8')
                     # qualityFile.append('brim_outside_only = True')
-                    # qualityFile.append('raft_margin = 15')
-                    qualityFile.append("raft_airgap = =min(extruderValues('machine_nozzle_size')) / 2")
+                    qualityFile.append('raft_margin = 3')
+                    qualityFile.append("raft_airgap = =min(extruderValues('machine_nozzle_size')) * 0.55")
                     # qualityFile.append('layer_0_z_overlap = =raft_airgap / 2')
                     # qualityFile.append('raft_surface_layers = 2')
                     # qualityFile.append('raft_surface_thickness = =layer_height')
                     # qualityFile.append('raft_surface_line_width = =line_width')
                     # qualityFile.append('raft_surface_line_spacing = =raft_surface_line_width')
-                    # qualityFile.append('raft_interface_thickness = =layer_height * 1.5')
-                    # qualityFile.append('raft_interface_line_width = =line_width * 2')
+                    qualityFile.append("raft_interface_thickness = =extruderValue(adhesion_extruder_nr, 'machine_nozzle_size') * 0.7")
+                    qualityFile.append('raft_interface_line_width = =line_width * 1.5')
                     # qualityFile.append('raft_interface_line_spacing = =raft_interface_line_width + 0.2')
-                    # qualityFile.append('raft_base_thickness = =layer_height_0 * 1.2')
-                    # qualityFile.append("raft_base_line_width = =extruderValue(adhesion_extruder_nr, 'machine_nozzle_size') * 2")
-                    # qualityFile.append('raft_base_line_spacing = =raft_base_line_width * 2')
+                    qualityFile.append("raft_base_thickness = =extruderValue(adhesion_extruder_nr, 'machine_nozzle_size') * 0.75")
+                    qualityFile.append("raft_base_line_width = =extruderValue(adhesion_extruder_nr, 'machine_nozzle_size') * 2.5")
+                    qualityFile.append("raft_base_line_spacing = =extruderValue(adhesion_extruder_nr, 'machine_nozzle_size') * 7.5")
                     # qualityFile.append('raft_speed = =speed_print / 60 * 30')
                     # qualityFile.append('raft_surface_speed = =raft_speed')
                     # qualityFile.append('raft_interface_speed = =raft_speed * 0.75')
