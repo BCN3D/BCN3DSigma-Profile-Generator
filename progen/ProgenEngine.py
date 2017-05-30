@@ -1006,7 +1006,12 @@ def cura2Profile():
     definition.append('        "machine_max_feedrate_y": { "default_value": 200 },')
     definition.append('        "machine_max_feedrate_z": { "default_value": 15 },')
     definition.append('        "machine_acceleration": { "default_value": 2000 },')
-    definition.append('        "layer_height_0": { "value": "min(extruderValues('+"'machine_nozzle_size'"+')) / 2" },')
+    definition.append('        "layer_height": { "maximum_value": "0.75 * min(extruderValues('+"'machine_nozzle_size'"+'))" },')
+    definition.append('        "layer_height_0":')
+    definition.append('        {')
+    definition.append('            "maximum_value": "0.75 * min(extruderValues('+"'machine_nozzle_size'"+'))",')
+    definition.append('            "value": "min(extruderValues('+"'machine_nozzle_size'"+')) / 2"')
+    definition.append('        },')
     # definition.append('        "support_enable":')
     # definition.append('        {')
     # definition.append('            "default_value": false,')
@@ -1098,7 +1103,7 @@ def cura2Profile():
         fileName = 'Cura 2/resources/materials/'+PS.cura2id+'/'+filament['brand'].replace(' ', '_')+'_'+filament['material'].replace(' ', '_')+'.xml.fdm_material'
         material = []
         material.append('<?xml version="1.0" encoding="UTF-8"?>')
-        material.append('<fdmmaterial xmlns="http://www.ultimaker.com/material">')
+        material.append('<fdmmaterial xmlns="http://www.ultimaker.com/material" version="1.3">')
         material.append('    <metadata>')
         material.append('        <name>')
         material.append('            <brand>'+filament['brand']+'</brand>')
@@ -1188,6 +1193,7 @@ def cura2Profile():
                         qualityFile.append('quality_type = layer'+("%.2f" % layerHeight)+'mm')
                         qualityFile.append('global_quality = True')
                         qualityFile.append('weight = '+str(len(globalQualities)))
+                        qualityFile.append('setting_version = 1')
                         qualityFile.append('')
                         qualityFile.append('[values]')
                         qualityFile.append('layer_height = '+("%.2f" % layerHeight))
@@ -1209,6 +1215,7 @@ def cura2Profile():
                     qualityFile.append('quality_type = layer'+("%.2f" % layerHeight)+'mm')
                     qualityFile.append('material = '+filament['brand'].replace(' ', '_')+'_'+filament['material'].replace(' ', '_')+'_'+PS.cura2id+'_'+hotend['id'].replace(' ', '_'))
                     qualityFile.append('weight = '+str(-(quality['index']-3)))
+                    qualityFile.append('setting_version = 1')
                     qualityFile.append('')
                     qualityFile.append('[values]')
 
@@ -1548,6 +1555,7 @@ def cura2Profile():
             variant.append('[metadata]')
             variant.append('author = '+PS.cura2Author)
             variant.append('type = variant')
+            variant.append('setting_version = 1')
             variant.append('')
             variant.append('[values]')
             # machine settings
