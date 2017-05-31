@@ -827,10 +827,10 @@ def curaProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, quality):
     ini.append('\t;Print time: {print_time}')
     ini.append('\t;Filament used: {filament_amount}m {filament_weight}g')
     ini.append('\t;Filament cost: {filament_cost}')
-    ini.append('\tT'+str(primaryExtruder)+'                                 ;change to active toolhead')
     if hotendLeft['id'] != 'None':
         ini.append(firstHeatSequence(hotendLeft, hotendRight, printTemperature1, 0, bedTemperature, 'Cura'))
     else:
+        ini.append('\tT'+str(primaryExtruder))
         ini.append(firstHeatSequence(hotendLeft, hotendRight, 0, printTemperature2, bedTemperature, 'Cura'))
     ini.append('\tG21                               ;metric values')
     ini.append('\tG90                               ;absolute positioning')
@@ -859,29 +859,42 @@ def curaProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, quality):
     ini.append('\t;Print time: {print_time}')
     ini.append('\t;Filament used: {filament_amount}m {filament_weight}g')
     ini.append('\t;Filament cost: {filament_cost}')
-    if printTemperature1 == 0:
-        ini.append(firstHeatSequence(hotendLeft, hotendRight, 0, printTemperature2, bedTemperature, 'Cura')) # Cura takes the the start2 as main start. Here we avoid getting the command M109 S0 T0
-    elif printTemperature2 == 0:
-        ini.append(firstHeatSequence(hotendLeft, hotendRight, printTemperature1, printTemperature1, bedTemperature, 'Cura'))
+    if printTemperature1 == 0 or printTemperature2 == 0:
+        if printTemperature1 == 0:
+            ini.append('\tT'+str(primaryExtruder))
+            ini.append(firstHeatSequence(hotendLeft, hotendRight, 0, printTemperature2, bedTemperature, 'Cura')) # Cura takes the the start2 as main start. Here we avoid getting  command M109 S0 T0
+        else:
+            ini.append(firstHeatSequence(hotendLeft, hotendRight, printTemperature1, 0, bedTemperature, 'Cura'))
+        ini.append('\tG21                               ;metric values')
+        ini.append('\tG90                               ;absolute positioning')
+        ini.append('\tM82                               ;set extruder to absolute mode')
+        ini.append('\tM107                              ;start with the fan off')
+        ini.append('\tG28 X0 Y0                         ;move X/Y to min endstops')
+        ini.append('\tG28 Z0                            ;move Z to min endstops')
+        ini.append('\tG1 Z5 F200                        ;Safety Z axis movement')
+        ini.append('\tG92 E0                            ;zero the extruded length')
+        ini.append('\tG1 F'+str(purgeSpeed)+' E'+str(startPurgeLength)+'                    ;extrude '+str(startPurgeLength)+'mm of feed stock')
+        ini.append('\tG92 E0                            ;zero the extruded length again')
+        ini.append('\tG1 F2400 E-4')
     else:
         ini.append(firstHeatSequence(hotendLeft, hotendRight, printTemperature1, printTemperature2, bedTemperature, 'Cura'))
-    ini.append('\tG21                               ;metric values')
-    ini.append('\tG90                               ;absolute positioning')
-    ini.append('\tM107                              ;start with the fan off')
-    ini.append('\tG28 X0 Y0                         ;move X/Y to min endstops')
-    ini.append('\tG28 Z0                            ;move Z to min endstops')
-    ini.append('\tG1 Z5 F200                        ;safety Z axis movement')
-    ini.append('\tM108                              ;enable layer fan for idle extruder')
-    ini.append('\tT1                                ;switch to the right extruder')
-    ini.append('\tG92 E0                            ;zero the extruded length')
-    ini.append('\tG1 F'+str(purgeSpeedT1)+' E'+str(startPurgeLengthT1)+'                    ;extrude '+str(startPurgeLengthT1)+'mm of feed stock')
-    ini.append('\tG92 E0                            ;zero the extruded length again')
-    ini.append('\tG1 F2400 E-{retraction_dual_amount}')
-    ini.append('\tT0                                ;switch to the left extruder')
-    ini.append('\tG92 E0                            ;zero the extruded length')
-    ini.append('\tG1 F'+str(purgeSpeedT0)+' E'+str(startPurgeLengthT0)+'                    ;extrude '+str(startPurgeLengthT0)+'mm of feed stock')
-    ini.append('\tG92 E0                            ;zero the extruded length again')
-    ini.append('\tG1 F2400 E-4')
+        ini.append('\tG21                               ;metric values')
+        ini.append('\tG90                               ;absolute positioning')
+        ini.append('\tM107                              ;start with the fan off')
+        ini.append('\tG28 X0 Y0                         ;move X/Y to min endstops')
+        ini.append('\tG28 Z0                            ;move Z to min endstops')
+        ini.append('\tG1 Z5 F200                        ;safety Z axis movement')
+        ini.append('\tM108                              ;enable layer fan for idle extruder')
+        ini.append('\tT1                                ;switch to the right extruder')
+        ini.append('\tG92 E0                            ;zero the extruded length')
+        ini.append('\tG1 F'+str(purgeSpeedT1)+' E'+str(startPurgeLengthT1)+'                    ;extrude '+str(startPurgeLengthT1)+'mm of feed stock')
+        ini.append('\tG92 E0                            ;zero the extruded length again')
+        ini.append('\tG1 F2400 E-{retraction_dual_amount}')
+        ini.append('\tT0                                ;switch to the left extruder')
+        ini.append('\tG92 E0                            ;zero the extruded length')
+        ini.append('\tG1 F'+str(purgeSpeedT0)+' E'+str(startPurgeLengthT0)+'                    ;extrude '+str(startPurgeLengthT0)+'mm of feed stock')
+        ini.append('\tG92 E0                            ;zero the extruded length again')
+        ini.append('\tG1 F2400 E-4')
     ini.append('end2.gcode = M104 T0 S0                        ;left extruder heater off')
     ini.append('\tM104 T1 S0                        ;right extruder heater off')
     ini.append('\tM140 S0                           ;heated bed heater off')
@@ -3064,17 +3077,17 @@ def firstHeatSequence(hotendLeft, hotendRight, leftHotendTemp, rightHotendTemp, 
         if hotendRight['id'] == 'None':
             # MEX Left
             startTimes = sorted([timeLeftHotend, timeBed])
-            startSequenceString += startTimes[-1][-6]+startTimes[-1][-3]+'S'+str(int(timeVsTemperature(startTimes[-1][-5], startTimes[-1][0]-startTimes[-2][0], 'getTemperature')))+r'\n'
-            startSequenceString += startTimes[-1][-6]+startTimes[-2][-4]+startTimes[-2][-2]+r'\n'
-            startSequenceString += startTimes[-1][-6]+startTimes[-1][-3]+startTimes[-1][-2]+r'\n'
-            startSequenceString += startTimes[-1][-6]+startTimes[-2][-3]+startTimes[-2][-2]+r'\n'
+            startSequenceString += startTimes[-1][-6]+startTimes[-1][-3]+'S'+str(int(timeVsTemperature(startTimes[-1][-5], startTimes[-1][0]-startTimes[-2][0], 'getTemperature')))+startTimes[-1][-1][-1:]
+            startSequenceString += startTimes[-1][-6]+startTimes[-2][-4]+startTimes[-2][-2]+startTimes[-2][-1][-1:]
+            startSequenceString += startTimes[-1][-6]+startTimes[-1][-3]+startTimes[-1][-2]+startTimes[-1][-1][-1:]
+            startSequenceString += startTimes[-1][-6]+startTimes[-2][-3]+startTimes[-2][-2]+startTimes[-2][-1][-1:]
         else:
             # MEX Right
             startTimes = sorted([timeRightHotend, timeBed])
-            startSequenceString += startTimes[-1][-6]+startTimes[-1][-3]+'S'+str(int(timeVsTemperature(startTimes[-1][-5], startTimes[-1][0]-startTimes[-2][0], 'getTemperature')))+r'\n'
-            startSequenceString += startTimes[-1][-6]+startTimes[-2][-4]+startTimes[-2][-2]+r'\n'
-            startSequenceString += startTimes[-1][-6]+startTimes[-1][-3]+startTimes[-1][-2]+r'\n'
-            startSequenceString += startTimes[-1][-6]+startTimes[-2][-3]+startTimes[-2][-2]+r'\n'
+            startSequenceString += startTimes[-1][-6]+startTimes[-1][-3]+'S'+str(int(timeVsTemperature(startTimes[-1][-5], startTimes[-1][0]-startTimes[-2][0], 'getTemperature')))+startTimes[-1][-1][-1:]
+            startSequenceString += startTimes[-1][-6]+startTimes[-2][-4]+startTimes[-2][-2]+startTimes[-2][-1][-1:]
+            startSequenceString += startTimes[-1][-6]+startTimes[-1][-3]+startTimes[-1][-2]+startTimes[-1][-1][-1:]
+            startSequenceString += startTimes[-1][-6]+startTimes[-2][-3]+startTimes[-2][-2]+startTimes[-2][-1][-1:]
     return startSequenceString
 
 def accelerationForPerimeters(nozzleSize, layerHeight, outerWallSpeed, base = 5, multiplier = 30000, defaultAcceleration = 2000):
