@@ -54,7 +54,8 @@ def cura2(fileAction):
     os.mkdir('Cura 2/plugins')
     os.mkdir('Cura 2/plugins/PostProcessingPlugin')
     os.mkdir('Cura 2/plugins/PostProcessingPlugin/scripts')
-    os.mkdir('Cura 2/plugins/'+PS.machineSettingsPluginName)
+    # os.mkdir('Cura 2/plugins/MachineSettingsAction')
+    # os.mkdir('Cura 2/plugins/'+PS.machineSettingsPluginName)
 
     for fileName, fileContent in ProgenEngine.cura2Profile():
         if fileAction == '--file':
@@ -327,7 +328,7 @@ def getCuraBundleSize(oneLineCsvSize = float(10494984)/78480): # experimental va
 
 def cura2FilesBundle():
     cura2('--file')
-    with open('Cura 2/Readme.txt', 'w') as f:
+    with open('Cura 2/README.txt', 'w') as f:
         lines = []
         lines.append(r'Build '+PS.progenBuildNumber+'\n')
         lines.append(r''+'\n')
@@ -335,11 +336,11 @@ def cura2FilesBundle():
         lines.append(r''+'\n')
         lines.append(r'    Mac OS:'+'\n')
         lines.append(r'        1 - COMBINE all folders inside "MacOS" with the ones inside "/Applications/Cura.app/Contents/Resources"'+'\n')
-        lines.append(r'        2 - Restart Cura 2'+'\n')
+        lines.append(r'        2 - Restart Cura 2.6'+'\n')
         lines.append(r''+'\n')
         lines.append(r'    Windows:'+'\n')
-        lines.append(r'        1 - COMBINE all folders inside "Windows" with the ones inside "C:/Program Files/Cura 2.5"'+'\n')
-        lines.append(r'        2 - Restart Cura 2'+'\n')
+        lines.append(r'        1 - COMBINE all folders inside "Windows" with the ones inside "C:/Program Files/Cura 2.6"'+'\n')
+        lines.append(r'        2 - Restart Cura 2.6'+'\n')
         f.writelines(lines)
     shutil.make_archive('BCN3D Sigma - Cura 2', 'zip', 'Cura 2')    
 
