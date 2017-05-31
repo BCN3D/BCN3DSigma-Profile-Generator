@@ -552,7 +552,7 @@ def simplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight):
                 reducedAccelerationForPerimeters = 2000
             else:
                 reducedAccelerationForPerimeters = accelerationForPerimeters(primaryHotend['nozzleSize'], layerHeight, int(defaultSpeed/60. * outlineUnderspeed))
-            fff.append('    <postProcessing>{REPLACE "; outer perimeter" "; outer perimeterM204 S'+str(reducedAccelerationForPerimeters)+'"},{REPLACE "; inner perimeter" "; inner perimeterM204 S2000"},{REPLACE "; solid layer" "; solid layerM204 S2000"},{REPLACE "; infill" "; infillM204 S2000",{REPLACE "; support" "; supportM204 S2000"},{REPLACE "; layer end" "; layer endM204 S2000"},{REPLACE "F12000G1 Z'+str(round(layerHeight*firstLayerHeightPercentage/100., 3))+' F1002G92 E0" "F12000G1 Z'+str(round(layerHeight*firstLayerHeightPercentage/100., 3))+' F1002G1 E0.0000 F720G92 E0"}</postProcessing>')
+            postProcessingScript = r'{REPLACE "; outer perimeter" "; outer perimeter\nM204 S'+str(reducedAccelerationForPerimeters)+r'"},{REPLACE "; inner perimeter" "; inner perimeter\nM204 S2000"},{REPLACE "; solid layer" "; solid layer\nM204 S2000"},{REPLACE "; infill" "; infill\nM204 S2000",{REPLACE "; support" "; support\nM204 S2000"},{REPLACE "; layer end" "; layer end\nM204 S2000"},{REPLACE "F12000\nG1 Z'+str(round(layerHeight*firstLayerHeightPercentage/100., 3))+r' F1002\nG92 E0" "F12000G1 Z'+str(round(layerHeight*firstLayerHeightPercentage/100., 3))+r' F1002\nG1 E0.0000 F720\nG92 E0"}'
             fff.append('  </autoConfigureQuality>')
 
             # if dataLog != '--no-data' :
@@ -566,17 +566,20 @@ def simplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight):
     if hotendLeft['id'] != 'None':
         fff.append('  <autoConfigureExtruders name="Left Extruder Only"  allowedToolheads="1">')
         fff.append('    <startingGcode>;Sigma ProGen '+PS.progenVersionNumber+' (Build '+PS.progenBuildNumber+'),,'+firstHeatSequence(hotendLeft, hotendRight, hotendLeftTemperature, 0, bedTemperature, 'Simplify3D')+',G21\t\t;metric values,G90\t\t;absolute positioning,M82\t\t;set extruder to absolute mode,M107\t\t;start with the fan off,G28 X0 Y0\t\t;move X/Y to min endstops,G28 Z0\t\t;move Z to min endstops,T0\t\t;change to active toolhead,G92 E0\t\t;zero the extruded length,G1 Z5 F200\t\t;safety Z axis movement,G1 F'+str(purgeSpeedT0)+' E'+str(startPurgeLengthT0)+'\t;extrude '+str(startPurgeLengthT0)+'mm of feed stock,G92 E0\t\t;zero the extruded length again</startingGcode>')
-        fff.append('    <layerChangeGcode>M104 S0 T1</layerChangeGcode>')
+        postProcessingScript += ',{REPLACE "M104 S'+str(hotendRightTemperature)+' T1" ""}'
+        fff.append('    <postProcessing>'+postProcessingScript+'</postProcessing>')
         fff.append('  </autoConfigureExtruders>')
     if hotendRight['id'] != 'None':
         fff.append('  <autoConfigureExtruders name="Right Extruder Only"  allowedToolheads="1">')
         fff.append('    <startingGcode>;Sigma ProGen '+PS.progenVersionNumber+' (Build '+PS.progenBuildNumber+'),,'+firstHeatSequence(hotendLeft, hotendRight, 0, hotendRightTemperature, bedTemperature, 'Simplify3D')+',G21\t\t;metric values,G90\t\t;absolute positioning,M82\t\t;set extruder to absolute mode,M107\t\t;start with the fan off,G28 X0 Y0\t\t;move X/Y to min endstops,G28 Z0\t\t;move Z to min endstops,T1\t\t;change to active toolhead,G92 E0\t\t;zero the extruded length,G1 Z5 F200\t\t;safety Z axis movement,G1 F'+str(purgeSpeedT1)+' E'+str(startPurgeLengthT1)+'\t;extrude '+str(startPurgeLengthT1)+'mm of feed stock,G92 E0\t\t;zero the extruded length again</startingGcode>')
-        fff.append('    <layerChangeGcode>M104 S0 T0</layerChangeGcode>')
+        postProcessingScript += ',{REPLACE "M104 S'+str(hotendLeftTemperature)+' T0" ""}'
+        fff.append('    <postProcessing>'+postProcessingScript+'</postProcessing>')
         fff.append('  </autoConfigureExtruders>')
     if hotendLeft['id'] != 'None' and hotendRight['id'] != 'None':
         fff.append('  <autoConfigureExtruders name="Both Extruders"  allowedToolheads="2">')
         fff.append('    <startingGcode>;Sigma ProGen '+PS.progenVersionNumber+' (Build '+PS.progenBuildNumber+'),,'+firstHeatSequence(hotendLeft, hotendRight, hotendLeftTemperature, hotendRightTemperature, bedTemperature, 'Simplify3D')+',G21\t\t;metric values,G90\t\t;absolute positioning,M108\t\t;enable layer fan for idle extruder,M107\t\t;start with the fan off,G28 X0 Y0\t\t;move X/Y to min endstops,G28 Z0\t\t;move Z to min endstops,T1\t\t;switch to the right extruder,G92 E0\t\t;zero the extruded length,G1 F'+str(purgeSpeedT1)+' E'+str(startPurgeLengthT1)+'\t;extrude '+str(startPurgeLengthT1)+'mm of feed stock,G92 E0\t\t;zero the extruded length again,G1 F200 E-9,T0\t\t;switch to the left extruder,G92 E0\t\t;zero the extruded length,G1 F'+str(purgeSpeedT0)+' E'+str(startPurgeLengthT0)+'\t;extrude '+str(startPurgeLengthT0)+'mm of feed stock,G92 E0\t\t;zero the extruded length again</startingGcode>')
         fff.append('    <layerChangeGcode></layerChangeGcode>')
+        fff.append('    <postProcessing>'+postProcessingScript+'</postProcessing>')
         fff.append('  </autoConfigureExtruders>')
 
     fff.append('</profile>')
