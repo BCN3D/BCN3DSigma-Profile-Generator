@@ -565,13 +565,13 @@ def simplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight):
     # Start gcode must be defined in autoConfigureExtruders. Otherwise you have problems with the first heat sequence in Dual Color prints.
     if hotendLeft['id'] != 'None':
         fff.append('  <autoConfigureExtruders name="Left Extruder Only"  allowedToolheads="1">')
-        fff.append('    <startingGcode>;Sigma ProGen '+PS.progenVersionNumber+' (Build '+PS.progenBuildNumber+'),,'+firstHeatSequence(hotendLeft, hotendRight, hotendLeftTemperature, 0, bedTemperature, 'Simplify3D')+',G21\t\t;metric values,G90\t\t;absolute positioning,M82\t\t;set extruder to absolute mode,M107\t\t;start with the fan off,G28 X0 Y0\t\t;move X/Y to min endstops,G28 Z0\t\t;move Z to min endstops,T0\t\t;change to active toolhead,G92 E0\t\t;zero the extruded length,G1 Z5 F200\t\t;safety Z axis movement,G1 F'+str(purgeSpeedT0)+' E'+str(startPurgeLengthT0)+'\t;extrude '+str(startPurgeLengthT0)+'mm of feed stock,G92 E0\t\t;zero the extruded length again</startingGcode>')
+        fff.append('    <startingGcode>;Sigma ProGen '+PS.progenVersionNumber+' (Build '+PS.progenBuildNumber+'),T0,'+firstHeatSequence(hotendLeft, hotendRight, hotendLeftTemperature, 0, bedTemperature, 'Simplify3D')+',G21\t\t;metric values,G90\t\t;absolute positioning,M82\t\t;set extruder to absolute mode,M107\t\t;start with the fan off,G28 X0 Y0\t\t;move X/Y to min endstops,G28 Z0\t\t;move Z to min endstops,G92 E0\t\t;zero the extruded length,G1 Z5 F200\t\t;safety Z axis movement,G1 F'+str(purgeSpeedT0)+' E'+str(startPurgeLengthT0)+'\t;extrude '+str(startPurgeLengthT0)+'mm of feed stock,G92 E0\t\t;zero the extruded length again</startingGcode>')
         postProcessingScript += ',{REPLACE "M104 S'+str(hotendRightTemperature)+' T1" ""}'
         fff.append('    <postProcessing>'+postProcessingScript+'</postProcessing>')
         fff.append('  </autoConfigureExtruders>')
     if hotendRight['id'] != 'None':
         fff.append('  <autoConfigureExtruders name="Right Extruder Only"  allowedToolheads="1">')
-        fff.append('    <startingGcode>;Sigma ProGen '+PS.progenVersionNumber+' (Build '+PS.progenBuildNumber+'),,'+firstHeatSequence(hotendLeft, hotendRight, 0, hotendRightTemperature, bedTemperature, 'Simplify3D')+',G21\t\t;metric values,G90\t\t;absolute positioning,M82\t\t;set extruder to absolute mode,M107\t\t;start with the fan off,G28 X0 Y0\t\t;move X/Y to min endstops,G28 Z0\t\t;move Z to min endstops,T1\t\t;change to active toolhead,G92 E0\t\t;zero the extruded length,G1 Z5 F200\t\t;safety Z axis movement,G1 F'+str(purgeSpeedT1)+' E'+str(startPurgeLengthT1)+'\t;extrude '+str(startPurgeLengthT1)+'mm of feed stock,G92 E0\t\t;zero the extruded length again</startingGcode>')
+        fff.append('    <startingGcode>;Sigma ProGen '+PS.progenVersionNumber+' (Build '+PS.progenBuildNumber+'),T1,'+firstHeatSequence(hotendLeft, hotendRight, 0, hotendRightTemperature, bedTemperature, 'Simplify3D')+',G21\t\t;metric values,G90\t\t;absolute positioning,M82\t\t;set extruder to absolute mode,M107\t\t;start with the fan off,G28 X0 Y0\t\t;move X/Y to min endstops,G28 Z0\t\t;move Z to min endstops,G92 E0\t\t;zero the extruded length,G1 Z5 F200\t\t;safety Z axis movement,G1 F'+str(purgeSpeedT1)+' E'+str(startPurgeLengthT1)+'\t;extrude '+str(startPurgeLengthT1)+'mm of feed stock,G92 E0\t\t;zero the extruded length again</startingGcode>')
         postProcessingScript += ',{REPLACE "M104 S'+str(hotendLeftTemperature)+' T0" ""}'
         fff.append('    <postProcessing>'+postProcessingScript+'</postProcessing>')
         fff.append('  </autoConfigureExtruders>')
@@ -827,6 +827,7 @@ def curaProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, quality):
     ini.append('\t;Print time: {print_time}')
     ini.append('\t;Filament used: {filament_amount}m {filament_weight}g')
     ini.append('\t;Filament cost: {filament_cost}')
+    ini.append('\tT'+str(primaryExtruder)+'                                 ;change to active toolhead')
     if hotendLeft['id'] != 'None':
         ini.append(firstHeatSequence(hotendLeft, hotendRight, printTemperature1, 0, bedTemperature, 'Cura'))
     else:
@@ -838,13 +839,12 @@ def curaProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, quality):
     ini.append('\tG28 X0 Y0                         ;move X/Y to min endstops')
     ini.append('\tG28 Z0                            ;move Z to min endstops')
     ini.append('\tG1 Z5 F200                        ;Safety Z axis movement')
-    ini.append('\tT'+str(primaryExtruder)+'                                 ;change to active toolhead')
     ini.append('\tG92 E0                            ;zero the extruded length')
     ini.append('\tG1 F'+str(purgeSpeed)+' E'+str(startPurgeLength)+'                    ;extrude '+str(startPurgeLength)+'mm of feed stock')
     ini.append('\tG92 E0                            ;zero the extruded length again')
     ini.append('\tG1 F2400 E-4')
-    ini.append('end.gcode = M104 S0')
-    ini.append('\tM104 T1 S0                        ;extruder heater off')
+    ini.append('end.gcode = M104 T0 S0                        ;left extruder heater off')
+    ini.append('\tM104 T1 S0                        ;right extruder heater off')
     ini.append('\tM140 S0                           ;heated bed heater off')
     ini.append('\tG91                               ;relative positioning')
     ini.append('\tG1 Z+0.5 E-5 Y+10 F{travel_speed} ;move Z up a bit and retract filament')
@@ -860,7 +860,7 @@ def curaProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, quality):
     ini.append('\t;Filament used: {filament_amount}m {filament_weight}g')
     ini.append('\t;Filament cost: {filament_cost}')
     if printTemperature1 == 0:
-        ini.append(firstHeatSequence(hotendLeft, hotendRight, printTemperature2, printTemperature2, bedTemperature, 'Cura'))
+        ini.append(firstHeatSequence(hotendLeft, hotendRight, 0, printTemperature2, bedTemperature, 'Cura')) # Cura takes the the start2 as main start. Here we avoid getting the command M109 S0 T0
     elif printTemperature2 == 0:
         ini.append(firstHeatSequence(hotendLeft, hotendRight, printTemperature1, printTemperature1, bedTemperature, 'Cura'))
     else:
@@ -882,8 +882,7 @@ def curaProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, quality):
     ini.append('\tG1 F'+str(purgeSpeedT0)+' E'+str(startPurgeLengthT0)+'                    ;extrude '+str(startPurgeLengthT0)+'mm of feed stock')
     ini.append('\tG92 E0                            ;zero the extruded length again')
     ini.append('\tG1 F2400 E-4')
-    ini.append('end2.gcode = M104 T0 S0')
-    ini.append('\tM104 T0 S0                        ;left extruder heater off')
+    ini.append('end2.gcode = M104 T0 S0                        ;left extruder heater off')
     ini.append('\tM104 T1 S0                        ;right extruder heater off')
     ini.append('\tM140 S0                           ;heated bed heater off')
     ini.append('\tG91                               ;relative positioning')
@@ -3065,17 +3064,17 @@ def firstHeatSequence(hotendLeft, hotendRight, leftHotendTemp, rightHotendTemp, 
         if hotendRight['id'] == 'None':
             # MEX Left
             startTimes = sorted([timeLeftHotend, timeBed])
-            startSequenceString += startTimes[-1][-6]+startTimes[-1][-3]+'S'+str(int(timeVsTemperature(startTimes[-1][-5], startTimes[-1][0]-startTimes[-2][0], 'getTemperature')))+startTimes[-1][-1]
-            startSequenceString += startTimes[-1][-6]+startTimes[-2][-4]+startTimes[-2][-2]+startTimes[-2][-1]
-            startSequenceString += startTimes[-1][-6]+startTimes[-1][-3]+startTimes[-1][-2]+startTimes[-1][-1]
-            startSequenceString += startTimes[-1][-6]+startTimes[-2][-3]+startTimes[-2][-2]+startTimes[-2][-1]
+            startSequenceString += startTimes[-1][-6]+startTimes[-1][-3]+'S'+str(int(timeVsTemperature(startTimes[-1][-5], startTimes[-1][0]-startTimes[-2][0], 'getTemperature')))+r'\n'
+            startSequenceString += startTimes[-1][-6]+startTimes[-2][-4]+startTimes[-2][-2]+r'\n'
+            startSequenceString += startTimes[-1][-6]+startTimes[-1][-3]+startTimes[-1][-2]+r'\n'
+            startSequenceString += startTimes[-1][-6]+startTimes[-2][-3]+startTimes[-2][-2]+r'\n'
         else:
             # MEX Right
             startTimes = sorted([timeRightHotend, timeBed])
-            startSequenceString += startTimes[-1][-6]+startTimes[-1][-3]+'S'+str(int(timeVsTemperature(startTimes[-1][-5], startTimes[-1][0]-startTimes[-2][0], 'getTemperature')))+startTimes[-1][-1]
-            startSequenceString += startTimes[-1][-6]+startTimes[-2][-4]+startTimes[-2][-2]+startTimes[-2][-1]
-            startSequenceString += startTimes[-1][-6]+startTimes[-1][-3]+startTimes[-1][-2]+startTimes[-1][-1]
-            startSequenceString += startTimes[-1][-6]+startTimes[-2][-3]+startTimes[-2][-2]+startTimes[-2][-1]
+            startSequenceString += startTimes[-1][-6]+startTimes[-1][-3]+'S'+str(int(timeVsTemperature(startTimes[-1][-5], startTimes[-1][0]-startTimes[-2][0], 'getTemperature')))+r'\n'
+            startSequenceString += startTimes[-1][-6]+startTimes[-2][-4]+startTimes[-2][-2]+r'\n'
+            startSequenceString += startTimes[-1][-6]+startTimes[-1][-3]+startTimes[-1][-2]+r'\n'
+            startSequenceString += startTimes[-1][-6]+startTimes[-2][-3]+startTimes[-2][-2]+r'\n'
     return startSequenceString
 
 def accelerationForPerimeters(nozzleSize, layerHeight, outerWallSpeed, base = 5, multiplier = 30000, defaultAcceleration = 2000):
