@@ -455,7 +455,7 @@ def simplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight):
                 fff.append('      <retractionZLift>'+("%.2f" % (layerHeight/2.))+'</retractionZLift>')
                 fff.append('      <retractionSpeed>'+str(filamentLeft['retractionSpeed']*60)+'</retractionSpeed>')
                 fff.append('      <useCoasting>'+str(retractValues(filamentLeft)[0])+'</useCoasting>')
-                fff.append('      <coastingDistance>'+str(coastValue(hotendLeft, filamentLeft) / (layerHeight * hotendLeft['nozzleSize']))+'</coastingDistance>')
+                fff.append('      <coastingDistance>'+str(coastVolume(hotendLeft, filamentLeft) / (layerHeight * hotendLeft['nozzleSize']))+'</coastingDistance>')
                 fff.append('      <useWipe>'+str(retractValues(filamentLeft)[1])+'</useWipe>')
                 fff.append('      <wipeDistance>'+str(hotendLeft['nozzleSize']*12.5)+'</wipeDistance>')
                 fff.append('    </extruder>')
@@ -472,7 +472,7 @@ def simplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight):
                 fff.append('      <retractionZLift>'+str(layerHeight/2)+'</retractionZLift>')
                 fff.append('      <retractionSpeed>'+str(filamentRight['retractionSpeed']*60)+'</retractionSpeed>')
                 fff.append('      <useCoasting>'+str(retractValues(filamentRight)[0])+'</useCoasting>')
-                fff.append('      <coastingDistance>'+str(coastValue(hotendRight, filamentRight) / (layerHeight * hotendRight['nozzleSize']))+'</coastingDistance>')
+                fff.append('      <coastingDistance>'+str(coastVolume(hotendRight, filamentRight) / (layerHeight * hotendRight['nozzleSize']))+'</coastingDistance>')
                 fff.append('      <useWipe>'+str(retractValues(filamentRight)[1])+'</useWipe>')
                 fff.append('      <wipeDistance>'+str(hotendRight['nozzleSize']*12.5)+'</wipeDistance>')
                 fff.append('    </extruder>')
@@ -1523,7 +1523,7 @@ def cura2Profile():
                     # qualityFile.append('conical_overhang_enabled = False')
                     # qualityFile.append('conical_overhang_angle = 50')
                     qualityFile.append('coasting_enable = True')
-                    qualityFile.append('coasting_volume = '+str(coastValue(hotend, filament)))
+                    qualityFile.append('coasting_volume = '+str(coastVolume(hotend, filament)))
                     qualityFile.append('coasting_min_volume = =coasting_volume * 2')
                     # qualityFile.append('coasting_speed = 90')
                     # qualityFile.append('skin_outline_count = 0')
@@ -1801,6 +1801,7 @@ def cura2Profile():
     postProcessing.append('                                line3 = lines[tempIndex + 3]')
     postProcessing.append('                                line4 = lines[tempIndex + 4]')
     postProcessing.append('                                line5 = lines[tempIndex + 5]')
+
     postProcessing.append('                                if line.startswith(idleExtruder) and line1.startswith("G92 E0") and line2.startswith("G1 E") and line3.startswith("G92 E0") and line4.startswith("G4 P2000") and line5.startswith("G1 F2400 E-8"):')
     postProcessing.append('                                    del lines[tempIndex]')
     postProcessing.append('                                    del lines[tempIndex]')
@@ -2972,7 +2973,7 @@ def retractValues(filament):
         retractWhileWiping = 1
         onlyWipeOutlines = 1
     else:
-        useCoasting = 0
+        useCoasting = 1
         useWipe = 0
         onlyRetractWhenCrossingOutline = 0
         retractBetweenLayers = 0
@@ -2981,9 +2982,8 @@ def retractValues(filament):
         onlyWipeOutlines = 1
     return useCoasting, useWipe, onlyRetractWhenCrossingOutline, retractBetweenLayers, useRetractionMinTravel, retractWhileWiping, onlyWipeOutlines
 
-def coastValue(hotend, filament):
-    coastVolume = float("%.2f" % ((hotend['nozzleSize'])**3*filament['purgeLength']/16))
-    return coastVolume
+def coastVolume(hotend, filament):
+    return float("%.2f" % ((hotend['nozzleSize'])**3*filament['purgeLength']/16))
 
 def maxFlowValue(hotend, filament, layerHeight):
     if hotend['nozzleSize'] <= 0.6:
