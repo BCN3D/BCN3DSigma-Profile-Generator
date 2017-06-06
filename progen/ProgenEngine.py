@@ -1270,7 +1270,8 @@ def cura2Profile():
                     else: 
                         qualityFile.append('travel_compensate_overlapping_walls_enabled = True') 
                     # qualityFile.append('fill_perimeter_gaps = everywhere')
-                    qualityFile.append('xy_offset = -0.1') 
+                    # qualityFile.append('xy_offset = -0.1') 
+                    qualityFile.append('xy_offset = 0') 
                     qualityFile.append('z_seam_type = random') 
                     qualityFile.append('z_seam_x = 105') 
                     qualityFile.append('z_seam_y = 297') 
@@ -1506,7 +1507,7 @@ def cura2Profile():
                     # qualityFile.append('meshfix_union_all_remove_holes = False')
                     # qualityFile.append('meshfix_extensive_stitching = False')
                     # qualityFile.append('meshfix_keep_open_polygons = False')
-                    # qualityFile.append('multiple_mesh_overlap = 0.15')
+                    qualityFile.append("multiple_mesh_overlap = =0.375 * machine_nozzle_size")
                     # qualityFile.append('carve_multiple_volumes = True')
                     # qualityFile.append('alternate_carve_order = True')
 
