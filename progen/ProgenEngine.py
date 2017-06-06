@@ -1380,12 +1380,11 @@ def cura2Profile():
                     # qualityFile.append('jerk_travel_layer_0 = =jerk_layer_0 * jerk_travel / jerk_print')
                     # qualityFile.append('jerk_skirt_brim = =jerk_layer_0')
 
-                    # travel                    
+                    # travel
                     if filament['isFlexibleMaterial']:
                         qualityFile.append('retraction_combing = all')
                     else:
                         qualityFile.append('retraction_combing = noskin')
-                    qualityFile.append('retraction_combing = all')
                     # qualityFile.append('travel_retract_before_outer_wall = False')
                     qualityFile.append('travel_avoid_other_parts = False')
                     # qualityFile.append('travel_avoid_distance = =machine_nozzle_tip_outer_diameter / 2 * 1.25')
