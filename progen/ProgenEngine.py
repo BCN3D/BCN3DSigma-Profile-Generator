@@ -1278,7 +1278,7 @@ def cura2Profile():
                     # qualityFile.append('skin_no_small_gaps_heuristic = True') 
 
                     # infill
-                    qualityFile.append('infill_sparse_density = ='+("%.2f" % min(100, quality['infillPercentage'] * 1.25))+' if infill_pattern == '+"'"+'cubicsubdiv'+"'"+' else '+("%.2f" % quality['infillPercentage'])) # 'if' is not working...
+                    qualityFile.append('infill_sparse_density = ='+str(int(min(100, quality['infillPercentage'] * 1.25)))+" if infill_pattern == 'cubicsubdiv' else "+str(int(quality['infillPercentage']))) # 'if' is not working... # 'if' is not working...
                     qualityFile.append('infill_pattern = grid')
                     # qualityFile.append('infill_angles = []')
                     # qualityFile.append('sub_div_rad_mult = 100')
