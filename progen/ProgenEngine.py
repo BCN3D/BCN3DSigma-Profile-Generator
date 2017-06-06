@@ -1297,7 +1297,7 @@ def cura2Profile():
                     qualityFile.append('default_material_print_temperature = '+str(round((getTemperature(hotend, filament, 'highTemperature')-getTemperature(hotend, filament, 'lowTemperature'))/2.+getTemperature(hotend, filament, 'lowTemperature'))))
                     # qualityFile.append('material_print_temperature = =default_material_print_temperature')                        
                     qualityFile.append('material_print_temperature_layer_0 = '+str(round((getTemperature(hotend, filament, 'highTemperature')))))
-                    temperatureInertiaInitialFix = -2.5
+                    temperatureInertiaInitialFix = 0
                     qualityFile.append('material_initial_print_temperature = =max(-273.15, material_print_temperature + '+str(temperatureInertiaInitialFix)+')')
                     temperatureInertiaFinalFix = -2.5
                     qualityFile.append('material_final_print_temperature = =max(-273.15, material_print_temperature + '+str(temperatureInertiaFinalFix)+')')
