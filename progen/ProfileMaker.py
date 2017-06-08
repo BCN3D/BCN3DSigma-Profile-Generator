@@ -54,8 +54,6 @@ def cura2(fileAction):
     os.mkdir('Cura 2/plugins')
     os.mkdir('Cura 2/plugins/PostProcessingPlugin')
     os.mkdir('Cura 2/plugins/PostProcessingPlugin/scripts')
-    # os.mkdir('Cura 2/plugins/MachineSettingsAction')
-    # os.mkdir('Cura 2/plugins/'+PS.machineSettingsPluginName)
 
     for fileName, fileContent in ProgenEngine.cura2Profile():
         if fileAction == '--file':
