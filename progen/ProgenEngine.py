@@ -1296,8 +1296,8 @@ def cura2Profile():
 
                     # material -> it's defined here to avoid the translation dictionary from xml file.
                     qualityFile.append('material_flow_dependent_temperature = True')
-                    qualityFile.append('default_material_print_temperature = '+str(round((getTemperature(hotend, filament, 'highTemperature')-getTemperature(hotend, filament, 'lowTemperature'))/2.+getTemperature(hotend, filament, 'lowTemperature'))))
-                    # qualityFile.append('material_print_temperature = =default_material_print_temperature')                        
+                    qualityFile.append('default_material_print_temperature = '+str(round((filament['printTemperature'][0] + filament['printTemperature'][1])/2.)))
+                    qualityFile.append('material_print_temperature = '+str(round((getTemperature(hotend, filament, 'lowTemperature') + getTemperature(hotend, filament, 'highTemperature'))/2.)))                        
                     qualityFile.append('material_print_temperature_layer_0 = '+str(round((getTemperature(hotend, filament, 'highTemperature')))))
                     temperatureInertiaInitialFix = 0
                     qualityFile.append('material_initial_print_temperature = =max(-273.15, material_print_temperature + '+str(temperatureInertiaInitialFix)+')')
