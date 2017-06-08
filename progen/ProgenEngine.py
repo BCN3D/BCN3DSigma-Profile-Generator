@@ -1022,7 +1022,9 @@ def cura2Profile():
     definition.append('        "machine_max_feedrate_x": { "default_value": 200 },')
     definition.append('        "machine_max_feedrate_y": { "default_value": 200 },')
     definition.append('        "machine_max_feedrate_z": { "default_value": 15 },')
-    definition.append('        "machine_acceleration": { "default_value": 2000 },')
+    definition.append('        "machine_acceleration": { "default_value": 2000 },')    
+    definition.append('        "material_flow_dependent_temperature": { "enabled": true },')
+    definition.append('        "print_sequence": { "enabled": true },')    
     definition.append('        "layer_height": { "maximum_value": "0.75 * min(extruderValues('+"'machine_nozzle_size'"+'))" },')
     definition.append('        "layer_height_0":')
     definition.append('        {')
@@ -1297,7 +1299,7 @@ def cura2Profile():
                     qualityFile.append('default_material_print_temperature = '+str(round((getTemperature(hotend, filament, 'highTemperature')-getTemperature(hotend, filament, 'lowTemperature'))/2.+getTemperature(hotend, filament, 'lowTemperature'))))
                     # qualityFile.append('material_print_temperature = =default_material_print_temperature')                        
                     qualityFile.append('material_print_temperature_layer_0 = '+str(round((getTemperature(hotend, filament, 'highTemperature')))))
-                    temperatureInertiaInitialFix = +5
+                    temperatureInertiaInitialFix = 0
                     qualityFile.append('material_initial_print_temperature = =max(-273.15, material_print_temperature + '+str(temperatureInertiaInitialFix)+')')
                     temperatureInertiaFinalFix = -2.5
                     qualityFile.append('material_final_print_temperature = =max(-273.15, material_print_temperature + '+str(temperatureInertiaFinalFix)+')')
