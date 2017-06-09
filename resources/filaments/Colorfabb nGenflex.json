@@ -2,8 +2,9 @@
     "id": "Colorfabb nGenflex",
     "brand": "Colorfabb",
     "material": "nGenFlex",
-    "color": "Generic",
-    "colorCode": "#B22744",
+    "colors": {
+        "Generic": "#B22744"
+    },
     "filamentDiameter": 2.85,
     "filamentPricePerKg": 61.46,
     "filamentDensity": 1.13,

@@ -2,8 +2,9 @@
     "id": "Colorfabb PLA-PHA",
     "brand": "Colorfabb",
     "material": "PLA-PHA",
-    "color": "Generic",
-    "colorCode": "#ffc924",
+    "colors": {
+        "Generic": "#ffc924"
+    },
     "filamentDiameter": 2.85,
     "filamentPricePerKg": 47.93,
     "filamentDensity": 1.21,

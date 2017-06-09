@@ -1,9 +1,10 @@
 {
     "id": "MatterHackers PLA Pro Series",
     "brand": "MatterHackers",
-    "material": "PLA",
-    "color": "Generic",
-    "colorCode": "#ffc924",
+    "material": "PLA Pro",
+    "colors": {
+        "Generic": "#ffc924"
+    },
     "filamentDiameter": 2.88,
     "filamentPricePerKg": 42.00,
     "filamentDensity": 1.25,
