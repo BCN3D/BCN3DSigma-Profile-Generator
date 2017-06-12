@@ -993,9 +993,7 @@ def cura2Profile():
     definition.append('        {')
     definition.append('            "0": "'+PS.cura2id+'_extruder_left",')
     definition.append('            "1": "'+PS.cura2id+'_extruder_right"')
-    definition.append('        },')
-    definition.append('        "first_start_actions": [ "'+PS.machineSettingsPluginName+'" ],')
-    definition.append('        "supported_actions": [ "'+PS.machineSettingsPluginName+'" ]')
+    definition.append('        }')
     definition.append('    },')
     definition.append('    "overrides": {')
     definition.append('        "machine_name": { "default_value": "'+PS.cura2Name+'" },')
@@ -1125,7 +1123,6 @@ def cura2Profile():
 
     for filament in sorted(PS.profilesData['filament'], key=lambda k: k['id']):
         for color in filament['colors']:
-            print color, filament['colors'][color]
             fileName = 'Cura 2/resources/materials/'+PS.cura2id+'/'+(filament['brand']+'_'+filament['material']+'_'+color+'.xml.fdm_material').replace(' ', '_')
             material = []
             material.append('<?xml version="1.0" encoding="UTF-8"?>')
