@@ -14,7 +14,10 @@
 # - Layer height standarization
 
 # ToDo:
-# - validate fw two fans and update start codes for fw two fans start (all sw)
+# - move all generics to definition -> errors when trying to apply
+# - add print mode (dupli/mirror) to SigmaVitamins
+# - add material colors (& remove generics)
+# - speeds heating hotends
 # - document version changes
 # - rewrite Logger.py
 
