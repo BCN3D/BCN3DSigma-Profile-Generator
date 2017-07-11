@@ -1028,6 +1028,7 @@ def cura2Profile():
     definition.append('        },')
     # definition.append('        "material_flow_temp_graph": { "enabled": "machine_nozzle_temp_enabled and material_flow_dependent_temperature" },') # Bad visualization
     definition.append('        "print_sequence": { "enabled": true },')
+    definition.append('        "start_layers_at_same_position": { "enabled": true },')
     definition.append('        "layer_height": { "maximum_value": "0.75 * min(extruderValues('+"'machine_nozzle_size'"+'))" },')
     definition.append('        "layer_height_0":')
     definition.append('        {')
@@ -1328,7 +1329,7 @@ def cura2Profile():
                         # qualityFile.append('retraction_retract_speed = =retraction_speed')
                         # qualityFile.append('retraction_prime_speed = =retraction_speed')
                         # qualityFile.append('retraction_extra_prime_amount = 0') # Adjust for flex materials
-                        # qualityFile.append('retraction_min_travel = =line_width * 2') # if this value works better, update Cura & S3D
+                        qualityFile.append('retraction_min_travel = 1.5')
                         qualityFile.append('retraction_count_max = '+str(int(filament['retractionCount'])))
                         # qualityFile.append('retraction_extrusion_window = =retraction_amount')
                         standbyTemperature = int(getTemperature(hotend, filament, 'standbyTemperature'))
@@ -1396,7 +1397,7 @@ def cura2Profile():
                         # qualityFile.append('travel_retract_before_outer_wall = False')
                         qualityFile.append('travel_avoid_other_parts = False')
                         # qualityFile.append('travel_avoid_distance = =machine_nozzle_tip_outer_diameter / 2 * 1.25')
-                        # qualityFile.append('start_layers_at_same_position = False') # different than z_seam
+                        qualityFile.append('start_layers_at_same_position = True') # different than z_seam
                         layerStartX, layerStartY = 105, 297
                         qualityFile.append('layer_start_x = '+str(layerStartX)) # different than z_seam
                         qualityFile.append('layer_start_y = '+str(layerStartY)) # different than z_seam
@@ -1736,7 +1737,7 @@ def cura2Profile():
     postProcessing.append('                    "label": "Max. Retraction Count (Left)",')
     postProcessing.append('                    "description": "For the Left Extruder: Number of retractions occurring within the retraction distance. When the number of retractions is reached, active extruder will park, prime and come back (stronger than ever ;)",')
     postProcessing.append('                    "type": "int",')
-    postProcessing.append('                    "default_value": 50,')
+    postProcessing.append('                    "default_value": 75,')
     postProcessing.append('                    "minimum_value": "0",')
     postProcessing.append('                    "minimum_value_warning": "0",')
     postProcessing.append('                    "maximum_value_warning": "90",')
@@ -1747,7 +1748,7 @@ def cura2Profile():
     postProcessing.append('                    "label": "Max. Retraction Count (Right)",')
     postProcessing.append('                    "description": "For the Right Extruder: Number of retractions occurring within the retraction distance. When the number of retractions is reached, active extruder will park, prime and come back (stronger than ever ;)",')
     postProcessing.append('                    "type": "int",')
-    postProcessing.append('                    "default_value": 50,')
+    postProcessing.append('                    "default_value": 75,')
     postProcessing.append('                    "minimum_value": "0",')
     postProcessing.append('                    "minimum_value_warning": "0",')
     postProcessing.append('                    "maximum_value_warning": "90",')
