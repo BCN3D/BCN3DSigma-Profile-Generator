@@ -59,7 +59,7 @@ def simplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight):
         fff.append('    <retractionSpeed>'+str(filamentLeft['retractionSpeed']*60)+'</retractionSpeed>')
         fff.append('    <useCoasting>0</useCoasting>')
         fff.append('    <coastingDistance>0.2</coastingDistance>')
-        fff.append('    <useWipe>0</useWipe>')
+        fff.append('    <useWipe>1</useWipe>')
         fff.append('    <wipeDistance>5</wipeDistance>')
         fff.append('  </extruder>')
     else:
@@ -76,7 +76,7 @@ def simplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight):
         fff.append('    <retractionSpeed>0</retractionSpeed>')
         fff.append('    <useCoasting>0</useCoasting>')
         fff.append('    <coastingDistance>0</coastingDistance>')
-        fff.append('    <useWipe>0</useWipe>')
+        fff.append('    <useWipe>1</useWipe>')
         fff.append('    <wipeDistance>0</wipeDistance>')
         fff.append('  </extruder>')
     if hotendRight['id'] != 'None':
@@ -93,7 +93,7 @@ def simplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight):
         fff.append('    <retractionSpeed>'+str(filamentRight['retractionSpeed']*60)+'</retractionSpeed>')
         fff.append('    <useCoasting>0</useCoasting>')
         fff.append('    <coastingDistance>0.2</coastingDistance>')
-        fff.append('    <useWipe>0</useWipe>')
+        fff.append('    <useWipe>1</useWipe>')
         fff.append('    <wipeDistance>5</wipeDistance>')
         fff.append('  </extruder>')
     fff.append('  <primaryExtruder>0</primaryExtruder>')
@@ -1269,7 +1269,7 @@ def cura2Profile():
 
                         #shell
                         qualityFile.append('wall_thickness = =max( 3 * machine_nozzle_size, '+("%.2f" % quality['wallWidth'])+')')     # 3 minimum Perimeters needed
-                        qualityFile.append('wall_0_wipe_dist = 0')
+                        qualityFile.append('wall_0_wipe_dist = =12.5 * machine_nozzle_size')
                         qualityFile.append('top_bottom_thickness = =max( 5 * layer_height, '+("%.2f" % quality['topBottomWidth'])+')') # 5 minimum layers needed
                         # qualityFile.append('top_thickness = =top_bottom_thickness')
                         # qualityFile.append('bottom_thickness = =top_bottom_thickness')
@@ -1284,7 +1284,7 @@ def cura2Profile():
                             qualityFile.append('travel_compensate_overlapping_walls_enabled = True') 
                         # qualityFile.append('fill_perimeter_gaps = everywhere')
                         # qualityFile.append('xy_offset = -0.1')
-                        qualityFile.append('z_seam_type = random') 
+                        qualityFile.append('z_seam_type = back') 
                         qualityFile.append('z_seam_x = 105') 
                         qualityFile.append('z_seam_y = 297') 
                         # qualityFile.append('skin_no_small_gaps_heuristic = True') 
@@ -1535,7 +1535,7 @@ def cura2Profile():
                         # qualityFile.append('draft_shield_height = 10')
                         # qualityFile.append('conical_overhang_enabled = False')
                         # qualityFile.append('conical_overhang_angle = 50')
-                        qualityFile.append('coasting_enable = True')
+                        qualityFile.append('coasting_enable = False')
                         qualityFile.append('coasting_volume = '+str(coastVolume(hotend, filament)))
                         qualityFile.append('coasting_min_volume = =coasting_volume * 2')
                         # qualityFile.append('coasting_speed = 90')
@@ -2275,15 +2275,15 @@ def purgeValues(hotend, filament, speed, layerHeight, minPurgeLength = 20): # pu
 def retractValues(filament):
     if filament['isFlexibleMaterial']:
         useCoasting = 0
-        useWipe = 0
+        useWipe = 1
         onlyRetractWhenCrossingOutline = 1
         retractBetweenLayers = 0
         useRetractionMinTravel = 1
         retractWhileWiping = 1
         onlyWipeOutlines = 1
     else:
-        useCoasting = 1
-        useWipe = 0
+        useCoasting = 0
+        useWipe = 1
         onlyRetractWhenCrossingOutline = 0
         retractBetweenLayers = 0
         useRetractionMinTravel = 1
