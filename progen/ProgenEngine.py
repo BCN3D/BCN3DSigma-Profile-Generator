@@ -2268,7 +2268,7 @@ def purgeValues(hotend, filament, speed, layerHeight, minPurgeLength = 20): # pu
     P = float("%.4f" % ((minPurgeLength*filament['extrusionMultiplier']*(hotend['nozzleSize']/2.)**2) / ((filament['filamentDiameter']/2.)**2)))
     
     # P (testing value)
-    P = 0
+    P = toolChangePurgeLength
 
     return (startPurgeLength, toolChangePurgeLength, F, S, E, P)
 
