@@ -275,7 +275,7 @@ def simplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight):
     fff.append('  <toolChangeRetractionSpeed>2400</toolChangeRetractionSpeed>')
     fff.append('  <allowThinWallGapFill>1</allowThinWallGapFill>')
     fff.append('  <thinWallAllowedOverlapPercentage>10</thinWallAllowedOverlapPercentage>')
-    fff.append('  <horizontalSizeCompensation>-0.1</horizontalSizeCompensation>')
+    fff.append('  <horizontalSizeCompensation>0</horizontalSizeCompensation>')
     # fff.append('  <overridePrinterModels>1</overridePrinterModels>')
     # fff.append('  <printerModelsOverride>BCN3DSigma.stl</printerModelsOverride>')
     # fff.append('  <autoConfigureMaterial name="'+str(filamentLeft)+" Left, "+str(filamentRight)+" Right"+'">')
