@@ -1296,7 +1296,7 @@ def cura2Profile():
                         # qualityFile.append('sub_div_rad_mult = 100')
                         # qualityFile.append('sub_div_rad_add = =wall_line_width_x')
                         # qualityFile.append('infill_overlap = =10 if infill_sparse_density < 95 and infill_pattern != '+"'"+'concentric'+"'"+' else 0')
-                        qualityFile.append("skin_overlap = =5 if top_bottom_pattern != 'concentric' else 0")
+                        qualityFile.append("skin_overlap = =10 if top_bottom_pattern != 'concentric' else 0")
                         # qualityFile.append('infill_wipe_dist = =wall_line_width_0 / 4 if wall_line_count == 1 else wall_line_width_x / 4')
                         qualityFile.append('infill_sparse_thickness = =layer_height')
                         # qualityFile.append('gradual_infill_steps = 0')
