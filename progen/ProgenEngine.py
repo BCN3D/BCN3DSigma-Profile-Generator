@@ -1053,8 +1053,6 @@ def cura2Profile():
     # definition.append('        },')
     definition.append(r'        "machine_start_gcode": { "default_value": "\n;Sigma ProGen '+PS.progenVersionNumber+' (Build '+PS.progenBuildNumber+r')\n\nG21\t\t;metric values\nG90\t\t;absolute positioning\nM82\t\t;set extruder to absolute mode\nM108 P1\t\t;enable layer fan for idle extruder\nM107\t\t;start with the fan off\nG28 X0 Y0\t\t;move X/Y to min endstops\nG28 Z0\t\t;move Z to min endstops\nG1 Z5 F200\t\t;safety Z axis movement\nT1\t\t;switch to the right extruder\nG92 E0\t\t;zero the extruded length\nG1 E20 F50\t\t;extrude 20mm of feed stock\nG92 E0\t\t;zero the extruded length\nG4 P2000\t\t;stabilize hotend'+"'"+r's pressure\nG1 F2400 E-8\t\t;retract\nT0\t\t;switch to the left extruder\nG92 E0\t\t;zero the extruded length\nG1 E20 F50\t\t;extrude 20mm of feed stock\nG92 E0\t\t;zero the extruded length\nG4 P2000\t\t;stabilize hotend'+"'"+r's pressure\nG1 F2400 E-8\t\t;retract\n" },')
     definition.append(r'        "machine_end_gcode": { "default_value": "\nM104 S0 T0\t\t;left extruder heater off\nM104 S0 T1\t\t;right extruder heater off\nM140 S0\t\t;heated bed heater off\nG91\t\t;relative positioning\nG1 Z+0.5 E-5 Y+10 F12000\t;move Z up a bit and retract filament\nG28 X0 Y0\t\t;move X/Y to min endstops so the head is out of the way\nM84\t\t;steppers off\nG90\t\t;absolute positioning\n" },')
-    definition.append('        "prime_tower_position_x": { "default_value": 105 },')
-    definition.append('        "prime_tower_position_y": { "default_value": 250 },')
     definition.append('        "machine_nozzle_temp_enabled": { "value": true },')
     definition.append('        "material_bed_temp_wait": { "value": true },')
     definition.append('        "material_print_temp_wait": { "value": true },')
@@ -1231,7 +1229,7 @@ def cura2Profile():
                             qualityFile.append('quality_type = layer'+("%.2f" % layerHeight)+'mm')
                             qualityFile.append('global_quality = True')
                             qualityFile.append('weight = '+str(len(globalQualities)))
-                            qualityFile.append('setting_version = 1')
+                            qualityFile.append('setting_version = 2')
                             qualityFile.append('')
                             qualityFile.append('[values]')
                             qualityFile.append('layer_height = '+("%.2f" % layerHeight))
@@ -1256,7 +1254,7 @@ def cura2Profile():
                             if globalQualities[index] == layerHeight:
                                 qualityFile.append('weight = '+str(index+1))
                                 break
-                        qualityFile.append('setting_version = 1')
+                        qualityFile.append('setting_version = 2')
                         qualityFile.append('')
                         qualityFile.append('[values]')
 
@@ -1632,10 +1630,11 @@ def cura2Profile():
             variant.append('[metadata]')
             variant.append('author = '+PS.cura2Author)
             variant.append('type = variant')
-            variant.append('setting_version = 1')
+            variant.append('setting_version = 2')
             variant.append('')
             variant.append('[values]')
             # machine settings
+            variant.append('machine_nozzle_id = '+str(hotend['id']))
             variant.append('machine_nozzle_size = '+str(hotend['nozzleSize']))
             variant.append('machine_nozzle_tip_outer_diameter = '+str(hotend['nozzleTipOuterDiameter']))
             variant.append('machine_nozzle_head_distance = '+str(hotend['nozzleHeadDistance']))
