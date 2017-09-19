@@ -47,7 +47,7 @@ def cura2(fileAction):
     os.mkdir('Cura 2/resources/materials')
     os.mkdir('Cura 2/resources/materials/'+PS.cura2id)
     os.mkdir('Cura 2/resources/meshes')
-    shutil.copyfile('resources/meshes/bcn3dsigma_bed.obj', 'Cura 2/resources/meshes/'+PS.cura2id+'_bed.obj')
+    shutil.copyfile('resources/meshes/bcn3dsigma_bed.stl', 'Cura 2/resources/meshes/'+PS.cura2id+'_bed.stl')
     os.mkdir('Cura 2/resources/quality')
     os.mkdir('Cura 2/resources/quality/'+PS.cura2id)
     os.mkdir('Cura 2/resources/variants')

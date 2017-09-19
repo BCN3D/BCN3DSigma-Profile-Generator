@@ -987,7 +987,7 @@ def cura2Profile():
     definition.append('        "category": "'+PS.cura2Category+'",')
     definition.append('        "manufacturer": "'+PS.cura2Manufacturer+'",')
     definition.append('        "file_formats": "text/x-gcode",')
-    definition.append('        "platform": "'+PS.cura2id+'_bed.obj",')
+    definition.append('        "platform": "'+PS.cura2id+'_bed.stl",')
     # definition.append('        "platform_texture": "'+PS.cura2id+'backplate.png",')
     definition.append('        "platform_offset": [0, 0, 0],')
     definition.append('        "has_machine_quality": true,')
