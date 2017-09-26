@@ -3,7 +3,18 @@
     "brand": "Colorfila",
     "material": "PLA",
     "colors": {
-        "Generic": "#ffc924"
+        "Arctic White": "#FEFEFE",
+        "Crystal Silver": "#646862",
+        "Dark Blue": "#0016C3",
+        "Deep Purple": "#3A2C3B",
+        "Gold Fever": "#CB9D2D",
+        "Grass Green": "#2AB954",
+        "Happy Yellow": "#FEDE00",
+        "Jet Black": "#0E0E0E",
+        "Ocean Blue": "#4AA0F6",
+        "Passion Red": "#FE2600",
+        "Pumpkin Orange": "#F86B15",
+        "Shades Grey": "#BFC4C7"
     },
     "filamentDiameter": 2.85,
     "filamentPricePerKg": 19.95,

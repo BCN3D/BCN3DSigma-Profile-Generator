@@ -3,7 +3,11 @@
     "brand": "Colorfabb",
     "material": "nGenFlex",
     "colors": {
-        "Generic": "#B22744"
+        "Black": "#060906",
+        "Dark Gray": "#586766",
+        "Light Brown": "#CC9D70",
+        "Medium Brown": "#785A46",
+        "Dark Brown": "#45332B"
     },
     "filamentDiameter": 2.85,
     "filamentPricePerKg": 61.46,

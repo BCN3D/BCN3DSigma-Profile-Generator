@@ -3,7 +3,22 @@
     "brand": "Recreus",
     "material": "Filaflex (210-230C)",
     "colors": {
-        "Generic": "#B22744"
+        "Black": "#0E0E0E",
+        "Blue": "#34B0DF",
+        "Red": "#D6090A",
+        "Purple": "#442094",
+        "Yellow": "#F1E318",
+        "Magenta": "#B9136F",
+        "Aquamarine": "#29E7B4",
+        "Silver": "#939393",
+        "Orange": "#FC6826",
+        "Green": "#83CA1F",
+        "Transparent": "#C6C9CA",
+        "Fluor": "#D4F62B",
+        "Skin I": "#D69A75",
+        "Skin II": "#7E2F13",
+        "White": "#FEFEFE",
+        "Gold": "#CB9D2D"
     },
     "filamentDiameter": 2.85,
     "filamentPricePerKg": 71.8,

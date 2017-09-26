@@ -3,7 +3,18 @@
     "brand": "Colorfabb",
     "material": "XT",
     "colors": {
-        "Generic": "#3633F2"
+        "Clear": "#E9E9E9",
+        "Dark Gray": "#586766",
+        "Black": "#060906",
+        "White": "#FFFFFF",
+        "Dark Green": "#008B56",
+        "Light Green": "#A9EB11",
+        "Light Blue": "#028EEC",
+        "Yellow": "#FEE500",
+        "Red": "#FD1203",
+        "Orange": "#FE9D0A",
+        "Purple": "#8861E1",
+        "Pink": "#E5007B"
     },
     "filamentDiameter": 2.85,
     "filamentPricePerKg": 53.27,

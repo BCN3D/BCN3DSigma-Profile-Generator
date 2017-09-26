@@ -3,7 +3,14 @@
     "brand": "MatterHackers",
     "material": "Nylon Pro",
     "colors": {
-        "Generic": "#ddff33"
+        "Black": "#0E0E0E",
+        "White": "#FEFEFE",
+        "Green": "#2AB954",
+        "Crystal Silver": "#646862",
+        "Blue": "#0016C3",
+        "Red": "#FE2600",
+        "Orange": "#F86B15",
+        "Grey": "#BFC4C7"
     },
     "filamentDiameter": 2.85,
     "filamentPricePerKg": 60.00,
