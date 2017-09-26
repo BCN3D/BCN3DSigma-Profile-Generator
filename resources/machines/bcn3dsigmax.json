@@ -1,0 +1,16 @@
+{
+    "id": "bcn3dsigmax",
+    "name": "Sigmax",
+    "manufacturer": "BCN3D Technologies",
+    "category": "BCN3D Technologies",
+    "author": "BCN3D Technologies",
+    "inherits": "bcn3dsigma",
+    "width": 420,
+    "depth": 297,
+    "height": 210,
+    "extruderHead": [[ -27.8, 39.6 ], [ -27.8, -58.8 ], [ 26.2, 39.6 ], [ 26.2, -58.8 ]],
+    "defaultHotend": "0.6mm - Brass",
+    "variants": "bcn3dsigma",
+    "qualities": "bcn3dsigma",
+    "printMode": ["regular", "mirror", "duplication"]
+}

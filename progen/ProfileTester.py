@@ -1,7 +1,7 @@
 #!/usr/bin/python -tt
 # coding: utf-8
 
-# Guillem Àvila Padró - May 2017
+# Guillem Àvila Padró - Oct 2017
 # Released under GNU LICENSE
 # https://opensource.org/licenses/GPL-3.0
 
@@ -72,7 +72,8 @@ def testCura2():
     realCura2ProfilesAvailable = 1
 
     # Start iteration
-    ProgenEngine.cura2Profile()
+    for machine in PS.profilesData['machine']:
+        ProgenEngine.cura2Profile(machine)
     print '\r\t\tTesting Cura 2 Profiles:     OK. Profiles Tested: '+str(realCura2ProfilesAvailable)
     return realCura2ProfilesAvailable
     

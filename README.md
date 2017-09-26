@@ -23,15 +23,13 @@ Decompress it if you need to, open a terminal, go to the directory and call the 
 
 Will ask for a functionality:
 
-1. **Profile for Simplify3D:** Will ask for left Hotend, left loaded Filament, right Hotend and right loaded Filament. Then will generate the fff profile file.
+1. **Profile for Simplify3D:** Will ask for machine, print mode, left Hotend, left loaded Filament, right Hotend and right loaded Filament (according to print mode). Then will generate the fff profile file.
 
-2. **Profile for Cura:** Same as *1*, now for Cura (will ask for Quality at the end).
+2. **Profile for Cura:** Asks nothig. Generates all the files to add BCN3D Machines to BCN3D Cura and, if it is already installed, copies all the files to the right places.
 
-2. **Profile for Cura 2 [Beta]:** Asks nothig. Generates all the files to add the Sigma to Cura 2 and, if Cura 2 is already installed, copies all the files to the right places.
+3. **Experimental features:** Some experimental extra features.
 
-4. **Experimental features:** Some experimental extra features.
-
-5. **Exit:** Quit the program.
+4. **Exit:** Quit the program.
 
 In order to add, remove or change a hotend, filament or quality preconfiguration edit the files in *Profiles Data* folder.
 
@@ -39,25 +37,24 @@ In order to add, remove or change a hotend, filament or quality preconfiguration
 
 To generate a profile without entering the GUI. 
 
-Simplify3D: call the script and insert 4 valid parameters:
+Simplify3D: call the script and insert 6 valid parameters:
 
-`python progen.py LHotend RHotend LFilament RFilament --software`
+`python progen.py Machine PrintMode LHotend RHotend LFilament RFilament`
 
-Cura: call the script and insert 5 valid parameters:
+Valid parameters:
 
-`python progen.py LHotend RHotend LFilament RFilament Quality --software`
+- Machine: `bcn3dsigma`  `bcn3dsigmax`
+- PrintMode: `regular` `mirror` `duplication`
+- Hotends: filenames in */resources/hotends* or `None` if not mounted. 
+- Fiaments: filenames in */resources/filaments* or 'None' if empty
 
-Cura 2: Still not available.
+Example:
 
-Valid parameters for Hotends are filenames in */resources/hotends* or 'None' if not mounted. Valid parameters for Fiaments are filenames in */resources/filaments* or 'None' if empty. Valid parameters for Quality are filenames in */resources/quality*. Examples: 
-
-`python progen.py "0.4 - Brass" "0.4 - Brass" "Colorfila PLA" "Colorfila PLA" --simplify3d`
+`python progen.py "bcn3dsigma" "regular" "0.4 - Brass" "0.4 - Brass" "Colorfila PLA" "Colorfila PLA"`
 
 Generates the file *BCN3D Sigma - 0.4 Left (PLA Colorfila), 0.4 Right (PLA Colorfila).fff*
 
-`python progen.py "0.4 - Brass" "0.4 - Brass" "Colorfila PLA" "Colorfila PLA" "Standard" --cura`
-
-Generates the file *BCN3D Sigma - 0.4 Left (PLA Colorfila), 0.4 Right (PLA Colorfila) - Standard.ini*
+*Note: Using mirror/duplication print modes need `None` parameters for Right Hotend and Filament.*
 
 
 ## Editing *resources* files

@@ -1,21 +1,21 @@
 {
-    "id": "Colorfabb HT",
-    "brand": "Colorfabb",
-    "material": "HT",
+    "id": "MatterHackers Nylon Pro Series",
+    "brand": "MatterHackers",
+    "material": "Nylon Pro",
     "colors": {
-        "Generic": "#3633F2"
+        "Generic": "#ddff33"
     },
     "filamentDiameter": 2.85,
-    "filamentPricePerKg": 59.93,
-    "filamentDensity": 1.18,
+    "filamentPricePerKg": 60.00,
+    "filamentDensity": 1.25,
     "isSupportMaterial": false,
     "isFlexibleMaterial": false,
     "isAbrasiveMaterial": false,
-    "bedTemperature": 100,
-    "printTemperature": [250, 280],
+    "bedTemperature": 65,
+    "printTemperature": [240, 260],
     "standbyTemperature": 150,
-    "defaultPrintSpeed": 40,
-    "advisedMaxPrintSpeed": 50,
+    "defaultPrintSpeed": 30,
+    "advisedMaxPrintSpeed": 30,
     "maxFlow": "None",
     "maxFlowForHighFlowHotend": "None",
     "retractionDistance": 4,
@@ -23,5 +23,5 @@
     "retractionCount": 100,
     "fanPercentage": [0, 0],
     "extrusionMultiplier": 1,
-    "purgeLength": 40
+    "purgeLength": 16
 }
