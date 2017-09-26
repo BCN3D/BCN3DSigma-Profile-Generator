@@ -2,7 +2,7 @@
 
 *NOTE: This is a development Branch where we upload beta versions. Find the latest stable version in the [Master](https://github.com/BCN3D/BCN3DSigma-Profile-Generator/tree/master) branch.*
 
-Profile Generator for Simplify3D, Cura & Cura 2 slicing softwares. Specifically designed for the BCN3D Sigma.
+Profile Generator for BCN3D Cura & Simplify3D slicing softwares. Specifically designed for the BCN3D Sigma.
 
 The official code behind the [Sigma ProGen web interface](https://www.bcn3dtechnologies.com/en/sigma-progen/). It generates profiles according to hotends, filaments and qualities defined in *resources* folder.
 
