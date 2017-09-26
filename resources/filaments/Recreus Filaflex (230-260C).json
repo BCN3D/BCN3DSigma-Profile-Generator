@@ -1,0 +1,27 @@
+{
+    "id": "Recreus Filaflex (230-260C)",
+    "brand": "Recreus",
+    "material": "Filaflex (230-260C)",
+    "colors": {
+        "Generic": "#B22744"
+    },
+    "filamentDiameter": 2.85,
+    "filamentPricePerKg": 71.8,
+    "filamentDensity": 1.20,
+    "isSupportMaterial": false,
+    "isFlexibleMaterial": true,
+    "isAbrasiveMaterial": false,
+    "bedTemperature": 0,
+    "printTemperature": [250, 260],
+    "standbyTemperature": 150,
+    "defaultPrintSpeed": 20,
+    "advisedMaxPrintSpeed": 110,
+    "maxFlow": "None",
+    "maxFlowForHighFlowHotend": "None",
+    "retractionDistance": 2.5,
+    "retractionSpeed": 40,
+    "retractionCount": 100,
+    "fanPercentage": [50, 100],
+    "extrusionMultiplier": 1.2,
+    "purgeLength": 120
+}

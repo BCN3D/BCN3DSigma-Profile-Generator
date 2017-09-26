@@ -1,0 +1,27 @@
+{
+    "id": "Colorfabb SteelFill",
+    "brand": "Colorfabb",
+    "material": "SteelFill",
+    "colors": {
+        "Generic": "#ffc924"
+    },
+    "filamentDiameter": 2.85,
+    "filamentPricePerKg": 66.6,
+    "filamentDensity": 3.13,
+    "isSupportMaterial": false,
+    "isFlexibleMaterial": false,
+    "isAbrasiveMaterial": true,
+    "bedTemperature": 65,
+    "printTemperature": [210, 220],
+    "standbyTemperature": 150,
+    "defaultPrintSpeed": 60,
+    "advisedMaxPrintSpeed": 80,
+    "maxFlow": "None",
+    "maxFlowForHighFlowHotend": "None",
+    "retractionDistance": 4,
+    "retractionSpeed": 40,
+    "retractionCount": 100,
+    "fanPercentage": [50, 100],
+    "extrusionMultiplier": 1.1,
+    "purgeLength": 55
+}

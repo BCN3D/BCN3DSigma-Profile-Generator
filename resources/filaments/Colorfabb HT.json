@@ -1,0 +1,27 @@
+{
+    "id": "Colorfabb HT",
+    "brand": "Colorfabb",
+    "material": "HT",
+    "colors": {
+        "Generic": "#3633F2"
+    },
+    "filamentDiameter": 2.85,
+    "filamentPricePerKg": 59.93,
+    "filamentDensity": 1.18,
+    "isSupportMaterial": false,
+    "isFlexibleMaterial": false,
+    "isAbrasiveMaterial": false,
+    "bedTemperature": 100,
+    "printTemperature": [250, 280],
+    "standbyTemperature": 150,
+    "defaultPrintSpeed": 40,
+    "advisedMaxPrintSpeed": 40,
+    "maxFlow": "None",
+    "maxFlowForHighFlowHotend": "None",
+    "retractionDistance": 4,
+    "retractionSpeed": 40,
+    "retractionCount": 100,
+    "fanPercentage": [0, 0],
+    "extrusionMultiplier": 1,
+    "purgeLength": 40
+}

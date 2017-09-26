@@ -1,0 +1,27 @@
+{
+    "id": "Colorfabb XT-CF20",
+    "brand": "Colorfabb",
+    "material": "XT-CF20",
+    "colors": {
+        "Generic": "#3633F2"
+    },
+    "filamentDiameter": 2.85,
+    "filamentPricePerKg": 66.60,
+    "filamentDensity": 1.36,
+    "isSupportMaterial": false,
+    "isFlexibleMaterial": false,
+    "isAbrasiveMaterial": true,
+    "bedTemperature": 80,
+    "printTemperature": [290, 290],
+    "standbyTemperature": 150,
+    "defaultPrintSpeed": 30,
+    "advisedMaxPrintSpeed": 50,
+    "maxFlow": 2.5,
+    "maxFlowForHighFlowHotend": "None",
+    "retractionDistance": 2,
+    "retractionSpeed": 20,
+    "retractionCount": 100,
+    "fanPercentage": [50, 100],
+    "extrusionMultiplier": 1,
+    "purgeLength": 40
+}

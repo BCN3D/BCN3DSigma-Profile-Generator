@@ -1,0 +1,27 @@
+{
+    "id": "Arnitel ID 2045",
+    "brand": "Nexeo Solutions",
+    "material": "Arnitel ID 2045",
+    "colors": {
+        "Generic": "#B22744"
+    },
+    "filamentDiameter": 2.85,
+    "filamentPricePerKg": 79.9,
+    "filamentDensity": 1.1,
+    "isSupportMaterial": false,
+    "isFlexibleMaterial": true,
+    "isAbrasiveMaterial": false,
+    "bedTemperature": 70,
+    "printTemperature": [230, 250],
+    "standbyTemperature": 150,
+    "defaultPrintSpeed": 30,
+    "advisedMaxPrintSpeed": 70,
+    "maxFlow": "None",
+    "maxFlowForHighFlowHotend": "None",
+    "retractionDistance": 6,
+    "retractionSpeed": 40,
+    "retractionCount": 100,
+    "fanPercentage": [50, 100],
+    "extrusionMultiplier": 1.10,
+    "purgeLength": 120
+}

@@ -1,0 +1,13 @@
+{
+    "id": "0.6mm - Brass",
+    "nozzleSize": 0.6,
+    "nozzleTipOuterDiameter": 1.19,
+    "nozzleHeadDistance": 3.5,
+    "nozzleExpansionAngle": 47.38,
+    "material": "Brass",
+    "temperatureCompensation": 0,
+    "hotBlock": "Standard",
+    "heatUpSpeed": 2.7,
+    "coolDownSpeed": 1.6,
+    "minimumCoolHeatTimeWindow": 5
+}
