@@ -315,7 +315,7 @@ def getCuraBundleSize(oneLineCsvSize = float(10494984)/78480): # experimental va
 
     totalProfiles = ((len(PS.profilesData['hotend'])-1) *  len(PS.profilesData['filament']) * 2 + curaIDEXHotendsCombinations * len(PS.profilesData['filament'])**2) * len(PS.profilesData['quality'])
 
-    fileName = cura(PS.profilesData['hotend'][0], PS.profilesData['hotend'][0], PS.profilesData['filament'][0], PS.profilesData['filament'][0], PS.profilesData['quality'][0], 'noData', '--file')
+    fileName = cura(PS.profilesData['hotend'][0], PS.profilesData['hotend'][0], PS.profilesData['filament'][0], PS.profilesData['filament'][0], PS.profilesData['quality'][0], '--file')
     
     csvSize = oneLineCsvSize * totalProfiles
     bundleSize = totalProfiles*os.path.getsize(fileName) + csvSize
