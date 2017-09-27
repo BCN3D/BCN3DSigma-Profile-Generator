@@ -146,9 +146,9 @@ def main():
         if sys.argv[-1] == '--simplify3d':
             if len(sys.argv) == 7:
                 if sys.argv[5] == '--no-file' or sys.argv[5] == '--only-filename':
-                    ProfileMaker.simplify3D(leftHotend, rightHotend, leftFilament, rightFilament, '--no-data', sys.argv[5])
+                    ProfileMaker.simplify3D(leftHotend, rightHotend, leftFilament, rightFilament, sys.argv[5])
             else:
-                ProfileMaker.simplify3D(leftHotend, rightHotend, leftFilament, rightFilament, '--no-data', '--file')
+                ProfileMaker.simplify3D(leftHotend, rightHotend, leftFilament, rightFilament, '--file')
         elif sys.argv[-1] == '--cura':
             for quality in os.listdir('./resources/quality'):
                 if quality == sys.argv[5]+'.json':
@@ -156,9 +156,9 @@ def main():
                         qualityCura = json.load(quality_file)
             if len(sys.argv) == 8:
                 if sys.argv[6] == '--no-file' or sys.argv[6] == '--only-filename':
-                    ProfileMaker.cura(leftHotend, rightHotend, leftFilament, rightFilament, qualityCura, '--no-data', sys.argv[6])
+                    ProfileMaker.cura(leftHotend, rightHotend, leftFilament, rightFilament, qualityCura, sys.argv[6])
             else:
-                ProfileMaker.cura(leftHotend, rightHotend, leftFilament, rightFilament, qualityCura, '--no-data', '--file')
+                ProfileMaker.cura(leftHotend, rightHotend, leftFilament, rightFilament, qualityCura, '--file')
     else:
         if len(sys.argv) == 1:
             experimentalMenu = False
