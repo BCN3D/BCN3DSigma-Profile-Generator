@@ -1122,7 +1122,10 @@ def cura2Profile(machine):
                             else:
                                 qualityFile.append('retraction_combing = noskin')
                             # qualityFile.append('travel_retract_before_outer_wall = False')
-                            qualityFile.append('travel_avoid_other_parts = False')
+                            if filament['isSupportMaterial']:
+                                qualityFile.append('travel_avoid_other_parts = True')
+                            else:
+                                qualityFile.append('travel_avoid_other_parts = False')
                             # qualityFile.append('travel_avoid_distance = =machine_nozzle_tip_outer_diameter / 2 * 1.25')
                             qualityFile.append('start_layers_at_same_position = True') # different than z_seam
                             layerStartX, layerStartY = machine['width']/2, machine['depth']
