@@ -85,7 +85,7 @@ def installCura2Files():
                 allowAutoInstall = True
             
             if allowAutoInstall:
-                root_src_dir = 'Cura 2\\Windows'
+                root_src_dir = 'Cura 2'
                 if len(installedCuras) > 1:
                     print "\n\t\tYou have more than one Cura 2 installed! Select where you want to add the BCN3D Sigma:"
                     answer0 = ''
