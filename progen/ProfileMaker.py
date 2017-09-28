@@ -70,7 +70,7 @@ def installCura2Files():
         installedCuras = []
         
         for folder in os.listdir('C:\Program Files'): # add [::-1] to list folders in reverse order
-            if 'Cura 2' in folder and 'Cura.exe' in os.listdir('C:\\Program Files\\'+folder):
+            if ('Cura 2' in folder or 'BCN3D Cura' in folder) and 'Cura.exe' in os.listdir('C:\\Program Files\\'+folder):
                     installedCuras.append(folder)
 
         if len(installedCuras) >= 1:
@@ -114,7 +114,7 @@ def installCura2Files():
                 shutil.move(src_file, dst_dir)
         if "Cura 2" in os.listdir('.'):
             shutil.rmtree("Cura 2")
-        print '\n\t\tThe BCN3D machines have been successfully added to Cura 2. Enjoy!\n'
+        print '\n\t\tThe BCN3D machines have been successfully added to Cura. Enjoy!\n'
     else:
         print "\n\t\tUnable to install files automatically.\n"
         print "\t\tA new folder called 'Cura 2' has been created in your working directory."
