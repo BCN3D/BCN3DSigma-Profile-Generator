@@ -13,8 +13,10 @@ import ProgenSettings as PS
 import Logger
 
 def simplify3DProfile(machine, printMode, hotendLeft, hotendRight, filamentLeft, filamentRight):
-    if printMode not in machine['printMode'] or (printMode != 'regular' and (hotendRight['id'] != 'None')):
+    if printMode not in machine['printMode'] or (printMode != 'regular' and (hotendLeft['id'] != hotendRight['id'] or filamentLeft['id'] != filamentRight['id'])):
         return
+    elif printMode != 'regular':
+        hotendRight = dict([('id', 'None')])
     fff = []
     fff.append('<?xml version="1.0" encoding="utf-8"?>')
     for q in PS.profilesData['quality']:
@@ -646,6 +648,8 @@ def cura2Profile(machine):
         cura2PreferredMaterial = filament['id'].replace(' ', '_')
         if 'Colorfila PLA' in filament['id']:
             cura2PreferredMaterial = filament['id'].replace(' ', '_')
+            if 'Pumpkin Orange' in filament['colors']:
+                cura2PreferredMaterial += '_Pumpkin_Orange'
             break
 
     fileName = 'Cura 2/resources/definitions/'+machine['id']+'.def.json'
@@ -691,6 +695,27 @@ def cura2Profile(machine):
     if 'inherits' in machine:
         definition.append('        "machine_width": { "default_value": '+str(machine['width'])+' },')
         definition.append('        "print_mode": { "enabled": true },')
+        setToValueIfPrintModeIsNotRegular = []
+        setToValueIfPrintModeIsNotRegular.append(['wall_extruder_nr', '-1'])
+        setToValueIfPrintModeIsNotRegular.append(['wall_0_extruder_nr', '-1'])
+        setToValueIfPrintModeIsNotRegular.append(['wall_x_extruder_nr', '-1'])
+        setToValueIfPrintModeIsNotRegular.append(['infill_extruder_nr', '-1'])
+        setToValueIfPrintModeIsNotRegular.append(['support_extruder_nr', '0'])
+        setToValueIfPrintModeIsNotRegular.append(['support_infill_extruder_nr', '0'])
+        setToValueIfPrintModeIsNotRegular.append(['support_extruder_nr_layer_0', '0'])
+        setToValueIfPrintModeIsNotRegular.append(['support_interface_extruder_nr', '0'])
+        setToValueIfPrintModeIsNotRegular.append(['support_roof_extruder_nr', '0'])
+        setToValueIfPrintModeIsNotRegular.append(['support_bottom_extruder_nr', '0'])
+        setToValueIfPrintModeIsNotRegular.append(['adhesion_extruder_nr', '0'])
+        setToValueIfPrintModeIsNotRegular.append(['prime_tower_enable', 'false'])
+        setToValueIfPrintModeIsNotRegular.append(['ooze_shield_enabled', 'false'])
+        setToValueIfPrintModeIsNotRegular.append(['smart_purge', 'false'])
+        for parameter in setToValueIfPrintModeIsNotRegular:
+            definition.append('        "'+parameter[0]+'":')
+            definition.append('        {')
+            definition.append('            "enabled": "print_mode == '+"'regular'"+'",')
+            definition.append('            "value": "'+parameter[1]+' if print_mode != '+"'regular'"+'"')
+            definition.append('        },')
         definition.append('        "avoid_grinding_filament": { "value": false }')
     else:
         definition.append('        "machine_width": { "default_value": '+str(machine['width'])+' },')
