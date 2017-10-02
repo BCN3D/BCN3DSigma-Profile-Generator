@@ -217,9 +217,7 @@ def main():
                     elif x2 == '4':
                         experimentalMenu = False
 
-                elif x == '5':
-                    if platform.system() != 'Windows':
-                        print '\n Until next time!\n'
+                elif x == '4':
                     break
 
                 if bundleProfilesSimplify3D or cura2FilesBundle or singleProfileSimplify3D or cura2Files:
