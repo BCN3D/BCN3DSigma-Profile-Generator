@@ -3,7 +3,10 @@
     "brand": "Colorfila",
     "material": "PET-G",
     "colors": {
-        "Generic": "#ffc924"
+        "Generic": "#B22744",
+        "Black": "#0E0E0E",
+        "Clear": "#E9E9E9",
+        "White": "#FFFFFF"
     },
     "filamentDiameter": 2.85,
     "filamentPricePerKg": 19.95,

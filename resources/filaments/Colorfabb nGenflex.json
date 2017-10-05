@@ -3,6 +3,7 @@
     "brand": "Colorfabb",
     "material": "nGenFlex",
     "colors": {
+        "Generic": "#343537",
         "Black": "#060906",
         "Dark Gray": "#586766",
         "Light Brown": "#CC9D70",

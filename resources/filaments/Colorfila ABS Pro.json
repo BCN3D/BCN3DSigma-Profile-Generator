@@ -3,7 +3,9 @@
     "brand": "Colorfila",
     "material": "ABS Pro",
     "colors": {
-        "Generic": "#8cb219"
+        "Generic": "#8cb219",
+        "Black": "#0E0E0E",
+        "White": "#FEFEFE"
     },
     "filamentDiameter": 2.85,
     "filamentPricePerKg": 24.79,

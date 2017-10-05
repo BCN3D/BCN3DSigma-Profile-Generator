@@ -3,6 +3,7 @@
     "brand": "Colorfabb",
     "material": "PLA-PHA",
     "colors": {
+        "Generic": "#343537",
         "Sky Blue": "#4AA0F6",
         "Ultra Marine Blue": "#3C4BCC",
         "Blue Grey": "#658096",

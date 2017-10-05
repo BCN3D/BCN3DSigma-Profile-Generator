@@ -3,6 +3,7 @@
     "brand": "Colorfila",
     "material": "TPU",
     "colors": {
+        "Generic": "#343537",
         "Black": "#060906",
         "White": "#FFFFFF"
     },

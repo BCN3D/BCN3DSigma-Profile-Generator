@@ -3,6 +3,8 @@
     "brand": "MatterHackers",
     "material": "Nylon Pro",
     "colors": {
+        "Generic": "#343537",
+        "Nylon Pro": "#0E0E0E",
         "Black": "#0E0E0E",
         "White": "#FEFEFE",
         "Green": "#2AB954",

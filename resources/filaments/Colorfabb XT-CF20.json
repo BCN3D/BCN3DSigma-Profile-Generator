@@ -1,9 +1,9 @@
 {
     "id": "Colorfabb XT-CF20",
     "brand": "Colorfabb",
-    "material": "XT-CF20",
+    "material": "Special",
     "colors": {
-        "Generic": "#343537"
+        "XT-CF20": "#343537"
     },
     "filamentDiameter": 2.85,
     "filamentPricePerKg": 66.60,

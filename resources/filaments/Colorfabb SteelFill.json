@@ -1,9 +1,9 @@
 {
     "id": "Colorfabb SteelFill",
     "brand": "Colorfabb",
-    "material": "SteelFill",
+    "material": "Special",
     "colors": {
-        "Generic": "#989C97"
+        "SteelFill": "#989C97"
     },
     "filamentDiameter": 2.85,
     "filamentPricePerKg": 66.6,

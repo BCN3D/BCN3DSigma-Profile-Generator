@@ -3,6 +3,7 @@
     "brand": "Recreus",
     "material": "Filaflex (230-260C)",
     "colors": {
+        "Generic": "#343537",
         "Black": "#0E0E0E",
         "Blue": "#34B0DF",
         "Red": "#D6090A",

@@ -3,6 +3,7 @@
     "brand": "Colorfila",
     "material": "PLA",
     "colors": {
+        "Generic": "#343537",
         "Arctic White": "#FEFEFE",
         "Crystal Silver": "#646862",
         "Dark Blue": "#0016C3",

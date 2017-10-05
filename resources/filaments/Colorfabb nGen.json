@@ -3,6 +3,7 @@
     "brand": "Colorfabb",
     "material": "nGen",
     "colors": {
+        "Generic": "#343537",
         "Black": "#060906",
         "White": "#FFFFFF",
         "Silver Metallic": "#BFC4C7",

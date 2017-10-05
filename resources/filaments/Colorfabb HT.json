@@ -3,6 +3,7 @@
     "brand": "Colorfabb",
     "material": "HT",
     "colors": {
+        "Generic": "#343537",
         "Clear": "#E9E9E9",
         "Dark Gray": "#586766",
         "Black": "#060906",
