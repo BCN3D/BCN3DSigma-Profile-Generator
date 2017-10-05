@@ -1,7 +1,7 @@
 #!/usr/bin/python -tt
 # coding: utf-8
 
-# Guillem Àvila Padró - May 2017
+# Guillem Àvila Padró - Oct 2017
 # Released under GNU LICENSE
 # https://opensource.org/licenses/GPL-3.0
 
