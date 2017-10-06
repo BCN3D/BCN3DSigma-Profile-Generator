@@ -5,7 +5,6 @@
     "colors": {
         "Generic": "#B22744",
         "Black": "#0E0E0E",
-        "Clear": "#E9E9E9",
         "White": "#FFFFFF"
     },
     "filamentDiameter": 2.85,
