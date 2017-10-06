@@ -665,7 +665,7 @@ def cura2Profile(machine):
 
     for filament in sorted(PS.profilesData['filament'], key=lambda k: k['id']):
         cura2PreferredMaterial = filament['id'].replace(' ', '_')
-        if 'Colorfila PLA' in filament['id']:
+        if 'BCN3D Filaments PLA' in filament['id']:
             cura2PreferredMaterial = filament['id'].replace(' ', '_')
             if 'Pumpkin Orange' in filament['colors']:
                 cura2PreferredMaterial += '_Pumpkin_Orange'
@@ -1178,7 +1178,7 @@ def cura2Profile(machine):
                 material.append('        <GUID>'+str(uuid.uuid1())+'</GUID>')
                 material.append('        <version>1</version>')
                 material.append('        <color_code>'+filament['colors'][color]+'</color_code>')
-                if filament['brand'] == 'Colorfila':
+                if filament['brand'] == 'BCN3D Filaments':
                     material.append('        <instructions>http://bcn3dtechnologies.com/en/3d-printer-filaments</instructions>')
                     material.append('        <author>')
                     material.append('            <organization>BCN3D Technologies</organization>')

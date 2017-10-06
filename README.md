@@ -50,9 +50,9 @@ Valid parameters:
 
 Example:
 
-`python progen.py "bcn3dsigma" "regular" "0.4 - Brass" "0.4 - Brass" "Colorfila PLA" "Colorfila PLA"`
+`python progen.py "bcn3dsigma" "regular" "0.4 - Brass" "0.4 - Brass" "BCN3D Filaments PLA" "BCN3D Filaments PLA"`
 
-Generates the file *BCN3D Sigma - 0.4 Left (PLA Colorfila), 0.4 Right (PLA Colorfila).fff*
+Generates the file *BCN3D Sigma - 0.4 Left (PLA BCN3D Filaments), 0.4 Right (PLA BCN3D Filaments).fff*
 
 *Note: Using mirror/duplication print modes need `None` parameters for Right Hotend and Filament.*
 
@@ -79,8 +79,8 @@ Hotends
 Filaments
 ```json5
 {
-    "id": "Colorfila PLA",          //         Filament Name
-    "brand": "Colorfila",           //         Filament Manufacturer
+    "id": "BCN3D Filaments PLA",          //         Filament Name
+    "brand": "BCN3D Filaments",           //         Filament Manufacturer
     "material": "PLA",              //         Material type
     "color": "Generic",             //         Color name
     "colorCode": "#ffc924",         //         HTML color code
