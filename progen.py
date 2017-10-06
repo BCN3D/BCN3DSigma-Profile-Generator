@@ -239,6 +239,7 @@ def main():
                         ProfileMaker.installCura2Files()
                         raw_input("\t\tPress Enter to continue...")
                     elif singleProfileSimplify3D:
+                        
                         c = selectMachineAndPrintMode(GUIHeader)
                         machine = sorted(PS.profilesData['machine'], key=lambda k: k['id'])[c[0]]
                         for m in PS.profilesData['machine']:
@@ -252,8 +253,8 @@ def main():
                             hotendRight = sorted(PS.profilesData['hotend'], key=lambda k: k['id'])[b[0]]
                             filamentRight = sorted(PS.profilesData['filament'], key=lambda k: k['id'])[b[1]]
                         else:
-                            hotendRight = dict([('id', 'None')])
-                            filamentRight = PS.profilesData['filament'][0]
+                            hotendRight = hotendLeft
+                            filamentRight = filamentLeft
                         clearDisplay()
                         print GUIHeader
                         if sorted(PS.profilesData['hotend'], key=lambda k: k['id'])[a[0]]['id'] == 'None' and sorted(PS.profilesData['hotend'], key=lambda k: k['id'])[b[0]]['id'] == 'None':
