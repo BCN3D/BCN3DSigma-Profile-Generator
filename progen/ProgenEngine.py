@@ -2454,10 +2454,8 @@ def firstHeatSequence(hotendLeft, hotendRight, leftHotendTemp, rightHotendTemp, 
     elif software == 'Cura':
         startSequenceString = '\t;' + startSequenceString[2:-1] + '\n'
         if hotendLeft['id'] != 'None':
-            print 'single left'
             timeLeftHotend  = (timeVsTemperature(hotendLeft, leftHotendTemp, 'getTime'), '\t', hotendLeft, 'M104 ', 'M109 ', 'S{print_temperature}',     ' T0\n')
         if hotendRight['id'] != 'None':
-            print 'single right' 
             timeRightHotend = (timeVsTemperature(hotendRight, rightHotendTemp, 'getTime'), '\t', hotendRight, 'M104 ', 'M109 ', 'S{print_temperature2}',    ' T1\n')
         timeBed         = (timeVsTemperature(bed, bedTemp, 'getTime'), '\t', bed, 'M140 ', 'M190 ', 'S{print_bed_temperature}', '\n')
     elif software == 'Cura2':
