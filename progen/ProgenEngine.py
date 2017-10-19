@@ -619,7 +619,7 @@ G28 X0 Y0\t\t;move X/Y to min endstops,\
 G28 Z0\t\t;move Z to min endstops,\
 G92 E0\t\t;zero the extruded length,\
 G1 Z5 F200\t\t;safety Z axis movement,\
-G1 F'+str(purgeSpeedT0)+' E'+str(startPurgeLengthT0)+'\t;extrude '+str(startPurgeLengthT0)+'mm of feed stock,\
+G1 F'+str(purgeSpeedT0)+' E'+str(startPurgeLengthT0)+'\t\t;extrude '+str(startPurgeLengthT0)+'mm of feed stock,\
 G92 E0\t\t;zero the extruded length again</startingGcode>')
         postProcessingScript += ',{REPLACE "M104 S'+str(hotendRightTemperature)+' T1" ""}'
         fff.append('    <postProcessing>'+postProcessingScript+'</postProcessing>')
@@ -637,7 +637,7 @@ G28 X0 Y0\t\t;move X/Y to min endstops,\
 G28 Z0\t\t;move Z to min endstops,\
 G92 E0\t\t;zero the extruded length,\
 G1 Z5 F200\t\t;safety Z axis movement,\
-G1 F'+str(purgeSpeedT1)+' E'+str(startPurgeLengthT1)+'\t;extrude '+str(startPurgeLengthT1)+'mm of feed stock,\
+G1 F'+str(purgeSpeedT1)+' E'+str(startPurgeLengthT1)+'\t\t;extrude '+str(startPurgeLengthT1)+'mm of feed stock,\
 G92 E0\t\t;zero the extruded length again</startingGcode>')
         postProcessingScript += ',{REPLACE "M104 S'+str(hotendLeftTemperature)+' T0" ""}'
         fff.append('    <postProcessing>'+postProcessingScript+'</postProcessing>')
@@ -654,10 +654,10 @@ G28 X0 Y0\t\t;move X/Y to min endstops,\
 G28 Z0\t\t;move Z to min endstops,\
 T1\t\t;switch to the right extruder,\
 G92 E0\t\t;zero the extruded length,\
-G1 F'+str(purgeSpeedT1)+' E'+str(startPurgeLengthT1)+'\t;extrude '+str(startPurgeLengthT1)+'mm of feed stock,G92 E0\t\t;zero the extruded length again,\
+G1 F'+str(purgeSpeedT1)+' E'+str(startPurgeLengthT1)+'\t\t;extrude '+str(startPurgeLengthT1)+'mm of feed stock,G92 E0\t\t;zero the extruded length again,\
 T0\t\t;switch to the left extruder,\
 G92 E0\t\t;zero the extruded length,\
-G1 F'+str(purgeSpeedT0)+' E'+str(startPurgeLengthT0)+'\t;extrude '+str(startPurgeLengthT0)+'mm of feed stock,\
+G1 F'+str(purgeSpeedT0)+' E'+str(startPurgeLengthT0)+'\t\t;extrude '+str(startPurgeLengthT0)+'mm of feed stock,\
 G92 E0\t\t;zero the extruded length again</startingGcode>')
         fff.append('    <layerChangeGcode></layerChangeGcode>')
         fff.append('    <postProcessing>'+postProcessingScript+'</postProcessing>')
