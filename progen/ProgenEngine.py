@@ -1119,38 +1119,37 @@ def cura2Profile():
     # definition.append('            "default_value": false,')
     # definition.append('            "resolve": "'+"'True' if 'True' in extruderValues('support_enable') else 'False'"+'"') # Not working
     # definition.append('        },')
-    definition.append(r'        "machine_start_gcode": { "default_value":\
-        "\n;Sigma ProGen '+PS.progenVersionNumber+' (Build '+PS.progenBuildNumber+r')\n\n\
-G21          ;metric values\n \
-G90          ;absolute positioning\n\
-M82          ;set extruder to absolute mode\n\
-M108 P1      ;enable layer fan for idle extruder\n\
-M107         ;start with the fan off\n\
-G28 X0 Y0    ;move X/Y to min endstops\n\
-G28 Z0       ;move Z to min endstops\n\
-G1 Z5 F200   ;safety Z axis movement\n\
-T1           ;switch to the right extruder\n\
-G92 E0       ;zero the extruded length\n\
-G1 E20 F50   ;extrude 20mm of feed stock\n\
-G92 E0       ;zero the extruded length\n\
-G4 P2000     ;stabilize hotend'+"'"+r's pressure\n\
-G1 F2400 E-8 ;retract\n\
-T0           ;switch to the left extruder\n\
-G92 E0       ;zero the extruded length\n\
-G1 E20 F50   ;extrude 20mm of feed stock\n\
-G92 E0       ;zero the extruded length\n\
-G4 P2000     ;stabilize hotend'+"'"+r's pressure\n\
-G1 F2400 E-8 ;retract\n" },')
-    definition.append(r'        "machine_end_gcode": { "default_value":\
-"\n\
-M104 S0 T0               ;left extruder heater off\n\
-M104 S0 T1               ;right extruder heater off\n\
-M140 S0                  ;heated bed heater off\n\
-G91                      ;relative positioning\n\
-G1 Z+0.5 E-5 Y+10 F12000 ;move Z up a bit and retract filament\n\
-G28 X0 Y0                ;move X/Y to min endstops so the head is out of the way\n\
-M84                      ;steppers off\n\
-G90                      ;absolute positioning\n" },')
+    definition.append('        "machine_start_gcode": { "default_value":'+\
+r'";Sigma ProGen '+PS.progenVersionNumber+' (Build '+PS.progenBuildNumber+r')\n\n'+\
+r'G21          ;metric values\n'+\
+r'G90          ;absolute positioning\n'+\
+r'M82          ;set extruder to absolute mode\n'+\
+r'M108 P1      ;enable layer fan for idle extruder\n'+\
+r'M107         ;start with the fan off\n'+\
+r'G28 X0 Y0    ;move X/Y to min endstops\n'+\
+r'G28 Z0       ;move Z to min endstops\n'+\
+r'G1 Z5 F200   ;safety Z axis movement\n'+\
+r'T1           ;switch to the right extruder\n'+\
+r'G92 E0       ;zero the extruded length\n'+\
+r'G1 E20 F50   ;extrude 20mm of feed stock\n'+\
+r'G92 E0       ;zero the extruded length\n'+\
+r'G4 P2000     ;stabilize hotend'+"'"+r's pressure\n'+\
+r'G1 F2400 E-8 ;retract\n'+\
+r'T0           ;switch to the left extruder\n'+\
+r'G92 E0       ;zero the extruded length\n'+\
+r'G1 E20 F50   ;extrude 20mm of feed stock\n'+\
+r'G92 E0       ;zero the extruded length\n'+\
+r'G4 P2000     ;stabilize hotend'+"'"+r's pressure\n'+\
+r'G1 F2400 E-8 ;retract\n" },')
+    definition.append(r'        "machine_end_gcode": { "default_value":'+\
+r'M104 S0 T0               ;left extruder heater off\n'+\
+r'M104 S0 T1               ;right extruder heater off\n'+\
+r'M140 S0                  ;heated bed heater off\n'+\
+r'G91                      ;relative positioning\n'+\
+r'G1 Z+0.5 E-5 Y+10 F12000 ;move Z up a bit and retract filament\n'+\
+r'G28 X0 Y0                ;move X/Y to min endstops so the head is out of the way\n'+\
+r'M84                      ;steppers off\n'+\
+r'G90                      ;absolute positioning\n" },')
     definition.append('        "machine_nozzle_temp_enabled": { "value": true },')
     definition.append('        "material_bed_temp_wait": { "value": true },')
     definition.append('        "material_print_temp_wait": { "value": true },')
