@@ -2443,59 +2443,69 @@ def timeVsTemperature(element, value, command):
         return max(0, temperature)
 
 def firstHeatSequence(hotendLeft, hotendRight, leftHotendTemp, rightHotendTemp, bedTemp, software):
-    startSequenceString = '; Start Heating Sequence. If you changed temperatures manually all elements may not heat in sync,'
-    bed = dict([('id', 'bed')])
-    if software == 'Simplify3D':
-        if hotendLeft['id'] != 'None':
-            timeLeftHotend  = (timeVsTemperature(hotendLeft, leftHotendTemp, 'getTime'), '', hotendLeft, 'M104 ', 'M109 ', 'S[extruder0_temperature]', ' T0,')
-        if hotendRight['id'] != 'None':
-            timeRightHotend = (timeVsTemperature(hotendRight, rightHotendTemp, 'getTime'), '', hotendRight, 'M104 ', 'M109 ', 'S[extruder1_temperature]', ' T1,')
-        timeBed         = (timeVsTemperature(bed, bedTemp, 'getTime'), '', bed, 'M140 ', 'M190 ', 'S[bed0_temperature]',       ',')
-    elif software == 'Cura':
-        startSequenceString = '\t;' + startSequenceString[2:-1] + '\n'
-        if hotendLeft['id'] != 'None':
-            timeLeftHotend  = (timeVsTemperature(hotendLeft, leftHotendTemp, 'getTime'), '\t', hotendLeft, 'M104 ', 'M109 ', 'S{print_temperature}',     ' T0\n')
-        if hotendRight['id'] != 'None':
-            timeRightHotend = (timeVsTemperature(hotendRight, rightHotendTemp, 'getTime'), '\t', hotendRight, 'M104 ', 'M109 ', 'S{print_temperature2}',    ' T1\n')
-        timeBed         = (timeVsTemperature(bed, bedTemp, 'getTime'), '\t', bed, 'M140 ', 'M190 ', 'S{print_bed_temperature}', '\n')
-    elif software == 'Cura2':
-        # Using Cura 2.5.0 the only labels we know to point to extruder being used are:
-        #   adhesion_extruder_nr
-        #   support_infill_extruder_nr
-        #   support_extruder_nr
-        #   support_interface_extruder_nr
-        startSequenceString = r'\n;' + startSequenceString[2:-1] + r'\n'
-        if hotendLeft['id'] != 'None':
-            timeLeftHotend  = (timeVsTemperature(hotendLeft, leftHotendTemp, 'getTime'), '', hotendLeft, 'M104 ', 'M109 ', 'S{material_print_temperature_layer_0}',     r' T0\n')
-        if hotendRight['id'] != 'None':
-            timeRightHotend = (timeVsTemperature(hotendRight, rightHotendTemp, 'getTime'), '', hotendRight, 'M104 ', 'M109 ', 'S{material_print_temperature_layer_0}',    r' T1\n')
-        timeBed         = (timeVsTemperature(bed, bedTemp, 'getTime'), '', bed, 'M140 ', 'M190 ', 'S{material_bed_temperature}', r'\n')
-
-    if rightHotendTemp != 0 and leftHotendTemp != 0:
-        # IDEX
-        startTimes = sorted([timeLeftHotend, timeRightHotend, timeBed])
-        startSequenceString += startTimes[-1][-6]+startTimes[-1][-3]+'S'+str(int(timeVsTemperature(startTimes[-1][-5], startTimes[-1][0]-startTimes[-2][0], 'getTemperature')))+startTimes[-1][-1]
-        startSequenceString += startTimes[-1][-6]+startTimes[-2][-4]+startTimes[-2][-2]+startTimes[-2][-1]
-        startSequenceString += startTimes[-1][-6]+startTimes[-1][-3]+'S'+str(int(timeVsTemperature(startTimes[-1][-5], startTimes[-1][0]-startTimes[-3][0], 'getTemperature')))+startTimes[-1][-1]
-        startSequenceString += startTimes[-1][-6]+startTimes[-3][-4]+startTimes[-3][-2]+startTimes[-3][-1]
-        startSequenceString += startTimes[-1][-6]+startTimes[-1][-3]+startTimes[-1][-2]+startTimes[-1][-1]
-        startSequenceString += startTimes[-1][-6]+startTimes[-2][-3]+startTimes[-2][-2]+startTimes[-2][-1]
-        startSequenceString += startTimes[-1][-6]+startTimes[-3][-3]+startTimes[-3][-2]+startTimes[-3][-1]
-    elif rightHotendTemp == 0:
-        # MEX Left
-        startTimes = sorted([timeLeftHotend, timeBed])
-        startSequenceString += startTimes[-1][-6]+startTimes[-1][-3]+'S'+str(int(timeVsTemperature(startTimes[-1][-5], startTimes[-1][0]-startTimes[-2][0], 'getTemperature')))+startTimes[-1][-1][-1:]
-        startSequenceString += startTimes[-1][-6]+startTimes[-2][-4]+startTimes[-2][-2]+startTimes[-2][-1][-1:]
-        startSequenceString += startTimes[-1][-6]+startTimes[-1][-3]+startTimes[-1][-2]+startTimes[-1][-1][-1:]
-        startSequenceString += startTimes[-1][-6]+startTimes[-2][-3]+startTimes[-2][-2]+startTimes[-2][-1][-1:]
-    elif leftHotendTemp == 0:
-        # MEX Right
-        startTimes = sorted([timeRightHotend, timeBed])
-        startSequenceString += '\tT1\n' if software == 'Cura' else 'T1,'
-        startSequenceString += startTimes[-1][-6]+startTimes[-1][-3]+'S'+str(int(timeVsTemperature(startTimes[-1][-5], startTimes[-1][0]-startTimes[-2][0], 'getTemperature')))+startTimes[-1][-1][-1:]
-        startSequenceString += startTimes[-1][-6]+startTimes[-2][-4]+startTimes[-2][-2]+startTimes[-2][-1][-1:]
-        startSequenceString += startTimes[-1][-6]+startTimes[-1][-3]+startTimes[-1][-2]+startTimes[-1][-1][-1:]
-        startSequenceString += startTimes[-1][-6]+startTimes[-2][-3]+startTimes[-2][-2]+startTimes[-2][-1][-1:]
+    useSmartSequence = False
+    if useSmartSequence:
+        startSequenceString = '; Start Heating Sequence. If you changed temperatures manually all elements may not heat in sync,'
+        bed = dict([('id', 'bed')])
+        if software == 'Simplify3D':
+            if hotendLeft['id'] != 'None':
+                timeLeftHotend  = (timeVsTemperature(hotendLeft, leftHotendTemp, 'getTime'), '', hotendLeft, 'M104 ', 'M109 ', 'S[extruder0_temperature]', ' T0,')
+            if hotendRight['id'] != 'None':
+                timeRightHotend = (timeVsTemperature(hotendRight, rightHotendTemp, 'getTime'), '', hotendRight, 'M104 ', 'M109 ', 'S[extruder1_temperature]', ' T1,')
+            timeBed         = (timeVsTemperature(bed, bedTemp, 'getTime'), '', bed, 'M140 ', 'M190 ', 'S[bed0_temperature]',       ',')
+        elif software == 'Cura':
+            startSequenceString = '\t;' + startSequenceString[2:-1] + '\n'
+            if hotendLeft['id'] != 'None':
+                timeLeftHotend  = (timeVsTemperature(hotendLeft, leftHotendTemp, 'getTime'), '\t', hotendLeft, 'M104 ', 'M109 ', 'S{print_temperature}',     ' T0\n')
+            if hotendRight['id'] != 'None':
+                timeRightHotend = (timeVsTemperature(hotendRight, rightHotendTemp, 'getTime'), '\t', hotendRight, 'M104 ', 'M109 ', 'S{print_temperature2}',    ' T1\n')
+            timeBed         = (timeVsTemperature(bed, bedTemp, 'getTime'), '\t', bed, 'M140 ', 'M190 ', 'S{print_bed_temperature}', '\n')
+        if rightHotendTemp != 0 and leftHotendTemp != 0:
+            # IDEX
+            startTimes = sorted([timeLeftHotend, timeRightHotend, timeBed])
+            startSequenceString += startTimes[-1][-6]+startTimes[-1][-3]+'S'+str(int(timeVsTemperature(startTimes[-1][-5], startTimes[-1][0]-startTimes[-2][0], 'getTemperature')))+startTimes[-1][-1]
+            startSequenceString += startTimes[-1][-6]+startTimes[-2][-4]+startTimes[-2][-2]+startTimes[-2][-1]
+            startSequenceString += startTimes[-1][-6]+startTimes[-1][-3]+'S'+str(int(timeVsTemperature(startTimes[-1][-5], startTimes[-1][0]-startTimes[-3][0], 'getTemperature')))+startTimes[-1][-1]
+            startSequenceString += startTimes[-1][-6]+startTimes[-3][-4]+startTimes[-3][-2]+startTimes[-3][-1]
+            startSequenceString += startTimes[-1][-6]+startTimes[-1][-3]+startTimes[-1][-2]+startTimes[-1][-1]
+            startSequenceString += startTimes[-1][-6]+startTimes[-2][-3]+startTimes[-2][-2]+startTimes[-2][-1]
+            startSequenceString += startTimes[-1][-6]+startTimes[-3][-3]+startTimes[-3][-2]+startTimes[-3][-1]
+        elif rightHotendTemp == 0:
+            # MEX Left
+            startTimes = sorted([timeLeftHotend, timeBed])
+            startSequenceString += startTimes[-1][-6]+startTimes[-1][-3]+'S'+str(int(timeVsTemperature(startTimes[-1][-5], startTimes[-1][0]-startTimes[-2][0], 'getTemperature')))+startTimes[-1][-1][-1:]
+            startSequenceString += startTimes[-1][-6]+startTimes[-2][-4]+startTimes[-2][-2]+startTimes[-2][-1][-1:]
+            startSequenceString += startTimes[-1][-6]+startTimes[-1][-3]+startTimes[-1][-2]+startTimes[-1][-1][-1:]
+            startSequenceString += startTimes[-1][-6]+startTimes[-2][-3]+startTimes[-2][-2]+startTimes[-2][-1][-1:]
+        elif leftHotendTemp == 0:
+            # MEX Right
+            startTimes = sorted([timeRightHotend, timeBed])
+            startSequenceString += '\tT1\n' if software == 'Cura' else 'T1,'
+            startSequenceString += startTimes[-1][-6]+startTimes[-1][-3]+'S'+str(int(timeVsTemperature(startTimes[-1][-5], startTimes[-1][0]-startTimes[-2][0], 'getTemperature')))+startTimes[-1][-1][-1:]
+            startSequenceString += startTimes[-1][-6]+startTimes[-2][-4]+startTimes[-2][-2]+startTimes[-2][-1][-1:]
+            startSequenceString += startTimes[-1][-6]+startTimes[-1][-3]+startTimes[-1][-2]+startTimes[-1][-1][-1:]
+            startSequenceString += startTimes[-1][-6]+startTimes[-2][-3]+startTimes[-2][-2]+startTimes[-2][-1][-1:]
+    else:
+        if software == 'Simplify3D':
+            if rightHotendTemp != 0 and leftHotendTemp != 0:
+                # IDEX
+                startSequenceString = 'M190 S[bed0_temperature],M104 S[extruder0_temperature],M104 T1 S[extruder1_temperature],M109 S[extruder0_temperature],M109 T1 S[extruder1_temperature],'
+            elif rightHotendTemp == 0:
+                # MEX Left
+                startSequenceString = 'M190 S[bed0_temperature],M109 S[extruder0_temperature],'
+            elif leftHotendTemp == 0:
+                # MEX Right
+                startSequenceString = 'M190 S[bed0_temperature],M109 T1 S[extruder1_temperature],'
+        elif software == 'Cura':
+            if rightHotendTemp != 0 and leftHotendTemp != 0:
+                # IDEX
+                startSequenceString = '\tM190 S{print_bed_temperature}\n\tM104 S{print_temperature}\n\tM104 T1 S{print_temperature2}\n\tM109 S{print_temperature}\n\tM109 T1 S{print_temperature2}\n'
+            elif rightHotendTemp == 0:
+                # MEX Left
+                startSequenceString = '\tM190 S{print_bed_temperature}\n\tM109 S{print_temperature}\n'
+            elif leftHotendTemp == 0:
+                # MEX Right
+                startSequenceString = '\tM190 S{print_bed_temperature}\n\tM109 T1 S{print_temperature2}\n'
     return startSequenceString
 
 def accelerationForPerimeters(nozzleSize, layerHeight, outerWallSpeed, base = 5, multiplier = 30000, defaultAcceleration = 2000):
