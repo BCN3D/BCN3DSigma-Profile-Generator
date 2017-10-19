@@ -655,7 +655,6 @@ G28 Z0\t\t;move Z to min endstops,\
 T1\t\t;switch to the right extruder,\
 G92 E0\t\t;zero the extruded length,\
 G1 F'+str(purgeSpeedT1)+' E'+str(startPurgeLengthT1)+'\t;extrude '+str(startPurgeLengthT1)+'mm of feed stock,G92 E0\t\t;zero the extruded length again,\
-G1 F200 E-9,\
 T0\t\t;switch to the left extruder,\
 G92 E0\t\t;zero the extruded length,\
 G1 F'+str(purgeSpeedT0)+' E'+str(startPurgeLengthT0)+'\t;extrude '+str(startPurgeLengthT0)+'mm of feed stock,\
