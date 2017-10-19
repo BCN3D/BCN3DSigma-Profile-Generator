@@ -239,7 +239,15 @@ def simplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight):
     fff.append('  <layerChangeGcode></layerChangeGcode>')
     fff.append('  <retractionGcode></retractionGcode>')
     fff.append('  <toolChangeGcode></toolChangeGcode>')
-    fff.append('  <endingGcode>M104 S0 T0\t\t\t;left extruder heater off,M104 S0 T1\t\t\t;right extruder heater off,M140 S0\t\t\t;heated bed heater off,G91\t\t\t;relative positioning,G1 Z+0.5 E-5 Y+10 F[travel_speed]\t;move Z up a bit and retract filament,G28 X0 Y0\t\t\t;move X/Y to min endstops so the head is out of the way,M84\t\t\t;steppers off,G90\t\t\t;absolute positioning,</endingGcode>')
+    fff.append('  <endingGcode>\
+M104 S0 T0\t\t\t;left extruder heater off,\
+M104 S0 T1\t\t\t;right extruder heater off,\
+M140 S0\t\t\t;heated bed heater off,\
+G91\t\t\t;relative positioning,\
+G1 Z+0.5 E-5 Y+10 F[travel_speed]\t;move Z up a bit and retract filament,\
+G28 X0 Y0\t\t\t;move X/Y to min endstops so the head is out of the way,\
+M84\t\t\t;steppers off,\
+G90\t\t\t;absolute positioning,</endingGcode>')
     fff.append('  <exportFileFormat>gcode</exportFileFormat>')
     fff.append('  <celebration>0</celebration>')
     fff.append('  <celebrationSong>Random Song</celebrationSong>')
@@ -556,14 +564,38 @@ def simplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight):
                 fff.append('      <setpoint layer="1" temperature="'+str(bedTemperature)+'"/>')
                 fff.append('    </temperatureController>')
             if hotendLeft['id'] != 'None' and hotendRight['id'] != 'None':                    
-                fff.append('    <toolChangeGcode>{IF NEWTOOL=0} T0\t\t\t;Start tool switch 0,{IF NEWTOOL=0} G1 F2400 E0,{IF NEWTOOL=0} M800 F'+str(purgeSpeedT0)+' S'+str(sParameterT0)+' E'+str(eParameterT0)+' P'+str(pParameterT0)+'\t;SmartPurge - Needs Firmware v01-1.2.3,;{IF NEWTOOL=0} G1 F'+str(purgeSpeedT0)+' E'+str(toolChangePurgeLengthT0)+'\t\t;Default purge value,'+fanActionOnToolChange1+',{IF NEWTOOL=1} T1\t\t\t;Start tool switch 1,{IF NEWTOOL=1} G1 F2400 E0,{IF NEWTOOL=1} M800 F'+str(purgeSpeedT1)+' S'+str(sParameterT1)+' E'+str(eParameterT1)+' P'+str(pParameterT1)+'\t;SmartPurge - Needs Firmware v01-1.2.3,;{IF NEWTOOL=1} G1 F'+str(purgeSpeedT1)+' E'+str(toolChangePurgeLengthT1)+'\t\t;Default purge,'+fanActionOnToolChange2+",G4 P2000\t\t\t\t;Stabilize Hotend's pressure,G92 E0\t\t\t\t;Zero extruder,G1 F3000 E-4.5\t\t\t\t;Retract,G1 F[travel_speed]\t\t\t;End tool switch,G91,G1 F[travel_speed] Z2,G90</toolChangeGcode>")
+                fff.append('    <toolChangeGcode>\
+{IF NEWTOOL=0} T0\t\t\t;Start tool switch 0,\
+{IF NEWTOOL=0} G1 F2400 E0,\
+{IF NEWTOOL=0} M800 F'+str(purgeSpeedT0)+' S'+str(sParameterT0)+' E'+str(eParameterT0)+' P'+str(pParameterT0)+'\t;SmartPurge - Needs Firmware v01-1.2.3,\
+;{IF NEWTOOL=0} G1 F'+str(purgeSpeedT0)+' E'+str(toolChangePurgeLengthT0)+'\t\t;Default purge value,\
+'+fanActionOnToolChange1+',\
+{IF NEWTOOL=1} T1\t\t\t;Start tool switch 1,\
+{IF NEWTOOL=1} G1 F2400 E0,\
+{IF NEWTOOL=1} M800 F'+str(purgeSpeedT1)+' S'+str(sParameterT1)+' E'+str(eParameterT1)+' P'+str(pParameterT1)+'\t;SmartPurge - Needs Firmware v01-1.2.3,\
+;{IF NEWTOOL=1} G1 F'+str(purgeSpeedT1)+' E'+str(toolChangePurgeLengthT1)+'\t\t;Default purge,\
+'+fanActionOnToolChange2+",\
+G4 P2000\t\t\t\t;Stabilize Hotend's pressure,\
+G92 E0\t\t\t\t;Zero extruder,\
+G1 F3000 E-4.5\t\t\t\t;Retract,\
+G1 F[travel_speed]\t\t\t;End tool switch,\
+G91,\
+G1 F[travel_speed] Z2,\
+G90</toolChangeGcode>")
             else:
                 fff.append('    <toolChangeGcode/>')
             if primaryFilament['isFlexibleMaterial']:
                 reducedAccelerationForPerimeters = 2000
             else:
                 reducedAccelerationForPerimeters = accelerationForPerimeters(primaryHotend['nozzleSize'], layerHeight, int(defaultSpeed/60. * outlineUnderspeed))
-            postProcessingScript = r'{REPLACE "; outer perimeter" "; outer perimeter\nM204 S'+str(reducedAccelerationForPerimeters)+r'"},{REPLACE "; inner perimeter" "; inner perimeter\nM204 S2000"},{REPLACE "; solid layer" "; solid layer\nM204 S2000"},{REPLACE "; infill" "; infill\nM204 S2000",{REPLACE "; support" "; support\nM204 S2000"},{REPLACE "; layer end" "; layer end\nM204 S2000"},{REPLACE "F12000\nG1 Z'+str(round(layerHeight*firstLayerHeightPercentage/100., 3))+r' F1002\nG92 E0" "F12000G1 Z'+str(round(layerHeight*firstLayerHeightPercentage/100., 3))+r' F1002\nG1 E0.0000 F720\nG92 E0"}'
+            postProcessingScript = \
+r'{REPLACE "; outer perimeter" "; outer perimeter\nM204 S'+str(reducedAccelerationForPerimeters)+'"},'+\
+r'{REPLACE "; inner perimeter" "; inner perimeter\nM204 S2000"},'+\
+r'{REPLACE "; solid layer" "; solid layer\nM204 S2000"},'+\
+r'{REPLACE "; infill" "; infill\nM204 S2000",'+\
+r'{REPLACE "; support" "; support\nM204 S2000"},'+\
+r'{REPLACE "; layer end" "; layer end\nM204 S2000"},'+\
+r'{REPLACE "F12000\nG1 Z'+str(round(layerHeight*firstLayerHeightPercentage/100., 3))+r' F1002\nG92 E0" "F12000G1 Z'+str(round(layerHeight*firstLayerHeightPercentage/100., 3))+r' F1002\nG1 E0.0000 F720\nG92 E0"}'
             fff.append('  </autoConfigureQuality>')
 
             # if dataLog != '--no-data' :
@@ -576,19 +608,58 @@ def simplify3DProfile(hotendLeft, hotendRight, filamentLeft, filamentRight):
     # Start gcode must be defined in autoConfigureExtruders. Otherwise you have problems with the first heat sequence in Dual Color prints.
     if hotendLeft['id'] != 'None':
         fff.append('  <autoConfigureExtruders name="Left Extruder Only"  allowedToolheads="1">')
-        fff.append('    <startingGcode>;Sigma ProGen '+PS.progenVersionNumber+' (Build '+PS.progenBuildNumber+'),'+firstHeatSequence(hotendLeft, hotendRight, hotendLeftTemperature, 0, bedTemperature, 'Simplify3D')+',G21\t\t;metric values,G90\t\t;absolute positioning,M82\t\t;set extruder to absolute mode,M107\t\t;start with the fan off,G28 X0 Y0\t\t;move X/Y to min endstops,G28 Z0\t\t;move Z to min endstops,G92 E0\t\t;zero the extruded length,G1 Z5 F200\t\t;safety Z axis movement,G1 F'+str(purgeSpeedT0)+' E'+str(startPurgeLengthT0)+'\t;extrude '+str(startPurgeLengthT0)+'mm of feed stock,G92 E0\t\t;zero the extruded length again</startingGcode>')
+        fff.append('    <startingGcode>\
+;Sigma ProGen '+PS.progenVersionNumber+' (Build '+PS.progenBuildNumber+'),\
+'+firstHeatSequence(hotendLeft, hotendRight, hotendLeftTemperature, 0, bedTemperature, 'Simplify3D')+',\
+G21\t\t;metric values,\
+G90\t\t;absolute positioning,\
+M82\t\t;set extruder to absolute mode,\
+M107\t\t;start with the fan off,\
+G28 X0 Y0\t\t;move X/Y to min endstops,\
+G28 Z0\t\t;move Z to min endstops,\
+G92 E0\t\t;zero the extruded length,\
+G1 Z5 F200\t\t;safety Z axis movement,\
+G1 F'+str(purgeSpeedT0)+' E'+str(startPurgeLengthT0)+'\t;extrude '+str(startPurgeLengthT0)+'mm of feed stock,\
+G92 E0\t\t;zero the extruded length again</startingGcode>')
         postProcessingScript += ',{REPLACE "M104 S'+str(hotendRightTemperature)+' T1" ""}'
         fff.append('    <postProcessing>'+postProcessingScript+'</postProcessing>')
         fff.append('  </autoConfigureExtruders>')
     if hotendRight['id'] != 'None':
         fff.append('  <autoConfigureExtruders name="Right Extruder Only"  allowedToolheads="1">')
-        fff.append('    <startingGcode>;Sigma ProGen '+PS.progenVersionNumber+' (Build '+PS.progenBuildNumber+'),'+firstHeatSequence(hotendLeft, hotendRight, 0, hotendRightTemperature, bedTemperature, 'Simplify3D')+',G21\t\t;metric values,G90\t\t;absolute positioning,M82\t\t;set extruder to absolute mode,M107\t\t;start with the fan off,G28 X0 Y0\t\t;move X/Y to min endstops,G28 Z0\t\t;move Z to min endstops,G92 E0\t\t;zero the extruded length,G1 Z5 F200\t\t;safety Z axis movement,G1 F'+str(purgeSpeedT1)+' E'+str(startPurgeLengthT1)+'\t;extrude '+str(startPurgeLengthT1)+'mm of feed stock,G92 E0\t\t;zero the extruded length again</startingGcode>')
+        fff.append('    <startingGcode>\
+;Sigma ProGen '+PS.progenVersionNumber+' (Build '+PS.progenBuildNumber+'),\
+'+firstHeatSequence(hotendLeft, hotendRight, 0, hotendRightTemperature, bedTemperature, 'Simplify3D')+',\
+G21\t\t;metric values,\
+G90\t\t;absolute positioning,\
+M82\t\t;set extruder to absolute mode,\
+M107\t\t;start with the fan off,\
+G28 X0 Y0\t\t;move X/Y to min endstops,\
+G28 Z0\t\t;move Z to min endstops,\
+G92 E0\t\t;zero the extruded length,\
+G1 Z5 F200\t\t;safety Z axis movement,\
+G1 F'+str(purgeSpeedT1)+' E'+str(startPurgeLengthT1)+'\t;extrude '+str(startPurgeLengthT1)+'mm of feed stock,\
+G92 E0\t\t;zero the extruded length again</startingGcode>')
         postProcessingScript += ',{REPLACE "M104 S'+str(hotendLeftTemperature)+' T0" ""}'
         fff.append('    <postProcessing>'+postProcessingScript+'</postProcessing>')
         fff.append('  </autoConfigureExtruders>')
     if hotendLeft['id'] != 'None' and hotendRight['id'] != 'None':
         fff.append('  <autoConfigureExtruders name="Both Extruders"  allowedToolheads="2">')
-        fff.append('    <startingGcode>;Sigma ProGen '+PS.progenVersionNumber+' (Build '+PS.progenBuildNumber+'),'+firstHeatSequence(hotendLeft, hotendRight, hotendLeftTemperature, hotendRightTemperature, bedTemperature, 'Simplify3D')+',G21\t\t;metric values,G90\t\t;absolute positioning,M108 P1\t\t;enable layer fan for idle extruder,M107\t\t;start with the fan off,G28 X0 Y0\t\t;move X/Y to min endstops,G28 Z0\t\t;move Z to min endstops,T1\t\t;switch to the right extruder,G92 E0\t\t;zero the extruded length,G1 F'+str(purgeSpeedT1)+' E'+str(startPurgeLengthT1)+'\t;extrude '+str(startPurgeLengthT1)+'mm of feed stock,G92 E0\t\t;zero the extruded length again,G1 F200 E-9,T0\t\t;switch to the left extruder,G92 E0\t\t;zero the extruded length,G1 F'+str(purgeSpeedT0)+' E'+str(startPurgeLengthT0)+'\t;extrude '+str(startPurgeLengthT0)+'mm of feed stock,G92 E0\t\t;zero the extruded length again</startingGcode>')
+        fff.append('    <startingGcode>\
+;Sigma ProGen '+PS.progenVersionNumber+' (Build '+PS.progenBuildNumber+'),'+firstHeatSequence(hotendLeft, hotendRight, hotendLeftTemperature, hotendRightTemperature, bedTemperature, 'Simplify3D')+',\
+G21\t\t;metric values,\
+G90\t\t;absolute positioning,\
+M108 P1\t\t;enable layer fan for idle extruder,\
+M107\t\t;start with the fan off,\
+G28 X0 Y0\t\t;move X/Y to min endstops,\
+G28 Z0\t\t;move Z to min endstops,\
+T1\t\t;switch to the right extruder,\
+G92 E0\t\t;zero the extruded length,\
+G1 F'+str(purgeSpeedT1)+' E'+str(startPurgeLengthT1)+'\t;extrude '+str(startPurgeLengthT1)+'mm of feed stock,G92 E0\t\t;zero the extruded length again,\
+G1 F200 E-9,\
+T0\t\t;switch to the left extruder,\
+G92 E0\t\t;zero the extruded length,\
+G1 F'+str(purgeSpeedT0)+' E'+str(startPurgeLengthT0)+'\t;extrude '+str(startPurgeLengthT0)+'mm of feed stock,\
+G92 E0\t\t;zero the extruded length again</startingGcode>')
         fff.append('    <layerChangeGcode></layerChangeGcode>')
         fff.append('    <postProcessing>'+postProcessingScript+'</postProcessing>')
         fff.append('  </autoConfigureExtruders>')
@@ -924,10 +995,10 @@ def curaProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, quality):
     ini.append('\t;This code is added after the T(n)')
     ini.append('\tG1 F2400 E0')
     ini.append('\tM800 F'+str(purgeSpeed)+' S'+str(sParameter)+' E'+str(eParameter)+' P'+str(pParameter)+' ;SmartPurge - Needs Firmware v01-1.2.3')
-    ini.append('\t;G1 F'+str(purgeSpeed)+' E'+str(toolChangePurgeLength)+'             ;Default purge')
-    ini.append("\tG4 P2000                   ;Stabilize Hotend's pressure")
-    ini.append('\tG92 E0                     ;Zero extruder')
-    ini.append('\tG1 F2400 E-4               ;Retract')
+    ini.append('\t;G1 F'+str(purgeSpeed)+' E'+str(toolChangePurgeLength)+'                ;Default purge')
+    ini.append("\tG4 P2000                       ;Stabilize Hotend's pressure")
+    ini.append('\tG92 E0                         ;Zero extruder')
+    ini.append('\tG1 F2400 E-4                   ;Retract')
     ini.append('\tG1 F{travel_speed}')
     ini.append('\tG91')
     ini.append('\tG1 F{travel_speed} Z2')
@@ -1049,8 +1120,38 @@ def cura2Profile():
     # definition.append('            "default_value": false,')
     # definition.append('            "resolve": "'+"'True' if 'True' in extruderValues('support_enable') else 'False'"+'"') # Not working
     # definition.append('        },')
-    definition.append(r'        "machine_start_gcode": { "default_value": "\n;Sigma ProGen '+PS.progenVersionNumber+' (Build '+PS.progenBuildNumber+r')\n\nG21\t\t;metric values\nG90\t\t;absolute positioning\nM82\t\t;set extruder to absolute mode\nM108 P1\t\t;enable layer fan for idle extruder\nM107\t\t;start with the fan off\nG28 X0 Y0\t\t;move X/Y to min endstops\nG28 Z0\t\t;move Z to min endstops\nG1 Z5 F200\t\t;safety Z axis movement\nT1\t\t;switch to the right extruder\nG92 E0\t\t;zero the extruded length\nG1 E20 F50\t\t;extrude 20mm of feed stock\nG92 E0\t\t;zero the extruded length\nG4 P2000\t\t;stabilize hotend'+"'"+r's pressure\nG1 F2400 E-8\t\t;retract\nT0\t\t;switch to the left extruder\nG92 E0\t\t;zero the extruded length\nG1 E20 F50\t\t;extrude 20mm of feed stock\nG92 E0\t\t;zero the extruded length\nG4 P2000\t\t;stabilize hotend'+"'"+r's pressure\nG1 F2400 E-8\t\t;retract\n" },')
-    definition.append(r'        "machine_end_gcode": { "default_value": "\nM104 S0 T0\t\t;left extruder heater off\nM104 S0 T1\t\t;right extruder heater off\nM140 S0\t\t;heated bed heater off\nG91\t\t;relative positioning\nG1 Z+0.5 E-5 Y+10 F12000\t;move Z up a bit and retract filament\nG28 X0 Y0\t\t;move X/Y to min endstops so the head is out of the way\nM84\t\t;steppers off\nG90\t\t;absolute positioning\n" },')
+    definition.append(r'        "machine_start_gcode": { "default_value":\
+        "\n;Sigma ProGen '+PS.progenVersionNumber+' (Build '+PS.progenBuildNumber+r')\n\n\
+G21          ;metric values\n \
+G90          ;absolute positioning\n\
+M82          ;set extruder to absolute mode\n\
+M108 P1      ;enable layer fan for idle extruder\n\
+M107         ;start with the fan off\n\
+G28 X0 Y0    ;move X/Y to min endstops\n\
+G28 Z0       ;move Z to min endstops\n\
+G1 Z5 F200   ;safety Z axis movement\n\
+T1           ;switch to the right extruder\n\
+G92 E0       ;zero the extruded length\n\
+G1 E20 F50   ;extrude 20mm of feed stock\n\
+G92 E0       ;zero the extruded length\n\
+G4 P2000     ;stabilize hotend'+"'"+r's pressure\n\
+G1 F2400 E-8 ;retract\n\
+T0           ;switch to the left extruder\n\
+G92 E0       ;zero the extruded length\n\
+G1 E20 F50   ;extrude 20mm of feed stock\n\
+G92 E0       ;zero the extruded length\n\
+G4 P2000     ;stabilize hotend'+"'"+r's pressure\n\
+G1 F2400 E-8 ;retract\n" },')
+    definition.append(r'        "machine_end_gcode": { "default_value":\
+"\n\
+M104 S0 T0               ;left extruder heater off\n\
+M104 S0 T1               ;right extruder heater off\n\
+M140 S0                  ;heated bed heater off\n\
+G91                      ;relative positioning\n\
+G1 Z+0.5 E-5 Y+10 F12000 ;move Z up a bit and retract filament\n\
+G28 X0 Y0                ;move X/Y to min endstops so the head is out of the way\n\
+M84                      ;steppers off\n\
+G90                      ;absolute positioning\n" },')
     definition.append('        "machine_nozzle_temp_enabled": { "value": true },')
     definition.append('        "material_bed_temp_wait": { "value": true },')
     definition.append('        "material_print_temp_wait": { "value": true },')
@@ -2495,7 +2596,7 @@ def firstHeatSequence(hotendLeft, hotendRight, leftHotendTemp, rightHotendTemp, 
                 startSequenceString = 'M190 S[bed0_temperature],M109 S[extruder0_temperature],'
             elif leftHotendTemp == 0:
                 # MEX Right
-                startSequenceString = 'M190 S[bed0_temperature],M109 T1 S[extruder1_temperature],'
+                startSequenceString = 'T1,M190 S[bed0_temperature],M109 S[extruder1_temperature],'
         elif software == 'Cura':
             if rightHotendTemp != 0 and leftHotendTemp != 0:
                 # IDEX
@@ -2505,7 +2606,7 @@ def firstHeatSequence(hotendLeft, hotendRight, leftHotendTemp, rightHotendTemp, 
                 startSequenceString = '\tM190 S{print_bed_temperature}\n\tM109 S{print_temperature}\n'
             elif leftHotendTemp == 0:
                 # MEX Right
-                startSequenceString = '\tM190 S{print_bed_temperature}\n\tM109 T1 S{print_temperature2}\n'
+                startSequenceString = '\tT1\n\tM190 S{print_bed_temperature}\n\tM109 S{print_temperature2}\n'
     return startSequenceString
 
 def accelerationForPerimeters(nozzleSize, layerHeight, outerWallSpeed, base = 5, multiplier = 30000, defaultAcceleration = 2000):
