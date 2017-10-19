@@ -13,7 +13,7 @@ import string
 def init():
     # Generic
     global progenVersionNumber
-    progenVersionNumber = '2.0.1'
+    progenVersionNumber = '2.0.2'
     global progenBuildNumber
     progenBuildNumber = time.strftime("%d")+string.uppercase[int(time.strftime("%m"))]+string.uppercase[int(time.strftime("%y")[-1])]+time.strftime("%H")+time.strftime("%M")
     global profilesData
