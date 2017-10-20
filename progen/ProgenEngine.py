@@ -1239,7 +1239,9 @@ def cura2Profile(machine):
     extruder.append('    "inherits": "fdmextruder",')
     extruder.append('    "metadata": {')
     extruder.append('        "machine": "'+machine['id']+'",')
-    extruder.append('        "position": "0"')
+    extruder.append('        "position": "0"') # Deprecated after 2.7
+# Cura 3 Feature extruder.append('        "position": "1",')
+# Cura 3 Feature extruder.append('        "quality_definition": "'+machine['id']+'_extruder_right"')
     extruder.append('    },')
     extruder.append('')
     extruder.append('    "overrides": {')
@@ -1249,7 +1251,7 @@ def cura2Profile(machine):
     extruder.append('        },')
     extruder.append('        "machine_nozzle_offset_x": { "default_value": 0.0 },')
     extruder.append('        "machine_nozzle_offset_y": { "default_value": 0.0 },')
-    extruder.append(r'        "machine_extruder_start_code": { "default_value": "G91\nG1 F12000 Z2\nG90\n" },') # Should be set as a quality parameter, but Cura 2.5 doesn't allow it
+    extruder.append(r'        "machine_extruder_start_code": { "default_value": "G91\nG1 F12000 Z'+machine['extruderSwitchZHop']+'\nG90\n" },')
     extruder.append('        "machine_extruder_start_pos_abs": { "default_value": false },')
     extruder.append('        "machine_extruder_start_pos_x": { "default_value": 0.0 },')
     extruder.append('        "machine_extruder_start_pos_y": { "default_value": 0.0 },')
@@ -1273,7 +1275,9 @@ def cura2Profile(machine):
     extruder.append('    "inherits": "fdmextruder",')
     extruder.append('    "metadata": {')
     extruder.append('        "machine": "'+machine['id']+'",')
-    extruder.append('        "position": "1"')
+    extruder.append('        "position": "1"') # Deprecated after 2.7
+# Cura 3 Feature extruder.append('        "position": "1",')
+# Cura 3 Feature extruder.append('        "quality_definition": "'+machine['id']+'_extruder_right"')
     extruder.append('    },')
     extruder.append('')
     extruder.append('    "overrides": {')
@@ -1283,7 +1287,7 @@ def cura2Profile(machine):
     extruder.append('        },')
     extruder.append('        "machine_nozzle_offset_x": { "default_value": 0.0 },')
     extruder.append('        "machine_nozzle_offset_y": { "default_value": 0.0 },')
-    extruder.append(r'        "machine_extruder_start_code": { "default_value": "G91\nG1 F12000 Z2\nG90\n" },') # Should be set as a quality parameter, but Cura 2.5 doesn't allow it
+    extruder.append(r'        "machine_extruder_start_code": { "default_value": "G91\nG1 F12000 Z'+machine['extruderSwitchZHop']+'\nG90\n" },')
     extruder.append('        "machine_extruder_start_pos_abs": { "default_value": false },')
     extruder.append('        "machine_extruder_start_pos_x": { "default_value": 0.0 },')
     extruder.append('        "machine_extruder_start_pos_y": { "default_value": 0.0 },')
@@ -1406,7 +1410,8 @@ def cura2Profile(machine):
                                 qualityFile.append('quality_type = layer'+("%.2f" % layerHeight)+'mm')
                                 qualityFile.append('global_quality = True')
                                 qualityFile.append('weight = '+str(len(globalQualities)))
-                                qualityFile.append('setting_version = 2')
+                                qualityFile.append('setting_version = 2')  # Deprecated after 2.7
+                                # Cura 3 feature qualityFile.append('setting_version = 3')
                                 qualityFile.append('')
                                 qualityFile.append('[values]')
                                 qualityFile.append('layer_height = '+("%.2f" % layerHeight))
@@ -1433,7 +1438,8 @@ def cura2Profile(machine):
                                     break
                             if notSupported:
                                 qualityFile.append('supported = False')
-                            qualityFile.append('setting_version = 2')
+                            qualityFile.append('setting_version = 2')  # Deprecated after 2.7
+                            # Cura 3 feature qualityFile.append('setting_version = 3')
                             qualityFile.append('')
                             qualityFile.append('[values]')
 
@@ -1552,7 +1558,8 @@ def cura2Profile(machine):
                 variant.append('[metadata]')
                 variant.append('author = '+machine['author'])
                 variant.append('type = variant')
-                variant.append('setting_version = 2') 
+                variant.append('setting_version = 2')  # Deprecated after 2.7
+                # Cura 3 feature variant.append('setting_version = 3')
                 variant.append('')
                 variant.append('[values]')
                 # machine settings
