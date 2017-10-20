@@ -613,7 +613,7 @@ def simplify3DProfile(machine, printMode, hotendLeft, hotendRight, filamentLeft,
                     'G1 F3000 E-4.5\t\t\t\t;Retract,'+\
                     'G1 F[travel_speed]\t\t\t;End tool switch,'+\
                     'G91,'+\
-                    'G1 F[travel_speed] Z2,'+\
+                    'G1 F[travel_speed] Z'+str(machine['extruderSwitchZHop'])+','+\
                     'G90</toolChangeGcode>')
             else:
                 fff.append('    <toolChangeGcode/>')
@@ -831,6 +831,7 @@ def cura2Profile(machine):
             definition.append('        },')
 
         definition.append('        "avoid_grinding_filament": { "value": false }')
+        definition.append('        "retraction_hop_height_after_extruder_switch": { "value": '+str(machine['extruderSwitchZHop'])+' },')
     else:
         definition.append('        "machine_width": { "default_value": '+str(machine['width'])+' },')
         definition.append('        "machine_depth": { "default_value": '+str(machine['depth'])+' },')
@@ -1044,7 +1045,7 @@ def cura2Profile(machine):
         definition.append('        "layer_start_y": { "value": "machine_depth" },') # different than z_seam
         definition.append('        "retraction_hop_enabled": { "value": true },')
         definition.append('        "retraction_hop_only_when_collides": { "value": true },')
-        definition.append('        "retraction_hop": { "value": "0.5 * layer_height" },')
+        definition.append('        "retraction_hop": { "value": "0.75 * layer_height" },')
         # definition.append('        "retraction_hop_after_extruder_switch": { "value": true },')
 
         # cooling
@@ -1216,6 +1217,7 @@ def cura2Profile(machine):
         # BCN3D
         definition.append('        "smart_purge": { "enabled": true },')
         definition.append('        "retract_reduction": { "enabled": true },')
+        definition.append('        "retraction_hop_height_after_extruder_switch": { "value": '+str(machine['extruderSwitchZHop'])+' },')
         definition.append('        "avoid_grinding_filament":')
         definition.append('        {')
         definition.append('            "enabled": true,')

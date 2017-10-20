@@ -15,4 +15,5 @@
     "variants": "bcn3dsigma",
     "qualities": "bcn3dsigma",
     "printMode": ["regular", "mirror", "duplication"]
+    "extruderSwitchZHop": 5
 }
