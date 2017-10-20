@@ -807,7 +807,7 @@ def cura2Profile(machine):
         definition.append('        "machine_width": { "default_value": '+str(machine['width'])+' },')
         definition.append('        "print_mode": { "enabled": true },')
         setToValueIfPrintModeIsNotRegular = []
-        setToValueIfPrintModeIsNotRegular.append(['wall_extruder_nr', '-1', '-1'])
+        setToValueIfPrintModeIsNotRegular.append(['wall_extruder_nr', '-1', '-1']) # Deprecated after 2.7
         setToValueIfPrintModeIsNotRegular.append(['wall_0_extruder_nr', '-1', '-1'])
         setToValueIfPrintModeIsNotRegular.append(['wall_x_extruder_nr', '-1', '-1'])
         setToValueIfPrintModeIsNotRegular.append(['roofing_extruder_nr', '-1', '-1'])
@@ -874,8 +874,8 @@ def cura2Profile(machine):
         # definition.append('            "default_value": false,')
         # definition.append('            "resolve": "'+"'True' if 'True' in extruderValues('support_enable') else 'False'"+'"') # Not working
         # definition.append('        },')
-        definition.append('        "machine_start_gcode": { "default_value":'+\
-            r'";Sigma ProGen '+PS.progenVersionNumber+' (Build '+PS.progenBuildNumber+r')\n\n'+\
+        definition.append('        "machine_start_gcode": { "default_value": "'+\
+            r';Sigma ProGen '+PS.progenVersionNumber+' (Build '+PS.progenBuildNumber+r')\n\n'+\
             r'G21          ;metric values\n'+\
             r'G90          ;absolute positioning\n'+\
             r'M82          ;set extruder to absolute mode\n'+\
@@ -896,7 +896,7 @@ def cura2Profile(machine):
             r'G92 E0       ;zero the extruded length\n'+\
             r'G4 P2000     ;stabilize hotend'+"'"+r's pressure\n'+\
             r'G1 F2400 E-8 ;retract\n" },')
-        definition.append(r'        "machine_end_gcode": { "default_value":'+\
+        definition.append(r'        "machine_end_gcode": { "default_value": "'+\
             r'M104 S0 T0               ;left extruder heater off\n'+\
             r'M104 S0 T1               ;right extruder heater off\n'+\
             r'M140 S0                  ;heated bed heater off\n'+\
@@ -928,9 +928,9 @@ def cura2Profile(machine):
         # definition.append('        "initial_layer_line_width_factor": { "value": 100 },')
 
         # shell
-        # definition.append('        "wall_extruder_nr": { "value": -1 },')
-        # definition.append('        "wall_0_extruder_nr": { "value": "wall_extruder_nr" },')
-        # definition.append('        "wall_x_extruder_nr": { "value": "wall_extruder_nr" },')
+        # definition.append('        "wall_extruder_nr": { "value": -1 },') # Deprecated after 2.7 
+        # definition.append('        "wall_0_extruder_nr": { "value": "-1" },')
+        # definition.append('        "wall_x_extruder_nr": { "value": "-1" },')
         definition.append('        "wall_0_wipe_dist": { "value": "12.5 * machine_nozzle_size" },')
         # definition.append('        "roofing_extruder_nr": { "value": -1 },')
         # definition.append('        "roofing_layer_count": { "value": 0 },')
@@ -949,18 +949,19 @@ def cura2Profile(machine):
         # definition.append('        "fill_outline_gaps": { "value": "'+"'everywhere'"+'" },')
         # definition.append('        "xy_offset": { "value": 0 },')
         definition.append('        "xy_offset_layer_0": { "value": -0.1 },')
-        definition.append('        "z_seam_type": { "value": "'+"'sharpest_corner'"+'" },')
+# Cura 3 Feature definition.append('        "z_seam_type": { "value": "'+"'sharpest_corner'"+'" },')
+        definition.append('        "z_seam_type": { "value": "'+"'back'"+'" },') # Deprecated after 2.7 (change to sharpest_corner)
         definition.append('        "z_seam_x": { "value": "int(machine_width/2.)" },')
         definition.append('        "z_seam_y": { "value": "machine_depth" },')
-        definition.append('        "z_seam_corner": { "value": "machine_depth" },')
-        definition.append('        "z_seam_relative": { "value": "'+"'z_seam_corner_inner'"+'" },')
+# Cura 3 Feature definition.append('        "z_seam_corner": { "value": "'+"'z_seam_corner_inner'"+'" },')
+        definition.append('        "z_seam_relative": { "value": false },')
         # definition.append('        "skin_no_small_gaps_heuristic": { "value": true },')
-        # definition.append('        "skin_outline_count": { "value": 1 },')
+# Cura 3 Feature # definition.append('        "skin_outline_count": { "value": 1 },')
 
         # infill
         # definition.append('        "infill_extruder_nr": { "value": -1 },')
         definition.append('        "infill_pattern": { "value": "'+"'grid'"+'" },')
-        # definition.append('        "zig_zaggify_infill": { "value": true },')
+# Cura 3 Feature # definition.append('        "zig_zaggify_infill": { "value": true },')
         # definition.append('        "infill_angles": { "value": [] },')
         # definition.append('        "sub_div_rad_mult": { "value": 100 },')
         # definition.append('        "sub_div_rad_add": { "value": "wall_line_width_x" },')
@@ -972,9 +973,9 @@ def cura2Profile(machine):
         # definition.append('        "gradual_infill_step_height": { "value": 5 },')
         definition.append('        "infill_before_walls": { "value": false },')
         # definition.append('        "min_infill_area": { "value": 0 },')
-        # definition.append('        "skin_preshrink": { "value": 0 },')
-        # definition.append('        "top_skin_preshrink": { "value": 0 },')
-        # definition.append('        "bottom_skin_preshrink": { "value": 0 },')
+# Cura 3 Feature # definition.append('        "skin_preshrink": { "value": 0 },')
+# Cura 3 Feature # definition.append('        "top_skin_preshrink": { "value": 0 },')
+# Cura 3 Feature # definition.append('        "bottom_skin_preshrink": { "value": 0 },')
         # definition.append('        "max_skin_angle_for_expansion": { "value": 20 },')
 
         # material
@@ -1088,10 +1089,10 @@ def cura2Profile(machine):
         # definition.append('        "skirt_gap": { "value": 3 },')
         # definition.append('        "brim_width": { "value": 8 },')
         # definition.append('        "brim_outside_only": { "value": true },')
-        # definition.append('        "z_offset_layer_0": { "value": 0 },')
-        # definition.append('        "z_offset_taper_layers": { "value": 0 },')
+# Cura 3 Feature # definition.append('        "z_offset_layer_0": { "value": 0 },')
+# Cura 3 Feature # definition.append('        "z_offset_taper_layers": { "value": 0 },')
         definition.append('        "raft_margin": { "value": 3 },')
-        # definition.append('        "raft_smoothing": { "value": 5 },')
+# Cura 3 Feature # definition.append('        "raft_smoothing": { "value": 5 },')
         definition.append('        "raft_airgap": { "value": "min(extruderValues('+"'machine_nozzle_size'"+')) * 0.55" },')
         # definition.append('        "layer_0_z_overlap": { "value": "raft_airgap / 2" },')
         # definition.append('        "raft_surface_layers": { "value": 2 },')
@@ -1152,13 +1153,13 @@ def cura2Profile(machine):
         # definition.append('        "anti_overhang_mesh": { "value": false },')
         # definition.append('        "magic_mesh_surface_mode": { "value": "'+"'normal'"+'" },')
         # definition.append('        "magic_spiralize": { "value": false },')
-        # definition.append('        "relative_extrusion": { "value": false },')
+# Cura 3 Feature # definition.append('        "relative_extrusion": { "value": false },')
 
         # experimental
-        # definition.append('        "optimize_wall_printing_order": { "value": false },')
-        # definition.append('        "support_skip_some_zags": { "value": false },')
-        # definition.append('        "support_skip_zag_per_mm": { "value": 20 },')
-        # definition.append('        "support_zag_skip_count": { "value": 5 },')
+# Cura 3 Feature # definition.append('        "optimize_wall_printing_order": { "value": false },')
+# Cura 3 Feature # definition.append('        "support_skip_some_zags": { "value": false },')
+# Cura 3 Feature # definition.append('        "support_skip_zag_per_mm": { "value": 20 },')
+# Cura 3 Feature # definition.append('        "support_zag_skip_count": { "value": 5 },')
         # definition.append('        "draft_shield_enabled": { "value": false },')
         # definition.append('        "draft_shield_dist": { "value": 10 },')
         # definition.append('        "draft_shield_height_limitation": { "value": false },')
@@ -1169,8 +1170,8 @@ def cura2Profile(machine):
         definition.append('        "coasting_min_volume": { "value": "coasting_volume * 2" },')
         # definition.append('        "coasting_speed": { "value": 90 },')
         # definition.append('        "skin_alternate_rotation": { "value": false },')
-        # definition.append('        "cross_infill_pocket_size": { "value": "infill_line_distance" },')
-        # definition.append('        "cross_infill_apply_pockets_alternatingly": { "value": true },')
+# Cura 3 Feature # definition.append('        "cross_infill_pocket_size": { "value": "infill_line_distance" },')
+# Cura 3 Feature # definition.append('        "cross_infill_apply_pockets_alternatingly": { "value": true },')
         definition.append('        "support_conical_min_width": { "value": 10 },')
         # definition.append('        "infill_hollow": { "value": false },')
         # definition.append('        "magic_fuzzy_skin_enabled": { "value": false },')
@@ -1201,7 +1202,7 @@ def cura2Profile(machine):
         # definition.append('        "wireframe_roof_outer_delay": { "value": 0.2 },')
         # definition.append('        "wireframe_nozzle_clearance": { "value": 1 },')
         # definition.append('        "ironing_enabled": { "value": false },')
-        definition.append('        "ironing_only_highest_layer": { "value": true },')
+# Cura 3 Feature # definition.append('        "ironing_only_highest_layer": { "value": true },')
         # definition.append('        "speed_ironing": { "value": "speed_topbottom * 20 / 30." },')
         # definition.append('        "acceleration_ironing": { "value": "acceleration_topbottom" },')
         # definition.append('        "jerk_ironing": { "value": "jerk_topbottom" },')
