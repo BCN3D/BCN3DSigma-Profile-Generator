@@ -830,8 +830,8 @@ def cura2Profile(machine):
             definition.append('            "value": "'+parameter[1]+' if print_mode != '+"'regular'"+' else '+parameter[2]+'"')
             definition.append('        },')
 
-        definition.append('        "avoid_grinding_filament": { "value": false }')
-        definition.append('        "retraction_hop_height_after_extruder_switch": { "value": '+str(machine['extruderSwitchZHop'])+' },')
+        definition.append('        "avoid_grinding_filament": { "value": false },')
+        definition.append('        "retraction_hop_height_after_extruder_switch": { "value": '+str(machine['extruderSwitchZHop'])+' }')
     else:
         definition.append('        "machine_width": { "default_value": '+str(machine['width'])+' },')
         definition.append('        "machine_depth": { "default_value": '+str(machine['depth'])+' },')
@@ -1043,7 +1043,7 @@ def cura2Profile(machine):
         # definition.append('        "travel_avoid_distance": { "value": "machine_nozzle_tip_outer_diameter / 2 * 1.25" },')
         definition.append('        "start_layers_at_same_position":')
         definition.append('        {')
-        definition.append('            "enabled": true')
+        definition.append('            "enabled": true,')
         definition.append('            "value": false')
         definition.append('        },')
         definition.append('        "layer_start_x": { "value": "machine_width/2" },') # different than z_seam
