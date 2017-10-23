@@ -2,9 +2,9 @@
     "id": "Draft",
     "index": 4,
     "layerHeightMultiplier": 0.5,
-    "defaultSpeed": 80,
-    "firstLayerUnderspeed": 0.64,
-    "outlineUnderspeed": 0.48,
+    "defaultSpeed": 60,
+    "firstLayerUnderspeed": 0.85,
+    "outlineUnderspeed": 0.85,
     "topBottomWidth": 0.8,
     "wallWidth": 1.2,
     "infillPercentage": 15
