@@ -988,8 +988,9 @@ def cura2Profile(machine):
         definition.append('        "retraction_min_travel": { "value": 1.5 },')
         # definition.append('        "retraction_extrusion_window": { "value": "retraction_amount" },')
         # definition.append('        "switch_extruder_retraction_amount": { "value": "machine_heat_zone_length" },')
-        definition.append('        "switch_extruder_retraction_speed": { "value": "retraction_speed" },')
-        definition.append('        "switch_extruder_prime_speed": { "value": "retraction_speed" },')
+        definition.append('        "switch_extruder_retraction_speeds": { "value": "retraction_speed" },')
+        # definition.append('        "switch_extruder_retraction_speed": { "value": "switch_extruder_retraction_speeds" },')
+        # definition.append('        "switch_extruder_prime_speed": { "value": "switch_extruder_retraction_speeds" },')
 
         # speed
         # definition.append('        "speed_infill": { "value": "speed_print" },')
@@ -1040,11 +1041,19 @@ def cura2Profile(machine):
 
         # travel
         # definition.append('        "travel_avoid_distance": { "value": "machine_nozzle_tip_outer_diameter / 2 * 1.25" },')
-        definition.append('        "start_layers_at_same_position": { "value": true },') # different than z_seam
+        definition.append('        "start_layers_at_same_position":')
+        definition.append('        {')
+        definition.append('            "enabled": true')
+        definition.append('            "value": false')
+        definition.append('        },')
         definition.append('        "layer_start_x": { "value": "machine_width/2" },') # different than z_seam
         definition.append('        "layer_start_y": { "value": "machine_depth" },') # different than z_seam
         definition.append('        "retraction_hop_enabled": { "value": true },')
-        definition.append('        "retraction_hop_only_when_collides": { "value": true },')
+        definition.append('        "retraction_hop_only_when_collides":')
+        definition.append('        {')
+        definition.append('            "enabled": true,')
+        definition.append('            "value": false')
+        definition.append('        },')
         definition.append('        "retraction_hop": { "value": "0.75 * layer_height" },')
         # definition.append('        "retraction_hop_after_extruder_switch": { "value": true },')
 
@@ -1251,7 +1260,7 @@ def cura2Profile(machine):
     extruder.append('        },')
     extruder.append('        "machine_nozzle_offset_x": { "default_value": 0.0 },')
     extruder.append('        "machine_nozzle_offset_y": { "default_value": 0.0 },')
-    extruder.append(r'        "machine_extruder_start_code": { "default_value": "G91\nG1 F12000 Z'+machine['extruderSwitchZHop']+'\nG90\n" },')
+    extruder.append(r'        "machine_extruder_start_code": { "default_value": "G91\nG1 F12000 Z'+str(machine['extruderSwitchZHop'])+'\nG90\n" },')
     extruder.append('        "machine_extruder_start_pos_abs": { "default_value": false },')
     extruder.append('        "machine_extruder_start_pos_x": { "default_value": 0.0 },')
     extruder.append('        "machine_extruder_start_pos_y": { "default_value": 0.0 },')
@@ -1287,7 +1296,7 @@ def cura2Profile(machine):
     extruder.append('        },')
     extruder.append('        "machine_nozzle_offset_x": { "default_value": 0.0 },')
     extruder.append('        "machine_nozzle_offset_y": { "default_value": 0.0 },')
-    extruder.append(r'        "machine_extruder_start_code": { "default_value": "G91\nG1 F12000 Z'+machine['extruderSwitchZHop']+'\nG90\n" },')
+    extruder.append(r'        "machine_extruder_start_code": { "default_value": "G91\nG1 F12000 Z'+str(machine['extruderSwitchZHop'])+'\nG90\n" },')
     extruder.append('        "machine_extruder_start_pos_abs": { "default_value": false },')
     extruder.append('        "machine_extruder_start_pos_x": { "default_value": 0.0 },')
     extruder.append('        "machine_extruder_start_pos_y": { "default_value": 0.0 },')
