@@ -806,30 +806,6 @@ def cura2Profile(machine):
     if 'inherits' in machine:
         definition.append('        "machine_width": { "default_value": '+str(machine['width'])+' },')
         definition.append('        "print_mode": { "enabled": true },')
-        setToValueIfPrintModeIsNotRegular = []
-        setToValueIfPrintModeIsNotRegular.append(['wall_extruder_nr', '-1', '-1']) # Deprecated after 2.7
-        setToValueIfPrintModeIsNotRegular.append(['wall_0_extruder_nr', '-1', '-1'])
-        setToValueIfPrintModeIsNotRegular.append(['wall_x_extruder_nr', '-1', '-1'])
-        setToValueIfPrintModeIsNotRegular.append(['roofing_extruder_nr', '-1', '-1'])
-        setToValueIfPrintModeIsNotRegular.append(['top_bottom_extruder_nr', '-1', '-1'])
-        setToValueIfPrintModeIsNotRegular.append(['infill_extruder_nr', '-1', '-1'])
-        setToValueIfPrintModeIsNotRegular.append(['support_extruder_nr', '0', '0'])
-        setToValueIfPrintModeIsNotRegular.append(['support_infill_extruder_nr', '0', "support_extruder_nr"])
-        setToValueIfPrintModeIsNotRegular.append(['support_extruder_nr_layer_0', '0', "support_extruder_nr"])
-        setToValueIfPrintModeIsNotRegular.append(['support_interface_extruder_nr', '0', "support_extruder_nr"])
-        setToValueIfPrintModeIsNotRegular.append(['support_roof_extruder_nr', '0', "support_extruder_nr"])
-        setToValueIfPrintModeIsNotRegular.append(['support_bottom_extruder_nr', '0', "support_extruder_nr"])
-        setToValueIfPrintModeIsNotRegular.append(['adhesion_extruder_nr', '0', '0'])
-        setToValueIfPrintModeIsNotRegular.append(['prime_tower_enable', 'False', 'False'])
-        setToValueIfPrintModeIsNotRegular.append(['ooze_shield_enabled', 'False', 'False'])
-        setToValueIfPrintModeIsNotRegular.append(['smart_purge', 'False', 'True'])
-        for parameter in setToValueIfPrintModeIsNotRegular:
-            definition.append('        "'+parameter[0]+'":')
-            definition.append('        {')
-            definition.append('            "enabled": "print_mode == '+"'regular'"+'",')
-            definition.append('            "value": "'+parameter[1]+' if print_mode != '+"'regular'"+' else '+parameter[2]+'"')
-            definition.append('        },')
-
         definition.append('        "avoid_grinding_filament": { "value": false },')
         definition.append('        "retraction_hop_height_after_extruder_switch": { "value": '+str(machine['extruderSwitchZHop'])+' }')
     else:
@@ -863,7 +839,6 @@ def cura2Profile(machine):
         definition.append('        },')
         # definition.append('        "material_flow_temp_graph": { "enabled": "machine_nozzle_temp_enabled and material_flow_dependent_temperature" },') # Bad visualization
         definition.append('        "print_sequence": { "enabled": true },')
-        definition.append('        "start_layers_at_same_position": { "enabled": true },')
         definition.append('        "layer_height": { "maximum_value": "0.75 * min(extruderValues('+"'machine_nozzle_size'"+'))" },')
         definition.append('        "layer_height_0":')
         definition.append('        {')
@@ -932,7 +907,6 @@ def cura2Profile(machine):
         # definition.append('        "wall_extruder_nr": { "value": -1 },') # Deprecated after 2.7 
         # definition.append('        "wall_0_extruder_nr": { "value": "-1" },')
         # definition.append('        "wall_x_extruder_nr": { "value": "-1" },')
-        definition.append('        "wall_0_wipe_dist": { "value": "12.5 * machine_nozzle_size" },')
         # definition.append('        "roofing_extruder_nr": { "value": -1 },')
         # definition.append('        "roofing_layer_count": { "value": 0 },')
         # definition.append('        "roofing_pattern": { "value": "top_bottom_pattern" },')
@@ -980,6 +954,9 @@ def cura2Profile(machine):
         # definition.append('        "max_skin_angle_for_expansion": { "value": 20 },')
 
         # material
+        definition.append('        "default_material_print_temperature": { "enabled": "machine_nozzle_temp_enabled and not (material_flow_dependent_temperature)" },')
+        definition.append('        "material_initial_print_temperature": { "enabled": "machine_nozzle_temp_enabled and not (material_flow_dependent_temperature)" },')
+        definition.append('        "material_final_print_temperature": { "enabled": "machine_nozzle_temp_enabled and not (material_flow_dependent_temperature)" },')
         # definition.append('        "retraction_enable": { "value": true },')
         # definition.append('        "retract_at_layer_change": { "value": false },')
         # definition.append('        "retraction_retract_speed": { "value": "retraction_speed" },')
@@ -1046,16 +1023,25 @@ def cura2Profile(machine):
         definition.append('            "enabled": true,')
         definition.append('            "value": false')
         definition.append('        },')
-        definition.append('        "layer_start_x": { "value": "machine_width/2" },') # different than z_seam
-        definition.append('        "layer_start_y": { "value": "machine_depth" },') # different than z_seam
+        definition.append('        "layer_start_x":') # different than z_seam
+        definition.append('        {')
+        definition.append('            "enabled": "start_layers_at_same_position",')
+        definition.append('            "value": "machine_width/2"')
+        definition.append('        },')
+        definition.append('        "layer_start_y":') # different than z_seam
+        definition.append('        {')
+        definition.append('            "enabled": "start_layers_at_same_position",')
+        definition.append('            "value": "machine_depth"')
+        definition.append('        },')
         definition.append('        "retraction_hop_enabled": { "value": true },')
         definition.append('        "retraction_hop_only_when_collides":')
         definition.append('        {')
         definition.append('            "enabled": true,')
         definition.append('            "value": false')
         definition.append('        },')
-        definition.append('        "retraction_hop": { "value": "0.75 * layer_height" },')
+        definition.append('        "retraction_hop": { "value": "0.5 * layer_height" },')
         # definition.append('        "retraction_hop_after_extruder_switch": { "value": true },')
+        definition.append('        "retraction_hop_height_after_extruder_switch": { "value": '+str(machine['extruderSwitchZHop'])+' },')
 
         # cooling
         # definition.append('        "cool_fan_speed_max": { "value": "cool_fan_speed" },')
@@ -1224,9 +1210,9 @@ def cura2Profile(machine):
         # definition.append('        "ironing_inset": { "value": "wall_line_width_0 / 2" },')
 
         # BCN3D
-        definition.append('        "smart_purge": { "enabled": true },')
+        definition.append('        "smart_purge": { "enabled": "print_mode == '+"'regular'"+'" },')
+        definition.append('        "minimum_extrusion": { "value": 2 },')
         definition.append('        "retract_reduction": { "enabled": true },')
-        definition.append('        "retraction_hop_height_after_extruder_switch": { "value": '+str(machine['extruderSwitchZHop'])+' },')
         definition.append('        "avoid_grinding_filament":')
         definition.append('        {')
         definition.append('            "enabled": true,')
@@ -1393,10 +1379,6 @@ def cura2Profile(machine):
                         colorsList = ['Generic']
                     else:
                         colorsList = filament['colors']
-                    if filament['isAbrasiveMaterial'] and hotend['material'] == "Brass":
-                        notSupported = True
-                    else:
-                        notSupported = False
                     for color in colorsList:
                         for quality in sorted(PS.profilesData['quality'], key=lambda k: k['index']):
                             layerHeight = getLayerHeight(hotend, quality)
@@ -1431,10 +1413,17 @@ def cura2Profile(machine):
 
                             # keep all default values commented
 
+                            if filament['isAbrasiveMaterial'] and hotend['material'] == "Brass":
+                                notSupported = True
+                            elif layerHeight < filament['minimumLayerHeight']:
+                                notSupported = True
+                            else:
+                                notSupported = False
+
                             qualityFile = []
                             qualityFile.append('[general]')
                             qualityFile.append('version = 2')
-                            qualityFile.append('name = '+quality['id']+' Quality')
+                            qualityFile.append('name = Not Supported' if notSupported else 'name = '+quality['id']+' Quality')
                             qualityFile.append('definition = '+machine['id'])
                             qualityFile.append('')
                             qualityFile.append('[metadata]')
@@ -1445,6 +1434,7 @@ def cura2Profile(machine):
                                 if globalQualities[index] == layerHeight:
                                     qualityFile.append('weight = '+str(index+1))
                                     break
+
                             if notSupported:
                                 qualityFile.append('supported = False')
                             qualityFile.append('setting_version = 2')  # Deprecated after 2.7
@@ -1461,10 +1451,8 @@ def cura2Profile(machine):
                                 #shell
                                 qualityFile.append('wall_thickness = =max( 3 * machine_nozzle_size, '+("%.2f" % quality['wallWidth'])+')')     # 3 minimum Perimeters needed
                                 qualityFile.append('top_bottom_thickness = =max( 5 * layer_height, '+("%.2f" % quality['topBottomWidth'])+')') # 5 minimum layers needed
-                                if filament['isFlexibleMaterial']:
-                                    qualityFile.append('travel_compensate_overlapping_walls_enabled = False')
-                                else: 
-                                    qualityFile.append('travel_compensate_overlapping_walls_enabled = True') 
+                                qualityFile.append('travel_compensate_overlapping_walls_enabled = '+('False' if filament['isFlexibleMaterial'] else 'True'))
+                                qualityFile.append('wall_0_wipe_dist = '+('0' if retractValues(filament)[1] == 0 else '=12.5 * machine_nozzle_size'))
 
                                 # infill
                                 qualityFile.append('infill_sparse_density = ='+str(int(min(100, quality['infillPercentage'] * 1.25)))+" if infill_pattern == 'cubicsubdiv' else "+str(int(quality['infillPercentage']))) # 'if' is not working...
@@ -1487,7 +1475,7 @@ def cura2Profile(machine):
                                 qualityFile.append('material_diameter = '+("%.2f" % filament['filamentDiameter']))
                                 qualityFile.append('retraction_amount = '+("%.2f" % filament['retractionDistance']))
                                 qualityFile.append('retraction_speed = '+("%.2f" % filament['retractionSpeed']))
-                                qualityFile.append('retraction_count_max = '+str(int(filament['retractionCount'])))
+                                qualityFile.append('max_retract = '+str(int(filament['retractionCount'])))
                                 qualityFile.append('material_flow = '+("%.2f" % (filament['extrusionMultiplier'] * 100)))
                                 standbyTemperature = int(getTemperature(hotend, filament, 'standbyTemperature'))
                                 qualityFile.append('material_standby_temperature = '+str(standbyTemperature))
@@ -1550,6 +1538,9 @@ def cura2Profile(machine):
 
                                 # experimental
                                 qualityFile.append('coasting_volume = '+str(coastVolume(hotend, filament)))
+
+                                # BCN3D
+                                qualityFile.append('purge_length = '+str(toolChangePurgeLength))
 
                             fileContent = '\n'.join(qualityFile)
                             filesList.append((fileName, fileContent))
@@ -1648,7 +1639,7 @@ def purgeValues(hotend, filament, speed, layerHeight, minPurgeLength = 20): # pu
 def retractValues(filament):
     if filament['isFlexibleMaterial']:
         useCoasting = 0
-        useWipe = 1
+        useWipe = 0
         onlyRetractWhenCrossingOutline = 1
         retractBetweenLayers = 0
         useRetractionMinTravel = 1
@@ -1656,7 +1647,7 @@ def retractValues(filament):
         onlyWipeOutlines = 1
     else:
         useCoasting = 0
-        useWipe = 1
+        useWipe = 0
         onlyRetractWhenCrossingOutline = 0
         retractBetweenLayers = 0
         useRetractionMinTravel = 1
