@@ -70,8 +70,8 @@ def installCura2Files():
         installedCuras = []
         
         for folder in os.listdir('C:\Program Files'): # add [::-1] to list folders in reverse order
-            if ('Cura 2' in folder or 'BCN3D Cura' in folder) and 'Cura.exe' in os.listdir('C:\\Program Files\\'+folder):
-                    installedCuras.append(folder)
+            if ('Cura 2' in folder or 'BCN3D Cura' in folder) and ('Cura.exe' in os.listdir('C:\\Program Files\\'+folder) or 'BCN3D_Cura.exe' in os.listdir('C:\\Program Files\\'+folder)):
+                installedCuras.append(folder)
 
         if len(installedCuras) >= 1:
 
