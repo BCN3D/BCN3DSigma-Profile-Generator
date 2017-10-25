@@ -9,5 +9,5 @@
     "hotBlock": "HighFlow",
     "heatUpSpeed": 4,
     "coolDownSpeed": 2.14,
-    "minimumCoolHeatTimeWindow": 5
+    "minimumCoolHeatTimeWindow": 300
 }
