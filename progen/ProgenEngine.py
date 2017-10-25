@@ -957,7 +957,6 @@ def cura2Profile(machine):
         # definition.append('        "material_initial_print_temperature": { "enabled": "machine_nozzle_temp_enabled and not (material_flow_dependent_temperature)" },')
         # definition.append('        "material_final_print_temperature": { "enabled": "machine_nozzle_temp_enabled and not (material_flow_dependent_temperature)" },')
         # definition.append('        "material_flow_temp_graph": { "enabled": "machine_nozzle_temp_enabled and material_flow_dependent_temperature" },') # Bad visualization
-        definition.append('        "material_standby_temperature": { "value": "150  if material_flow_dependent_temperature else material_print_temperature" },')
         # definition.append('        "retraction_enable": { "value": true },')
         # definition.append('        "retract_at_layer_change": { "value": false },')
         # definition.append('        "retraction_retract_speed": { "value": "retraction_speed" },')
@@ -1479,7 +1478,7 @@ def cura2Profile(machine):
                                 qualityFile.append('max_retract = '+str(int(filament['retractionCount'])))
                                 qualityFile.append('material_flow = '+("%.2f" % (filament['extrusionMultiplier'] * 100)))
                                 standbyTemperature = int(getTemperature(hotend, filament, 'standbyTemperature'))
-                                # qualityFile.append('material_standby_temperature = ='+str(standbyTemperature)+' if material_flow_dependent_temperature else material_print_temperature') # defined in machine def as here it's not changing the value
+                                qualityFile.append('material_standby_temperature = '+str(standbyTemperature))
                                 #  qualityFile.append('switch_extruder_extra_prime_amount = '+("%.2f" % filament['retractionSpeed'])) # Parameter that should be there to purge on toolchage
 
                                 # speed
