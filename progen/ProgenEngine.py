@@ -832,12 +832,6 @@ def cura2Profile(machine):
         definition.append('        "machine_max_feedrate_x": { "default_value": 200 },')
         definition.append('        "machine_max_feedrate_y": { "default_value": 200 },')
         definition.append('        "machine_max_feedrate_z": { "default_value": 15 },')
-        definition.append('        "material_flow_dependent_temperature":')
-        definition.append('        {')
-        definition.append('            "enabled": true,')
-        definition.append('            "value": true')
-        definition.append('        },')
-        # definition.append('        "material_flow_temp_graph": { "enabled": "machine_nozzle_temp_enabled and material_flow_dependent_temperature" },') # Bad visualization
         definition.append('        "print_sequence": { "enabled": true },')
         definition.append('        "layer_height": { "maximum_value": "0.75 * min(extruderValues('+"'machine_nozzle_size'"+'))" },')
         definition.append('        "layer_height_0":')
@@ -954,9 +948,16 @@ def cura2Profile(machine):
         # definition.append('        "max_skin_angle_for_expansion": { "value": 20 },')
 
         # material
-        definition.append('        "default_material_print_temperature": { "enabled": "machine_nozzle_temp_enabled and not (material_flow_dependent_temperature)" },')
-        definition.append('        "material_initial_print_temperature": { "enabled": "machine_nozzle_temp_enabled and not (material_flow_dependent_temperature)" },')
-        definition.append('        "material_final_print_temperature": { "enabled": "machine_nozzle_temp_enabled and not (material_flow_dependent_temperature)" },')
+        definition.append('        "material_flow_dependent_temperature":')
+        definition.append('        {')
+        definition.append('            "enabled": true,')
+        definition.append('            "value": '+str(machine['useAutoTemperature']).lower())
+        definition.append('        },')
+        # definition.append('        "default_material_print_temperature": { "enabled": "machine_nozzle_temp_enabled and not (material_flow_dependent_temperature)" },')
+        # definition.append('        "material_initial_print_temperature": { "enabled": "machine_nozzle_temp_enabled and not (material_flow_dependent_temperature)" },')
+        # definition.append('        "material_final_print_temperature": { "enabled": "machine_nozzle_temp_enabled and not (material_flow_dependent_temperature)" },')
+        # definition.append('        "material_flow_temp_graph": { "enabled": "machine_nozzle_temp_enabled and material_flow_dependent_temperature" },') # Bad visualization
+        definition.append('        "material_standby_temperature": { "value": "150  if material_flow_dependent_temperature else material_print_temperature" },')
         # definition.append('        "retraction_enable": { "value": true },')
         # definition.append('        "retract_at_layer_change": { "value": false },')
         # definition.append('        "retraction_retract_speed": { "value": "retraction_speed" },')
@@ -1119,7 +1120,7 @@ def cura2Profile(machine):
         # definition.append('        "raft_base_fan_speed": { "value": "raft_fan_speed" },')
 
         # dual
-        definition.append('        "prime_tower_enable": { "value": false },')
+        definition.append('        "prime_tower_enable": { "value": '+str(machine['usePrimeTower']).lower()+' },')
         definition.append('        "prime_tower_size": { "value": "max(15, round(math.sqrt(prime_tower_min_volume/layer_height), 2))" },')
         # definition.append('        "prime_tower_wall_thickness": { "value": "round(max(2 * prime_tower_line_width, 0.5 * (prime_tower_size - math.sqrt(max(0, prime_tower_size ** 2 - prime_tower_min_volume / layer_height)))), 3)" },')
         # definition.append('        "prime_tower_position_x": { "value": "machine_width - max(extruderValue(adhesion_extruder_nr, 'brim_width') * extruderValue(adhesion_extruder_nr, 'initial_layer_line_width_factor') / 100 if adhesion_type == 'brim' else (extruderValue(adhesion_extruder_nr, 'raft_margin') if adhesion_type == 'raft' else (extruderValue(adhesion_extruder_nr, 'skirt_gap') if adhesion_type == 'skirt' else 0)), max(extruderValues('travel_avoid_distance'))) - max(extruderValues('support_offset')) - sum(extruderValues('skirt_brim_line_width')) * extruderValue(adhesion_extruder_nr, 'initial_layer_line_width_factor') / 100 - 1" },')
@@ -1461,9 +1462,9 @@ def cura2Profile(machine):
                                 qualityFile.append('material_print_temperature = =default_material_print_temperature + '+str(temperatureAdjustedToFlow(filament, hotend, layerHeight, defaultSpeed) - defaultMaterialPrintTemperature(filament)))
                                 qualityFile.append('material_print_temperature_layer_0 = =default_material_print_temperature + '+str(int(round((getTemperature(hotend, filament, 'highTemperature')))) - defaultMaterialPrintTemperature(filament)))
                                 temperatureInertiaInitialFix = 0
-                                qualityFile.append('material_initial_print_temperature = =material_print_temperature + '+str(temperatureInertiaInitialFix))
+                                qualityFile.append('material_initial_print_temperature = =material_print_temperature + '+str(temperatureInertiaInitialFix)+' if material_flow_dependent_temperature else material_print_temperature')
                                 temperatureInertiaFinalFix = -2.5
-                                qualityFile.append('material_final_print_temperature = =material_print_temperature + '+str(temperatureInertiaFinalFix))
+                                qualityFile.append('material_final_print_temperature = =material_print_temperature + '+str(temperatureInertiaFinalFix)+' if material_flow_dependent_temperature else material_print_temperature')
                                 minFlow = 0.3 * 0.05 * 10
                                 minTemp = getTemperature(hotend, filament, 'lowTemperature')
                                 maxFlow = maxFlowValue(hotend, filament, layerHeight)
@@ -1478,7 +1479,7 @@ def cura2Profile(machine):
                                 qualityFile.append('max_retract = '+str(int(filament['retractionCount'])))
                                 qualityFile.append('material_flow = '+("%.2f" % (filament['extrusionMultiplier'] * 100)))
                                 standbyTemperature = int(getTemperature(hotend, filament, 'standbyTemperature'))
-                                qualityFile.append('material_standby_temperature = '+str(standbyTemperature))
+                                # qualityFile.append('material_standby_temperature = ='+str(standbyTemperature)+' if material_flow_dependent_temperature else material_print_temperature') # defined in machine def as here it's not changing the value
                                 #  qualityFile.append('switch_extruder_extra_prime_amount = '+("%.2f" % filament['retractionSpeed'])) # Parameter that should be there to purge on toolchage
 
                                 # speed
