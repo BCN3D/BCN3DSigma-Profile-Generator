@@ -1,0 +1,30 @@
+{
+    "id": "BCN3D Filaments PET-G",
+    "brand": "BCN3D Filaments",
+    "material": "PET-G",
+    "colors": {
+        "Generic": "#B22744",
+        "Black": "#0E0E0E",
+        "White": "#FFFFFF"
+    },
+    "filamentDiameter": 2.85,
+    "filamentPricePerKg": 19.95,
+    "filamentDensity": 1.25,
+    "isSupportMaterial": false,
+    "isFlexibleMaterial": false,
+    "isAbrasiveMaterial": false,
+    "bedTemperature": 80,
+    "printTemperature": [235, 235],
+    "standbyTemperature": 150,
+    "defaultPrintSpeed": 45,
+    "advisedMaxPrintSpeed": 45,
+    "maxFlow": "None",
+    "maxFlowForHighFlowHotend": "None",
+    "retractionDistance": 5,
+    "retractionSpeed": 60,
+    "retractionCount": 50,
+    "fanPercentage": [0, 20],
+    "extrusionMultiplier": 1,
+    "minimumLayerHeight": 0,
+    "purgeLength": 16
+}

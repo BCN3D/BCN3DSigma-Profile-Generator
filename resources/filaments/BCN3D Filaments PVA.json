@@ -1,0 +1,28 @@
+{
+    "id": "BCN3D Filaments PVA",
+    "brand": "BCN3D Filaments",
+    "material": "PVA",
+    "colors": {
+        "Natural": "#E6E3C8"
+    },
+    "filamentDiameter": 2.85,
+    "filamentPricePerKg": 72.48,
+    "filamentDensity": 1.30,
+    "isSupportMaterial": true,
+    "isFlexibleMaterial": false,
+    "isAbrasiveMaterial": false,
+    "bedTemperature": 65,
+    "printTemperature": [220, 220],
+    "standbyTemperature": 150,
+    "defaultPrintSpeed": 30,
+    "advisedMaxPrintSpeed": 30,
+    "maxFlow": "None",
+    "maxFlowForHighFlowHotend": "None",
+    "retractionDistance": 4,
+    "retractionSpeed": 40,
+    "retractionCount": 50,
+    "fanPercentage": [50, 100],
+    "extrusionMultiplier": 1.1,
+    "minimumLayerHeight": 0,
+    "purgeLength": 120
+}

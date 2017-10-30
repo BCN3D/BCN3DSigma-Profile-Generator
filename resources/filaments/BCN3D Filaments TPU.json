@@ -1,9 +1,11 @@
 {
-    "id": "Colorfila TPU",
-    "brand": "Colorfila",
+    "id": "BCN3D Filaments TPU",
+    "brand": "BCN3D Filaments",
     "material": "TPU",
     "colors": {
-        "Generic": "#B22744"
+        "Generic": "#343537",
+        "Black": "#060906",
+        "White": "#FFFFFF"
     },
     "filamentDiameter": 2.85,
     "filamentPricePerKg": 50,
@@ -20,8 +22,9 @@
     "maxFlowForHighFlowHotend": "None",
     "retractionDistance": 6,
     "retractionSpeed": 40,
-    "retractionCount": 100,
+    "retractionCount": 50,
     "fanPercentage": [50, 100],
     "extrusionMultiplier": 1.10,
+    "minimumLayerHeight": 0,
     "purgeLength": 120
 }
