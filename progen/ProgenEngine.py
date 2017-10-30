@@ -757,8 +757,8 @@ def cura2Profile(machine):
         cura2PreferredMaterial = filament['id'].replace(' ', '_')
         if 'BCN3D Filaments PLA' in filament['id']:
             cura2PreferredMaterial = filament['id'].replace(' ', '_')
-            if 'Pumpkin Orange' in filament['colors']:
-                cura2PreferredMaterial += '_Pumpkin_Orange'
+            if 'Orange' in filament['colors']:
+                cura2PreferredMaterial += '_Orange'
             break
 
     fileName = 'Cura 2/resources/definitions/'+machine['id']+'.def.json'
@@ -1210,8 +1210,11 @@ def cura2Profile(machine):
         # definition.append('        "ironing_inset": { "value": "wall_line_width_0 / 2" },')
 
         # BCN3D
-        definition.append('        "smart_purge": { "enabled": "print_mode == '+"'regular'"+'" },')
-        definition.append('        "minimum_extrusion": { "value": 2 },')
+        definition.append('        "smart_purge":')
+        definition.append('        {')
+        definition.append('            "enabled":  "enabled": "print_mode == '+"'regular'"+'",')
+        definition.append('            "value": true')
+        definition.append('        },')  
         definition.append('        "retract_reduction": { "enabled": true },')
         definition.append('        "avoid_grinding_filament":')
         definition.append('        {')
@@ -1540,7 +1543,9 @@ def cura2Profile(machine):
                                 qualityFile.append('coasting_volume = '+str(coastVolume(hotend, filament)))
 
                                 # BCN3D
-                                qualityFile.append('purge_length = '+str(toolChangePurgeLength))
+                                qualityFile.append('smart_purge_slope = '+str(sParameter))
+                                qualityFile.append('smart_purge_maximum_purge_distance = '+str(eParameter))
+                                qualityFile.append('smart_purge_minimum_purge_distance = '+str(pParameter))
 
                             fileContent = '\n'.join(qualityFile)
                             filesList.append((fileName, fileContent))
