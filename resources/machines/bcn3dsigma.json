@@ -13,6 +13,6 @@
     "defaultHotend": "0.4mm - Brass",
     "printMode": ["regular"],
     "extruderSwitchZHop": 2,
-    "usePrimeTower": true,
+    "usePrimeTower": false,
     "useAutoTemperature": false
 }
