@@ -966,6 +966,7 @@ def cura2Profile(machine):
         # definition.append('        "retraction_extrusion_window": { "value": "retraction_amount" },')
         # definition.append('        "switch_extruder_retraction_amount": { "value": "machine_heat_zone_length" },')
         definition.append('        "switch_extruder_retraction_speeds": { "value": "retraction_speed" },')
+        definition.append('        "switch_extruder_prime_speed": { "value": "retraction_speed * 0.25" },')
         # definition.append('        "switch_extruder_retraction_speed": { "value": "switch_extruder_retraction_speeds" },')
         # definition.append('        "switch_extruder_prime_speed": { "value": "switch_extruder_retraction_speeds" },')
 
@@ -1212,7 +1213,7 @@ def cura2Profile(machine):
         # BCN3D
         definition.append('        "smart_purge":')
         definition.append('        {')
-        definition.append('            "enabled":  "enabled": "print_mode == '+"'regular'"+'",')
+        definition.append('            "enabled": "print_mode == '+"'regular'"+'",')
         definition.append('            "value": true')
         definition.append('        },')  
         definition.append('        "retract_reduction": { "enabled": true },')
@@ -1446,8 +1447,6 @@ def cura2Profile(machine):
                             qualityFile.append('[values]')
 
                             if not notSupported:
-                                # qualityFile.append(r'machine_extruder_start_code = ="\nM800 F'+str(purgeSpeed)+' S'+str(sParameter)+' E'+str(eParameter)+' P'+str(pParameter)+r'\t;SmartPurge - Needs Firmware v01-1.2.3\nG4 P2000\t\t\t\t;Stabilize Hotend'+"'"+r's pressure\nG92 E0\t\t\t\t;Zero extruder\nG1 F3000 E-4.5\t\t\t\t;Retract\nG1 F12000\t\t\t;End tool switch\nG91\nG1 F12000 Z2\nG90\n"') # Keyword NOT WORKING on Cura 2.5
-
                                 # resolution
                                 qualityFile.append('layer_height = '+("%.2f" % layerHeight))
 
