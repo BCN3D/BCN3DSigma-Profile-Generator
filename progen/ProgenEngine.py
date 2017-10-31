@@ -1461,18 +1461,12 @@ def cura2Profile(machine):
 
                                 # material -> default_material_print_temperature, material_bed_temperature,  must be set into material to avoid conflicts
                                 qualityFile.append('material_print_temperature = =default_material_print_temperature + '+str(temperatureAdjustedToFlow(filament, hotend, layerHeight, defaultSpeed) - defaultMaterialPrintTemperature(filament)))
-                                qualityFile.append('material_print_temperature_layer_0 = =default_material_print_temperature + '+str(int(round((getTemperature(hotend, filament, 'highTemperature')))) - defaultMaterialPrintTemperature(filament)))
+                                qualityFile.append('material_print_temperature_layer_0 = '+str(int(round((getTemperature(hotend, filament, 'highTemperature'))))))
                                 temperatureInertiaInitialFix = 0
                                 qualityFile.append('material_initial_print_temperature = =material_print_temperature + '+str(temperatureInertiaInitialFix)+' if material_flow_dependent_temperature else material_print_temperature')
                                 temperatureInertiaFinalFix = -2.5
                                 qualityFile.append('material_final_print_temperature = =material_print_temperature + '+str(temperatureInertiaFinalFix)+' if material_flow_dependent_temperature else material_print_temperature')
-                                minFlow = 0.3 * 0.05 * 10
-                                minTemp = getTemperature(hotend, filament, 'lowTemperature')
-                                maxFlow = maxFlowValue(hotend, filament, layerHeight)
-                                maxTemp = getTemperature(hotend, filament, 'highTemperature')
-                                stdFlow = 0.4 * 0.15 * 60
-                                stdTemp = (minTemp + maxTemp) /2.
-                                qualityFile.append('material_flow_temp_graph = [['+str(minFlow)+','+str(minTemp)+'], ['+str(stdFlow)+','+str(stdTemp)+'], ['+str(maxFlow)+','+str(maxTemp)+']]')
+                                qualityFile.append('material_flow_temp_graph = '+str(adjustedFlowTemperatureGraph(hotend, filament)))
                                 qualityFile.append('material_extrusion_cool_down_speed = 1') # this value depends on extruded flow (not material_flow)
                                 qualityFile.append('material_diameter = '+("%.2f" % filament['filamentDiameter']))
                                 qualityFile.append('retraction_amount = '+("%.2f" % filament['retractionDistance']))
@@ -1690,15 +1684,45 @@ def defaultMaterialPrintTemperature(filament):
     # Exclusive function for Cura 2 to get default_material_print_temperature
     return int(round((filament['printTemperature'][0] + filament['printTemperature'][1])/2.))
 
+def adjustedFlowTemperatureGraph(hotend, filament):
+    adjustedGraph = []
+    if 'flowTemperatureGraph' in filament:
+        for pair in filament['flowTemperatureGraph']:
+            adjustedGraph.append([float(pair[0]), float(pair[1]) + hotend['temperatureCompensation']])
+    else:
+        minFlow = 0.3 * 0.05 * 10
+        minTemp = getTemperature(hotend, filament, 'lowTemperature')
+        maxFlow = maxFlowValue(hotend, filament, layerHeight)
+        maxTemp = getTemperature(hotend, filament, 'highTemperature')
+        stdFlow = 0.4 * 0.15 * 60
+        stdTemp = (minTemp + maxTemp) /2.
+        adjustedGraph = [[minFlow, minTemp], [stdFlow, stdTemp], [maxFlow, maxTemp]]
+    return adjustedGraph
+
 def temperatureAdjustedToFlow(filament, hotend, layerHeight, speed, base = 5):
     # adaptative temperature according to flow values. Rounded to base
-    flow = hotend['nozzleSize']*layerHeight*float(speed)/60
+    flow = hotend['nozzleSize']*layerHeight*float(speed)/60 # [mm3/sec]
 
     # Warning if something is not working properly
     if int(flow) > int(maxFlowValue(hotend, filament, layerHeight)):
         print "\nwarning! you're trying to print at higher flow than allowed:", filament['id']+':', str(int(flow)), str(int(maxFlowValue(hotend, filament, layerHeight)))
 
-    temperature = int(base * round((getTemperature(hotend, filament, 'lowTemperature') + flow/maxFlowValue(hotend, filament, layerHeight) * float(getTemperature(hotend, filament, 'highTemperature')-getTemperature(hotend, filament, 'lowTemperature')))/float(base)))
+    graph = adjustedFlowTemperatureGraph(hotend, filament)
+    if flow < float(graph[0][0]):
+        temperature = float(graph[0][1])
+    elif flow > float(graph[-1][0]):
+        temperature = float(graph[-1][1])
+    else:
+        for pairIndex in range(len(graph)):
+            flow1, temp1 = float(graph[pairIndex][0]), float(graph[pairIndex][1])
+            flow2, temp2 = float(graph[pairIndex + 1][0]), float(graph[pairIndex + 1][1])
+            if flow1 <= flow <= flow2:
+                temperature = (flow - flow1)/(flow2 - flow1) * (temp2 - temp1) + temp1
+                # rounded to base
+                temperature = int(base * round(temperature/float(base)))
+    # OldTemperature Calculation
+    # temperature = int(base * round((getTemperature(hotend, filament, 'lowTemperature') + flow/maxFlowValue(hotend, filament, layerHeight) * float(getTemperature(hotend, filament, 'highTemperature')-getTemperature(hotend, filament, 'lowTemperature')))/float(base)))
+
     return temperature
 
 def fanSpeed(hotend, filament, temperature, layerHeight, base = 5):
@@ -1706,7 +1730,7 @@ def fanSpeed(hotend, filament, temperature, layerHeight, base = 5):
     if getTemperature(hotend, filament, 'highTemperature') - getTemperature(hotend, filament, 'lowTemperature') == 0 or filament['fanPercentage'][1] == 0:
         fanSpeed = filament['fanPercentage'][0]
     else:
-        fanSpeedForTemperature = int(base * round((filament['fanPercentage'][0] + (temperature-getTemperature(hotend, filament, 'lowTemperature'))/float(getTemperature(hotend, filament, 'highTemperature')-getTemperature(hotend, filament, 'lowTemperature'))*float(filament['fanPercentage'][1]-filament['fanPercentage'][0]))/float(base)))
+        fanSpeedForTemperature = int(base * round((filament['fanPercentage'][0] + (temperature-min(temperature, getTemperature(hotend, filament, 'lowTemperature')))/max(temperature, float(getTemperature(hotend, filament, 'highTemperature'))-min(temperature, getTemperature(hotend, filament, 'lowTemperature')))*float(filament['fanPercentage'][1]-filament['fanPercentage'][0]))/float(base)))
         LayerHeightAtMaxFanSpeed = 0.025
         LayerHeightAtMinFanSpeed = 0.2
         fanSpeedForLayerHeight = int(base * round((filament['fanPercentage'][0] + (layerHeight - LayerHeightAtMaxFanSpeed)/float(LayerHeightAtMinFanSpeed-LayerHeightAtMaxFanSpeed)*float(filament['fanPercentage'][1]-filament['fanPercentage'][0]))/float(base)))
