@@ -805,8 +805,23 @@ def cura2Profile(machine):
     definition.append('        "machine_max_jerk_xy": { "value": '+str(machine['jerk'])+' },') # Adjust jerk
     if 'inherits' in machine:
         definition.append('        "machine_width": { "default_value": '+str(machine['width'])+' },')
+        definition.append('        "machine_max_feedrate_e": { "default_value": 40 },')
         definition.append('        "print_mode": { "enabled": true },')
         definition.append('        "avoid_grinding_filament": { "value": false },')
+        definition.append('        "retraction_speed": { "maximum_value_warning": "35"},')
+        definition.append('        "retraction_retract_speed":')
+        definition.append('        {')
+        definition.append('            "value": "min(retraction_speed, 35)",')
+        definition.append('            "maximum_value_warning": "35"')
+        definition.append('        },')
+        definition.append('        "retraction_prime_speed": { "maximum_value_warning": "35"},')
+        definition.append('        "switch_extruder_retraction_speeds": { "maximum_value_warning": "35"},')
+        definition.append('        "switch_extruder_retraction_speed":')
+        definition.append('        {')
+        definition.append('            "value": "min(switch_extruder_retraction_speeds, 35)",')
+        definition.append('            "maximum_value_warning": "35"')
+        definition.append('        },')
+        definition.append('        "switch_extruder_prime_speed": { "maximum_value_warning": "35"},')
         definition.append('        "retraction_hop_height_after_extruder_switch": { "value": '+str(machine['extruderSwitchZHop'])+' }')
     else:
         definition.append('        "machine_width": { "default_value": '+str(machine['width'])+' },')
@@ -832,6 +847,7 @@ def cura2Profile(machine):
         definition.append('        "machine_max_feedrate_x": { "default_value": 200 },')
         definition.append('        "machine_max_feedrate_y": { "default_value": 200 },')
         definition.append('        "machine_max_feedrate_z": { "default_value": 15 },')
+        definition.append('        "machine_max_feedrate_e": { "default_value": 135 },')
         definition.append('        "print_sequence": { "enabled": true },')
         definition.append('        "layer_height": { "maximum_value": "0.75 * min(extruderValues('+"'machine_nozzle_size'"+'))" },')
         definition.append('        "layer_height_0":')
@@ -960,7 +976,7 @@ def cura2Profile(machine):
         # definition.append('        "retraction_enable": { "value": true },')
         # definition.append('        "retract_at_layer_change": { "value": false },')
         # definition.append('        "retraction_retract_speed": { "value": "retraction_speed" },')
-        # definition.append('        "retraction_prime_speed": { "value": "retraction_speed" },')
+        definition.append('        "retraction_prime_speed": { "value": "retraction_speed * 0.5" },')
         # definition.append('        "retraction_extra_prime_amount": { "value": 0 },') # Adjust for flex material
         definition.append('        "retraction_min_travel": { "value": 1.5 },')
         # definition.append('        "retraction_extrusion_window": { "value": "retraction_amount" },')
@@ -1388,7 +1404,6 @@ def cura2Profile(machine):
                             layerHeight = getLayerHeight(hotend, quality)
                             firstLayerHeight = hotend['nozzleSize']/2.
                             defaultSpeed, firstLayerUnderspeed, outlineUnderspeed, supportUnderspeed = speedValues(hotend, hotend, filament, filament, layerHeight, firstLayerHeight, 1, quality, 'MEX Left')
-                            hotendLeftTemperature = temperatureAdjustedToFlow(filament, hotend, layerHeight, defaultSpeed)
                             startPurgeLength, toolChangePurgeLength, purgeSpeed, sParameter, eParameter, pParameter = purgeValues(hotend, filament, defaultSpeed, layerHeight)
                             # Create a new global quality for the new layer height
                             if layerHeight not in globalQualities:
@@ -1466,7 +1481,7 @@ def cura2Profile(machine):
                                 qualityFile.append('material_initial_print_temperature = =material_print_temperature + '+str(temperatureInertiaInitialFix)+' if material_flow_dependent_temperature else material_print_temperature')
                                 temperatureInertiaFinalFix = -2.5
                                 qualityFile.append('material_final_print_temperature = =material_print_temperature + '+str(temperatureInertiaFinalFix)+' if material_flow_dependent_temperature else material_print_temperature')
-                                qualityFile.append('material_flow_temp_graph = '+str(adjustedFlowTemperatureGraph(hotend, filament)))
+                                qualityFile.append('material_flow_temp_graph = '+str(adjustedFlowTemperatureGraph(hotend, filament, layerHeight)))
                                 qualityFile.append('material_extrusion_cool_down_speed = 1') # this value depends on extruded flow (not material_flow)
                                 qualityFile.append('material_diameter = '+("%.2f" % filament['filamentDiameter']))
                                 qualityFile.append('retraction_amount = '+("%.2f" % filament['retractionDistance']))
@@ -1684,19 +1699,24 @@ def defaultMaterialPrintTemperature(filament):
     # Exclusive function for Cura 2 to get default_material_print_temperature
     return int(round((filament['printTemperature'][0] + filament['printTemperature'][1])/2.))
 
-def adjustedFlowTemperatureGraph(hotend, filament):
+def adjustedFlowTemperatureGraph(hotend, filament, layerHeight):
     adjustedGraph = []
     if 'flowTemperatureGraph' in filament:
         for pair in filament['flowTemperatureGraph']:
             adjustedGraph.append([float(pair[0]), float(pair[1]) + hotend['temperatureCompensation']])
     else:
-        minFlow = 0.3 * 0.05 * 10
-        minTemp = getTemperature(hotend, filament, 'lowTemperature')
-        maxFlow = maxFlowValue(hotend, filament, layerHeight)
+        maxFlow = round(maxFlowValue(hotend, filament, layerHeight), 2)
+        minFlow = min(round(0.3 * 0.05 * 10, 2), maxFlow)
+        stdFlow = min(round(0.4 * 0.15 * 60, 2), maxFlow)
         maxTemp = getTemperature(hotend, filament, 'highTemperature')
-        stdFlow = 0.4 * 0.15 * 60
+        minTemp = getTemperature(hotend, filament, 'lowTemperature') if minFlow < maxFlow else maxTemp
         stdTemp = (minTemp + maxTemp) /2.
-        adjustedGraph = [[minFlow, minTemp], [stdFlow, stdTemp], [maxFlow, maxTemp]]
+        adjustedGraph = []
+        if minFlow < stdFlow and minTemp < maxTemp:
+            adjustedGraph.append([minFlow, minTemp])
+        if stdFlow < maxFlow and stdTemp < maxTemp:
+            adjustedGraph.append([stdFlow, stdTemp])
+        adjustedGraph.append([maxFlow, maxTemp])
     return adjustedGraph
 
 def temperatureAdjustedToFlow(filament, hotend, layerHeight, speed, base = 5):
@@ -1707,13 +1727,13 @@ def temperatureAdjustedToFlow(filament, hotend, layerHeight, speed, base = 5):
     if int(flow) > int(maxFlowValue(hotend, filament, layerHeight)):
         print "\nwarning! you're trying to print at higher flow than allowed:", filament['id']+':', str(int(flow)), str(int(maxFlowValue(hotend, filament, layerHeight)))
 
-    graph = adjustedFlowTemperatureGraph(hotend, filament)
-    if flow < float(graph[0][0]):
+    graph = adjustedFlowTemperatureGraph(hotend, filament, layerHeight)
+    if flow <= float(graph[0][0]):
         temperature = float(graph[0][1])
-    elif flow > float(graph[-1][0]):
+    elif flow >= float(graph[-1][0]):
         temperature = float(graph[-1][1])
     else:
-        for pairIndex in range(len(graph)):
+        for pairIndex in range(len(graph)-1):
             flow1, temp1 = float(graph[pairIndex][0]), float(graph[pairIndex][1])
             flow2, temp2 = float(graph[pairIndex + 1][0]), float(graph[pairIndex + 1][1])
             if flow1 <= flow <= flow2:
@@ -1723,7 +1743,7 @@ def temperatureAdjustedToFlow(filament, hotend, layerHeight, speed, base = 5):
     # OldTemperature Calculation
     # temperature = int(base * round((getTemperature(hotend, filament, 'lowTemperature') + flow/maxFlowValue(hotend, filament, layerHeight) * float(getTemperature(hotend, filament, 'highTemperature')-getTemperature(hotend, filament, 'lowTemperature')))/float(base)))
 
-    return temperature
+    return int(temperature)
 
 def fanSpeed(hotend, filament, temperature, layerHeight, base = 5):
     # adaptative fan speed according to temperature values. Rounded to base
