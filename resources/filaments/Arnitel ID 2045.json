@@ -27,5 +27,5 @@
     "fanPercentage": [50, 100],
     "extrusionMultiplier": 1.10,
     "minimumLayerHeight": 0,
-    "purgeLength": 120
+    "purgeVolume": 97.31
 }

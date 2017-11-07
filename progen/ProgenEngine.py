@@ -471,8 +471,8 @@ def simplify3DProfile(machine, printMode, hotendLeft, hotendRight, filamentLeft,
             raftExtruder = primaryExtruder
             skirtExtruder = primaryExtruder
             useCoasting, useWipe, onlyRetractWhenCrossingOutline, retractBetweenLayers, useRetractionMinTravel, retractWhileWiping, onlyWipeOutlines = retractValues(primaryFilament)
-            startPurgeLengthT0, toolChangePurgeLengthT0, purgeSpeedT0, sParameterT0, eParameterT0, pParameterT0 = purgeValuesT0
-            startPurgeLengthT1, toolChangePurgeLengthT1, purgeSpeedT1, sParameterT1, eParameterT1, pParameterT1 = purgeValuesT1
+            purgeSpeedT0, mmPerSecondIncrementT0, maxPurgeDistanceT0, minPurgeDistanceT0 = purgeValuesT0
+            purgeSpeedT1, mmPerSecondIncrementT1, maxPurgeDistanceT1, minPurgeDistanceT1 = purgeValuesT1
             if printMode == 'regular':
                 fff.append('  <autoConfigureQuality name="'+extruder+secondaryExtruderAction+str(quality['id'])+'">')
             else:
@@ -600,13 +600,13 @@ def simplify3DProfile(machine, printMode, hotendLeft, hotendRight, filamentLeft,
                 fff.append('    <toolChangeGcode>'+\
                     '{IF NEWTOOL=0} T0\t\t\t;Start tool switch 0,'+\
                     '{IF NEWTOOL=0} G1 F2400 E0,'+\
-                    '{IF NEWTOOL=0} M800 F'+str(purgeSpeedT0)+' S'+str(sParameterT0)+' E'+str(eParameterT0)+' P'+str(pParameterT0)+'\t;SmartPurge - Needs Firmware v01-1.2.3,'+\
-                    ';{IF NEWTOOL=0} G1 F'+str(purgeSpeedT0)+' E'+str(toolChangePurgeLengthT0)+'\t\t;Default purge value,'+\
+                    '{IF NEWTOOL=0} M800 F'+str(purgeSpeedT0)+' S'+str(mmPerSecondIncrementT0)+' E'+str(maxPurgeDistanceT0)+' P'+str(minPurgeDistanceT0)+'\t;SmartPurge - Needs Firmware v01-1.2.3,'+\
+                    ';{IF NEWTOOL=0} G1 F'+str(purgeSpeedT0)+' E'+str(minPurgeDistanceT0)+'\t\t;Default purge value,'+\
                     ''+fanActionOnToolChange1+','+\
                     '{IF NEWTOOL=1} T1\t\t\t;Start tool switch 1,'+\
                     '{IF NEWTOOL=1} G1 F2400 E0,'+\
-                    '{IF NEWTOOL=1} M800 F'+str(purgeSpeedT1)+' S'+str(sParameterT1)+' E'+str(eParameterT1)+' P'+str(pParameterT1)+'\t;SmartPurge - Needs Firmware v01-1.2.3,'+\
-                    ';{IF NEWTOOL=1} G1 F'+str(purgeSpeedT1)+' E'+str(toolChangePurgeLengthT1)+'\t\t;Default purge,'+\
+                    '{IF NEWTOOL=1} M800 F'+str(purgeSpeedT1)+' S'+str(mmPerSecondIncrementT1)+' E'+str(maxPurgeDistanceT1)+' P'+str(minPurgeDistanceT1)+'\t;SmartPurge - Needs Firmware v01-1.2.3,'+\
+                    ';{IF NEWTOOL=1} G1 F'+str(purgeSpeedT1)+' E'+str(minPurgeDistanceT1)+'\t\t;Default purge,'+\
                     fanActionOnToolChange2+','+\
                     "G4 P2000\t\t\t\t;Stabilize Hotend's pressure,"+\
                     'G92 E0\t\t\t\t;Zero extruder,'+\
@@ -653,7 +653,7 @@ def simplify3DProfile(machine, printMode, hotendLeft, hotendRight, filamentLeft,
                 'G28 Z0\t\t;move Z to min endstops,'+\
                 'G92 E0\t\t;zero the extruded length,'+\
                 'G1 Z5 F200\t\t;safety Z axis movement,'+\
-                'G1 F'+str(purgeSpeedT0)+' E'+str(startPurgeLengthT0)+'\t;extrude '+str(startPurgeLengthT0)+'mm of feed stock,'+\
+                'G1 E20 F50\t\t;extrude 20mm of feed stock,'+\
                 'G92 E0\t\t;zero the extruded length again</startingGcode>')
         else:
             fff.append('  <autoConfigureExtruders name="Extruders in '+printMode+' mode"  allowedToolheads="1">')
@@ -672,10 +672,10 @@ def simplify3DProfile(machine, printMode, hotendLeft, hotendRight, filamentLeft,
                 'G28 Z0\t\t;move Z to min endstops,'+\
                 'T1\t\t;switch to the right extruder,'+\
                 'G92 E0\t\t;zero the extruded length,'+\
-                'G1 F'+str(purgeSpeedT0)+' E'+str(startPurgeLengthT0)+'\t\t;extrude '+str(startPurgeLengthT0)+'mm of feed stock,'+\
+                'G1 E20 F50\t\t;extrude 20mm of feed stock,'+\
                 'G92 E0\t\t;zero the extruded length again,G1 F200 E-9,'+\
                 'T0\t\t;switch to the left extruder,G92 E0\t\t;zero the extruded length,'+\
-                'G1 F'+str(purgeSpeedT0)+' E'+str(startPurgeLengthT0)+'\t\t;extrude '+str(startPurgeLengthT0)+'mm of feed stock,'+\
+                'G1 E20 F50\t\t;extrude 20mm of feed stock,'+\
                 'G92 E0\t\t;zero the extruded length again'+printModeGcode+''+\
                 'G4 P1,'+\
                 'G4 P2,'+\
@@ -696,7 +696,7 @@ def simplify3DProfile(machine, printMode, hotendLeft, hotendRight, filamentLeft,
             'G28 Z0\t\t;move Z to min endstops,'+\
             'G92 E0\t\t;zero the extruded length,'+\
             'G1 Z5 F200\t\t;safety Z axis movement,'+\
-            'G1 F'+str(purgeSpeedT1)+' E'+str(startPurgeLengthT1)+'\t\t;extrude '+str(startPurgeLengthT1)+'mm of feed stock,'+\
+            'G1 E20 F50\t\t;extrude 20mm of feed stock,'+\
             'G92 E0\t\t;zero the extruded length again</startingGcode>')
         postProcessingScript += ',{REPLACE "M104 S'+str(hotendLeftTemperature)+' T0" ""}'
         fff.append('    <postProcessing>'+postProcessingScript+'</postProcessing>')
@@ -714,11 +714,11 @@ def simplify3DProfile(machine, printMode, hotendLeft, hotendRight, filamentLeft,
             'G28 Z0\t\t;move Z to min endstops,'+\
             'T1\t\t;switch to the right extruder,'+\
             'G92 E0\t\t;zero the extruded length,'+\
-            'G1 F'+str(purgeSpeedT1)+' E'+str(startPurgeLengthT1)+'\t\t;extrude '+str(startPurgeLengthT1)+'mm of feed stock,'+\
+            'G1 E20 F50\t\t;extrude 20mm of feed stock,'+\
             'G92 E0\t\t;zero the extruded length again,'+\
             'T0\t\t;switch to the left extruder,'+\
             'G92 E0\t\t;zero the extruded length,'+\
-            'G1 F'+str(purgeSpeedT0)+' E'+str(startPurgeLengthT0)+'\t\t;extrude '+str(startPurgeLengthT0)+'mm of feed stock,'+\
+            'G1 E20 F50\t\t;extrude 20mm of feed stock,'+\
             'G92 E0\t\t;zero the extruded length again</startingGcode>')
         fff.append('    <layerChangeGcode></layerChangeGcode>')
         fff.append('    <postProcessing>'+postProcessingScript+'</postProcessing>')
@@ -974,7 +974,7 @@ def cura2Profile(machine):
         # definition.append('        "material_final_print_temperature": { "enabled": "machine_nozzle_temp_enabled and not (material_flow_dependent_temperature)" },')
         # definition.append('        "material_flow_temp_graph": { "enabled": "machine_nozzle_temp_enabled and material_flow_dependent_temperature" },') # Bad visualization
         # definition.append('        "retraction_enable": { "value": true },')
-        # definition.append('        "retract_at_layer_change": { "value": false },')
+        definition.append('        "retract_at_layer_change": { "value": true },')
         # definition.append('        "retraction_retract_speed": { "value": "retraction_speed" },')
         definition.append('        "retraction_prime_speed": { "value": "retraction_speed * 0.5" },')
         # definition.append('        "retraction_extra_prime_amount": { "value": 0 },') # Adjust for flex material
@@ -1056,7 +1056,7 @@ def cura2Profile(machine):
         definition.append('            "enabled": true,')
         definition.append('            "value": false')
         definition.append('        },')
-        definition.append('        "retraction_hop": { "value": "0.5 * layer_height" },')
+        definition.append('        "retraction_hop": { "value": "layer_height" },')
         # definition.append('        "retraction_hop_after_extruder_switch": { "value": true },')
         definition.append('        "retraction_hop_height_after_extruder_switch": { "value": '+str(machine['extruderSwitchZHop'])+' },')
 
@@ -1230,7 +1230,7 @@ def cura2Profile(machine):
         definition.append('        "smart_purge":')
         definition.append('        {')
         definition.append('            "enabled": "print_mode == '+"'regular'"+'",')
-        definition.append('            "value": true')
+        definition.append('            "value": false')
         definition.append('        },')  
         definition.append('        "retract_reduction": { "enabled": true },')
         definition.append('        "avoid_grinding_filament":')
@@ -1404,7 +1404,7 @@ def cura2Profile(machine):
                             layerHeight = getLayerHeight(hotend, quality)
                             firstLayerHeight = hotend['nozzleSize']/2.
                             defaultSpeed, firstLayerUnderspeed, outlineUnderspeed, supportUnderspeed = speedValues(hotend, hotend, filament, filament, layerHeight, firstLayerHeight, 1, quality, 'MEX Left')
-                            startPurgeLength, toolChangePurgeLength, purgeSpeed, sParameter, eParameter, pParameter = purgeValues(hotend, filament, defaultSpeed, layerHeight)
+                            purgeSpeed, mmPerSecondIncrement, maxPurgeDistance, minPurgeDistance = purgeValues(hotend, filament, defaultSpeed, layerHeight)
                             # Create a new global quality for the new layer height
                             if layerHeight not in globalQualities:
                                 globalQualities.append(layerHeight)
@@ -1466,7 +1466,7 @@ def cura2Profile(machine):
                                 qualityFile.append('layer_height = '+("%.2f" % layerHeight))
 
                                 #shell
-                                qualityFile.append('wall_thickness = =max( 3 * machine_nozzle_size, '+("%.2f" % quality['wallWidth'])+')')     # 3 minimum Perimeters needed
+                                qualityFile.append('wall_thickness = =round(max( 3 * machine_nozzle_size, '+("%.2f" % quality['wallWidth'])+'), 1)')     # 3 minimum Perimeters needed
                                 qualityFile.append('top_bottom_thickness = =max( 5 * layer_height, '+("%.2f" % quality['topBottomWidth'])+')') # 5 minimum layers needed
                                 qualityFile.append('travel_compensate_overlapping_walls_enabled = '+('False' if filament['isFlexibleMaterial'] else 'True'))
                                 qualityFile.append('wall_0_wipe_dist = '+('0' if retractValues(filament)[1] == 0 else '=12.5 * machine_nozzle_size'))
@@ -1498,6 +1498,7 @@ def cura2Profile(machine):
                                 qualityFile.append('speed_wall_0 = =round(speed_print * '+("%.2f" % outlineUnderspeed)+', 1)')
                                 qualityFile.append('speed_support = =round(speed_print * '+("%.2f" % supportUnderspeed)+', 1)')
                                 qualityFile.append('speed_layer_0 = =round(speed_print * '+("%.2f" % firstLayerUnderspeed)+', 1)')
+                                qualityFile.append('purge_speed = '+("%.2f" % (purgeSpeed/60.)))
                                 qualityFile.append('acceleration_wall_0 = '+str(int(accelerationForPerimeters(hotend['nozzleSize'], layerHeight, int(defaultSpeed/60. * outlineUnderspeed)))))
 
                                 # travel
@@ -1538,10 +1539,11 @@ def cura2Profile(machine):
                                     # qualityFile.append('support_conical_angle = 30')
 
                                 # platform_adhesion
-                                qualityFile.append("skirt_brim_minimal_length = =round((material_diameter/2)**2 / (extruderValue(adhesion_extruder_nr, 'machine_nozzle_size')/2)**2 *"+str(startPurgeLength)+', 2)')
+                                minPurgeDistance
+                                qualityFile.append("skirt_brim_minimal_length = =round("+str(filament['purgeVolume'])+" / (math.pi*(extruderValue(adhesion_extruder_nr, 'machine_nozzle_size')/2)**2), 2)")
 
                                 # dual
-                                qualityFile.append("prime_tower_min_volume = =round((material_diameter/2)**2 / (extruderValue(adhesion_extruder_nr, 'machine_nozzle_size')/2)**2 *"+str(toolChangePurgeLength)+', 2)')
+                                qualityFile.append("prime_tower_min_volume = "+str(filament['purgeVolume'] / 2))
 
                                 # meshfix
 
@@ -1551,9 +1553,9 @@ def cura2Profile(machine):
                                 qualityFile.append('coasting_volume = '+str(coastVolume(hotend, filament)))
 
                                 # BCN3D
-                                qualityFile.append('smart_purge_slope = '+str(sParameter))
-                                qualityFile.append('smart_purge_maximum_purge_distance = '+str(eParameter))
-                                qualityFile.append('smart_purge_minimum_purge_distance = '+str(pParameter))
+                                qualityFile.append('smart_purge_slope = '+str(mmPerSecondIncrement))
+                                qualityFile.append('smart_purge_maximum_purge_distance = '+str(maxPurgeDistance))
+                                qualityFile.append('smart_purge_minimum_purge_distance = '+str(minPurgeDistance))
 
                             fileContent = '\n'.join(qualityFile)
                             filesList.append((fileName, fileContent))
@@ -1607,54 +1609,44 @@ def purgeValues(hotend, filament, speed, layerHeight, minPurgeLength = 20): # pu
     SmartPurge Command:
     M800 F-- S-- E-- P--
         F - Speed
-        S - Slope (according to NSize, Flow, Purge@5min)
-        E - Maximum distance to purge (according to NSize, Flow)
+        S - Slope (according to NSize, Flow, PurgeLength) - [mm] -> this distance will be added to the P distance each second the hotend is idle. Up to E distance 
+        E - Maximum distance to purge
         P - Minimum distance to purge
     '''
 
     # nozzleSizeBehavior
-    maxPurgeLenghtAtHotendTip = 2.25 * filament['purgeLength'] * filament['extrusionMultiplier']
-    minPurgeLenghtAtHotendTip = 0.5  * filament['purgeLength'] * filament['extrusionMultiplier']
-    curveGrowth = 1 # Here we assume the growth curve is constant for all materials. Change this value if it's not
-    hotendPurgeMultiplier = (maxPurgeLenghtAtHotendTip - (maxPurgeLenghtAtHotendTip-minPurgeLenghtAtHotendTip)*math.exp(-hotend['nozzleSize']/float(curveGrowth)))/float(filament['purgeLength'])
-
-    baseStartLength04 = 7
-    startPurgeLength = float("%.2f" % max(10, (hotendPurgeMultiplier * baseStartLength04)))
-    
-    # this length is a FIXED value. It is not used on SmartPurge, we do not recommend to work with fixed purge lengths
-    baseToolChangeLength04 = 1.5 # experimental value that works well for most of the prints
-    toolChangePurgeLength = float("%.2f" % (hotendPurgeMultiplier * baseToolChangeLength04))
+    if hotend['hotBlock'] == 'Standard':
+        hotendPurgeMultiplier = 10/10
+    elif hotend['hotBlock'] == 'HighFlow':
+        hotendPurgeMultiplier = 14/10
+    # maxPurgeLenghtAtHotendTip = 2.25 * filament['purgeLength'] * filament['extrusionMultiplier']
+    # minPurgeLenghtAtHotendTip = 0.5  * filament['purgeLength'] * filament['extrusionMultiplier']
+    # curveGrowth = 1 # Here we assume the growth curve is constant for all materials. Change this value if it's not
+    # hotendPurgeMultiplier = (maxPurgeLenghtAtHotendTip - (maxPurgeLenghtAtHotendTip-minPurgeLenghtAtHotendTip)*math.exp(-hotend['nozzleSize']/float(curveGrowth)))/float(filament['purgeLength'])
 
     # F - Extrusion Speed -> adjusted to improve surplus material storage (maximum purge speed for the hotend's temperature):
-    maxPrintSpeed = (max(1, temperatureAdjustedToFlow(filament, hotend, layerHeight, speed) - getTemperature(hotend, filament, 'lowTemperature'))/float(max(1, getTemperature(hotend, filament, 'highTemperature')-getTemperature(hotend, filament, 'lowTemperature')))) * maxFlowValue(hotend, filament, layerHeight) / (hotend['nozzleSize']*layerHeight/60.)
-    F = float("%.2f" % (maxPrintSpeed * hotend['nozzleSize'] * layerHeight / (math.pi * (filament['filamentDiameter']/2.)**2)))
+    F = 48
 
     # S - Slope of the SmartPurge function (according to NSize, Flow, PurgeLength)
-    distanceAtNozzleTip = hotendPurgeMultiplier * filament['purgeLength'] * filament['extrusionMultiplier']
-    slopeCorrection = 0.005 # experimental value
-    S = float("%.4f" % ((distanceAtNozzleTip * (hotend['nozzleSize']/2.)**2) / ((filament['filamentDiameter']/2.)**2) * slopeCorrection))
+    # distanceAtNozzleTip = hotendPurgeMultiplier * filament['purgeLength'] * filament['extrusionMultiplier']
+    # slopeCorrection = 0.005 # experimental value
+    # S = float("%.4f" % ((distanceAtNozzleTip * (hotend['nozzleSize']/2.)**2) / ((filament['filamentDiameter']/2.)**2) * slopeCorrection))
+    S = 0.0005 * hotend['nozzleSize']
 
-    # E - Maximum distance to purge (according to NSize, Flow)
-    if hotend['nozzleSize'] >= 0.8:
-        maxPurgeLength = (6 + 16)/2. # max length to purge (highFlow)
-    else:
-        maxPurgeLength = (6 + 12)/2. # max length to purge (standard)
-    E = float("%.2f" % (maxPurgeLength * filament['extrusionMultiplier']))
-    
-    # P - Minimum distance to purge 
-    P = float("%.4f" % ((minPurgeLength*filament['extrusionMultiplier']*(hotend['nozzleSize']/2.)**2) / ((filament['filamentDiameter']/2.)**2)))
-    
     # P (testing value)
-    P = toolChangePurgeLength
+    P = float("%.2f" % (hotendPurgeMultiplier * filament['purgeVolume'] / (math.pi * ((filament['filamentDiameter']/2.)**2))))
+        
+    # E - Maximum distance to purge
+    E = 2 * P
 
-    return (startPurgeLength, toolChangePurgeLength, F, S, E, P)
+    return (F, S, E, P)
 
 def retractValues(filament):
     if filament['isFlexibleMaterial']:
         useCoasting = 0
         useWipe = 0
         onlyRetractWhenCrossingOutline = 1
-        retractBetweenLayers = 0
+        retractBetweenLayers = 1
         useRetractionMinTravel = 1
         retractWhileWiping = 1
         onlyWipeOutlines = 1
@@ -1662,14 +1654,14 @@ def retractValues(filament):
         useCoasting = 0
         useWipe = 0
         onlyRetractWhenCrossingOutline = 0
-        retractBetweenLayers = 0
+        retractBetweenLayers = 1
         useRetractionMinTravel = 1
         retractWhileWiping = 1
         onlyWipeOutlines = 1
     return useCoasting, useWipe, onlyRetractWhenCrossingOutline, retractBetweenLayers, useRetractionMinTravel, retractWhileWiping, onlyWipeOutlines
 
 def coastVolume(hotend, filament):
-    return float("%.2f" % ((hotend['nozzleSize'])**3*filament['purgeLength']/16))
+    return float("%.2f" % ((hotend['nozzleSize'])**3))
 
 def maxFlowValue(hotend, filament, layerHeight):
     if hotend['nozzleSize'] <= 0.6:
