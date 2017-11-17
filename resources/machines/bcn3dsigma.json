@@ -15,5 +15,5 @@
     "printMode": ["regular"],
     "extruderSwitchZHop": 2,
     "usePrimeTower": true,
-    "useAutoTemperature": true
+    "useAutoTemperature": false
 }
