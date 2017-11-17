@@ -128,83 +128,91 @@ def is_admin():
         return False
 
 def simplify3DProfilesBundle(profilesCreatedCount):
-    y = 'y'
-    if getSimplify3DBundleSize()/1024/1024 >= 150: # define Size limit to notice (in MB)
-        print '\t\tEstimated space needed during the process: '+str(int(getSimplify3DBundleSize()*1.075/1024/1024))+' MB.'
-        print '\t\tEstimated final bundle size: '+str(int(getSimplify3DBundleSize()*0.075/1024/1024))+' MB.'
-        print '\t\tDo you want to continue? (Y/n)'
-        while y not in ['Y', 'n']:
-            y = raw_input('\t\t')
-        print
-    else:
-        y = 'Y'
-    if y == 'Y':
-        totalSmaProfiles = (len(PS.profilesData['hotend'])-1) *  len(PS.profilesData['filament']) * 2
-        totalBigProfiles = (len(PS.profilesData['hotend'])-1)**2 * len(PS.profilesData['filament'])**2
-        totalProfilesAvailable = totalSmaProfiles + totalBigProfiles
-        if ".BCN3D Sigma - Simplify3D Profiles temp" in os.listdir('.'):
-            shutil.rmtree(".BCN3D Sigma - Simplify3D Profiles temp")
-        os.mkdir(".BCN3D Sigma - Simplify3D Profiles temp")
-        os.chdir(".BCN3D Sigma - Simplify3D Profiles temp")
-        for hotendLeft in sorted(PS.profilesData['hotend'], key=lambda k: k['id']):
-            if hotendLeft['id'] != 'None':
-                os.mkdir("Left Hotend "+hotendLeft['id'])
-                os.chdir("Left Hotend "+hotendLeft['id'])
-            else:
-                os.mkdir("No Left Hotend")
-                os.chdir("No Left Hotend")
-            for hotendRight in sorted(PS.profilesData['hotend'], key=lambda k: k['id']):
-                if hotendRight['id'] != 'None':
-                    os.mkdir("Right Hotend "+hotendRight['id'])
-                    os.chdir("Right Hotend "+hotendRight['id'])
-                else:                
-                    os.mkdir("No Right Hotend")
-                    os.chdir("No Right Hotend")
-                for filamentLeft in sorted(PS.profilesData['filament'], key=lambda k: k['id']):
-                    for filamentRight in sorted(PS.profilesData['filament'], key=lambda k: k['id']):
-                        if hotendRight['id'] == 'None' and hotendLeft['id'] == 'None':
-                            break
-                        profilesCreatedCount += 1
-                        simplify3D(machine, printMode, hotendLeft, hotendRight, filamentLeft, filamentRight, '--file' )
-                        sys.stdout.write("\r\t\tProgress: %d%%" % int(float(profilesCreatedCount)/totalProfilesAvailable*100))
-                        sys.stdout.flush()
-                        if hotendRight['id'] == 'None':
-                            break
-                    if hotendLeft['id'] == 'None':
-                        break
-                os.chdir('..')
-            os.chdir('..')
-        csv = open("BCN3D Sigma - Simplify3D Profiles.csv", "w")
-        # csv.writelines(dataLog)
-        csv.close()
-        os.chdir('..')
-        sys.stdout.write("\r\t\tProgress: Creating the zip file...")
-        sys.stdout.flush()
-        shutil.make_archive('BCN3D Sigma - Simplify3D Profiles', 'zip', '.BCN3D Sigma - Simplify3D Profiles temp')
-        shutil.rmtree(".BCN3D Sigma - Simplify3D Profiles temp")
-        print("\r\t\tYour bundle 'BCN3D Sigma - Simplify3D Profiles.zip' is ready. Enjoy!\n")+'\t',
-        return profilesCreatedCount
-    else:
-        return 0
-
-def getSimplify3DBundleSize(oneLineCsvSize = float(10494984)/78480): # experimental value
-    if ".BCN3D Sigma - Simplify3D Profiles temp" in os.listdir('.'):
-        shutil.rmtree(".BCN3D Sigma - Simplify3D Profiles temp")
-    os.mkdir(".BCN3D Sigma - Simplify3D Profiles temp")
-    os.chdir(".BCN3D Sigma - Simplify3D Profiles temp")
-    
+    # y = 'y'
+    # if getSimplify3DBundleSize()/1024/1024 >= 150: # define Size limit to notice (in MB)
+    #     print '\t\tEstimated space needed during the process: '+str(int(getSimplify3DBundleSize()*1.075/1024/1024))+' MB.'
+    #     print '\t\tEstimated final bundle size: '+str(int(getSimplify3DBundleSize()*0.075/1024/1024))+' MB.'
+    #     print '\t\tDo you want to continue? (Y/n)'
+    #     while y not in ['Y', 'n']:
+    #         y = raw_input('\t\t')
+    #     print
+    # else:
+    #     y = 'Y'
+    # if y == 'Y':
     totalSmaProfiles = (len(PS.profilesData['hotend'])-1) *  len(PS.profilesData['filament']) * 2
     totalBigProfiles = (len(PS.profilesData['hotend'])-1)**2 * len(PS.profilesData['filament'])**2
-
-    fileNameBig = simplify3D(PS.profilesData['hotend'][0], PS.profilesData['hotend'][0], PS.profilesData['filament'][0], PS.profilesData['filament'][0], 'noData', '--file')
-    fileNameSmall = simplify3D(PS.profilesData['hotend'][0], PS.profilesData['hotend'][-1], PS.profilesData['filament'][0], PS.profilesData['filament'][0], 'noData', '--file')
-    
-    csvSize = oneLineCsvSize * (totalSmaProfiles*len(PS.profilesData['quality']) + totalBigProfiles*len(PS.profilesData['quality'])*3)
-    bundleSize = totalSmaProfiles*os.path.getsize(fileNameSmall)+totalBigProfiles*os.path.getsize(fileNameBig) + csvSize
-
+    totalProfilesAvailable = totalSmaProfiles + totalBigProfiles
+    if ".BCN3D - Simplify3D Profiles temp" in os.listdir('.'):
+        shutil.rmtree(".BCN3D - Simplify3D Profiles temp")
+    os.mkdir(".BCN3D - Simplify3D Profiles temp")
+    os.chdir(".BCN3D - Simplify3D Profiles temp")
+    for machine in sorted(PS.profilesData['machine'], key=lambda k: k['id']):
+        os.mkdir(machine['name'])
+        os.chdir(machine['name'])
+        for printMode in machine['printMode']:
+            os.mkdir(printMode)
+            os.chdir(printMode)
+            for hotendLeft in sorted(PS.profilesData['hotend'], key=lambda k: k['id']):
+                if hotendLeft['id'] != 'None':
+                    os.mkdir("Left Hotend "+hotendLeft['id'])
+                    os.chdir("Left Hotend "+hotendLeft['id'])
+                else:
+                    os.mkdir("No Left Hotend")
+                    os.chdir("No Left Hotend")
+                for hotendRight in sorted(PS.profilesData['hotend'], key=lambda k: k['id']):
+                    if hotendRight['id'] != 'None':
+                        os.mkdir("Right Hotend "+hotendRight['id'])
+                        os.chdir("Right Hotend "+hotendRight['id'])
+                    else:                
+                        os.mkdir("No Right Hotend")
+                        os.chdir("No Right Hotend")
+                    for filamentLeft in sorted(PS.profilesData['filament'], key=lambda k: k['id']):
+                        for filamentRight in sorted(PS.profilesData['filament'], key=lambda k: k['id']):
+                            if hotendRight['id'] == 'None' and hotendLeft['id'] == 'None':
+                                break
+                            simplify3D(machine, printMode, hotendLeft, hotendRight, filamentLeft, filamentRight, '--file' )
+                            profilesCreatedCount += 1
+                            sys.stdout.write("\r\t\tProgress: %d%%" % int(float(profilesCreatedCount)/totalProfilesAvailable*100))
+                            sys.stdout.flush()
+                            if hotendRight['id'] == 'None':
+                                break
+                        if hotendLeft['id'] == 'None':
+                            break
+                    os.chdir('..')
+                os.chdir('..')
+            os.chdir('..')
+        os.chdir('..')
+    csv = open("BCN3D Sigma - Simplify3D Profiles.csv", "w")
+    # csv.writelines(dataLog)
+    csv.close()
     os.chdir('..')
-    shutil.rmtree(".BCN3D Sigma - Simplify3D Profiles temp")
-    return bundleSize*1.05
+    sys.stdout.write("\r\t\tProgress: Creating the zip file...")
+    sys.stdout.flush()
+    shutil.make_archive('BCN3D - Simplify3D Profiles', 'zip', '.BCN3D - Simplify3D Profiles temp')
+    shutil.rmtree(".BCN3D - Simplify3D Profiles temp")
+    print("\r\t\tYour bundle 'BCN3D - Simplify3D Profiles.zip' is ready. Enjoy!\n")+'\t',
+    return profilesCreatedCount
+    # else:
+    #     return 0
+
+# def getSimplify3DBundleSize(oneLineCsvSize = float(10494984)/78480): # experimental value
+#     if ".BCN3D Sigma - Simplify3D Profiles temp" in os.listdir('.'):
+#         shutil.rmtree(".BCN3D Sigma - Simplify3D Profiles temp")
+#     os.mkdir(".BCN3D Sigma - Simplify3D Profiles temp")
+#     os.chdir(".BCN3D Sigma - Simplify3D Profiles temp")
+    
+#     totalSmaProfiles = (len(PS.profilesData['hotend'])-1) *  len(PS.profilesData['filament']) * 2
+#     totalBigProfiles = (len(PS.profilesData['hotend'])-1)**2 * len(PS.profilesData['filament'])**2
+
+#     fileNameBig = simplify3D(PS.profilesData['machine'][0], 'regular', PS.profilesData['hotend'][0], PS.profilesData['hotend'][0], PS.profilesData['filament'][0], PS.profilesData['filament'][0], '--file')
+#     fileNameSmall = simplify3D(PS.profilesData['machine'][0], 'regular', PS.profilesData['hotend'][0], PS.profilesData['hotend'][-1], PS.profilesData['filament'][0], PS.profilesData['filament'][0], '--file')
+    
+#     csvSize = oneLineCsvSize * (totalSmaProfiles*len(PS.profilesData['quality']) + totalBigProfiles*len(PS.profilesData['quality'])*3)
+#     bundleSize = totalSmaProfiles*os.path.getsize(fileNameSmall)+totalBigProfiles*os.path.getsize(fileNameBig) + csvSize
+
+#     os.chdir('..')
+#     shutil.rmtree(".BCN3D Sigma - Simplify3D Profiles temp")
+#     return bundleSize*1.05
 
 def cura2FilesBundle():
     cura2('--file')
