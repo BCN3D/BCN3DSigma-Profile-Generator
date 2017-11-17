@@ -14,7 +14,7 @@
     "isFlexibleMaterial": false,
     "isAbrasiveMaterial": false,
     "bedTemperature": 80,
-    "printTemperature": [235, 235],
+    "printTemperature": [195, 235],
     "standbyTemperature": 150,
     "defaultPrintSpeed": 45,
     "advisedMaxPrintSpeed": 45,
@@ -23,7 +23,7 @@
     "retractionDistance": 5,
     "retractionSpeed": 60,
     "retractionCount": 50,
-    "fanPercentage": [0, 20],
+    "fanPercentage": [50, 100],
     "extrusionMultiplier": 1,
     "minimumLayerHeight": 0,
     "purgeVolume": 97.31
