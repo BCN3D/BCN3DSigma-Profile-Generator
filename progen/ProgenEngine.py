@@ -76,7 +76,7 @@ def simplify3DProfile(machine, printMode, hotendLeft, hotendRight, filamentLeft,
         fff.append('    <useCoasting>0</useCoasting>')
         fff.append('    <coastingDistance>0.2</coastingDistance>')
         fff.append('    <useWipe>1</useWipe>')
-        fff.append('    <wipeDistance>5</wipeDistance>')
+        fff.append('    <wipeDistance>0</wipeDistance>')
         fff.append('  </extruder>')
     else:
         fff.append('  <extruder name="">')
@@ -110,7 +110,7 @@ def simplify3DProfile(machine, printMode, hotendLeft, hotendRight, filamentLeft,
         fff.append('    <useCoasting>0</useCoasting>')
         fff.append('    <coastingDistance>0.2</coastingDistance>')
         fff.append('    <useWipe>1</useWipe>')
-        fff.append('    <wipeDistance>5</wipeDistance>')
+        fff.append('    <wipeDistance>0</wipeDistance>')
         fff.append('  </extruder>')
     fff.append('  <primaryExtruder>0</primaryExtruder>')
     fff.append('  <layerHeight>0.2</layerHeight>')
@@ -316,7 +316,7 @@ def simplify3DProfile(machine, printMode, hotendLeft, hotendRight, filamentLeft,
     fff.append('  <toolChangeRetractionSpeed>'+str(min(value1, value2, value3)*60)+'</toolChangeRetractionSpeed>')
     fff.append('  <externalThinWallType>0</externalThinWallType>')
     fff.append('  <internalThinWallType>2</internalThinWallType>')
-    fff.append('  <thinWallAllowedOverlapPercentage>10</thinWallAllowedOverlapPercentage>')
+    fff.append('  <thinWallAllowedOverlapPercentage>0</thinWallAllowedOverlapPercentage>')
     fff.append('  <singleExtrusionMinLength>1</singleExtrusionMinLength>')
     fff.append('  <singleExtrusionMinPrintingWidthPercentage>50</singleExtrusionMinPrintingWidthPercentage>')
     fff.append('  <singleExtrusionMaxPrintingWidthPercentage>200</singleExtrusionMaxPrintingWidthPercentage>')
@@ -509,7 +509,7 @@ def simplify3DProfile(machine, printMode, hotendLeft, hotendRight, filamentLeft,
                 fff.append('      <useCoasting>'+str(retractValues(filamentLeft)[0])+'</useCoasting>')
                 fff.append('      <coastingDistance>'+str(coastVolume(hotendLeft, filamentLeft) / (layerHeight * hotendLeft['nozzleSize']))+'</coastingDistance>')
                 fff.append('      <useWipe>'+str(retractValues(filamentLeft)[1])+'</useWipe>')
-                fff.append('      <wipeDistance>'+str(hotendLeft['nozzleSize']*12.5)+'</wipeDistance>')
+                fff.append('      <wipeDistance>'+str(coastVolume(hotendLeft, filamentLeft) / (layerHeight * hotendLeft['nozzleSize']))+'</wipeDistance>')
                 fff.append('    </extruder>')
             if hotendRight['id'] != 'None':
                 fff.append('    <extruder name="Right Extruder '+str(hotendRight['nozzleSize'])+'">')
@@ -526,7 +526,7 @@ def simplify3DProfile(machine, printMode, hotendLeft, hotendRight, filamentLeft,
                 fff.append('      <useCoasting>'+str(retractValues(filamentRight)[0])+'</useCoasting>')
                 fff.append('      <coastingDistance>'+str(coastVolume(hotendRight, filamentRight) / (layerHeight * hotendRight['nozzleSize']))+'</coastingDistance>')
                 fff.append('      <useWipe>'+str(retractValues(filamentRight)[1])+'</useWipe>')
-                fff.append('      <wipeDistance>'+str(hotendRight['nozzleSize']*12.5)+'</wipeDistance>')
+                fff.append('      <wipeDistance>'+str(coastVolume(hotendRight, filamentRight) / (layerHeight * hotendRight['nozzleSize']))+'</wipeDistance>')
                 fff.append('    </extruder>')
             fff.append('    <primaryExtruder>'+str(primaryExtruder)+'</primaryExtruder>')
             fff.append('    <raftExtruder>'+str(raftExtruder)+'</raftExtruder>')
@@ -811,6 +811,7 @@ def cura2Profile(machine):
         definition.append('        "machine_max_feedrate_e": { "default_value": '+str(machine['maxFeedrateE'])+' },')
         definition.append('        "print_mode": { "enabled": true },')
         definition.append('        "avoid_grinding_filament": { "value": false },')
+        definition.append('        "retraction_combing": { "value": "'+"'off'"+'" },')
         definition.append('        "retraction_speed": { "maximum_value_warning": "machine_max_feedrate_e"},')
         definition.append('        "retraction_retract_speed":')
         definition.append('        {')
@@ -956,7 +957,7 @@ def cura2Profile(machine):
         # definition.append('        "sub_div_rad_mult": { "value": 100 },')
         # definition.append('        "sub_div_rad_add": { "value": "wall_line_width_x" },')
         # definition.append('        "infill_overlap": { "value": "10 if infill_sparse_density < 95 and infill_pattern != '+"'"+'concentric'+"'"+' else 0" },')
-        definition.append('        "skin_overlap": { "value": "10 if top_bottom_pattern != '+"'concentric'"+' else 0" },')
+        definition.append('        "skin_overlap": { "value": "0" },')
         # definition.append('        "infill_wipe_dist": { "value": "wall_line_width_0 / 4 if wall_line_count == 1 else wall_line_width_x / 4" },')
         definition.append('        "infill_sparse_thickness": { "value": "layer_height" },')
         # definition.append('        "gradual_infill_steps": { "value": 0 },')
@@ -1043,11 +1044,11 @@ def cura2Profile(machine):
         definition.append('        "jerk_wall_0": { "value": "jerk_wall * 0.5" },')
         # definition.append('        "jerk_wall_x": { "value": "jerk_wall" },')
         # definition.append('        "jerk_roofing": { "value": "jerk_topbottom" },')
-        definition.append('        "jerk_topbottom": { "value": "jerk_print * 0.5" },')
-        definition.append('        "jerk_support": { "value": "jerk_print * 0.75" },')
+        definition.append('        "jerk_topbottom": { "value": "jerk_wall_0" },')
+        definition.append('        "jerk_support": { "value": "jerk_wall" },')
         # definition.append('        "jerk_support_infill": { "value": "jerk_support" },')
         definition.append('        "jerk_support_interface": { "value": "jerk_topbottom" },')
-        definition.append('        "jerk_prime_tower": { "value": "jerk_print * 0.75" },')
+        definition.append('        "jerk_prime_tower": { "value": "jerk_wall" },')
         definition.append('        "jerk_travel": { "value": "jerk_print if magic_spiralize else 15" },')
         definition.append('        "jerk_layer_0": { "value": "jerk_topbottom" },')
         # definition.append('        "jerk_print_layer_0": { "value": "jerk_layer_0" },')
@@ -1077,6 +1078,7 @@ def cura2Profile(machine):
         definition.append('            "enabled": true,')
         definition.append('            "value": false')
         definition.append('        },')
+        definition.append('        "retraction_combing": { "value": "'+"'noskin'"+'" },')
         definition.append('        "retraction_hop": { "value": "layer_height" },')
         # definition.append('        "retraction_hop_after_extruder_switch": { "value": true },')
         definition.append('        "retraction_hop_height_after_extruder_switch": { "value": '+str(machine['extruderSwitchZHop'])+' },')
@@ -1200,7 +1202,7 @@ def cura2Profile(machine):
         # definition.append('        "draft_shield_height": { "value": 10 },')
         # definition.append('        "conical_overhang_enabled": { "value": false },')
         # definition.append('        "conical_overhang_angle": { "value": 50 },')
-        definition.append('        "coasting_enable": { "value": true },')
+        definition.append('        "coasting_enable": { "value": false },')
         definition.append('        "coasting_min_volume": { "value": "coasting_volume * 2" },')
         # definition.append('        "coasting_speed": { "value": 90 },')
         # definition.append('        "skin_alternate_rotation": { "value": false },')
@@ -1490,7 +1492,7 @@ def cura2Profile(machine):
                                 qualityFile.append('wall_thickness = =round(max( 3 * machine_nozzle_size, '+("%.2f" % quality['wallWidth'])+'), 1)')     # 3 minimum Perimeters needed
                                 qualityFile.append('top_bottom_thickness = =max( 5 * layer_height, '+("%.2f" % quality['topBottomWidth'])+')') # 5 minimum layers needed
                                 qualityFile.append('travel_compensate_overlapping_walls_enabled = '+('False' if filament['isFlexibleMaterial'] else 'True'))
-                                qualityFile.append('wall_0_wipe_dist = '+('0' if retractValues(filament)[1] == 0 else '='str(coastVolume(hotendRight, filamentRight))' / layer_height * machine_nozzle_size'))
+                                qualityFile.append('wall_0_wipe_dist = '+('0' if retractValues(filament)[1] == 0 else '=round('+str(coastVolume(hotend, filament))+' / (layer_height * machine_nozzle_size), 2)'))
 
                                 # infill
                                 qualityFile.append('infill_sparse_density = ='+str(int(min(100, quality['infillPercentage'] * 1.25)))+" if infill_pattern == 'cubicsubdiv' else "+str(int(quality['infillPercentage']))) # 'if' is not working...
@@ -1526,8 +1528,6 @@ def cura2Profile(machine):
                                 # travel
                                 if filament['isFlexibleMaterial']:
                                     qualityFile.append('retraction_combing = all')
-                                else:
-                                    qualityFile.append('retraction_combing = noskin')
                                 # qualityFile.append('travel_retract_before_outer_wall = False')
                                 if filament['isSupportMaterial']:
                                     qualityFile.append('travel_avoid_other_parts = True')
@@ -1665,16 +1665,16 @@ def purgeValues(hotend, filament, speed, layerHeight, minPurgeLength = 20): # pu
 
 def retractValues(filament):
     if filament['isFlexibleMaterial']:
-        useCoasting = 1
-        useWipe = 0
+        useCoasting = 0
+        useWipe = 1
         onlyRetractWhenCrossingOutline = 1
         retractBetweenLayers = 1
         useRetractionMinTravel = 1
         retractWhileWiping = 1
         onlyWipeOutlines = 1
     else:
-        useCoasting = 1
-        useWipe = 0
+        useCoasting = 0
+        useWipe = 1
         onlyRetractWhenCrossingOutline = 0
         retractBetweenLayers = 1
         useRetractionMinTravel = 1
