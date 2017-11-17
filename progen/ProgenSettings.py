@@ -21,9 +21,6 @@ def init():
     global loggedData
     loggedData = ["LFilament;RFilament;Extruder;Quality;LNozzle;RNozzle;InfillExt;PrimaryExt;SupportExt;LFlow;RFlow;Layers/Infill;DefaultSpeed;FirstLayerUnderspeed;OutLineUnderspeed;SupportUnderspeed;FirstLayerHeightPercentage;LTemp;RTemp;BTemp;\n"]
 
-    global cura2PostProcessingPluginName
-    cura2PostProcessingPluginName = 'Sigma Vitamins'
-
 def readProfilesData():
     profilesData = dict([("machine", []), ("hotend", []), ("filament", []), ("quality", [])])
     for machine in os.listdir('./resources/machines'):

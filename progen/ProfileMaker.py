@@ -25,29 +25,29 @@ def simplify3D(machine, printMode, hotendLeft, hotendRight, filamentLeft, filame
         print fileName
     return fileName
 
-def cura2(fileAction):
+def cura(fileAction):
 
-    if "Cura 2" in os.listdir('.'):
-        shutil.rmtree("Cura 2")
-    os.mkdir('Cura 2')
-    os.mkdir('Cura 2/resources')
-    os.mkdir('Cura 2/resources/definitions')
-    os.mkdir('Cura 2/resources/extruders')
-    os.mkdir('Cura 2/resources/materials')
-    os.mkdir('Cura 2/resources/meshes')
-    os.mkdir('Cura 2/resources/quality')
+    if "Cura" in os.listdir('.'):
+        shutil.rmtree("Cura")
+    os.mkdir('Cura')
+    os.mkdir('Cura/resources')
+    os.mkdir('Cura/resources/definitions')
+    os.mkdir('Cura/resources/extruders')
+    os.mkdir('Cura/resources/materials')
+    os.mkdir('Cura/resources/meshes')
+    os.mkdir('Cura/resources/quality')
     i = 0
     for machine in PS.profilesData['machine']:
         if i < 1:
-            os.mkdir('Cura 2/resources/materials/'+machine['manufacturer'])
+            os.mkdir('Cura/resources/materials/'+machine['manufacturer'])
             i += 1
-        shutil.copyfile('resources/meshes/'+machine['id']+'_bed.stl', 'Cura 2/resources/meshes/'+machine['id']+'_bed.stl')
+        shutil.copyfile('resources/meshes/'+machine['id']+'_bed.stl', 'Cura/resources/meshes/'+machine['id']+'_bed.stl')
         if 'qualities' not in machine:
-            os.mkdir('Cura 2/resources/quality/'+machine['id'])
-    os.mkdir('Cura 2/resources/variants')
+            os.mkdir('Cura/resources/quality/'+machine['id'])
+    os.mkdir('Cura/resources/variants')
 
     for machine in PS.profilesData['machine']:
-        for fileName, fileContent in ProgenEngine.cura2Profile(machine):
+        for fileName, fileContent in ProgenEngine.curaProfile(machine):
             if fileAction == '--file':
                 with open(fileName, "w") as f:
                     f.write(fileContent)
@@ -56,13 +56,13 @@ def cura2(fileAction):
             elif fileAction == '--only-filename':
                 print fileName
 
-def installCura2Files():
+def installCuraFiles():
     
     allowAutoInstall = False
 
     if platform.system() == 'Darwin' and 'Cura.app' in os.listdir('/Applications'):
         allowAutoInstall = True
-        root_src_dir = 'Cura 2'
+        root_src_dir = 'Cura'
         root_dst_dir = '/Applications/Cura.app/Contents/Resources/resources'
     
     elif platform.system() == 'Windows':
@@ -70,7 +70,7 @@ def installCura2Files():
         installedCuras = []
         
         for folder in os.listdir('C:\Program Files'): # add [::-1] to list folders in reverse order
-            if ('Cura 2' in folder or 'BCN3D Cura' in folder) and ('Cura.exe' in os.listdir('C:\\Program Files\\'+folder) or 'BCN3D_Cura.exe' in os.listdir('C:\\Program Files\\'+folder)):
+            if ('Cura' in folder or 'BCN3D Cura' in folder) and ('Cura.exe' in os.listdir('C:\\Program Files\\'+folder) or 'BCN3D_Cura.exe' in os.listdir('C:\\Program Files\\'+folder)):
                 installedCuras.append(folder)
 
         if len(installedCuras) >= 1:
@@ -85,9 +85,9 @@ def installCura2Files():
                 allowAutoInstall = True
             
             if allowAutoInstall:
-                root_src_dir = 'Cura 2'
+                root_src_dir = 'Cura'
                 if len(installedCuras) > 1:
-                    print "\n\t\tYou have more than one Cura 2 installed! Select where you want to add the BCN3D Sigma:"
+                    print "\n\t\tYou have more than one Cura installed! Select where you want to add the BCN3D Sigma:"
                     answer0 = ''
                     folderOptions = []
                     for c in range(len(installedCuras)):
@@ -112,14 +112,14 @@ def installCura2Files():
                 if os.path.exists(dst_file):
                     os.remove(dst_file)
                 shutil.move(src_file, dst_dir)
-        if "Cura 2" in os.listdir('.'):
-            shutil.rmtree("Cura 2")
+        if "Cura" in os.listdir('.'):
+            shutil.rmtree("Cura")
         print '\n\t\tThe BCN3D machines have been successfully added to Cura. Enjoy!\n'
     else:
         print "\n\t\tUnable to install files automatically.\n"
-        print "\t\tA new folder called 'Cura 2' has been created in your working directory."
+        print "\t\tA new folder called 'Cura' has been created in your working directory."
         print "\t\tCOMBINE the folders inside MacOS or Windows, according to your OS with the ones"
-        print "\t\tinside your Cura 2 installation folder. Be careful to NOT replace it!\n"
+        print "\t\tinside your Cura installation folder. Be careful to NOT replace it!\n"
 
 def is_admin():
     try:
@@ -214,9 +214,9 @@ def simplify3DProfilesBundle(profilesCreatedCount):
 #     shutil.rmtree(".BCN3D Sigma - Simplify3D Profiles temp")
 #     return bundleSize*1.05
 
-def cura2FilesBundle():
-    cura2('--file')
-    with open('Cura 2/README.txt', 'w') as f:
+def curaFilesBundle():
+    cura('--file')
+    with open('Cura/README.txt', 'w') as f:
         lines = []
         lines.append(r'Build '+PS.progenBuildNumber+'\n')
         lines.append(r''+'\n')
@@ -230,17 +230,17 @@ def cura2FilesBundle():
         lines.append(r'        1 - COMBINE all folders inside "resources" with the ones inside "C:/Program Files/BCN3D Cura 1.0/resources"'+'\n')
         lines.append(r'        2 - Restart BCN3D Cura'+'\n')
         f.writelines(lines)
-    shutil.make_archive('BCN3D Cura - resources', 'zip', 'Cura 2')    
+    shutil.make_archive('BCN3D Cura - resources', 'zip', 'Cura')    
 
     # # Copy files to BCN3D Utilities repository
     # try:
-    #     if "MacOS" in os.listdir("../BCN3D-Utilities/Sigma - Cura 2"):
-    #         shutil.rmtree("../BCN3D-Utilities/Sigma - Cura 2/MacOS")
-    #     shutil.copytree("Cura 2/MacOS", "../BCN3D-Utilities/Sigma - Cura 2/MacOS")
-    #     if "Windows" in os.listdir("../BCN3D-Utilities/Sigma - Cura 2"):
-    #         shutil.rmtree("../BCN3D-Utilities/Sigma - Cura 2/Windows")
-    #     shutil.copytree("Cura 2/Windows", "../BCN3D-Utilities/Sigma - Cura 2/Windows")
+    #     if "MacOS" in os.listdir("../BCN3D-Utilities/Sigma - Cura"):
+    #         shutil.rmtree("../BCN3D-Utilities/Sigma - Cura/MacOS")
+    #     shutil.copytree("Cura/MacOS", "../BCN3D-Utilities/Sigma - Cura/MacOS")
+    #     if "Windows" in os.listdir("../BCN3D-Utilities/Sigma - Cura"):
+    #         shutil.rmtree("../BCN3D-Utilities/Sigma - Cura/Windows")
+    #     shutil.copytree("Cura/Windows", "../BCN3D-Utilities/Sigma - Cura/Windows")
     # except:
     #     pass
 
-    shutil.rmtree("Cura 2")
+    shutil.rmtree("Cura")

@@ -733,7 +733,7 @@ def simplify3DProfile(machine, printMode, hotendLeft, hotendRight, filamentLeft,
     fileContent = '\n'.join(fff)
     return fileName, fileContent
 
-def cura2Profile(machine):
+def curaProfile(machine):
     '''
         Values hierarchy:
             
@@ -745,26 +745,26 @@ def cura2Profile(machine):
     filesList = [] # List containing tuples: (fileName, fileContent)
 
     for hotend in sorted(PS.profilesData['hotend'], key=lambda k: k['id']):
-        cura2PreferredVariant = hotend['id'].replace(' ', '_')
+        curaPreferredVariant = hotend['id'].replace(' ', '_')
         if machine['defaultHotend'] in hotend['id']:
-            cura2PreferredVariant = hotend['id'].replace(' ', '_')
+            curaPreferredVariant = hotend['id'].replace(' ', '_')
             break
 
     for quality in sorted(PS.profilesData['quality'], key=lambda k: k['index']):
-        cura2PreferredQuality = quality['id'].replace(' ', '_')
+        curaPreferredQuality = quality['id'].replace(' ', '_')
         if 'Standard' in quality['id']:
-            cura2PreferredQuality = quality['id'].replace(' ', '_')
+            curaPreferredQuality = quality['id'].replace(' ', '_')
             break
 
     for filament in sorted(PS.profilesData['filament'], key=lambda k: k['id']):
-        cura2PreferredMaterial = filament['id'].replace(' ', '_')
+        curaPreferredMaterial = filament['id'].replace(' ', '_')
         if 'BCN3D Filaments PLA' in filament['id']:
-            cura2PreferredMaterial = filament['id'].replace(' ', '_')
+            curaPreferredMaterial = filament['id'].replace(' ', '_')
             if 'Orange' in filament['colors']:
-                cura2PreferredMaterial += '_Orange'
+                curaPreferredMaterial += '_Orange'
             break
 
-    fileName = 'Cura 2/resources/definitions/'+machine['id']+'.def.json'
+    fileName = 'Cura/resources/definitions/'+machine['id']+'.def.json'
     definition = []
     definition.append('{')
     definition.append('    "id": "'+machine['id']+'",')
@@ -792,9 +792,9 @@ def cura2Profile(machine):
     definition.append('        "has_machine_materials": true,')
     definition.append('        "has_variant_materials": true,')
     definition.append('        "has_variants": true,')
-    definition.append('        "preferred_material": "*'+cura2PreferredMaterial+'*",')
-    definition.append('        "preferred_variant": "*'+cura2PreferredVariant+'*",')
-    definition.append('        "preferred_quality": "*'+cura2PreferredQuality+'*",')
+    definition.append('        "preferred_material": "*'+curaPreferredMaterial+'*",')
+    definition.append('        "preferred_variant": "*'+curaPreferredVariant+'*",')
+    definition.append('        "preferred_quality": "*'+curaPreferredQuality+'*",')
     definition.append('        "variants_name": "Hotend",')
     definition.append('        "machine_extruder_trains":')
     definition.append('        {')
@@ -1268,7 +1268,7 @@ def cura2Profile(machine):
     fileContent = '\n'.join(definition)
     filesList.append((fileName, fileContent))
 
-    fileName = 'Cura 2/resources/extruders/'+machine['id']+'_extruder_left.def.json'
+    fileName = 'Cura/resources/extruders/'+machine['id']+'_extruder_left.def.json'
     extruder = []
     extruder.append('{')
     extruder.append('    "id": "'+machine['id']+'_extruder_left",')
@@ -1304,7 +1304,7 @@ def cura2Profile(machine):
     fileContent = '\n'.join(extruder)
     filesList.append((fileName, fileContent))
 
-    fileName = 'Cura 2/resources/extruders/'+machine['id']+'_extruder_right.def.json'
+    fileName = 'Cura/resources/extruders/'+machine['id']+'_extruder_right.def.json'
     extruder = []
     extruder.append('{')
     extruder.append('    "id": "'+machine['id']+'_extruder_right",')
@@ -1342,8 +1342,8 @@ def cura2Profile(machine):
 
     for filament in sorted(PS.profilesData['filament'], key=lambda k: k['id']):
         for color in filament['colors']:
-            fileName = 'Cura 2/resources/materials/'+machine['manufacturer']+'/'+(filament['brand']+'_'+filament['material']+'_'+color+'.xml.fdm_material').replace(' ', '_')
-            if (filament['brand']+'_'+filament['material']+'_'+color+'.xml.fdm_material').replace(' ', '_') not in os.listdir('Cura 2/resources/materials/'+machine['manufacturer']):
+            fileName = 'Cura/resources/materials/'+machine['manufacturer']+'/'+(filament['brand']+'_'+filament['material']+'_'+color+'.xml.fdm_material').replace(' ', '_')
+            if (filament['brand']+'_'+filament['material']+'_'+color+'.xml.fdm_material').replace(' ', '_') not in os.listdir('Cura/resources/materials/'+machine['manufacturer']):
                 material = []
                 material.append('<?xml version="1.0" encoding="UTF-8"?>')
                 material.append('<fdmmaterial xmlns="http://www.ultimaker.com/material" version="1.3">')
@@ -1431,7 +1431,7 @@ def cura2Profile(machine):
                             # Create a new global quality for the new layer height
                             if layerHeight not in globalQualities:
                                 globalQualities.append(layerHeight)
-                                fileName = 'Cura 2/resources/quality/'+machine['id']+'/'+machine['id']+'_global_Layer_'+("%.2f" % layerHeight)+'_mm_Quality.inst.cfg'
+                                fileName = 'Cura/resources/quality/'+machine['id']+'/'+machine['id']+'_global_Layer_'+("%.2f" % layerHeight)+'_mm_Quality.inst.cfg'
                                 qualityFile = []
                                 qualityFile.append('[general]')
                                 qualityFile.append('version = 2')
@@ -1451,7 +1451,7 @@ def cura2Profile(machine):
                                 fileContent = '\n'.join(qualityFile)
                                 filesList.append((fileName, fileContent))
 
-                            fileName = 'Cura 2/resources/quality/'+machine['id']+'/'+'_'.join([machine['id'], hotend['id'], filament['brand'], filament['material'], color, quality['id'], 'Quality.inst.cfg']).replace(' ', '_')
+                            fileName = 'Cura/resources/quality/'+machine['id']+'/'+'_'.join([machine['id'], hotend['id'], filament['brand'], filament['material'], color, quality['id'], 'Quality.inst.cfg']).replace(' ', '_')
 
                             # keep all default values commented
 
@@ -1585,7 +1585,7 @@ def cura2Profile(machine):
     if 'variants' not in machine:
         for hotend in sorted(PS.profilesData['hotend'], key=lambda k: k['id']):
             if hotend['id'] != 'None':
-                fileName = 'Cura 2/resources/variants/'+machine['id']+'_'+hotend['id'].replace(' ', '_')+'.inst.cfg'
+                fileName = 'Cura/resources/variants/'+machine['id']+'_'+hotend['id'].replace(' ', '_')+'.inst.cfg'
                 variant = []
                 variant.append('[general]')
                 variant.append('name = '+hotend['id'])

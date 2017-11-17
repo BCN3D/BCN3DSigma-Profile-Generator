@@ -125,11 +125,11 @@ def validArguments():
         return False
 
 def clearDisplay():
-    pass
-    # if platform.system() == 'Windows':
-    #     os.system('cls')
-    # else:
-    #     os.system('clear')
+    # pass
+    if platform.system() == 'Windows':
+        os.system('cls')
+    else:
+        os.system('clear')
 
 def main():
     # if platform.system() == 'Windows':
@@ -195,13 +195,13 @@ def main():
                     while x2 not in ['1','2','3','4']:
                         x2 = raw_input('\t')
 
-                singleProfileSimplify3D, cura2Files, bundleProfilesSimplify3D, testComb, cura2FilesBundle = False, False, False, False, False
+                singleProfileSimplify3D, curaFiles, bundleProfilesSimplify3D, testComb, curaFilesBundle = False, False, False, False, False
 
                 if x == '1':
                     singleProfileSimplify3D = True
                     GUIHeader = title+'\n\n    Profile for Simplify3D'
                 elif x == '2':
-                    cura2Files = True
+                    curaFiles = True
                     GUIHeader = title+'\n\n\n    Profile for Cura'
                 elif x == '3':
                     experimentalMenu = True               
@@ -209,7 +209,7 @@ def main():
                         bundleProfilesSimplify3D = True
                         GUIHeader = title+'\n\n\n\n\n    Experimental features\n\n\n\t   Generate a bundle of profiles - Simplify3D\n'
                     elif x2 == '2':
-                        cura2FilesBundle = True
+                        curaFilesBundle = True
                         GUIHeader = title+'\n\n\n\n\n    Experimental features\n\n\n\n\t   Generate a bundle of profiles - Cura\n'
                     elif x2 == '3':
                         testComb = True
@@ -220,23 +220,23 @@ def main():
                 elif x == '4':
                     break
 
-                if bundleProfilesSimplify3D or cura2FilesBundle or singleProfileSimplify3D or cura2Files:
+                if bundleProfilesSimplify3D or curaFilesBundle or singleProfileSimplify3D or curaFiles:
                     if bundleProfilesSimplify3D:
                         clearDisplay()
                         print GUIHeader
                         ProfileMaker.simplify3DProfilesBundle(profilesCreatedCount)
                         profilesCreatedCount = ProfileMaker.simplify3DProfilesBundle(profilesCreatedCount)
-                    elif cura2FilesBundle:
+                    elif curaFilesBundle:
                         clearDisplay()
                         print GUIHeader
-                        ProfileMaker.cura2FilesBundle()
+                        ProfileMaker.curaFilesBundle()
                         raw_input("\n\t\tCura files created and zipped to share ;) Press Enter to continue...")
 
-                    elif cura2Files:
+                    elif curaFiles:
                         clearDisplay()
                         print GUIHeader
-                        ProfileMaker.cura2('--file')
-                        ProfileMaker.installCura2Files()
+                        ProfileMaker.cura('--file')
+                        ProfileMaker.installCuraFiles()
                         raw_input("\t\tPress Enter to continue...")
                     elif singleProfileSimplify3D:
                         
