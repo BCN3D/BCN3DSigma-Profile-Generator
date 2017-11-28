@@ -156,7 +156,7 @@ def main():
             leftFilament = PS.profilesData['filament'][0]
         if sys.argv[4] == 'None':
             rightFilament = PS.profilesData['filament'][0]
-        if len(sys.argv) == 9:
+        if len(sys.argv) == 8:
             if sys.argv[7] == '--no-file' or sys.argv[7] == '--only-filename':
                 ProfileMaker.simplify3D(machine, printMode, leftHotend, rightHotend, leftFilament, rightFilament, sys.argv[7])
         else:
