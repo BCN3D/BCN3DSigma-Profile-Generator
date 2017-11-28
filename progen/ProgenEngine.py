@@ -845,8 +845,8 @@ def curaProfile(machine):
         definition.append('            ]')
         definition.append('        },')
         definition.append('        "gantry_height": { "default_value": '+str(machine['height'])+' },')
-        definition.append('        "extruder_prime_pos_z": { "default_value": 2.0 },') # The Z coordinate of the position where the nozzle primes at the start of printing.
-        definition.append('        "extruder_prime_pos_abs": { "default_value": false },') # Make the extruder prime position absolute rather than relative to the last-known location of the head.
+        # definition.append('        "extruder_prime_pos_z": { "default_value": 2.0 },') # The Z coordinate of the position where the nozzle primes at the start of printing.
+        # definition.append('        "extruder_prime_pos_abs": { "default_value": false },') # Make the extruder prime position absolute rather than relative to the last-known location of the head.
         definition.append('        "machine_max_feedrate_x": { "default_value": 200 },')
         definition.append('        "machine_max_feedrate_y": { "default_value": 200 },')
         definition.append('        "machine_max_feedrate_z": { "default_value": 12 },')
@@ -942,7 +942,7 @@ def curaProfile(machine):
         definition.append('        "xy_offset_layer_0": { "value": -0.1 },')
 # Cura 3 Feature definition.append('        "z_seam_type": { "value": "'+"'sharpest_corner'"+'" },')
         definition.append('        "z_seam_type": { "value": "'+"'back'"+'" },') # Deprecated after 2.7 (change to sharpest_corner)
-        definition.append('        "z_seam_x": { "value": "int(machine_width/2.)" },')
+        definition.append('        "z_seam_x": { "value": "int(machine_width/2.) if print_mode == '+"'regular'"+' else int((machine_width/2.)/2.) if print_mode == '+"'duplication'"+' else int((machine_width/2. - 54/2)/2.)" },')
         definition.append('        "z_seam_y": { "value": "machine_depth" },')
 # Cura 3 Feature definition.append('        "z_seam_corner": { "value": "'+"'z_seam_corner_inner'"+'" },')
         definition.append('        "z_seam_relative": { "value": false },')
@@ -980,7 +980,7 @@ def curaProfile(machine):
         # definition.append('        "material_final_print_temperature": { "enabled": "machine_nozzle_temp_enabled and not (material_flow_dependent_temperature)" },')
         # definition.append('        "material_flow_temp_graph": { "enabled": "machine_nozzle_temp_enabled and material_flow_dependent_temperature" },') # Bad visualization
         # definition.append('        "retraction_enable": { "value": true },')
-        definition.append('        "retract_at_layer_change": { "value": true },')
+        definition.append('        "retract_at_layer_change": { "value": false },')
         definition.append('        "retraction_speed": { "maximum_value_warning": "machine_max_feedrate_e"},')
         definition.append('        "retraction_retract_speed":')
         definition.append('        {')
@@ -1098,7 +1098,7 @@ def curaProfile(machine):
         # definition.append('        "support_connect_zigzags": { "value": true },')
         # definition.append('        "support_top_distance": { "value": "extruderValue(support_roof_extruder_nr if support_roof_enable else support_infill_extruder_nr, '+"'support_z_distance'"+')" },')
         # definition.append('        "support_bottom_distance": { "value": "extruderValue(support_bottom_extruder_nr if support_bottom_enable else support_infill_extruder_nr, '+"'support_z_distance'"+') if support_type == '+"'everywhere'"+' else 0" },')
-        # definition.append('        "support_xy_overrides_z": { "value": "z_overrides_xy" },')
+        definition.append('        "support_xy_overrides_z": { "value": "xy_overrides_z" },')
         # definition.append('        "support_xy_distance_overhang": { "value": "machine_nozzle_size / 2" },')
         # definition.append('        "support_bottom_stair_step_height": { "value": 0.3 },')
         definition.append('        "support_join_distance": { "value": 10 },')
@@ -1546,6 +1546,7 @@ def curaProfile(machine):
                                 if filament['isSupportMaterial']:
                                     # qualityFile.append('support_enable = True') # Not working
                                     qualityFile.append('support_infill_rate = 25')
+                                    qualityFile.append("support_xy_overrides_z = ='z_overrides_xy'")
                                     qualityFile.append('support_xy_distance = 0.5')
                                     qualityFile.append('support_z_distance = 0')
                                     qualityFile.append('support_interface_density = 100')
@@ -1554,6 +1555,7 @@ def curaProfile(machine):
                                 else:
                                     # qualityFile.append('support_enable = False')
                                     qualityFile.append('support_infill_rate = 15')
+                                    qualityFile.append("support_xy_overrides_z = ='xy_overrides_z'")
                                     qualityFile.append('support_xy_distance = 0.7')
                                     qualityFile.append('support_z_distance = =layer_height')
                                     qualityFile.append('support_interface_density = 75')
