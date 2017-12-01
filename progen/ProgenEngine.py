@@ -266,6 +266,8 @@ def simplify3DProfile(machine, printMode, hotendLeft, hotendRight, filamentLeft,
     fff.append('  <endingGcode>'+\
         'M104 S0 T0\t\t\t;left extruder heater off,'+\
         'M104 S0 T1\t\t\t;right extruder heater off,'+\
+        'M204 S2000\t\t\t;set default acceleration,'+\
+        'M205 X15 Y15\t\t\t;set defaul jerk,'+\
         'M140 S0\t\t\t;heated bed heater off,'+\
         'G91\t\t\t;relative positioning,'+\
         'G1 Z+0.5 E-5 Y+10 F[travel_speed]\t;move Z up a bit and retract filament,'+\
@@ -625,13 +627,13 @@ def simplify3DProfile(machine, printMode, hotendLeft, hotendRight, filamentLeft,
             else:
                 reducedAccelerationForPerimeters = accelerationForPerimeters(primaryHotend['nozzleSize'], layerHeight, int(defaultSpeed/60. * outlineUnderspeed))
             postProcessingScript = \
-                r'{REPLACE "; outer perimeter" "; outer perimeter\nM204 S'+str(reducedAccelerationForPerimeters)+'"},'+\
-                r'{REPLACE "; inner perimeter" "; inner perimeter\nM204 S2000"},'+\
-                r'{REPLACE "; solid layer" "; solid layer\nM204 S2000"},'+\
-                r'{REPLACE "; infill" "; infill\nM204 S2000",'+\
-                r'{REPLACE "; support" "; support\nM204 S2000"},'+\
-                r'{REPLACE "; layer end" "; layer end\nM204 S2000"},'+\
                 r'{REPLACE "F12000\nG1 Z'+str(round(layerHeight*firstLayerHeightPercentage/100., 3))+r' F720\nG92 E0" "F12000G1 Z'+str(round(layerHeight*firstLayerHeightPercentage/100., 3))+r' F720\nG1 E0.0000 F720\nG92 E0"}'
+                # r'{REPLACE "; outer perimeter" "; outer perimeter\nM204 S'+str(reducedAccelerationForPerimeters)+'"},'+\
+                # r'{REPLACE "; inner perimeter" "; inner perimeter\nM204 S2000"},'+\
+                # r'{REPLACE "; solid layer" "; solid layer\nM204 S2000"},'+\
+                # r'{REPLACE "; infill" "; infill\nM204 S2000",'+\
+                # r'{REPLACE "; support" "; support\nM204 S2000"},'+\
+                # r'{REPLACE "; layer end" "; layer end\nM204 S2000"},'+\
             fff.append('  </autoConfigureQuality>')
 
             # if dataLog != '--no-data' :
@@ -652,6 +654,8 @@ def simplify3DProfile(machine, printMode, hotendLeft, hotendRight, filamentLeft,
                 'G90\t\t;absolute positioning,'+\
                 'M82\t\t;set extruder to absolute mode,'+\
                 'M107\t\t;start with the fan off,'+\
+                'M204 S2000\t\t;set default acceleration,'+\
+                'M205 X15 Y15\t\t;set defaul jerk,'+\
                 'G28 X0 Y0\t\t;move X/Y to min endstops,'+\
                 'G28 Z0\t\t;move Z to min endstops,'+\
                 'G92 E0\t\t;zero the extruded length,'+\
@@ -671,6 +675,8 @@ def simplify3DProfile(machine, printMode, hotendLeft, hotendRight, filamentLeft,
                 'G90\t\t;absolute positioning,'+\
                 'M108 P1\t\t;enable layer fan for idle extruder,'+\
                 'M107\t\t;start with the fan off,'+\
+                'M204 S2000\t\t;set default acceleration,'+\
+                'M205 X15 Y15\t\t;set defaul jerk,'+\
                 'G28 X0 Y0\t\t;move X/Y to min endstops,'+\
                 'G28 Z0\t\t;move Z to min endstops,'+\
                 'T1\t\t;switch to the right extruder,'+\
@@ -695,6 +701,8 @@ def simplify3DProfile(machine, printMode, hotendLeft, hotendRight, filamentLeft,
             'G90\t\t;absolute positioning,'+\
             'M82\t\t;set extruder to absolute mode,'+\
             'M107\t\t;start with the fan off,'+\
+            'M204 S2000\t\t;set default acceleration,'+\
+            'M205 X15 Y15\t\t;set defaul jerk,'+\
             'G28 X0 Y0\t\t;move X/Y to min endstops,'+\
             'G28 Z0\t\t;move Z to min endstops,'+\
             'G92 E0\t\t;zero the extruded length,'+\
@@ -713,6 +721,8 @@ def simplify3DProfile(machine, printMode, hotendLeft, hotendRight, filamentLeft,
             'G90\t\t;absolute positioning,'+\
             'M108 P1\t\t;enable layer fan for idle extruder,'+\
             'M107\t\t;start with the fan off,'+\
+            'M204 S2000\t\t;set default acceleration,'+\
+            'M205 X15 Y15\t\t;set defaul jerk,'+\
             'G28 X0 Y0\t\t;move X/Y to min endstops,'+\
             'G28 Z0\t\t;move Z to min endstops,'+\
             'T1\t\t;switch to the right extruder,'+\
@@ -868,6 +878,8 @@ def curaProfile(machine):
             r'G21          ;metric values\n'+\
             r'G90          ;absolute positioning\n'+\
             r'M82          ;set extruder to absolute mode\n'+\
+            r'M204 S2000   ;set default acceleration\n'+\
+            r'M205 X15 Y15 ;set defaul jerk\n'+\
             r'M108 P1      ;enable layer fan for idle extruder\n'+\
             r'M107         ;start with the fan off\n'+\
             r'G28 X0 Y0    ;move X/Y to min endstops\n'+\
@@ -889,6 +901,8 @@ def curaProfile(machine):
             r'M104 S0 T0               ;left extruder heater off\n'+\
             r'M104 S0 T1               ;right extruder heater off\n'+\
             r'M140 S0                  ;heated bed heater off\n'+\
+            r'M204 S2000               ;set default acceleration\n'+\
+            r'M205 X15 Y15             ;set defaul jerk\n'+\
             r'G91                      ;relative positioning\n'+\
             r'G1 Z+0.5 E-5 Y+10 F12000 ;move Z up a bit and retract filament\n'+\
             r'G28 X0 Y0                ;move X/Y to min endstops so the head is out of the way\n'+\
@@ -1022,7 +1036,7 @@ def curaProfile(machine):
         # definition.append('        "speed_slowdown_layers = 2" },')
         definition.append('        "speed_equalize_flow_enabled": { "value": true },')
         definition.append('        "speed_equalize_flow_max": { "value": 100 },')
-        definition.append('        "acceleration_enabled": { "value": true },')
+        definition.append('        "acceleration_enabled": { "value": false },')
         definition.append('        "acceleration_print": { "value": "machine_acceleration" },')
         # definition.append('        "acceleration_infill": { "value": "acceleration_print" },')
         # definition.append('        "acceleration_wall": { "value": "round(acceleration_print - (acceleration_print - acceleration_wall_0)/ 2.)" },')
@@ -1037,7 +1051,7 @@ def curaProfile(machine):
         # definition.append('        "acceleration_print_layer_0": { "value": "acceleration_layer_0" },')
         # definition.append('        "acceleration_travel_layer_0": { "value": "acceleration_layer_0 * acceleration_travel / acceleration_print" },')
         # definition.append('        "acceleration_skirt_brim": { "value": "acceleration_layer_0" },')
-        definition.append('        "jerk_enabled": { "value": true },')
+        definition.append('        "jerk_enabled": { "value": false },')
         definition.append('        "jerk_print": { "value": "machine_max_jerk_xy" },')
         # definition.append('        "jerk_infill": { "value": "jerk_print" },')
         definition.append('        "jerk_wall": { "value": "jerk_print * 0.75" },')
@@ -1049,7 +1063,7 @@ def curaProfile(machine):
         # definition.append('        "jerk_support_infill": { "value": "jerk_support" },')
         definition.append('        "jerk_support_interface": { "value": "jerk_topbottom" },')
         definition.append('        "jerk_prime_tower": { "value": "jerk_wall" },')
-        definition.append('        "jerk_travel": { "value": "jerk_print if magic_spiralize else 15" },')
+        definition.append('        "jerk_travel": { "value": "jerk_print if magic_spiralize else machine_max_jerk_xy" },')
         definition.append('        "jerk_layer_0": { "value": "jerk_topbottom" },')
         # definition.append('        "jerk_print_layer_0": { "value": "jerk_layer_0" },')
         # definition.append('        "jerk_travel_layer_0": { "value": "jerk_layer_0 * jerk_travel / jerk_print" },')
@@ -1391,6 +1405,7 @@ def curaProfile(machine):
                 material.append('    <properties>')
                 material.append('        <density>'+str(filament['filamentDensity'])+'</density>')
                 material.append('        <diameter>'+str(filament['filamentDiameter'])+'</diameter>')
+                # material.append('        <price>'+str(filament['filamentPricePerKg'])+'</price>')
                 material.append('    </properties>')
                 material.append('    <settings>')
                 material.append('        <setting key="print temperature">'+str(defaultMaterialPrintTemperature(filament))+'</setting>') # default_material_print_temperature
