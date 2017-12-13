@@ -334,8 +334,6 @@ def simplify3DProfile(machine, printMode, hotendLeft, hotendRight, filamentLeft,
             overlapInternalInfillAngles = 1
             generateSupport = 0
             supportHorizontalPartOffset = 0.7
-            supportUpperSeparationLayers = 1
-            supportLowerSeparationLayers = 1
             supportAngles = '90'
             supportInfillPercentage = 25
             denseSupportInfillPercentage = 75
@@ -384,14 +382,14 @@ def simplify3DProfile(machine, printMode, hotendLeft, hotendRight, filamentLeft,
                 supportExtruder = primaryExtruder
                 bedTemperature = primaryFilament['bedTemperature']
                 secondaryExtruderAction = ' - '
+                supportUpperSeparationLayers = int(0.15/layerHeight) + 1
+                supportLowerSeparationLayers = supportUpperSeparationLayers
             else:
                 # IDEX                
                 if filamentLeft['isSupportMaterial'] != filamentRight['isSupportMaterial']:
                     # IDEX, Support Material
                     generateSupport = 1
                     supportHorizontalPartOffset = 0.1
-                    supportUpperSeparationLayers = 0
-                    supportLowerSeparationLayers = 0
                     supportAngles = '90,0'
                     supportInfillPercentage = 25
                     denseSupportInfillPercentage = 100
@@ -426,7 +424,9 @@ def simplify3DProfile(machine, printMode, hotendLeft, hotendRight, filamentLeft,
                         fanActionOnToolChange1 = '{IF NEWTOOL=0} M106 S'+str(fanSpeed(primaryHotend, primaryFilament, hotendLeftTemperature, layerHeight))+"\t\t"+';enable fan for part material,'
                         fanActionOnToolChange2 = '{IF NEWTOOL=1} M107'+"\t\t"+';disable fan for support material,' 
                     infillExtruder = primaryExtruder
-                    supportExtruder = abs(primaryExtruder-1)                    
+                    supportExtruder = abs(primaryExtruder-1) 
+                    supportUpperSeparationLayers = 0
+                    supportLowerSeparationLayers = 0                   
                 else:
                     # IDEX, Combined Infill
                     avoidCrossingOutline = 0
@@ -467,6 +467,8 @@ def simplify3DProfile(machine, printMode, hotendLeft, hotendRight, filamentLeft,
                     infillExtruder = abs(primaryExtruder-1)
                     supportExtruder = primaryExtruder
                     firstLayerHeight = primaryHotend['nozzleSize'] / 2.
+                    supportUpperSeparationLayers = int(0.15/layerHeight) + 1
+                    supportLowerSeparationLayers = supportUpperSeparationLayers
                 bedTemperature = max(filamentLeft['bedTemperature'], filamentRight['bedTemperature'])
                         
             firstLayerHeightPercentage = int(firstLayerHeight * 100 / float(layerHeight))
@@ -1572,7 +1574,7 @@ def curaProfile(machine):
                                     qualityFile.append('support_infill_rate = 15')
                                     qualityFile.append("support_xy_overrides_z = ='xy_overrides_z'")
                                     qualityFile.append('support_xy_distance = 0.7')
-                                    qualityFile.append('support_z_distance = =layer_height')
+                                    qualityFile.append('support_z_distance = =max(layer_height, 0.15)')
                                     qualityFile.append('support_interface_density = 75')
                                     qualityFile.append('support_conical_enabled = True')
                                     # qualityFile.append('support_conical_angle = 30')
