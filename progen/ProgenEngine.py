@@ -266,8 +266,8 @@ def simplify3DProfile(machine, printMode, hotendLeft, hotendRight, filamentLeft,
     fff.append('  <endingGcode>'+\
         'M104 S0 T0\t\t\t;left extruder heater off,'+\
         'M104 S0 T1\t\t\t;right extruder heater off,'+\
-        'M204 S2000\t\t\t;set default acceleration,'+\
-        'M205 X15 Y15\t\t\t;set defaul jerk,'+\
+        'M204 S'+str(machine['acceleration'])+'\t\t\t;set default acceleration,'+\
+        'M205 X'+str(machine['jerk'])+' Y'+str(machine['jerk'])+'\t\t\t;set defaul jerk,'+\
         'M140 S0\t\t\t;heated bed heater off,'+\
         'G91\t\t\t;relative positioning,'+\
         'G1 Z+0.5 E-5 Y+10 F[travel_speed]\t;move Z up a bit and retract filament,'+\
@@ -656,8 +656,8 @@ def simplify3DProfile(machine, printMode, hotendLeft, hotendRight, filamentLeft,
                 'G90\t\t;absolute positioning,'+\
                 'M82\t\t;set extruder to absolute mode,'+\
                 'M107\t\t;start with the fan off,'+\
-                'M204 S2000\t\t;set default acceleration,'+\
-                'M205 X15 Y15\t\t;set defaul jerk,'+\
+                'M204 S'+str(machine['acceleration'])+'\t\t;set default acceleration,'+\
+                'M205 X'+str(machine['jerk'])+' Y'+str(machine['jerk'])+'\t\t;set defaul jerk,'+\
                 'G28 X0 Y0\t\t;move X/Y to min endstops,'+\
                 'G28 Z0\t\t;move Z to min endstops,'+\
                 'G92 E0\t\t;zero the extruded length,'+\
@@ -677,8 +677,8 @@ def simplify3DProfile(machine, printMode, hotendLeft, hotendRight, filamentLeft,
                 'G90\t\t;absolute positioning,'+\
                 'M108 P1\t\t;enable layer fan for idle extruder,'+\
                 'M107\t\t;start with the fan off,'+\
-                'M204 S2000\t\t;set default acceleration,'+\
-                'M205 X15 Y15\t\t;set defaul jerk,'+\
+                'M204 S'+str(machine['acceleration'])+'\t\t;set default acceleration,'+\
+                'M205 X'+str(machine['jerk'])+' Y'+str(machine['jerk'])+'\t\t;set defaul jerk,'+\
                 'G28 X0 Y0\t\t;move X/Y to min endstops,'+\
                 'G28 Z0\t\t;move Z to min endstops,'+\
                 'T1\t\t;switch to the right extruder,'+\
@@ -703,8 +703,8 @@ def simplify3DProfile(machine, printMode, hotendLeft, hotendRight, filamentLeft,
             'G90\t\t;absolute positioning,'+\
             'M82\t\t;set extruder to absolute mode,'+\
             'M107\t\t;start with the fan off,'+\
-            'M204 S2000\t\t;set default acceleration,'+\
-            'M205 X15 Y15\t\t;set defaul jerk,'+\
+            'M204 S'+str(machine['acceleration'])+'\t\t;set default acceleration,'+\
+            'M205 X'+str(machine['jerk'])+' Y'+str(machine['jerk'])+'\t\t;set defaul jerk,'+\
             'G28 X0 Y0\t\t;move X/Y to min endstops,'+\
             'G28 Z0\t\t;move Z to min endstops,'+\
             'G92 E0\t\t;zero the extruded length,'+\
@@ -723,8 +723,8 @@ def simplify3DProfile(machine, printMode, hotendLeft, hotendRight, filamentLeft,
             'G90\t\t;absolute positioning,'+\
             'M108 P1\t\t;enable layer fan for idle extruder,'+\
             'M107\t\t;start with the fan off,'+\
-            'M204 S2000\t\t;set default acceleration,'+\
-            'M205 X15 Y15\t\t;set defaul jerk,'+\
+            'M204 S'+str(machine['acceleration'])+'\t\t;set default acceleration,'+\
+            'M205 X'+str(machine['jerk'])+' Y'+str(machine['jerk'])+'\t\t;set defaul jerk,'+\
             'G28 X0 Y0\t\t;move X/Y to min endstops,'+\
             'G28 Z0\t\t;move Z to min endstops,'+\
             'T1\t\t;switch to the right extruder,'+\
@@ -880,8 +880,8 @@ def curaProfile(machine):
             r'G21          ;metric values\n'+\
             r'G90          ;absolute positioning\n'+\
             r'M82          ;set extruder to absolute mode\n'+\
-            r'M204 S2000   ;set default acceleration\n'+\
-            r'M205 X15 Y15 ;set defaul jerk\n'+\
+            r'M204 S'+str(machine['acceleration'])+'   ;set default acceleration\n'+\
+            r'M205 X'+str(machine['jerk'])+' Y'+str(machine['jerk'])+' ;set defaul jerk\n'+\
             r'M108 P1      ;enable layer fan for idle extruder\n'+\
             r'M107         ;start with the fan off\n'+\
             r'G28 X0 Y0    ;move X/Y to min endstops\n'+\
@@ -903,8 +903,8 @@ def curaProfile(machine):
             r'M104 S0 T0               ;left extruder heater off\n'+\
             r'M104 S0 T1               ;right extruder heater off\n'+\
             r'M140 S0                  ;heated bed heater off\n'+\
-            r'M204 S2000               ;set default acceleration\n'+\
-            r'M205 X15 Y15             ;set defaul jerk\n'+\
+            r'M204 S'+str(machine['acceleration'])+'               ;set default acceleration\n'+\
+            r'M205 X'+str(machine['jerk'])+' Y'+str(machine['jerk'])+'             ;set defaul jerk\n'+\
             r'G91                      ;relative positioning\n'+\
             r'G1 Z+0.5 E-5 Y+10 F12000 ;move Z up a bit and retract filament\n'+\
             r'G28 X0 Y0                ;move X/Y to min endstops so the head is out of the way\n'+\
