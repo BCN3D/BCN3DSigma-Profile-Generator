@@ -1,28 +1,28 @@
 {
-    "id": "Colorfabb SteelFill",
+    "id": "Colorfabb CopperFill",
     "brand": "Colorfabb",
     "material": "Composites",
     "colors": {
-        "SteelFill": "#80867F"
+        "CopperFill": "#B58164"
     },
-    "filamentDiameter": 2.85,
+    "filamentDiameter": 2.9,
     "filamentPricePerKg": 66.6,
-    "filamentDensity": 3.13,
+    "filamentDensity": 3.9,
     "isSupportMaterial": false,
     "isFlexibleMaterial": false,
-    "isAbrasiveMaterial": true,
+    "isAbrasiveMaterial": false,
     "bedTemperature": 65,
     "printTemperature": [210, 220],
     "standbyTemperature": 150,
-    "defaultPrintSpeed": 60,
-    "advisedMaxPrintSpeed": 80,
+    "defaultPrintSpeed": 50,
+    "advisedMaxPrintSpeed": 100,
     "maxFlow": "None",
     "maxFlowForHighFlowHotend": "None",
-    "retractionDistance": 4,
+    "retractionDistance": 3,
     "retractionSpeed": 40,
     "retractionCount": 50,
     "fanPercentage": [50, 100],
     "extrusionMultiplier": 1.1,
-    "minimumLayerHeight": 0,
+    "minimumLayerHeight": 0.15,
     "purgeVolume": 97.31
 }
