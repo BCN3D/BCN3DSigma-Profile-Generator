@@ -880,8 +880,8 @@ def curaProfile(machine):
             r'G21          ;metric values\n'+\
             r'G90          ;absolute positioning\n'+\
             r'M82          ;set extruder to absolute mode\n'+\
-            r'M204 S'+str(machine['acceleration'])+'   ;set default acceleration\n'+\
-            r'M205 X'+str(machine['jerk'])+' Y'+str(machine['jerk'])+' ;set defaul jerk\n'+\
+            r'M204 S'+str(machine['acceleration'])+r'   ;set default acceleration\n'+\
+            r'M205 X'+str(machine['jerk'])+' Y'+str(machine['jerk'])+r' ;set defaul jerk\n'+\
             r'M108 P1      ;enable layer fan for idle extruder\n'+\
             r'M107         ;start with the fan off\n'+\
             r'G28 X0 Y0    ;move X/Y to min endstops\n'+\
@@ -903,8 +903,8 @@ def curaProfile(machine):
             r'M104 S0 T0               ;left extruder heater off\n'+\
             r'M104 S0 T1               ;right extruder heater off\n'+\
             r'M140 S0                  ;heated bed heater off\n'+\
-            r'M204 S'+str(machine['acceleration'])+'               ;set default acceleration\n'+\
-            r'M205 X'+str(machine['jerk'])+' Y'+str(machine['jerk'])+'             ;set defaul jerk\n'+\
+            r'M204 S'+str(machine['acceleration'])+r'               ;set default acceleration\n'+\
+            r'M205 X'+str(machine['jerk'])+' Y'+str(machine['jerk'])+r'             ;set defaul jerk\n'+\
             r'G91                      ;relative positioning\n'+\
             r'G1 Z+0.5 E-5 Y+10 F12000 ;move Z up a bit and retract filament\n'+\
             r'G28 X0 Y0                ;move X/Y to min endstops so the head is out of the way\n'+\
