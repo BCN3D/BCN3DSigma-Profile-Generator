@@ -681,12 +681,11 @@ def simplify3DProfile(machine, printMode, hotendLeft, hotendRight, filamentLeft,
                 'M205 X'+str(machine['jerk'])+' Y'+str(machine['jerk'])+'\t\t;set defaul jerk,'+\
                 'G28 X0 Y0\t\t;move X/Y to min endstops,'+\
                 'G28 Z0\t\t;move Z to min endstops,'+\
-                'T1\t\t;switch to the right extruder,'+\
+                'T0\t\t;switch to the left extruder,'+\
+                'M605 S4\t\t;clone extruders steps,'+\
                 'G92 E0\t\t;zero the extruded length,'+\
                 'G1 E20 F50\t\t;extrude 20mm of feed stock,'+\
-                'G92 E0\t\t;zero the extruded length again,'+\
-                'T0\t\t;switch to the left extruder,G92 E0\t\t;zero the extruded length,'+\
-                'G1 E20 F50\t\t;extrude 20mm of feed stock,'+\
+                'M605 S3\t\t;back to independent extruder steps'+\
                 'G92 E0\t\t;zero the extruded length again'+printModeGcode+''+\
                 'G4 P1,'+\
                 'G4 P2,'+\
@@ -716,25 +715,44 @@ def simplify3DProfile(machine, printMode, hotendLeft, hotendRight, filamentLeft,
         fff.append('  </autoConfigureExtruders>')
     if hotendLeft['id'] != 'None' and hotendRight['id'] != 'None':
         fff.append('  <autoConfigureExtruders name="Both Extruders"  allowedToolheads="2">')
-        fff.append('    <startingGcode>'+\
-            ';Sigma ProGen '+PS.progenVersionNumber+' (Build '+PS.progenBuildNumber+'),,'+\
-            ''+firstHeatSequence(hotendLeft, hotendRight, hotendLeftTemperature, hotendRightTemperature, bedTemperature, 'Simplify3D')+','+\
-            'G21\t\t;metric values,'+\
-            'G90\t\t;absolute positioning,'+\
-            'M108 P1\t\t;enable layer fan for idle extruder,'+\
-            'M107\t\t;start with the fan off,'+\
-            'M204 S'+str(machine['acceleration'])+'\t\t;set default acceleration,'+\
-            'M205 X'+str(machine['jerk'])+' Y'+str(machine['jerk'])+'\t\t;set defaul jerk,'+\
-            'G28 X0 Y0\t\t;move X/Y to min endstops,'+\
-            'G28 Z0\t\t;move Z to min endstops,'+\
-            'T1\t\t;switch to the right extruder,'+\
-            'G92 E0\t\t;zero the extruded length,'+\
-            'G1 E20 F50\t\t;extrude 20mm of feed stock,'+\
-            'G92 E0\t\t;zero the extruded length again,'+\
-            'T0\t\t;switch to the left extruder,'+\
-            'G92 E0\t\t;zero the extruded length,'+\
-            'G1 E20 F50\t\t;extrude 20mm of feed stock,'+\
-            'G92 E0\t\t;zero the extruded length again</startingGcode>')
+        if 'mirror' in machine['printMode'] or 'duplication' in machine['printMode']:
+            fff.append('    <startingGcode>'+\
+                ';Sigma ProGen '+PS.progenVersionNumber+' (Build '+PS.progenBuildNumber+'),,'+\
+                ''+firstHeatSequence(hotendLeft, hotendRight, hotendLeftTemperature, hotendRightTemperature, bedTemperature, 'Simplify3D')+','+\
+                'G21\t\t;metric values,'+\
+                'G90\t\t;absolute positioning,'+\
+                'M108 P1\t\t;enable layer fan for idle extruder,'+\
+                'M107\t\t;start with the fan off,'+\
+                'M204 S'+str(machine['acceleration'])+'\t\t;set default acceleration,'+\
+                'M205 X'+str(machine['jerk'])+' Y'+str(machine['jerk'])+'\t\t;set defaul jerk,'+\
+                'G28 X0 Y0\t\t;move X/Y to min endstops,'+\
+                'G28 Z0\t\t;move Z to min endstops,'+\
+                'T0\t\t;switch to the left extruder,'+\
+                'M605 S4\t\t;clone extruders steps,'+\
+                'G92 E0\t\t;zero the extruded length,'+\
+                'G1 E20 F50\t\t;extrude 20mm of feed stock,'+\
+                'M605 S3\t\t;back to independent extruder steps'+\
+                'G92 E0\t\t;zero the extruded length again</startingGcode>')
+        else:
+            fff.append('    <startingGcode>'+\
+                ';Sigma ProGen '+PS.progenVersionNumber+' (Build '+PS.progenBuildNumber+'),,'+\
+                ''+firstHeatSequence(hotendLeft, hotendRight, hotendLeftTemperature, hotendRightTemperature, bedTemperature, 'Simplify3D')+','+\
+                'G21\t\t;metric values,'+\
+                'G90\t\t;absolute positioning,'+\
+                'M108 P1\t\t;enable layer fan for idle extruder,'+\
+                'M107\t\t;start with the fan off,'+\
+                'M204 S'+str(machine['acceleration'])+'\t\t;set default acceleration,'+\
+                'M205 X'+str(machine['jerk'])+' Y'+str(machine['jerk'])+'\t\t;set defaul jerk,'+\
+                'G28 X0 Y0\t\t;move X/Y to min endstops,'+\
+                'G28 Z0\t\t;move Z to min endstops,'+\
+                'T1\t\t;switch to the right extruder,'+\
+                'G92 E0\t\t;zero the extruded length,'+\
+                'G1 E20 F50\t\t;extrude 20mm of feed stock,'+\
+                'G92 E0\t\t;zero the extruded length again,'+\
+                'T0\t\t;switch to the left extruder,'+\
+                'G92 E0\t\t;zero the extruded length,'+\
+                'G1 E20 F50\t\t;extrude 20mm of feed stock,'+\
+                'G92 E0\t\t;zero the extruded length again</startingGcode>')
         fff.append('    <layerChangeGcode></layerChangeGcode>')
         fff.append('    <postProcessing>'+postProcessingScript+'</postProcessing>')
         fff.append('  </autoConfigureExtruders>')
