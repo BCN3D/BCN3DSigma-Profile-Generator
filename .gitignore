@@ -95,3 +95,7 @@ ENV/
 *.ini
 
 Profiles Data Experimental/*
+
+.idea/
+
+Cura 2/
