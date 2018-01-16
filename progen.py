@@ -105,16 +105,16 @@ def selectQuality(header):
     return int(answer0)-1   
 
 def validArguments():
-    if len(sys.argv) > 1 and (len(sys.argv) == 7 or len(sys.argv) == 8):
+    if len(sys.argv) > 1 and len(sys.argv) == 8:
         machine = sys.argv[1]+'.json' in os.listdir('./resources/machines')
         printMode = False
         for m in PS.profilesData['machine']:
             if m['id'] == sys.argv[1]:
                 printMode = sys.argv[2] in m['printMode']
-        leftHotend = sys.argv[3]+'.json' in os.listdir('./resources/hotends') or sys.argv[1] == 'None'
-        rightHontend = sys.argv[4]+'.json' in os.listdir('./resources/hotends') or sys.argv[2] == 'None'
-        leftFilament = sys.argv[5]+'.json' in os.listdir('./resources/filaments') or (sys.argv[1] == 'None' and sys.argv[3] == 'None')
-        rightFilament = sys.argv[6]+'.json' in os.listdir('./resources/filaments') or (sys.argv[2] == 'None' and sys.argv[4] == 'None')
+        leftHotend = sys.argv[3]+'.json' in os.listdir('./resources/hotends') or sys.argv[3] == 'None'
+        rightHontend = sys.argv[4]+'.json' in os.listdir('./resources/hotends') or sys.argv[4] == 'None'
+        leftFilament = sys.argv[5]+'.json' in os.listdir('./resources/filaments') or (sys.argv[3] == 'None' and sys.argv[5] == 'None')
+        rightFilament = sys.argv[6]+'.json' in os.listdir('./resources/filaments') or (sys.argv[4] == 'None' and sys.argv[6] == 'None')
         # print machine, printMode, leftHotend, rightHontend, leftFilament, rightFilament
         if len(sys.argv) == 9:
             fileAction = sys.argv[7] == '--no-file' or sys.argv[7] == '--only-filename'
@@ -140,22 +140,26 @@ def main():
         with open('./resources/machines/'+sys.argv[1]+'.json') as machine_file:    
             machine = json.load(machine_file)
         printMode = sys.argv[2]
-        with open('./resources/hotends/'+sys.argv[3]+'.json') as machine_file:    
-            leftHotend = json.load(machine_file)
-        with open('./resources/hotends/'+sys.argv[4]+'.json') as machine_file:    
-            rightHotend = json.load(machine_file)
-        with open('./resources/filaments/'+sys.argv[5]+'.json') as machine_file:    
-            leftFilament = json.load(machine_file)
-        with open('./resources/filaments/'+sys.argv[6]+'.json') as machine_file:    
-            rightFilament = json.load(machine_file)
-        if sys.argv[1] == 'None':
-            leftHotend = dict([('id', 'None')])
-        if sys.argv[2] == "None":
-            rightHotend = dict([('id', 'None')])
         if sys.argv[3] == 'None':
+            leftHotend = dict([('id', 'None')])
+        else:
+            with open('./resources/hotends/'+sys.argv[3]+'.json') as machine_file:    
+                leftHotend = json.load(machine_file)
+        if sys.argv[4] == "None":
+            rightHotend = dict([('id', 'None')])
+        else:
+            with open('./resources/hotends/'+sys.argv[4]+'.json') as machine_file:    
+                rightHotend = json.load(machine_file)
+        if sys.argv[5] == 'None':
             leftFilament = PS.profilesData['filament'][0]
-        if sys.argv[4] == 'None':
+        else:
+            with open('./resources/filaments/'+sys.argv[5]+'.json') as machine_file:    
+                leftFilament = json.load(machine_file)
+        if sys.argv[6] == 'None':
             rightFilament = PS.profilesData['filament'][0]
+        else:
+            with open('./resources/filaments/'+sys.argv[6]+'.json') as machine_file:    
+                rightFilament = json.load(machine_file)
         if len(sys.argv) == 8:
             if sys.argv[7] == '--no-file' or sys.argv[7] == '--only-filename':
                 ProfileMaker.simplify3D(machine, printMode, leftHotend, rightHotend, leftFilament, rightFilament, sys.argv[7])
