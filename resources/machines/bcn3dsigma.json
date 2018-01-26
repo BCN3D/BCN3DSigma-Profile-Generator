@@ -13,6 +13,7 @@
     "extruderHead": [[ -27.8, 39.6 ], [ -27.8, -58.8 ], [ 26.2, 39.6 ], [ 26.2, -58.8 ]],
     "defaultHotend": "0.4mm - Brass",
     "printMode": ["regular"],
+    "retractionAmountMultiplier": 1,
     "extruderSwitchZHop": 2,
     "usePrimeTower": true,
     "useAutoTemperature": false
