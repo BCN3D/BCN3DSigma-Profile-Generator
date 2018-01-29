@@ -161,7 +161,7 @@ def simplify3DProfile(machine, printMode, hotendLeft, hotendRight, filamentLeft,
     fff.append('  <infillLayerInterval>1</infillLayerInterval>')
     fff.append('  <internalInfillAngles>45,-45</internalInfillAngles>')
     fff.append('  <overlapInternalInfillAngles>1</overlapInternalInfillAngles>')
-    fff.append('  <externalInfillAngles>45,-45</externalInfillAngles>')
+    fff.append('  <externalInfillAngles>0,90</externalInfillAngles>')
     fff.append('  <generateSupport>0</generateSupport>')
     fff.append('  <supportExtruder>0</supportExtruder>')
     fff.append('  <supportInfillPercentage>25</supportInfillPercentage>')
@@ -333,7 +333,6 @@ def simplify3DProfile(machine, printMode, hotendLeft, hotendRight, filamentLeft,
             infillLayerInterval = 1
             overlapInternalInfillAngles = 1
             generateSupport = 0
-            supportHorizontalPartOffset = 0.7
             supportAngles = '90'
             supportInfillPercentage = 25
             denseSupportInfillPercentage = 75
@@ -349,6 +348,8 @@ def simplify3DProfile(machine, printMode, hotendLeft, hotendRight, filamentLeft,
                     primaryHotend = hotendLeft
                     layerHeight = getLayerHeight(primaryHotend, quality)
                     firstLayerHeight = primaryHotend['nozzleSize'] / 2.
+                    retractionMinTravel = hotendLeft['nozzleSize'] * 3.75
+                    supportHorizontalPartOffset = 2 * hotendLeft['nozzleSize']
                     defaultSpeed, firstLayerUnderspeed, outlineUnderspeed, supportUnderspeed = speedValues(hotendLeft, hotendRight, filamentLeft, filamentRight, layerHeight, firstLayerHeight, infillLayerInterval, quality, 'MEX Left')
                     hotendLeftTemperature = temperatureAdjustedToFlow(filamentLeft, hotendLeft, layerHeight, defaultSpeed)
                     purgeValuesT0 = purgeValues(hotendLeft, filamentLeft, defaultSpeed, layerHeight)
@@ -367,6 +368,8 @@ def simplify3DProfile(machine, printMode, hotendLeft, hotendRight, filamentLeft,
                     primaryHotend = hotendRight
                     layerHeight = getLayerHeight(primaryHotend, quality)
                     firstLayerHeight = primaryHotend['nozzleSize'] / 2.
+                    retractionMinTravel = hotendRight['nozzleSize'] * 3.75
+                    supportHorizontalPartOffset = 2 * hotendRight['nozzleSize']
                     defaultSpeed, firstLayerUnderspeed, outlineUnderspeed, supportUnderspeed = speedValues(hotendLeft, hotendRight, filamentLeft, filamentRight, layerHeight, firstLayerHeight, infillLayerInterval, quality, 'MEX Right')
                     hotendRightTemperature = temperatureAdjustedToFlow(filamentRight, hotendRight, layerHeight, defaultSpeed)
                     purgeValuesT1 = purgeValues(hotendRight, filamentRight, defaultSpeed, layerHeight)
@@ -385,7 +388,8 @@ def simplify3DProfile(machine, printMode, hotendLeft, hotendRight, filamentLeft,
                 supportUpperSeparationLayers = int(0.15/layerHeight) + 1
                 supportLowerSeparationLayers = supportUpperSeparationLayers
             else:
-                # IDEX                
+                # IDEX
+                retractionMinTravel = min(hotendLeft['nozzleSize'], hotendRight['nozzleSize']) * 3.75
                 if filamentLeft['isSupportMaterial'] != filamentRight['isSupportMaterial']:
                     # IDEX, Support Material
                     generateSupport = 1
@@ -430,6 +434,7 @@ def simplify3DProfile(machine, printMode, hotendLeft, hotendRight, filamentLeft,
                 else:
                     # IDEX, Combined Infill
                     avoidCrossingOutline = 0
+                    supportHorizontalPartOffset = 2 * max(hotendLeft['nozzleSize'], hotendRight['nozzleSize'])
                     if hotendLeft['nozzleSize'] <= hotendRight['nozzleSize']:
                         # IDEX, Combined Infill (Right Hotend has thicker or equal nozzle)
                         primaryExtruder = 0
@@ -511,7 +516,7 @@ def simplify3DProfile(machine, printMode, hotendLeft, hotendRight, filamentLeft,
                 fff.append('      <retractionZLift>'+("%.2f" % (2 * layerHeight))+'</retractionZLift>')
                 fff.append('      <retractionSpeed>'+str(min(filamentLeft['retractionSpeed'], machine['maxFeedrateE'])*60)+'</retractionSpeed>')
                 fff.append('      <useCoasting>'+str(retractValues(filamentLeft)[0])+'</useCoasting>')
-                fff.append('      <coastingDistance>'+str(coastVolume(hotendLeft, filamentLeft) / (layerHeight * hotendLeft['nozzleSize']))+'</coastingDistance>')
+                fff.append('      <coastingDistance>'+str(coastVolume(hotendLeft, filamentLeft) / (layerHeight * hotendLeft['nozzleSize']) * machine['retractionAmountMultiplier'])+'</coastingDistance>')
                 fff.append('      <useWipe>'+str(retractValues(filamentLeft)[1])+'</useWipe>')
                 fff.append('      <wipeDistance>'+str(coastVolume(hotendLeft, filamentLeft) / (layerHeight * hotendLeft['nozzleSize']))+'</wipeDistance>')
                 fff.append('    </extruder>')
@@ -528,7 +533,7 @@ def simplify3DProfile(machine, printMode, hotendLeft, hotendRight, filamentLeft,
                 fff.append('      <retractionZLift>'+str(2 * layerHeight)+'</retractionZLift>')
                 fff.append('      <retractionSpeed>'+str(min(filamentRight['retractionSpeed'], machine['maxFeedrateE'])*60)+'</retractionSpeed>')
                 fff.append('      <useCoasting>'+str(retractValues(filamentRight)[0])+'</useCoasting>')
-                fff.append('      <coastingDistance>'+str(coastVolume(hotendRight, filamentRight) / (layerHeight * hotendRight['nozzleSize']))+'</coastingDistance>')
+                fff.append('      <coastingDistance>'+str(coastVolume(hotendRight, filamentRight) / (layerHeight * hotendRight['nozzleSize']) * machine['retractionAmountMultiplier'])+'</coastingDistance>')
                 fff.append('      <useWipe>'+str(retractValues(filamentRight)[1])+'</useWipe>')
                 fff.append('      <wipeDistance>'+str(coastVolume(hotendRight, filamentRight) / (layerHeight * hotendRight['nozzleSize']))+'</wipeDistance>')
                 fff.append('    </extruder>')
@@ -561,6 +566,7 @@ def simplify3DProfile(machine, printMode, hotendLeft, hotendRight, filamentLeft,
             fff.append('    <onlyRetractWhenCrossingOutline>'+str(onlyRetractWhenCrossingOutline)+'</onlyRetractWhenCrossingOutline>')
             fff.append('    <retractBetweenLayers>'+str(retractBetweenLayers)+'</retractBetweenLayers>')
             fff.append('    <useRetractionMinTravel>'+str(useRetractionMinTravel)+'</useRetractionMinTravel>')
+            fff.append('    <retractionMinTravel>'+str(retractionMinTravel)+'</retractionMinTravel>')
             fff.append('    <retractWhileWiping>'+str(retractWhileWiping)+'</retractWhileWiping>')
             fff.append('    <onlyWipeOutlines>'+str(onlyWipeOutlines)+'</onlyWipeOutlines>')
             fff.append('    <minBridgingArea>10</minBridgingArea>')
@@ -841,7 +847,7 @@ def curaProfile(machine):
         definition.append('        "machine_max_feedrate_e": { "default_value": '+str(machine['maxFeedrateE'])+' },')
         definition.append('        "print_mode": { "enabled": true },')
         definition.append('        "avoid_grinding_filament": { "value": false },')
-        definition.append('        "retraction_combing": { "value": "'+"'noskin'"+'" },')
+        definition.append('        "retraction_combing": { "value": "'+"'all'"+'" },')
         definition.append('        "retraction_speed": { "maximum_value_warning": "machine_max_feedrate_e" },')
         definition.append('        "retraction_amount_multiplier": { "value": '+str(machine['retractionAmountMultiplier'])+' },')
         definition.append('        "retraction_retract_speed":')
@@ -967,7 +973,7 @@ def curaProfile(machine):
         # definition.append('        "bottom_thickness": { "value": "top_bottom_thickness" },')
         # definition.append('        "top_bottom_pattern": { "value": "'+"'lines'"+'" },')
         # definition.append('        "top_bottom_pattern_0": { "value": "top_bottom_pattern" },')
-        # definition.append('        "skin_angles": { "value": "[ ]'+"'"+') # ?? check synt" },')
+        definition.append('        "skin_angles": { "value": "[0, 90]" },')
         definition.append('        "wall_0_inset": { "value": "wall_line_width_x - wall_line_width_0" },')
         # definition.append('        "outer_inset_first": { "value": false },')
         # definition.append('        "alternate_extra_perimeter": { "value": false },')
@@ -1040,7 +1046,7 @@ def curaProfile(machine):
         definition.append('            "maximum_value_warning": "machine_max_feedrate_e"')
         definition.append('        },')
         # definition.append('        "retraction_extra_prime_amount": { "value": 0 },') # Adjust for flex material
-        definition.append('        "retraction_min_travel": { "value": 1.5 },')
+        definition.append('        "retraction_min_travel": { "value": "3.75 * machine_nozzle_size" },')
         # definition.append('        "retraction_extrusion_window": { "value": "retraction_amount" },')
         definition.append('        "switch_extruder_retraction_amount": { "value": "machine_heat_zone_length * retraction_amount_multiplier" },')
 
@@ -1114,7 +1120,7 @@ def curaProfile(machine):
         definition.append('            "enabled": true,')
         definition.append('            "value": false')
         definition.append('        },')
-        definition.append('        "retraction_combing": { "value": "'+"'noskin'"+'" },')
+        definition.append('        "retraction_combing": { "value": "'+"'all'"+'" },')
         definition.append('        "retraction_hop": { "value": "2 * layer_height" },')
         # definition.append('        "retraction_hop_after_extruder_switch": { "value": true },')
         definition.append('        "retraction_hop_height_after_extruder_switch": { "value": '+str(machine['extruderSwitchZHop'])+' },')
@@ -1238,7 +1244,7 @@ def curaProfile(machine):
         # definition.append('        "draft_shield_height": { "value": 10 },')
         # definition.append('        "conical_overhang_enabled": { "value": false },')
         # definition.append('        "conical_overhang_angle": { "value": 50 },')
-        definition.append('        "coasting_enable": { "value": false },')
+        definition.append('        "coasting_enable": { "value": true },')
         definition.append('        "coasting_min_volume": { "value": "coasting_volume * 2" },')
         # definition.append('        "coasting_speed": { "value": 90 },')
         # definition.append('        "skin_alternate_rotation": { "value": false },')
@@ -1593,7 +1599,7 @@ def curaProfile(machine):
                                     # qualityFile.append('support_enable = False')
                                     qualityFile.append('support_infill_rate = 15')
                                     qualityFile.append("support_xy_overrides_z = ='xy_overrides_z'")
-                                    qualityFile.append('support_xy_distance = 0.7')
+                                    qualityFile.append('support_xy_distance = machine_nozzle_size * 2')
                                     qualityFile.append('support_z_distance = =max(layer_height, 0.15)')
                                     qualityFile.append('support_interface_density = 75')
                                     qualityFile.append('support_conical_enabled = True')
@@ -1611,7 +1617,7 @@ def curaProfile(machine):
                                 # blackmagic
 
                                 # experimental
-                                qualityFile.append('coasting_volume = '+str(coastVolume(hotend, filament)))
+                                qualityFile.append('coasting_volume = '+str(coastVolume(hotend, filament))+' * retraction_amount_multiplier')
 
                                 # BCN3D
                                 qualityFile.append('smart_purge_slope = '+str(mmPerSecondIncrement))
@@ -1704,7 +1710,7 @@ def purgeValues(hotend, filament, speed, layerHeight, minPurgeLength = 20): # pu
 
 def retractValues(filament):
     if filament['isFlexibleMaterial']:
-        useCoasting = 0
+        useCoasting = 1
         useWipe = 1
         onlyRetractWhenCrossingOutline = 1
         retractBetweenLayers = 1
@@ -1712,7 +1718,7 @@ def retractValues(filament):
         retractWhileWiping = 1
         onlyWipeOutlines = 1
     else:
-        useCoasting = 0
+        useCoasting = 1
         useWipe = 1
         onlyRetractWhenCrossingOutline = 0
         retractBetweenLayers = 1
