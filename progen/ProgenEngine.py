@@ -1599,7 +1599,7 @@ def curaProfile(machine):
                                     # qualityFile.append('support_enable = False')
                                     qualityFile.append('support_infill_rate = 15')
                                     qualityFile.append("support_xy_overrides_z = ='xy_overrides_z'")
-                                    qualityFile.append('support_xy_distance = machine_nozzle_size * 2')
+                                    qualityFile.append('support_xy_distance = =machine_nozzle_size * 2')
                                     qualityFile.append('support_z_distance = =max(layer_height, 0.15)')
                                     qualityFile.append('support_interface_density = 75')
                                     qualityFile.append('support_conical_enabled = True')
