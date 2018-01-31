@@ -216,19 +216,21 @@ def simplify3DProfilesBundle(profilesCreatedCount):
 
 def curaFilesBundle():
     cura('--file')
+    curaSoftwareName = "Ultimaker Cura"
+    curaSoftwareVersion = "3.2"
     with open('Cura/README.txt', 'w') as f:
         lines = []
         lines.append(r'Build '+PS.progenBuildNumber+'\n')
         lines.append(r''+'\n')
-        lines.append(r'Instructions:'+'\n')
+        lines.append(r'Instructions to install BCN3D Machines into '+curaSoftwareName+':'+'\n')
         lines.append(r''+'\n')
         lines.append(r'    Mac OS:'+'\n')
-        lines.append(r'        1 - COMBINE all folders inside "resources" with the ones inside "/Applications/BCN3D Cura.app/Contents/Resources/resources"'+'\n')
-        lines.append(r'        2 - Restart BCN3D Cura'+'\n')
+        lines.append(r'        1 - COMBINE all folders inside "resources" with the ones inside "/Applications/'+curaSoftwareName+'.app/Contents/Resources/resources"'+'\n')
+        lines.append(r'        2 - Restart '+curaSoftwareName+'\n')
         lines.append(r''+'\n')
         lines.append(r'    Windows:'+'\n')
-        lines.append(r'        1 - COMBINE all folders inside "resources" with the ones inside "C:/Program Files/BCN3D Cura 1.0/resources"'+'\n')
-        lines.append(r'        2 - Restart BCN3D Cura'+'\n')
+        lines.append(r'        1 - COMBINE all folders inside "resources" with the ones inside "C:/Program Files/'+curaSoftwareName+' '+curaSoftwareVersion+'/resources"'+'\n')
+        lines.append(r'        2 - Restart '+curaSoftwareName+'\n')
         f.writelines(lines)
     shutil.make_archive('BCN3D Cura - resources', 'zip', 'Cura')    
 
