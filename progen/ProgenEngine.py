@@ -847,7 +847,7 @@ def curaProfile(machine):
         definition.append('        "machine_max_feedrate_e": { "default_value": '+str(machine['maxFeedrateE'])+' },')
         definition.append('        "print_mode": { "enabled": true },')
         definition.append('        "avoid_grinding_filament": { "value": false },')
-        definition.append('        "retraction_combing": { "value": "'+"'all'"+'" },')
+        # definition.append('        "retraction_combing": { "value": "'+"'all'"+'" },')
         definition.append('        "retraction_speed": { "maximum_value_warning": "machine_max_feedrate_e" },')
         definition.append('        "retraction_amount_multiplier": { "value": '+str(machine['retractionAmountMultiplier'])+' },')
         definition.append('        "retraction_retract_speed":')
@@ -914,16 +914,17 @@ def curaProfile(machine):
             r'G1 Z5 F200   ;safety Z axis movement\n'+\
             r'T1           ;switch to the right extruder\n'+\
             r'G92 E0       ;zero the extruded length\n'+\
-            r'G1 E20 F50   ;extrude 20mm of feed stock\n'+\
-            r'G92 E0       ;zero the extruded length\n'+\
-            r'G4 P2000     ;stabilize hotend'+"'"+r's pressure\n'+\
-            r'G1 F2400 E-8 ;retract\n'+\
+            # r'G1 E20 F50   ;extrude 20mm of feed stock\n'+\
+            # r'G92 E0       ;zero the extruded length\n'+\
+            # r'G4 P2000     ;stabilize hotend'+"'"+r's pressure\n'+\
+            # r'G1 F2400 E-8 ;retract\n'+\
             r'T0           ;switch to the left extruder\n'+\
             r'G92 E0       ;zero the extruded length\n'+\
-            r'G1 E20 F50   ;extrude 20mm of feed stock\n'+\
-            r'G92 E0       ;zero the extruded length\n'+\
-            r'G4 P2000     ;stabilize hotend'+"'"+r's pressure\n'+\
-            r'G1 F2400 E-8 ;retract\n" },')
+            # r'G1 E20 F50   ;extrude 20mm of feed stock\n'+\
+            # r'G92 E0       ;zero the extruded length\n'+\
+            # r'G4 P2000     ;stabilize hotend'+"'"+r's pressure\n'+\
+            # r'G1 F2400 E-8 ;retract\n'+\
+            r'" },')
         definition.append(r'        "machine_end_gcode": { "default_value": "'+\
             r'M104 S0 T0               ;left extruder heater off\n'+\
             r'M104 S0 T1               ;right extruder heater off\n'+\
@@ -949,7 +950,6 @@ def curaProfile(machine):
         # definition.append('        "wall_line_width": { "value": "line_width" },')
         definition.append('        "wall_line_width_0": { "value": "machine_nozzle_size * 0.875" },')
         # definition.append('        "wall_line_width_x": { "value": "machine_nozzle_size * 0.85" },')
-        # definition.append('        "roofing_line_width": { "value": "skin_line_width" },')
         # definition.append('        "skin_line_width": { "value": "line_width" },')
         # definition.append('        "infill_line_width": { "value": "machine_nozzle_size * 1.25" },')
         # definition.append('        "skirt_brim_line_width": { "value": "line_width" },')
@@ -959,15 +959,13 @@ def curaProfile(machine):
         # definition.append('        "support_bottom_line_width": { "value": "extruderValue(support_bottom_extruder_nr, '+"'support_interface_line_width'"+')" },')
         # definition.append('        "prime_tower_line_width": { "value": "line_width" },')
         # definition.append('        "initial_layer_line_width_factor": { "value": 100 },')
-
+        
         # shell
-        # definition.append('        "wall_extruder_nr": { "value": -1 },') # Deprecated after 2.7 
+        # definition.append('        "wall_extruder_nr": { "value": -1 },')
         # definition.append('        "wall_0_extruder_nr": { "value": "-1" },')
         # definition.append('        "wall_x_extruder_nr": { "value": "-1" },')
         # definition.append('        "roofing_extruder_nr": { "value": -1 },')
         # definition.append('        "roofing_layer_count": { "value": 0 },')
-        # definition.append('        "roofing_pattern": { "value": "top_bottom_pattern" },')
-        # definition.append('        "roofing_angles": { "value": "skin_angles" },')
         # definition.append('        "top_bottom_extruder_nr": { "value": -1 },')
         # definition.append('        "top_thickness": { "value": "top_bottom_thickness" },')
         # definition.append('        "bottom_thickness": { "value": "top_bottom_thickness" },')
@@ -975,27 +973,38 @@ def curaProfile(machine):
         # definition.append('        "top_bottom_pattern_0": { "value": "top_bottom_pattern" },')
         definition.append('        "skin_angles": { "value": "[0, 90]" },')
         definition.append('        "wall_0_inset": { "value": "wall_line_width_x - wall_line_width_0" },')
+        definition.append('        "optimize_wall_printing_order": { "value": true },')
         # definition.append('        "outer_inset_first": { "value": false },')
         # definition.append('        "alternate_extra_perimeter": { "value": false },')
-        definition.append('        "fill_perimeter_gaps": { "value": "'+"'everywhere'"+'" },')
-        # definition.append('        "fill_outline_gaps": { "value": "'+"'everywhere'"+'" },')
+        # definition.append('        "fill_perimeter_gaps": { "value": "'+"'everywhere'"+'" },')
+        # definition.append('        "filter_out_tiny_gaps": { "value": true },')
+        # definition.append('        "fill_outline_gaps": { "value": false },')
         # definition.append('        "xy_offset": { "value": 0 },')
         definition.append('        "xy_offset_layer_0": { "value": -0.1 },')
-# Cura 3 Feature definition.append('        "z_seam_type": { "value": "'+"'sharpest_corner'"+'" },')
-        definition.append('        "z_seam_type": { "value": "'+"'back'"+'" },') # Deprecated after 2.7 (change to sharpest_corner)
+        # definition.append('        "z_seam_type": { "value": "'+"'sharpest_corner'"+'" },')
         definition.append('        "z_seam_x": { "value": "int(machine_width/2.) if print_mode == '+"'regular'"+' else int((machine_width/2.)/2.) if print_mode == '+"'duplication'"+' else int((machine_width/2. - 54/2)/2.)" },')
         definition.append('        "z_seam_y": { "value": "machine_depth" },')
-# Cura 3 Feature definition.append('        "z_seam_corner": { "value": "'+"'z_seam_corner_inner'"+'" },')
-        definition.append('        "z_seam_relative": { "value": false },')
-        definition.append('        "skin_no_small_gaps_heuristic": { "value": false },')
-# Cura 3 Feature # definition.append('        "skin_outline_count": { "value": 1 },')
+        # definition.append('        "z_seam_corner": { "value": "'+"'z_seam_corner_inner'"+'" },')
+        # definition.append('        "z_seam_relative": { "value": false },')
+        # definition.append('        "skin_no_small_gaps_heuristic": { "value": true },')
+        # definition.append('        "skin_outline_count": { "value": 1 },')
+        # definition.append('        "ironing_enabled": { "value": false },')
+        # definition.append('        "ironing_only_highest_layer": { "value": true },')
+        # definition.append('        "ironing_pattern": { "value": "'+"'zigzag'"+'" },')
+        # definition.append('        "ironing_line_spacing": { "value": 0.1 },')
+        # definition.append('        "ironing_flow": { "value": 10 },')
+        # definition.append('        "ironing_inset": { "value": "wall_line_width_0 / 2" },')
+        # definition.append('        "speed_ironing": { "value": "speed_topbottom * 20 / 30." },')
+        # definition.append('        "acceleration_ironing": { "value": "acceleration_topbottom" },')
+        # definition.append('        "jerk_ironing": { "value": "jerk_topbottom" },')
 
         # infill
         # definition.append('        "infill_extruder_nr": { "value": -1 },')
-        definition.append('        "infill_pattern": { "value": "'+"'grid'"+'" },')
-# Cura 3 Feature # definition.append('        "zig_zaggify_infill": { "value": true },')
+        # definition.append('        "infill_pattern": { "value": "'+"'lines'"+' if infill_sparse_density > 25 else '+"'grid'"+'" },')
+        # definition.append('        "zig_zaggify_infill": { "value": true },')
         # definition.append('        "infill_angles": { "value": [] },')
-        # definition.append('        "sub_div_rad_mult": { "value": 100 },')
+        # definition.append('        "infill_offset_x": { "value": 0 },')
+        # definition.append('        "infill_offset_y": { "value": 0 },')
         # definition.append('        "sub_div_rad_add": { "value": "wall_line_width_x" },')
         # definition.append('        "infill_overlap": { "value": "10 if infill_sparse_density < 95 and infill_pattern != '+"'"+'concentric'+"'"+' else 0" },')
         definition.append('        "skin_overlap": { "value": "0" },')
@@ -1005,22 +1014,26 @@ def curaProfile(machine):
         # definition.append('        "gradual_infill_step_height": { "value": 5 },')
         definition.append('        "infill_before_walls": { "value": false },')
         # definition.append('        "min_infill_area": { "value": 0 },')
-# Cura 3 Feature # definition.append('        "skin_preshrink": { "value": 0 },')
-# Cura 3 Feature # definition.append('        "top_skin_preshrink": { "value": 0 },')
-# Cura 3 Feature # definition.append('        "bottom_skin_preshrink": { "value": 0 },')
-        # definition.append('        "max_skin_angle_for_expansion": { "value": 20 },')
+        # definition.append('        "skin_preshrink": { "value": 0 },')
+        # definition.append('        "top_skin_preshrink": { "value": 0 },')
+        # definition.append('        "bottom_skin_preshrink": { "value": 0 },')
+        # definition.append('        "bottom_skin_preshrink": { "value": 0 },')
+        # definition.append('        "expand_skins_expand_distance": { "value": "wall_line_width_0 + (wall_line_count - 1) * wall_line_width_x" },')
+        # definition.append('        "top_skin_expand_distance": { "value": "expand_skins_expand_distance" },')
+        # definition.append('        "bottom_skin_expand_distance": { "value": "expand_skins_expand_distance" },')
+        # definition.append('        "max_skin_angle_for_expansion": { "value": 90 },')
+        # definition.append('        "min_skin_width_for_expansion": { "value": "top_layers * layer_height / math.tan(math.radians(max_skin_angle_for_expansion))" },')
 
         # material
-        definition.append('        "material_flow_dependent_temperature":')
-        definition.append('        {')
-        definition.append('            "enabled": true,')
-        definition.append('            "value": '+str(machine['useAutoTemperature']).lower())
-        definition.append('        },')
         # definition.append('        "default_material_print_temperature": { "enabled": "machine_nozzle_temp_enabled and not (material_flow_dependent_temperature)" },')
         # definition.append('        "material_initial_print_temperature": { "enabled": "machine_nozzle_temp_enabled and not (material_flow_dependent_temperature)" },')
         # definition.append('        "material_final_print_temperature": { "enabled": "machine_nozzle_temp_enabled and not (material_flow_dependent_temperature)" },')
-        # definition.append('        "material_flow_temp_graph": { "enabled": "machine_nozzle_temp_enabled and material_flow_dependent_temperature" },') # Bad visualization
+        temperatureInertiaInitialFix = 0
+        definition.append('        "material_initial_print_temperature": { "value": "material_print_temperature + '+str(temperatureInertiaInitialFix)+' if material_flow_dependent_temperature else material_print_temperature" },')
+        temperatureInertiaFinalFix = -2.5
+        definition.append('        "material_final_print_temperature": { "value": "material_print_temperature + '+str(temperatureInertiaFinalFix)+' if material_flow_dependent_temperature else material_print_temperature" },')
         # definition.append('        "retraction_enable": { "value": true },')
+        definition.append('        "material_extrusion_cool_down_speed": { "value": 1 },') # this value depends on extruded flow (not material_flow)
         definition.append('        "retract_at_layer_change": { "value": false },')
         definition.append('        "retraction_amount_multiplier": { "value": '+str(machine['retractionAmountMultiplier'])+' },')
         definition.append('        "retraction_speed": { "maximum_value_warning": "machine_max_feedrate_e" },')
@@ -1048,7 +1061,7 @@ def curaProfile(machine):
         # definition.append('        "retraction_extra_prime_amount": { "value": 0 },') # Adjust for flex material
         definition.append('        "retraction_min_travel": { "value": "3.75 * machine_nozzle_size" },')
         # definition.append('        "retraction_extrusion_window": { "value": "retraction_amount" },')
-        definition.append('        "switch_extruder_retraction_amount": { "value": "machine_heat_zone_length * retraction_amount_multiplier" },')
+        #BCN3DFix! definition.append('        "switch_extruder_retraction_amount": { "value": "machine_heat_zone_length * retraction_amount_multiplier" },')
 
         # speed
         # definition.append('        "speed_infill": { "value": "speed_print" },')
@@ -1064,7 +1077,7 @@ def curaProfile(machine):
         # definition.append('        "speed_slowdown_layers = 2" },')
         definition.append('        "speed_equalize_flow_enabled": { "value": true },')
         definition.append('        "speed_equalize_flow_max": { "value": 100 },')
-        definition.append('        "acceleration_enabled": { "value": false },')
+        definition.append('        "acceleration_enabled": { "value": true },')
         definition.append('        "acceleration_print": { "value": "machine_acceleration" },')
         # definition.append('        "acceleration_infill": { "value": "acceleration_print" },')
         # definition.append('        "acceleration_wall": { "value": "round(acceleration_print - (acceleration_print - acceleration_wall_0)/ 2.)" },')
@@ -1079,7 +1092,7 @@ def curaProfile(machine):
         # definition.append('        "acceleration_print_layer_0": { "value": "acceleration_layer_0" },')
         # definition.append('        "acceleration_travel_layer_0": { "value": "acceleration_layer_0 * acceleration_travel / acceleration_print" },')
         # definition.append('        "acceleration_skirt_brim": { "value": "acceleration_layer_0" },')
-        definition.append('        "jerk_enabled": { "value": false },')
+        definition.append('        "jerk_enabled": { "value": true },')
         definition.append('        "jerk_print": { "value": "machine_max_jerk_xy" },')
         # definition.append('        "jerk_infill": { "value": "jerk_print" },')
         definition.append('        "jerk_wall": { "value": "jerk_print * 0.75" },')
@@ -1114,18 +1127,16 @@ def curaProfile(machine):
         definition.append('            "enabled": "start_layers_at_same_position",')
         definition.append('            "value": "machine_depth"')
         definition.append('        },')
+        definition.append('        "travel_avoid_other_parts": { "value": true },')
         definition.append('        "retraction_hop_enabled": { "value": true },')
-        definition.append('        "retraction_hop_only_when_collides":')
-        definition.append('        {')
-        definition.append('            "enabled": true,')
-        definition.append('            "value": false')
-        definition.append('        },')
+        definition.append('        "retraction_hop_only_when_collides": { "value": true },')
         definition.append('        "retraction_combing": { "value": "'+"'all'"+'" },')
         definition.append('        "retraction_hop": { "value": "2 * layer_height" },')
         # definition.append('        "retraction_hop_after_extruder_switch": { "value": true },')
         definition.append('        "retraction_hop_height_after_extruder_switch": { "value": '+str(machine['extruderSwitchZHop'])+' },')
 
         # cooling
+        definition.append('        "cool_fan_enabled": { "value": true },')
         # definition.append('        "cool_fan_speed_0": { "value": 0 },')
         # definition.append('        "cool_fan_speed_max": { "value": "cool_fan_speed" },')
         definition.append('        "cool_fan_full_at_height": { "value": "0 if adhesion_type == '+"'raft'"+' else layer_height_0 + 4 * layer_height" },') # after 6 layers
@@ -1135,20 +1146,25 @@ def curaProfile(machine):
         # definition.append('        "cool_lift_head": { "value": false },')
 
         # support
+        # definition.append('        "support_enable": { "value": false },')
         # definition.append('        "support_type": { "value": "'+"'everywhere'"+'" },')
         # definition.append('        "support_pattern": { "value": "'+"'zigzag'"+'" },')
         # definition.append('        "support_connect_zigzags": { "value": true },')
         # definition.append('        "support_top_distance": { "value": "extruderValue(support_roof_extruder_nr if support_roof_enable else support_infill_extruder_nr, '+"'support_z_distance'"+')" },')
         # definition.append('        "support_bottom_distance": { "value": "extruderValue(support_bottom_extruder_nr if support_bottom_enable else support_infill_extruder_nr, '+"'support_z_distance'"+') if support_type == '+"'everywhere'"+' else 0" },')
-        definition.append('        "support_xy_overrides_z": { "value": "xy_overrides_z" },')
+        definition.append('        "support_z_distance": { "value": "max(layer_height, 0.15)" },')
+        definition.append('        "support_xy_overrides_z": { "value": "'+"'xy_overrides_z'"+'" },')
+        definition.append('        "support_xy_distance": { "value": "machine_nozzle_size * 2" },')
         # definition.append('        "support_xy_distance_overhang": { "value": "machine_nozzle_size / 2" },')
         # definition.append('        "support_bottom_stair_step_height": { "value": 0.3 },')
         definition.append('        "support_join_distance": { "value": 10 },')
         definition.append('        "support_offset": { "value": 1 },')
+        definition.append('        "support_infill_rate": { "value": 15 },')
         # definition.append('        "support_infill_sparse_thickness": { "value": "resolveOrValue('+"'layer_height'"+')" },')
         # definition.append('        "gradual_support_infill_steps": { "value": 0 },')
         # definition.append('        "gradual_support_infill_step_height": { "value": 1 },')
         definition.append('        "support_interface_enable": { "value": true },')
+        definition.append('        "support_interface_density": { "value": 75 },')
         definition.append('        "support_interface_height": { "value": "5 * layer_height" },')
         # definition.append('        "support_roof_height": { "value": "extruderValue(support_roof_extruder_nr, '+"'support_interface_height'"+')" },')
         # definition.append('        "support_bottom_height": { "value": "extruderValue(support_interface_extruder_nr, '+"'support_interface_height'"+')" },')
@@ -1158,19 +1174,24 @@ def curaProfile(machine):
         # definition.append('        "support_tower_diameter": { "value": 3.0 },')
         definition.append('        "support_minimal_diameter": { "value": 1.0 },')
         # definition.append('        "support_tower_roof_angle": { "value": 65 },')
+        # definition.append('        "support_mesh_drop_down": { "value": true },')
+        definition.append('        "support_conical_enabled": { "value": true },')
 
         # platform adhesion
-        # definition.append('        "extruder_prime_pos_x": { "value": 0 },')
-        # definition.append('        "extruder_prime_pos_y": { "value": 0 },')
+        definition.append('        "prime_blob_enable":') # different than z_seam
+        definition.append('        {')
+        definition.append('            "enabled": true,')
+        definition.append('            "value": true')
+        definition.append('        },')
+        definition.append('        "extruder_prime_pos_y": { "value": "machine_depth" },')
         definition.append('        "adhesion_type": { "value": "'+"'skirt'"+'" },')
         definition.append('        "skirt_line_count": { "value": 2 },')
+        definition.append('        "skirt_brim_minimal_length": { "value": "round(((material_diameter / extruderValue(adhesion_extruder_nr, '+"'machine_nozzle_size'"+')) ** 2) * 20, 2)" },')
         # definition.append('        "skirt_gap": { "value": 3 },')
         # definition.append('        "brim_width": { "value": 8 },')
         # definition.append('        "brim_outside_only": { "value": true },')
-# Cura 3 Feature # definition.append('        "z_offset_layer_0": { "value": 0 },')
-# Cura 3 Feature # definition.append('        "z_offset_taper_layers": { "value": 0 },')
         definition.append('        "raft_margin": { "value": 3 },')
-# Cura 3 Feature # definition.append('        "raft_smoothing": { "value": 5 },')
+        # definition.append('        "raft_smoothing": { "value": 5 },')
         definition.append('        "raft_airgap": { "value": "min(extruderValues('+"'machine_nozzle_size'"+')) * 0.55" },')
         # definition.append('        "layer_0_z_overlap": { "value": "raft_airgap / 2" },')
         # definition.append('        "raft_surface_layers": { "value": 2 },')
@@ -1222,6 +1243,7 @@ def curaProfile(machine):
         definition.append('        "multiple_mesh_overlap": { "value": "0.375 * machine_nozzle_size - xy_offset" },')
         # definition.append('        "carve_multiple_volumes": { "value": true },')
         # definition.append('        "alternate_carve_order": { "value": true },')
+        # definition.append('        "remove_empty_first_layers": { "value": true },')
 
         # blackmagic
         # definition.append('        "print_sequence": { "value": "'+"'all_at_once'"+'" },')
@@ -1231,13 +1253,32 @@ def curaProfile(machine):
         # definition.append('        "anti_overhang_mesh": { "value": false },')
         # definition.append('        "magic_mesh_surface_mode": { "value": "'+"'normal'"+'" },')
         # definition.append('        "magic_spiralize": { "value": false },')
-# Cura 3 Feature # definition.append('        "relative_extrusion": { "value": false },')
+        # definition.append('        "smooth_spiralized_contours": { "value": true },')
+        # definition.append('        "relative_extrusion": { "value": false },')
 
         # experimental
-# Cura 3 Feature # definition.append('        "optimize_wall_printing_order": { "value": false },')
-# Cura 3 Feature # definition.append('        "support_skip_some_zags": { "value": false },')
-# Cura 3 Feature # definition.append('        "support_skip_zag_per_mm": { "value": 20 },')
-# Cura 3 Feature # definition.append('        "support_zag_skip_count": { "value": 5 },')
+        # definition.append('        "support_tree_enable": { "value": false },')
+        # definition.append('        "support_tree_angle": { "value": 40 },')
+        # definition.append('        "support_tree_branch_distance": { "value": 4 },')
+        # definition.append('        "support_tree_branch_diameter": { "value": 2 },')
+        # definition.append('        "support_tree_branch_diameter_angle": { "value": 5 },')
+        # definition.append('        "support_tree_collision_resolution": { "value": "support_line_width / 2" },')
+        # definition.append('        "support_tree_wall_thickness": { "value": "support_line_width" },')
+        # definition.append('        "slicing_tolerance": { "value": "'+"'middle'"+'" },')
+        # definition.append('        "roofing_line_width": { "value": "skin_line_width" },')
+        # definition.append('        "roofing_pattern": { "value": "top_bottom_pattern" },')
+        # definition.append('        "roofing_angles": { "value": "skin_angles" },')
+        # definition.append('        "infill_enable_travel_optimization": { "value": false },')
+        definition.append('        "material_flow_dependent_temperature":')
+        definition.append('        {')
+        definition.append('            "enabled": true,')
+        definition.append('            "value": '+str(machine['useAutoTemperature']).lower())
+        definition.append('        },')
+        # definition.append('        "material_flow_temp_graph": { "enabled": "machine_nozzle_temp_enabled and material_flow_dependent_temperature" },') # Bad visualization
+        # definition.append('        "meshfix_maximum_resolution": { "value": 0.01 },')
+        # definition.append('        "support_skip_some_zags": { "value": false },')
+        # definition.append('        "support_skip_zag_per_mm": { "value": 20 },')
+        # definition.append('        "support_zag_skip_count": { "value": 5 },')
         # definition.append('        "draft_shield_enabled": { "value": false },')
         # definition.append('        "draft_shield_dist": { "value": 10 },')
         # definition.append('        "draft_shield_height_limitation": { "value": false },')
@@ -1248,13 +1289,16 @@ def curaProfile(machine):
         definition.append('        "coasting_min_volume": { "value": "coasting_volume * 2" },')
         # definition.append('        "coasting_speed": { "value": 90 },')
         # definition.append('        "skin_alternate_rotation": { "value": false },')
-# Cura 3 Feature # definition.append('        "cross_infill_pocket_size": { "value": "infill_line_distance" },')
-# Cura 3 Feature # definition.append('        "cross_infill_apply_pockets_alternatingly": { "value": true },')
+        # definition.append('        "cross_infill_pocket_size": { "value": "infill_line_distance" },')
+        # definition.append('        "cross_infill_apply_pockets_alternatingly": { "value": true },')
+        # definition.append('        "support_conical_angle": { "value": 30 },')
         definition.append('        "support_conical_min_width": { "value": 10 },')
         # definition.append('        "infill_hollow": { "value": false },')
         # definition.append('        "magic_fuzzy_skin_enabled": { "value": false },')
         # definition.append('        "magic_fuzzy_skin_thickness": { "value": 0.3 },')
         # definition.append('        "magic_fuzzy_skin_point_density": { "value": 1.25 },')
+        # definition.append('        "flow_rate_max_extrusion_offset": { "value": 0 },')
+        # definition.append('        "flow_rate_extrusion_offset_factor": { "value": 100 },')
         # definition.append('        "wireframe_enabled": { "value": false },')
         # definition.append('        "wireframe_height": { "value": "machine_nozzle_head_distance" },')
         # definition.append('        "wireframe_roof_inset": { "value": "wireframe_height" },')
@@ -1278,18 +1322,11 @@ def curaProfile(machine):
         # definition.append('        "wireframe_roof_fall_down": { "value": 2 },')
         # definition.append('        "wireframe_roof_drag_along": { "value": 0.8 },')
         # definition.append('        "wireframe_roof_outer_delay": { "value": 0.2 },')
-        # definition.append('        "wireframe_nozzle_clearance": { "value": 1 },')
-        # definition.append('        "ironing_enabled": { "value": false },')
-# Cura 3 Feature # definition.append('        "ironing_only_highest_layer": { "value": true },')
-        # definition.append('        "speed_ironing": { "value": "speed_topbottom * 20 / 30." },')
-        # definition.append('        "acceleration_ironing": { "value": "acceleration_topbottom" },')
-        # definition.append('        "jerk_ironing": { "value": "jerk_topbottom" },')
-        # definition.append('        "ironing_pattern": { "value": "'+"'zigzag'"+'" },')
-        # definition.append('        "ironing_line_spacing": { "value": "'+"'zigzag'"+'" },')
-        # definition.append('        "ironing_pattern": { "value": "'+"'zigzag'"+'" },')
-        # definition.append('        "ironing_line_spacing": { "value": "machine_nozzle_tip_outer_diameter/2" },')
-        # definition.append('        "ironing_flow": { "value": 10 },')
-        # definition.append('        "ironing_inset": { "value": "wall_line_width_0 / 2" },')
+        # definition.append('        "wireframe_nozzle_clearance": { "value": 1 },')        
+        # definition.append('        "adaptive_layer_height_enabled": { "value": false },')        
+        # definition.append('        "adaptive_layer_height_variation": { "value": 0.1 },')        
+        # definition.append('        "adaptive_layer_height_variation_step": { "value": 0.01 },')        
+        # definition.append('        "adaptive_layer_height_threshold": { "value": 200 },')
 
         # BCN3D
         definition.append('        "smart_purge":')
@@ -1319,9 +1356,8 @@ def curaProfile(machine):
     extruder.append('    "inherits": "fdmextruder",')
     extruder.append('    "metadata": {')
     extruder.append('        "machine": "'+machine['id']+'",')
-    extruder.append('        "position": "0"') # Deprecated after 2.7
-# Cura 3 Feature extruder.append('        "position": "1",')
-# Cura 3 Feature extruder.append('        "quality_definition": "'+machine['id']+'_extruder_right"')
+    extruder.append('        "position": "0",')
+    extruder.append('        "quality_definition": "'+machine['id']+'_extruder_left"')
     extruder.append('    },')
     extruder.append('')
     extruder.append('    "overrides": {')
@@ -1339,8 +1375,7 @@ def curaProfile(machine):
     extruder.append('        "machine_extruder_end_pos_abs": { "default_value": false },')
     extruder.append('        "machine_extruder_end_pos_x": { "default_value": 0.0 },')
     extruder.append('        "machine_extruder_end_pos_y": { "default_value": 0.0 },')
-    extruder.append('        "extruder_prime_pos_x": { "default_value": 0.0 },')
-    extruder.append('        "extruder_prime_pos_y": { "default_value": 0.0 }')
+    extruder.append('        "extruder_prime_pos_x": { "default_value": 0.0 }')
     extruder.append('    }')
     extruder.append('}')
     fileContent = '\n'.join(extruder)
@@ -1355,9 +1390,8 @@ def curaProfile(machine):
     extruder.append('    "inherits": "fdmextruder",')
     extruder.append('    "metadata": {')
     extruder.append('        "machine": "'+machine['id']+'",')
-    extruder.append('        "position": "1"') # Deprecated after 2.7
-# Cura 3 Feature extruder.append('        "position": "1",')
-# Cura 3 Feature extruder.append('        "quality_definition": "'+machine['id']+'_extruder_right"')
+    extruder.append('        "position": "1",')
+    extruder.append('        "quality_definition": "'+machine['id']+'_extruder_right"')
     extruder.append('    },')
     extruder.append('')
     extruder.append('    "overrides": {')
@@ -1375,8 +1409,7 @@ def curaProfile(machine):
     extruder.append('        "machine_extruder_end_pos_abs": { "default_value": false },')
     extruder.append('        "machine_extruder_end_pos_x": { "default_value": 0.0 },')
     extruder.append('        "machine_extruder_end_pos_y": { "default_value": 0.0 },')
-    extruder.append('        "extruder_prime_pos_x": { "default_value": 0.0 },')
-    extruder.append('        "extruder_prime_pos_y": { "default_value": 0.0 }')
+    extruder.append('        "extruder_prime_pos_x": { "default_value": "machine_width" }')
     extruder.append('    }')
     extruder.append('}')
     fileContent = '\n'.join(extruder)
@@ -1432,21 +1465,31 @@ def curaProfile(machine):
                 material.append('    </metadata>')
                 material.append('    <properties>')
                 material.append('        <density>'+str(filament['filamentDensity'])+'</density>')
-                material.append('        <diameter>'+str(filament['filamentDiameter'])+'</diameter>')
+                material.append('        <diameter>'+str(filament['filamentDiameter'])+'</diameter>') # material_diameter
                 # material.append('        <price>'+str(filament['filamentPricePerKg'])+'</price>')
                 material.append('    </properties>')
                 material.append('    <settings>')
                 material.append('        <setting key="print temperature">'+str(defaultMaterialPrintTemperature(filament))+'</setting>') # default_material_print_temperature
                 material.append('        <setting key="heated bed temperature">'+str(filament['bedTemperature'])+'</setting>') # material_bed_temperature
+                material.append('        <setting key="standby temperature">'+str(filament['standbyTemperature'])+'</setting>') # material_standby_temperature
+                # material.append('        <setting key="processing temperature graph">'+str(filament['standbyTemperature'])+'</setting>') # material_flow_temp_graph
+                material.append('        <setting key="print cooling">'+str(int(filament['fanPercentage'][1]))+'</setting>') # cool_fan_speed
+                # material.append('        <setting key="retraction amount">'+str(filament['standbyTemperature'])+'</setting>') # retraction_amount
+                # material.append('        <setting key="retraction speed">'+str(filament['standbyTemperature'])+'</setting>') # retraction_speed
+                # material.append('        <setting key="adhesion tendency">0</setting>') # material_adhesion_tendency
+                # material.append('        <setting key="surface energy">100</setting>') # material_surface_energy
                 material.append('')
                 material.append('        <machine>')
                 for m in sorted(PS.profilesData['machine'], key=lambda k: k['id']):
-                    material.append('           <machine_identifier manufacturer="'+m['manufacturer']+'" product="'+m['id']+'" />')
+                    if 'qualities' not in m:
+                        material.append('           <machine_identifier manufacturer="'+m['manufacturer']+'" product="'+m['id']+'" />')
                 for hotend in sorted(PS.profilesData['hotend'], key=lambda k: k['id']):
                     if hotend['id'] != 'None':
                         if filament['isAbrasiveMaterial'] and hotend['material'] == "Brass":
                             material.append('           <hotend id="'+hotend['id']+'">')
                             material.append('                <setting key="hardware compatible">no</setting>')
+                            # material.append('                <setting key="standby temperature">100</setting>')
+                            # material.append('                <setting key="retraction amount">6.5</setting>')
                             material.append('           </hotend>')
                         else:
                             material.append('           <hotend id="'+hotend['id']+'" />')
@@ -1486,8 +1529,7 @@ def curaProfile(machine):
                                 qualityFile.append('quality_type = layer'+("%.2f" % layerHeight)+'mm')
                                 qualityFile.append('global_quality = True')
                                 qualityFile.append('weight = '+str(len(globalQualities)))
-                                qualityFile.append('setting_version = 2')  # Deprecated after 2.7
-                                # Cura 3 feature qualityFile.append('setting_version = 3')
+                                qualityFile.append('setting_version = 4')
                                 qualityFile.append('')
                                 qualityFile.append('[values]')
                                 qualityFile.append('layer_height = '+("%.2f" % layerHeight))
@@ -1522,8 +1564,7 @@ def curaProfile(machine):
 
                             if notSupported:
                                 qualityFile.append('supported = False')
-                            qualityFile.append('setting_version = 2')  # Deprecated after 2.7
-                            # Cura 3 feature qualityFile.append('setting_version = 3')
+                            qualityFile.append('setting_version = 4')
                             qualityFile.append('')
                             qualityFile.append('[values]')
 
@@ -1538,25 +1579,18 @@ def curaProfile(machine):
                                 qualityFile.append('wall_0_wipe_dist = '+('0' if retractValues(filament)[1] == 0 else '=round('+str(coastVolume(hotend, filament))+' / (layer_height * machine_nozzle_size), 2)'))
 
                                 # infill
-                                qualityFile.append('infill_sparse_density = ='+str(int(min(100, quality['infillPercentage'] * 1.25)))+" if infill_pattern == 'cubicsubdiv' else "+str(int(quality['infillPercentage']))) # 'if' is not working...
+                                qualityFile.append('infill_sparse_density = '+str(int(quality['infillPercentage'])))
+                                # qualityFile.append('infill_sparse_density = ='+str(int(quality['infillPercentage']))+" if infill_pattern != 'cubicsubdiv' else "+str(int(min(100, quality['infillPercentage'] * 1.25)))) # if is not working on Cura 3.2
 
                                 # material -> default_material_print_temperature, material_bed_temperature,  must be set into material to avoid conflicts
                                 qualityFile.append('material_print_temperature = =default_material_print_temperature + '+str(temperatureAdjustedToFlow(filament, hotend, layerHeight, defaultSpeed) - defaultMaterialPrintTemperature(filament)))
                                 qualityFile.append('material_print_temperature_layer_0 = '+str(int(round((getTemperature(hotend, filament, 'highTemperature'))))))
-                                temperatureInertiaInitialFix = 0
-                                qualityFile.append('material_initial_print_temperature = =material_print_temperature + '+str(temperatureInertiaInitialFix)+' if material_flow_dependent_temperature else material_print_temperature')
-                                temperatureInertiaFinalFix = -2.5
-                                qualityFile.append('material_final_print_temperature = =material_print_temperature + '+str(temperatureInertiaFinalFix)+' if material_flow_dependent_temperature else material_print_temperature')
                                 qualityFile.append('material_flow_temp_graph = '+str(adjustedFlowTemperatureGraph(hotend, filament, layerHeight)))
-                                qualityFile.append('material_extrusion_cool_down_speed = 1') # this value depends on extruded flow (not material_flow)
-                                qualityFile.append('material_diameter = '+("%.2f" % filament['filamentDiameter']))
-                                qualityFile.append('retraction_amount = =retraction_amount_multiplier * '+("%.2f" % filament['retractionDistance']))
+                            #BCN3DFix!    qualityFile.append('retraction_amount = =retraction_amount_multiplier * '+("%.2f" % filament['retractionDistance']))
                                 qualityFile.append('retraction_speed = =min(machine_max_feedrate_e, '+("%.2f" % filament['retractionSpeed'])+')')
                                 qualityFile.append('retraction_prime_speed = =min('+("%.2f" % filament['retractionSpeed'])+' * 0.5, machine_max_feedrate_e)')
                                 qualityFile.append('max_retract = '+str(int(filament['retractionCount'])))
                                 qualityFile.append('material_flow = '+("%.2f" % (filament['extrusionMultiplier'] * 100)))
-                                standbyTemperature = int(getTemperature(hotend, filament, 'standbyTemperature'))
-                                qualityFile.append('material_standby_temperature = '+str(standbyTemperature))
                                 #  qualityFile.append('switch_extruder_extra_prime_amount = '+("%.2f" % filament['retractionSpeed'])) # Parameter that should be there to purge on toolchage
 
                                 # speed
@@ -1569,20 +1603,15 @@ def curaProfile(machine):
                                 qualityFile.append('acceleration_wall_0 = '+str(int(accelerationForPerimeters(hotend['nozzleSize'], layerHeight, int(defaultSpeed/60. * outlineUnderspeed)))))
 
                                 # travel
-                                if filament['isFlexibleMaterial']:
-                                    qualityFile.append('retraction_combing = all')
+                                # if filament['isFlexibleMaterial']:
+                                #     qualityFile.append('retraction_combing = all')
                                 # qualityFile.append('travel_retract_before_outer_wall = False')
-                                if filament['isSupportMaterial']:
-                                    qualityFile.append('travel_avoid_other_parts = True')
-                                else:
-                                    qualityFile.append('travel_avoid_other_parts = False')
+                                # if filament['isSupportMaterial']:
+                                #     qualityFile.append('travel_avoid_other_parts = True')
 
                                 # cooling
-                                if filament['fanPercentage'][1] > 0:
-                                    qualityFile.append('cool_fan_enabled = True')
-                                else:
+                                if filament['fanPercentage'][1] <= 0:
                                     qualityFile.append('cool_fan_enabled = False')
-                                qualityFile.append('cool_fan_speed = '+str(int(filament['fanPercentage'][1])))
                                 qualityFile.append('cool_fan_speed_min = '+str(int(filament['fanPercentage'][0])))
 
                                 # support
@@ -1594,20 +1623,9 @@ def curaProfile(machine):
                                     qualityFile.append('support_z_distance = 0')
                                     qualityFile.append('support_interface_density = 100')
                                     qualityFile.append('support_conical_enabled = False')
-                                    # qualityFile.append('support_conical_angle = 30')
-                                else:
-                                    # qualityFile.append('support_enable = False')
-                                    qualityFile.append('support_infill_rate = 15')
-                                    qualityFile.append("support_xy_overrides_z = ='xy_overrides_z'")
-                                    qualityFile.append('support_xy_distance = =machine_nozzle_size * 2')
-                                    qualityFile.append('support_z_distance = =max(layer_height, 0.15)')
-                                    qualityFile.append('support_interface_density = 75')
-                                    qualityFile.append('support_conical_enabled = True')
-                                    # qualityFile.append('support_conical_angle = 30')
 
                                 # platform_adhesion
-                                minPurgeDistance
-                                qualityFile.append("skirt_brim_minimal_length = =round("+str(filament['purgeVolume'])+" / (math.pi*(extruderValue(adhesion_extruder_nr, 'machine_nozzle_size')/2)**2), 2)")
+                                # qualityFile.append("skirt_brim_minimal_length = =round("+str(filament['purgeVolume'])+" / (math.pi*(extruderValue(adhesion_extruder_nr, 'machine_nozzle_size')/2)**2), 2)") # already in machine definition
 
                                 # dual
                                 qualityFile.append("prime_tower_min_volume = "+str(filament['purgeVolume'] / 2))
@@ -1617,7 +1635,7 @@ def curaProfile(machine):
                                 # blackmagic
 
                                 # experimental
-                                qualityFile.append('coasting_volume = '+str(coastVolume(hotend, filament))+' * retraction_amount_multiplier')
+                              #BCN3DFix!   qualityFile.append('coasting_volume = '+str(coastVolume(hotend, filament))+' * retraction_amount_multiplier')
 
                                 # BCN3D
                                 qualityFile.append('smart_purge_slope = '+str(mmPerSecondIncrement))
@@ -1640,8 +1658,7 @@ def curaProfile(machine):
                 variant.append('[metadata]')
                 variant.append('author = '+machine['author'])
                 variant.append('type = variant')
-                variant.append('setting_version = 2')  # Deprecated after 2.7
-                # Cura 3 feature variant.append('setting_version = 3')
+                variant.append('setting_version = 4')
                 variant.append('')
                 variant.append('[values]')
                 # machine settings
@@ -1750,12 +1767,10 @@ def getTemperature(hotend, filament, temperatureToAdjust):
         adjustedTemperature = filament['printTemperature'][0] + hotend['temperatureCompensation']
     elif temperatureToAdjust == "highTemperature":
         adjustedTemperature = filament['printTemperature'][1] + hotend['temperatureCompensation']
-    elif temperatureToAdjust == "standbyTemperature":
-        adjustedTemperature = filament['standbyTemperature'] + hotend['temperatureCompensation']
     return adjustedTemperature
 
 def defaultMaterialPrintTemperature(filament):
-    # Exclusive function for Cura 2 to get default_material_print_temperature
+    # Exclusive function for Cura to get default_material_print_temperature
     return int(round((filament['printTemperature'][0] + filament['printTemperature'][1])/2.))
 
 def adjustedFlowTemperatureGraph(hotend, filament, layerHeight):
