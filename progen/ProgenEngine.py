@@ -267,7 +267,7 @@ def simplify3DProfile(machine, printMode, hotendLeft, hotendRight, filamentLeft,
         'M104 S0 T0\t\t\t;left extruder heater off,'+\
         'M104 S0 T1\t\t\t;right extruder heater off,'+\
         'M204 S'+str(machine['acceleration'])+'\t\t\t;set default acceleration,'+\
-        'M205 X'+str(machine['jerk'])+' Y'+str(machine['jerk'])+'\t\t\t;set defaul jerk,'+\
+        'M205 X'+str(machine['jerk'])+' Y'+str(machine['jerk'])+'\t\t\t;set default jerk,'+\
         'M140 S0\t\t\t;heated bed heater off,'+\
         'G91\t\t\t;relative positioning,'+\
         'G1 Z+0.5 E-5 Y+10 F[travel_speed]\t;move Z up a bit and retract filament,'+\
@@ -663,7 +663,7 @@ def simplify3DProfile(machine, printMode, hotendLeft, hotendRight, filamentLeft,
                 'M82\t\t;set extruder to absolute mode,'+\
                 'M107\t\t;start with the fan off,'+\
                 'M204 S'+str(machine['acceleration'])+'\t\t;set default acceleration,'+\
-                'M205 X'+str(machine['jerk'])+' Y'+str(machine['jerk'])+'\t\t;set defaul jerk,'+\
+                'M205 X'+str(machine['jerk'])+' Y'+str(machine['jerk'])+'\t\t;set default jerk,'+\
                 'G28 X0 Y0\t\t;move X/Y to min endstops,'+\
                 'G28 Z0\t\t;move Z to min endstops,'+\
                 'G92 E0\t\t;zero the extruded length,'+\
@@ -684,7 +684,7 @@ def simplify3DProfile(machine, printMode, hotendLeft, hotendRight, filamentLeft,
                 'M108 P1\t\t;enable layer fan for idle extruder,'+\
                 'M107\t\t;start with the fan off,'+\
                 'M204 S'+str(machine['acceleration'])+'\t\t;set default acceleration,'+\
-                'M205 X'+str(machine['jerk'])+' Y'+str(machine['jerk'])+'\t\t;set defaul jerk,'+\
+                'M205 X'+str(machine['jerk'])+' Y'+str(machine['jerk'])+'\t\t;set default jerk,'+\
                 'G28 X0 Y0\t\t;move X/Y to min endstops,'+\
                 'G28 Z0\t\t;move Z to min endstops,'+\
                 'T0\t\t;switch to the left extruder,'+\
@@ -709,7 +709,7 @@ def simplify3DProfile(machine, printMode, hotendLeft, hotendRight, filamentLeft,
             'M82\t\t;set extruder to absolute mode,'+\
             'M107\t\t;start with the fan off,'+\
             'M204 S'+str(machine['acceleration'])+'\t\t;set default acceleration,'+\
-            'M205 X'+str(machine['jerk'])+' Y'+str(machine['jerk'])+'\t\t;set defaul jerk,'+\
+            'M205 X'+str(machine['jerk'])+' Y'+str(machine['jerk'])+'\t\t;set default jerk,'+\
             'G28 X0 Y0\t\t;move X/Y to min endstops,'+\
             'G28 Z0\t\t;move Z to min endstops,'+\
             'G92 E0\t\t;zero the extruded length,'+\
@@ -730,7 +730,7 @@ def simplify3DProfile(machine, printMode, hotendLeft, hotendRight, filamentLeft,
                 'M108 P1\t\t;enable layer fan for idle extruder,'+\
                 'M107\t\t;start with the fan off,'+\
                 'M204 S'+str(machine['acceleration'])+'\t\t;set default acceleration,'+\
-                'M205 X'+str(machine['jerk'])+' Y'+str(machine['jerk'])+'\t\t;set defaul jerk,'+\
+                'M205 X'+str(machine['jerk'])+' Y'+str(machine['jerk'])+'\t\t;set default jerk,'+\
                 'G28 X0 Y0\t\t;move X/Y to min endstops,'+\
                 'G28 Z0\t\t;move Z to min endstops,'+\
                 'T0\t\t;switch to the left extruder,'+\
@@ -748,7 +748,7 @@ def simplify3DProfile(machine, printMode, hotendLeft, hotendRight, filamentLeft,
                 'M108 P1\t\t;enable layer fan for idle extruder,'+\
                 'M107\t\t;start with the fan off,'+\
                 'M204 S'+str(machine['acceleration'])+'\t\t;set default acceleration,'+\
-                'M205 X'+str(machine['jerk'])+' Y'+str(machine['jerk'])+'\t\t;set defaul jerk,'+\
+                'M205 X'+str(machine['jerk'])+' Y'+str(machine['jerk'])+'\t\t;set default jerk,'+\
                 'G28 X0 Y0\t\t;move X/Y to min endstops,'+\
                 'G28 Z0\t\t;move Z to min endstops,'+\
                 'T1\t\t;switch to the right extruder,'+\
@@ -904,9 +904,9 @@ def curaProfile(machine):
             r';Sigma ProGen '+PS.progenVersionNumber+' (Build '+PS.progenBuildNumber+r')\n\n'+\
             r'G21          ;metric values\n'+\
             r'G90          ;absolute positioning\n'+\
-            r'M82          ;set extruder to absolute mode\n'+\
+            # r'M82          ;set extruder to absolute mode\n'+\ # Cura 3.2 already sets it
             r'M204 S'+str(machine['acceleration'])+r'   ;set default acceleration\n'+\
-            r'M205 X'+str(machine['jerk'])+' Y'+str(machine['jerk'])+r' ;set defaul jerk\n'+\
+            r'M205 X'+str(machine['jerk'])+' Y'+str(machine['jerk'])+r' ;set default jerk\n'+\
             r'M108 P1      ;enable layer fan for idle extruder\n'+\
             r'M107         ;start with the fan off\n'+\
             r'G28 X0 Y0    ;move X/Y to min endstops\n'+\
@@ -930,7 +930,7 @@ def curaProfile(machine):
             r'M104 S0 T1               ;right extruder heater off\n'+\
             r'M140 S0                  ;heated bed heater off\n'+\
             r'M204 S'+str(machine['acceleration'])+r'               ;set default acceleration\n'+\
-            r'M205 X'+str(machine['jerk'])+' Y'+str(machine['jerk'])+r'             ;set defaul jerk\n'+\
+            r'M205 X'+str(machine['jerk'])+' Y'+str(machine['jerk'])+r'             ;set default jerk\n'+\
             r'G91                      ;relative positioning\n'+\
             r'G1 Z+0.5 E-5 Y+10 F12000 ;move Z up a bit and retract filament\n'+\
             r'G28 X0 Y0                ;move X/Y to min endstops so the head is out of the way\n'+\
@@ -1061,6 +1061,7 @@ def curaProfile(machine):
         # definition.append('        "retraction_extra_prime_amount": { "value": 0 },') # Adjust for flex material
         definition.append('        "retraction_min_travel": { "value": "3.75 * machine_nozzle_size" },')
         # definition.append('        "retraction_extrusion_window": { "value": "retraction_amount" },')
+        definition.append('        "switch_extruder_retraction_amount": { "value": "machine_heat_zone_length" },')
         #BCN3DFix! definition.append('        "switch_extruder_retraction_amount": { "value": "machine_heat_zone_length * retraction_amount_multiplier" },')
 
         # speed
@@ -1073,7 +1074,7 @@ def curaProfile(machine):
         definition.append('        "speed_travel": { "value": "round(speed_print if magic_spiralize else 200)" },')
         # definition.append('        "speed_print_layer_0": { "value": "speed_layer_0" },')
         definition.append('        "speed_travel_layer_0": { "value": "round(speed_travel * speed_layer_0 / speed_print, 1)" },')
-        # definition.append('        "skirt_brim_speed": { "value": "speed_layer_0" },')
+        definition.append('        "skirt_brim_speed": { "value": "speed_infill * layer_height / layer_height_0 if adhesion_type == '+"'skirt'"+' else speed_layer_0" },')
         # definition.append('        "speed_slowdown_layers = 2" },')
         definition.append('        "speed_equalize_flow_enabled": { "value": true },')
         definition.append('        "speed_equalize_flow_max": { "value": 100 },')
@@ -1178,15 +1179,10 @@ def curaProfile(machine):
         definition.append('        "support_conical_enabled": { "value": true },')
 
         # platform adhesion
-        definition.append('        "prime_blob_enable":') # different than z_seam
-        definition.append('        {')
-        definition.append('            "enabled": true,')
-        definition.append('            "value": true')
-        definition.append('        },')
         definition.append('        "extruder_prime_pos_y": { "value": "machine_depth" },')
         definition.append('        "adhesion_type": { "value": "'+"'skirt'"+'" },')
         definition.append('        "skirt_line_count": { "value": 2 },')
-        definition.append('        "skirt_brim_minimal_length": { "value": "round(((material_diameter / extruderValue(adhesion_extruder_nr, '+"'machine_nozzle_size'"+')) ** 2) * 20, 2)" },')
+        definition.append('        "skirt_brim_minimal_length": { "value": "round((20 * math.pi * (extruderValue(adhesion_extruder_nr, '+"'material_diameter'"+') / 2) ** 2) / (extruderValue(adhesion_extruder_nr, '+"'machine_nozzle_size'"+') * layer_height_0), 2)" },')
         # definition.append('        "skirt_gap": { "value": 3 },')
         # definition.append('        "brim_width": { "value": 8 },')
         # definition.append('        "brim_outside_only": { "value": true },')
@@ -1285,7 +1281,7 @@ def curaProfile(machine):
         # definition.append('        "draft_shield_height": { "value": 10 },')
         # definition.append('        "conical_overhang_enabled": { "value": false },')
         # definition.append('        "conical_overhang_angle": { "value": 50 },')
-        definition.append('        "coasting_enable": { "value": true },')
+        definition.append('        "coasting_enable": { "value": false },')
         definition.append('        "coasting_min_volume": { "value": "coasting_volume * 2" },')
         # definition.append('        "coasting_speed": { "value": 90 },')
         # definition.append('        "skin_alternate_rotation": { "value": false },')
@@ -1367,7 +1363,19 @@ def curaProfile(machine):
     extruder.append('        },')
     extruder.append('        "machine_nozzle_offset_x": { "default_value": 0.0 },')
     extruder.append('        "machine_nozzle_offset_y": { "default_value": 0.0 },')
-    extruder.append(r'        "machine_extruder_start_code": { "default_value": "G91\nG1 F12000 Z'+str(machine['extruderSwitchZHop'])+r'\nG90\n" },')
+    extruder.append(r'        "machine_extruder_start_code": { "default_value": "'+\
+        r'G91\n'+\
+        r'G1 F12000 Z2\n'+\
+        r'G90\n'+\
+        r'\n'+\
+        r'G92 E0\n'+\
+        r'G1 F600 E{switch_extruder_retraction_amount}\n'+\
+        r'M800 F48 S0.0002 E30.5 P1.525 ;smartpurge\n'+\
+        r'G4 P2000\n'+\
+        r'G92 E0\n'+\
+        r'G1 F2400 E-{switch_extruder_retraction_amount}\n'+\
+        r'G92 E0\n'+\
+        r'" },') # ajustar la purge speed per anar en sincronia amb la velocitat de infill
     extruder.append('        "machine_extruder_start_pos_abs": { "default_value": false },')
     extruder.append('        "machine_extruder_start_pos_x": { "default_value": 0.0 },')
     extruder.append('        "machine_extruder_start_pos_y": { "default_value": 0.0 },')
@@ -1401,7 +1409,19 @@ def curaProfile(machine):
     extruder.append('        },')
     extruder.append('        "machine_nozzle_offset_x": { "default_value": 0.0 },')
     extruder.append('        "machine_nozzle_offset_y": { "default_value": 0.0 },')
-    extruder.append(r'        "machine_extruder_start_code": { "default_value": "G91\nG1 F12000 Z'+str(machine['extruderSwitchZHop'])+r'\nG90\n" },')
+    extruder.append(r'        "machine_extruder_start_code": { "default_value": "'+\
+        r'G91\n'+\
+        r'G1 F12000 Z2\n'+\
+        r'G90\n'+\
+        r'\n'+\
+        r'G92 E0\n'+\
+        r'G1 F600 E{switch_extruder_retraction_amount}\n'+\
+        r'M800 F48 S0.0002 E30.5 P1.525 ;smartpurge\n'+\
+        r'G4 P2000\n'+\
+        r'G92 E0\n'+\
+        r'G1 F2400 E-{switch_extruder_retraction_amount}\n'+\
+        r'G92 E0\n'+\
+        r'" },') # ajustar la purge speed per anar en sincronia amb la velocitat de infill
     extruder.append('        "machine_extruder_start_pos_abs": { "default_value": false },')
     extruder.append('        "machine_extruder_start_pos_x": { "default_value": 0.0 },')
     extruder.append('        "machine_extruder_start_pos_y": { "default_value": 0.0 },')
@@ -1587,6 +1607,7 @@ def curaProfile(machine):
                                 qualityFile.append('material_print_temperature_layer_0 = '+str(int(round((getTemperature(hotend, filament, 'highTemperature'))))))
                                 qualityFile.append('material_flow_temp_graph = '+str(adjustedFlowTemperatureGraph(hotend, filament, layerHeight)))
                             #BCN3DFix!    qualityFile.append('retraction_amount = =retraction_amount_multiplier * '+("%.2f" % filament['retractionDistance']))
+                                qualityFile.append('retraction_amount = =max('+("%.2f" % filament['retractionDistance'])+', 6)')
                                 qualityFile.append('retraction_speed = =min(machine_max_feedrate_e, '+("%.2f" % filament['retractionSpeed'])+')')
                                 qualityFile.append('retraction_prime_speed = =min('+("%.2f" % filament['retractionSpeed'])+' * 0.5, machine_max_feedrate_e)')
                                 qualityFile.append('max_retract = '+str(int(filament['retractionCount'])))
