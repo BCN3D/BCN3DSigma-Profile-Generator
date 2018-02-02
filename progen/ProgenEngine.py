@@ -1740,9 +1740,11 @@ def purgeValues(hotend, filament, speed, layerHeight, minPurgeLength = 20): # pu
 
     # P (testing value)
     P = float("%.2f" % (hotendPurgeMultiplier * filament['purgeVolume'] / (math.pi * ((filament['filamentDiameter']/2.)**2))))
+    P = float("%.2f" % (hotendPurgeMultiplier * filament['purgeVolume'] / (math.pi * ((filament['filamentDiameter']/2.)**2)))) / 10 # better
         
     # E - Maximum distance to purge
     E = 2 * P
+    E = P # better
 
     return (F, S, E, P)
 
