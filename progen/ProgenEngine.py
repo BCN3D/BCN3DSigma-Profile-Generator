@@ -845,7 +845,7 @@ def curaProfile(machine):
     if 'inherits' in machine:
         definition.append('        "machine_width": { "default_value": '+str(machine['width'])+' },')
         definition.append('        "machine_max_feedrate_e": { "default_value": '+str(machine['maxFeedrateE'])+' },')
-        definition.append('        "print_mode": { "enabled": true },')
+        # definition.append('        "print_mode": { "enabled": true },') # disabled for Cura 3.2
         definition.append('        "avoid_grinding_filament": { "value": false },')
         # definition.append('        "retraction_combing": { "value": "'+"'all'"+'" },')
         definition.append('        "retraction_speed": { "maximum_value_warning": "machine_max_feedrate_e" },')
@@ -1329,7 +1329,7 @@ def curaProfile(machine):
         definition.append('        "smart_purge":')
         definition.append('        {')
         definition.append('            "enabled": "print_mode == '+"'regular'"+'",')
-        definition.append('            "value": false')
+        definition.append('            "value": true')
         definition.append('        },')  
         definition.append('        "retract_reduction": { "enabled": true },')
         definition.append('        "avoid_grinding_filament":')
@@ -1366,12 +1366,12 @@ def curaProfile(machine):
     extruder.append('        "machine_nozzle_offset_y": { "default_value": 0.0 },')
     extruder.append(r'        "machine_extruder_start_code": { "default_value": "'+\
         r'G91\n'+\
-        r'G1 F12000 Z2\n'+\
+        r'G1 F12000 Z{retraction_hop_height_after_extruder_switch}\n'+\
         r'G90\n'+\
         r'\n'+\
         r'G92 E0\n'+\
         r'G1 F600 E{switch_extruder_retraction_amount}\n'+\
-        r'M800 F48 S0.0002 E30.5 P1.525 ;smartpurge\n'+\
+        r'M800 F{purge_speed} S{smart_purge_slope} E{smart_purge_maximum_purge_distance} P{smart_purge_minimum_purge_distance} ;smartpurge\n'+\
         r'G4 P2000\n'+\
         r'G92 E0\n'+\
         r'G1 F2400 E-{switch_extruder_retraction_amount}\n'+\
@@ -1412,12 +1412,12 @@ def curaProfile(machine):
     extruder.append('        "machine_nozzle_offset_y": { "default_value": 0.0 },')
     extruder.append(r'        "machine_extruder_start_code": { "default_value": "'+\
         r'G91\n'+\
-        r'G1 F12000 Z2\n'+\
+        r'G1 F12000 Z{retraction_hop_height_after_extruder_switch}\n'+\
         r'G90\n'+\
         r'\n'+\
         r'G92 E0\n'+\
         r'G1 F600 E{switch_extruder_retraction_amount}\n'+\
-        r'M800 F48 S0.0002 E30.5 P1.525 ;smartpurge\n'+\
+        r'M800 F{purge_speed} S{smart_purge_slope} E{smart_purge_maximum_purge_distance} P{smart_purge_minimum_purge_distance} ;smartpurge\n'+\
         r'G4 P2000\n'+\
         r'G92 E0\n'+\
         r'G1 F2400 E-{switch_extruder_retraction_amount}\n'+\
@@ -1606,8 +1606,7 @@ def curaProfile(machine):
                                 qualityFile.append('material_print_temperature = =default_material_print_temperature + '+str(temperatureAdjustedToFlow(filament, hotend, layerHeight, defaultSpeed) - defaultMaterialPrintTemperature(filament)))
                                 qualityFile.append('material_print_temperature_layer_0 = '+str(int(round((getTemperature(hotend, filament, 'highTemperature'))))))
                                 qualityFile.append('material_flow_temp_graph = '+str(adjustedFlowTemperatureGraph(hotend, filament, layerHeight)))
-                            #BCN3DFix!    qualityFile.append('retraction_amount = =retraction_amount_multiplier * '+("%.2f" % filament['retractionDistance']))
-                                qualityFile.append('retraction_amount = =max('+("%.2f" % filament['retractionDistance'])+', 6)')
+                                qualityFile.append('retraction_amount = =retraction_amount_multiplier * '+("%.2f" % filament['retractionDistance']))
                                 qualityFile.append('retraction_speed = =min(machine_max_feedrate_e, '+("%.2f" % filament['retractionSpeed'])+')')
                                 qualityFile.append('retraction_prime_speed = =min('+("%.2f" % filament['retractionSpeed'])+' * 0.5, machine_max_feedrate_e)')
                                 qualityFile.append('max_retract = '+str(int(filament['retractionCount'])))
@@ -1650,7 +1649,7 @@ def curaProfile(machine):
                                 # blackmagic
 
                                 # experimental
-                              #BCN3DFix!   qualityFile.append('coasting_volume = '+str(coastVolume(hotend, filament))+' * retraction_amount_multiplier')
+                                qualityFile.append('coasting_volume = '+str(coastVolume(hotend, filament))+' * retraction_amount_multiplier')
 
                                 # BCN3D
                                 purgeSpeed, mmPerSecondIncrement, maxPurgeDistance, minPurgeDistance = purgeValues(hotend, filament, defaultSpeed, layerHeight)
@@ -1740,7 +1739,7 @@ def purgeValues(hotend, filament, speed, layerHeight, minPurgeLength = 20): # pu
         
     # E - Maximum distance to purge
     E = 2 * P
-    E = P # better
+    E = float("%.2f" % (hotendPurgeMultiplier * filament['purgeVolume'] / (math.pi * ((filament['filamentDiameter']/2.)**2)))) # better
 
     return (F, S, E, P)
 
