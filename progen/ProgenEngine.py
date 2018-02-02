@@ -1058,7 +1058,7 @@ def curaProfile(machine):
         definition.append('            "value": "min(retraction_speed * 0.25, machine_max_feedrate_e)",')
         definition.append('            "maximum_value_warning": "machine_max_feedrate_e"')
         definition.append('        },')
-        # definition.append('        "retraction_extra_prime_amount": { "value": 0 },') # Adjust for flex material
+        definition.append('        "retraction_extra_prime_amount": { "value": 0.75 },') # Adjust for flex material
         definition.append('        "retraction_min_travel": { "value": "3.75 * machine_nozzle_size" },')
         # definition.append('        "retraction_extrusion_window": { "value": "retraction_amount" },')
         definition.append('        "switch_extruder_retraction_amount": { "value": "machine_heat_zone_length" },')
@@ -1218,7 +1218,8 @@ def curaProfile(machine):
         # definition.append('        "raft_base_fan_speed": { "value": "raft_fan_speed" },')
 
         # dual
-        definition.append('        "prime_tower_enable": { "value": '+str(machine['usePrimeTower']).lower()+' },')
+        # definition.append('        "prime_tower_enable": { "value": '+str(machine['usePrimeTower']).lower()+' },')
+        definition.append('        "prime_tower_enable": { "value": false },') # just for testing...
         definition.append('        "prime_tower_size": { "value": "max(25, round(math.sqrt(prime_tower_min_volume/layer_height), 2))" },')
         # definition.append('        "prime_tower_wall_thickness": { "value": "round(max(2 * prime_tower_line_width, 0.5 * (prime_tower_size - math.sqrt(max(0, prime_tower_size ** 2 - prime_tower_min_volume / layer_height)))), 3)" },')
         # definition.append('        "prime_tower_position_x": { "value": "machine_width - max(extruderValue(adhesion_extruder_nr, 'brim_width') * extruderValue(adhesion_extruder_nr, 'initial_layer_line_width_factor') / 100 if adhesion_type == 'brim' else (extruderValue(adhesion_extruder_nr, 'raft_margin') if adhesion_type == 'raft' else (extruderValue(adhesion_extruder_nr, 'skirt_gap') if adhesion_type == 'skirt' else 0)), max(extruderValues('travel_avoid_distance'))) - max(extruderValues('support_offset')) - sum(extruderValues('skirt_brim_line_width')) * extruderValue(adhesion_extruder_nr, 'initial_layer_line_width_factor') / 100 - 1" },')
@@ -1533,7 +1534,6 @@ def curaProfile(machine):
                             layerHeight = getLayerHeight(hotend, quality)
                             firstLayerHeight = hotend['nozzleSize']/2.
                             defaultSpeed, firstLayerUnderspeed, outlineUnderspeed, supportUnderspeed = speedValues(hotend, hotend, filament, filament, layerHeight, firstLayerHeight, 1, quality, 'MEX Left')
-                            purgeSpeed, mmPerSecondIncrement, maxPurgeDistance, minPurgeDistance = purgeValues(hotend, filament, defaultSpeed, layerHeight)
                             # Create a new global quality for the new layer height
                             if layerHeight not in globalQualities:
                                 globalQualities.append(layerHeight)
@@ -1620,15 +1620,9 @@ def curaProfile(machine):
                                 qualityFile.append('speed_wall_0 = =round(speed_print * '+("%.2f" % outlineUnderspeed)+', 1)')
                                 qualityFile.append('speed_support = =round(speed_print * '+("%.2f" % supportUnderspeed)+', 1)')
                                 qualityFile.append('speed_layer_0 = =round(speed_print * '+("%.2f" % firstLayerUnderspeed)+', 1)')
-                                qualityFile.append('purge_speed = '+("%.2f" % (purgeSpeed/60.)))
                                 qualityFile.append('acceleration_wall_0 = '+str(int(accelerationForPerimeters(hotend['nozzleSize'], layerHeight, int(defaultSpeed/60. * outlineUnderspeed)))))
 
                                 # travel
-                                # if filament['isFlexibleMaterial']:
-                                #     qualityFile.append('retraction_combing = all')
-                                # qualityFile.append('travel_retract_before_outer_wall = False')
-                                # if filament['isSupportMaterial']:
-                                #     qualityFile.append('travel_avoid_other_parts = True')
 
                                 # cooling
                                 if filament['fanPercentage'][1] <= 0:
@@ -1659,6 +1653,8 @@ def curaProfile(machine):
                               #BCN3DFix!   qualityFile.append('coasting_volume = '+str(coastVolume(hotend, filament))+' * retraction_amount_multiplier')
 
                                 # BCN3D
+                                purgeSpeed, mmPerSecondIncrement, maxPurgeDistance, minPurgeDistance = purgeValues(hotend, filament, defaultSpeed, layerHeight)
+                                qualityFile.append('purge_speed = '+("%.2f" % (purgeSpeed/60.)))
                                 qualityFile.append('smart_purge_slope = '+str(mmPerSecondIncrement))
                                 qualityFile.append('smart_purge_maximum_purge_distance = '+str(maxPurgeDistance))
                                 qualityFile.append('smart_purge_minimum_purge_distance = '+str(minPurgeDistance))
