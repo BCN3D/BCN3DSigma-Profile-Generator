@@ -1328,7 +1328,8 @@ def curaProfile(machine):
         # BCN3D
         definition.append('        "smart_purge":')
         definition.append('        {')
-        definition.append('            "enabled": "print_mode == '+"'regular'"+'",')
+        # definition.append('            "enabled": "print_mode == '+"'regular'"+'",')
+        definition.append('            "enabled": false,') # until cura 3.2 allows dynamic values to zero when disabled
         definition.append('            "value": true')
         definition.append('        },')  
         definition.append('        "retract_reduction": { "enabled": true },')
