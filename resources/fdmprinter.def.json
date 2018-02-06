@@ -4743,7 +4743,7 @@
                 {
                     "label": "Distance Gradient",
                     "description": "Distance to purge per second idle. Purged distance will increase this amount each second the toolhead remains idle. If the final distance is shorter than the Minimum Purge Distance it will be increased to this value the ensure the right Hotend's pressure. If the final distance is greater than the Maximum Purge Distance it will be decreased to this value to avoid purge tray filling.",
-                    "unit": "mm",
+                    "unit": "mm/s",
                     "type": "float",
                     "default_value": 1.5,
                     "minimum_value": "0",
