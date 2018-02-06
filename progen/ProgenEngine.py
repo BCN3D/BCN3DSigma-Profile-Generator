@@ -1012,7 +1012,7 @@ def curaProfile(machine):
         definition.append('        "infill_sparse_thickness": { "value": "layer_height" },')
         # definition.append('        "gradual_infill_steps": { "value": 0 },')
         # definition.append('        "gradual_infill_step_height": { "value": 5 },')
-        definition.append('        "infill_before_walls": { "value": false },')
+        definition.append('        "infill_before_walls": { "value": true },')
         # definition.append('        "min_infill_area": { "value": 0 },')
         # definition.append('        "skin_preshrink": { "value": 0 },')
         # definition.append('        "top_skin_preshrink": { "value": 0 },')
@@ -1035,6 +1035,7 @@ def curaProfile(machine):
         # definition.append('        "retraction_enable": { "value": true },')
         definition.append('        "material_extrusion_cool_down_speed": { "value": 1 },') # this value depends on extruded flow (not material_flow)
         definition.append('        "retract_at_layer_change": { "value": false },')
+        definition.append('        "retraction_amount": { "maximum_value_warning": "machine_heat_zone_length" },')
         definition.append('        "retraction_amount_multiplier": { "value": '+str(machine['retractionAmountMultiplier'])+' },')
         definition.append('        "retraction_speed": { "maximum_value_warning": "machine_max_feedrate_e" },')
         definition.append('        "retraction_retract_speed":')
@@ -1058,11 +1059,14 @@ def curaProfile(machine):
         definition.append('            "value": "min(retraction_speed * 0.25, machine_max_feedrate_e)",')
         definition.append('            "maximum_value_warning": "machine_max_feedrate_e"')
         definition.append('        },')
-        definition.append('        "retraction_extra_prime_amount": { "value": 0.75 },') # Adjust for flex material
+        definition.append('        "retraction_extra_prime_amount": { "value": "coasting_volume if coasting_enable else 0" },') # Adjust for flex material
         definition.append('        "retraction_min_travel": { "value": "3.75 * machine_nozzle_size" },')
         # definition.append('        "retraction_extrusion_window": { "value": "retraction_amount" },')
-        definition.append('        "switch_extruder_retraction_amount": { "value": "machine_heat_zone_length" },')
-        #BCN3DFix! definition.append('        "switch_extruder_retraction_amount": { "value": "machine_heat_zone_length * retraction_amount_multiplier" },')
+        definition.append('        "switch_extruder_retraction_amount":')
+        definition.append('        {')
+        definition.append('            "value": "machine_heat_zone_length",')
+        definition.append('            "maximum_value_warning": "machine_heat_zone_length"')
+        definition.append('        },')
 
         # speed
         # definition.append('        "speed_infill": { "value": "speed_print" },')
@@ -1282,8 +1286,8 @@ def curaProfile(machine):
         # definition.append('        "draft_shield_height": { "value": 10 },')
         # definition.append('        "conical_overhang_enabled": { "value": false },')
         # definition.append('        "conical_overhang_angle": { "value": 50 },')
-        definition.append('        "coasting_enable": { "value": false },')
-        definition.append('        "coasting_min_volume": { "value": "coasting_volume * 2" },')
+        definition.append('        "coasting_enable": { "value": true },')
+        definition.append('        "coasting_min_volume": { "value": "coasting_volume * 4" },')
         # definition.append('        "coasting_speed": { "value": 90 },')
         # definition.append('        "skin_alternate_rotation": { "value": false },')
         # definition.append('        "cross_infill_pocket_size": { "value": "infill_line_distance" },')
@@ -1326,10 +1330,12 @@ def curaProfile(machine):
         # definition.append('        "adaptive_layer_height_threshold": { "value": 200 },')
 
         # BCN3D
+        definition.append('        "skirt_brim_minimal_length": { "value": "round((20 * math.pi * (extruderValue(adhesion_extruder_nr, '+"'material_diameter'"+') / 2) ** 2) / (extruderValue(adhesion_extruder_nr, '+"'machine_nozzle_size'"+') * layer_height_0), 2)" },')
+        definition.append('        "purge_speed": { "value": "round(max(40 * (machine_nozzle_size / material_diameter) ** 2, machine_nozzle_size * layer_height * speed_infill / (math.pi * ((material_diameter / 2) ** 2))), 2)" },')
         definition.append('        "smart_purge":')
         definition.append('        {')
         # definition.append('            "enabled": "print_mode == '+"'regular'"+'",')
-        definition.append('            "enabled": false,') # until cura 3.2 allows dynamic values to zero when disabled
+        definition.append('            "enabled": true,')
         definition.append('            "value": true')
         definition.append('        },')  
         definition.append('        "retract_reduction": { "enabled": true },')
@@ -1607,7 +1613,7 @@ def curaProfile(machine):
                                 qualityFile.append('material_print_temperature = =default_material_print_temperature + '+str(temperatureAdjustedToFlow(filament, hotend, layerHeight, defaultSpeed) - defaultMaterialPrintTemperature(filament)))
                                 qualityFile.append('material_print_temperature_layer_0 = '+str(int(round((getTemperature(hotend, filament, 'highTemperature'))))))
                                 qualityFile.append('material_flow_temp_graph = '+str(adjustedFlowTemperatureGraph(hotend, filament, layerHeight)))
-                                qualityFile.append('retraction_amount = =retraction_amount_multiplier * '+("%.2f" % filament['retractionDistance']))
+                                qualityFile.append('retraction_amount = =min(machine_heat_zone_length, retraction_amount_multiplier * '+("%.2f" % filament['retractionDistance'])+')')
                                 qualityFile.append('retraction_speed = =min(machine_max_feedrate_e, '+("%.2f" % filament['retractionSpeed'])+')')
                                 qualityFile.append('retraction_prime_speed = =min('+("%.2f" % filament['retractionSpeed'])+' * 0.5, machine_max_feedrate_e)')
                                 qualityFile.append('max_retract = '+str(int(filament['retractionCount'])))
@@ -1650,14 +1656,14 @@ def curaProfile(machine):
                                 # blackmagic
 
                                 # experimental
-                                qualityFile.append('coasting_volume = '+str(coastVolume(hotend, filament))+' * retraction_amount_multiplier')
+                                qualityFile.append('coasting_volume = ='+str(coastVolume(hotend, filament))+' * retraction_amount_multiplier')
 
                                 # BCN3D
                                 purgeSpeed, mmPerSecondIncrement, maxPurgeDistance, minPurgeDistance = purgeValues(hotend, filament, defaultSpeed, layerHeight)
-                                qualityFile.append('purge_speed = '+("%.2f" % (purgeSpeed/60.)))
-                                qualityFile.append('smart_purge_slope = '+str(mmPerSecondIncrement))
-                                qualityFile.append('smart_purge_maximum_purge_distance = '+str(maxPurgeDistance))
-                                qualityFile.append('smart_purge_minimum_purge_distance = '+str(minPurgeDistance))
+                                # qualityFile.append('purge_speed = '+("%.2f" % (purgeSpeed/60.))) # defined in machine's def
+                                qualityFile.append('smart_purge_slope = ='+str(mmPerSecondIncrement)+' if smart_purge else 0')
+                                qualityFile.append('smart_purge_maximum_purge_distance = ='+str(maxPurgeDistance)+' if smart_purge else 0')
+                                qualityFile.append('smart_purge_minimum_purge_distance = ='+str(minPurgeDistance)+' if smart_purge else 0')
 
                             fileContent = '\n'.join(qualityFile)
                             filesList.append((fileName, fileContent))
@@ -1713,6 +1719,8 @@ def purgeValues(hotend, filament, speed, layerHeight, minPurgeLength = 20): # pu
         S - Slope (according to NSize, Flow, PurgeLength) - [mm] -> this distance will be added to the P distance each second the hotend is idle. Up to E distance 
         E - Maximum distance to purge
         P - Minimum distance to purge
+
+    purges max(P, min(S * idleTime, E)) mm @ F speed
     '''
 
     # nozzleSizeBehavior
