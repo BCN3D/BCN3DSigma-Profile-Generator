@@ -695,7 +695,7 @@ def simplify3DProfile(machine, printMode, hotendLeft, hotendRight, filamentLeft,
                 'G92 E0\t\t;zero the extruded length again'+printModeGcode+''+\
                 'G4 P1,'+\
                 'G4 P2,'+\
-                'G3 P3''</startingGcode>')
+                'G4 P3''</startingGcode>')
         postProcessingScript += ',{REPLACE "M104 S'+str(hotendRightTemperature)+' T1" ""}'
         fff.append('    <postProcessing>'+postProcessingScript+'</postProcessing>')
         fff.append('  </autoConfigureExtruders>')
@@ -845,7 +845,7 @@ def curaProfile(machine):
     if 'inherits' in machine:
         definition.append('        "machine_width": { "default_value": '+str(machine['width'])+' },')
         definition.append('        "machine_max_feedrate_e": { "default_value": '+str(machine['maxFeedrateE'])+' },')
-        # definition.append('        "print_mode": { "enabled": true },') # disabled for Cura 3.2
+        definition.append('        "print_mode": { "enabled": true },')
         definition.append('        "avoid_grinding_filament": { "value": false },')
         # definition.append('        "retraction_combing": { "value": "'+"'all'"+'" },')
         definition.append('        "retraction_speed": { "maximum_value_warning": "machine_max_feedrate_e" },')
@@ -867,6 +867,7 @@ def curaProfile(machine):
         definition.append('        "machine_width": { "default_value": '+str(machine['width'])+' },')
         definition.append('        "machine_depth": { "default_value": '+str(machine['depth'])+' },')
         definition.append('        "machine_height": { "default_value": '+str(machine['height'])+' },')
+        definition.append('        "machine_disallowed_areas": { "value": "[[]] if print_mode == '+"'regular'"+' else [[[-(abs(machine_head_with_fans_polygon[0][0]) + abs(machine_head_with_fans_polygon[2][0])) / 2, machine_depth / 2], [-(abs(machine_head_with_fans_polygon[0][0]) + abs(machine_head_with_fans_polygon[2][0])) / 2, -machine_depth / 2], [machine_width / 2, -machine_depth / 2], [machine_width / 2, machine_depth / 2]]] if print_mode == '+"'mirror'"+' else [[[0, machine_depth / 2], [0, -machine_depth / 2], [machine_width / 2, -machine_depth / 2], [machine_width / 2, machine_depth / 2]]]" },')
         definition.append('        "machine_heated_bed": { "default_value": true },')
         definition.append('        "machine_extruder_count": { "default_value": 2 },')
         definition.append('        "machine_center_is_zero": { "default_value": false },')
@@ -924,6 +925,10 @@ def curaProfile(machine):
             # r'G92 E0       ;zero the extruded length\n'+\
             # r'G4 P2000     ;stabilize hotend'+"'"+r's pressure\n'+\
             # r'G1 F2400 E-8 ;retract\n'+\
+            r'{print_mode_gcode}\n'+\
+            r'G4 P1\n'+\
+            r'G4 P2\n'+\
+            r'G4 P3\n'+\
             r'" },')
         definition.append(r'        "machine_end_gcode": { "default_value": "'+\
             r'M104 S0 T0               ;left extruder heater off\n'+\
@@ -939,8 +944,8 @@ def curaProfile(machine):
         definition.append('        "machine_nozzle_temp_enabled": { "value": true },')
         definition.append('        "material_bed_temp_wait": { "value": true },')
         definition.append('        "material_print_temp_wait": { "value": true },')
-        definition.append('        "material_bed_temp_prepend": { "value": false },') # Cura 2.5 ignores it
-        definition.append('        "material_print_temp_prepend": { "value": false },') # Cura 2.5 ignores it
+        # definition.append('        "material_bed_temp_prepend": { "value": false },') # Cura 2.5 ignores it
+        # definition.append('        "material_print_temp_prepend": { "value": false },') # Cura 2.5 ignores it
 
         # resolution
         definition.append('        "line_width": { "value": "machine_nozzle_size" },')
@@ -1334,11 +1339,11 @@ def curaProfile(machine):
         definition.append('        "purge_speed": { "value": "round(max(40 * (machine_nozzle_size / material_diameter) ** 2, machine_nozzle_size * layer_height * speed_infill / (math.pi * ((material_diameter / 2) ** 2))), 2)" },')
         definition.append('        "smart_purge":')
         definition.append('        {')
-        # definition.append('            "enabled": "print_mode == '+"'regular'"+'",')
+        # definition.append('            "enabled": "print_mode == '+"'regular'"+'",') # change to universal enable for dual -> machine_extruders ??
         definition.append('            "enabled": true,')
         definition.append('            "value": true')
         definition.append('        },')  
-        definition.append('        "retract_reduction": { "enabled": true },')
+        # definition.append('        "retract_reduction": { "enabled": true },')
         definition.append('        "avoid_grinding_filament":')
         definition.append('        {')
         definition.append('            "enabled": true,')
@@ -1375,14 +1380,13 @@ def curaProfile(machine):
         r'G91\n'+\
         r'G1 F12000 Z{retraction_hop_height_after_extruder_switch}\n'+\
         r'G90\n'+\
-        r'\n'+\
         r'G92 E0\n'+\
         r'G1 F600 E{switch_extruder_retraction_amount}\n'+\
         r'M800 F{purge_speed} S{smart_purge_slope} E{smart_purge_maximum_purge_distance} P{smart_purge_minimum_purge_distance} ;smartpurge\n'+\
-        r'G4 P2000\n'+\
         r'G92 E0\n'+\
         r'G1 F2400 E-{switch_extruder_retraction_amount}\n'+\
         r'G92 E0\n'+\
+        r'G4 P2000\n'+\
         r'" },') # ajustar la purge speed per anar en sincronia amb la velocitat de infill
     extruder.append('        "machine_extruder_start_pos_abs": { "default_value": false },')
     extruder.append('        "machine_extruder_start_pos_x": { "default_value": 0.0 },')
@@ -1421,14 +1425,13 @@ def curaProfile(machine):
         r'G91\n'+\
         r'G1 F12000 Z{retraction_hop_height_after_extruder_switch}\n'+\
         r'G90\n'+\
-        r'\n'+\
         r'G92 E0\n'+\
         r'G1 F600 E{switch_extruder_retraction_amount}\n'+\
         r'M800 F{purge_speed} S{smart_purge_slope} E{smart_purge_maximum_purge_distance} P{smart_purge_minimum_purge_distance} ;smartpurge\n'+\
-        r'G4 P2000\n'+\
         r'G92 E0\n'+\
         r'G1 F2400 E-{switch_extruder_retraction_amount}\n'+\
         r'G92 E0\n'+\
+        r'G4 P2000\n'+\
         r'" },') # ajustar la purge speed per anar en sincronia amb la velocitat de infill
     extruder.append('        "machine_extruder_start_pos_abs": { "default_value": false },')
     extruder.append('        "machine_extruder_start_pos_x": { "default_value": 0.0 },')

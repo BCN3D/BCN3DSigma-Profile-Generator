@@ -37,6 +37,7 @@ def cura(fileAction):
     os.mkdir('Cura/resources/meshes')
     os.mkdir('Cura/resources/quality')
     shutil.copyfile('resources/fdmprinter.def.json', 'Cura/resources/definitions/fdmprinter.def.json')
+    shutil.copyfile('resources/fdmextruder.def.json', 'Cura/resources/definitions/fdmextruder.def.json')
     i = 0
     for machine in PS.profilesData['machine']:
         if i < 1:
