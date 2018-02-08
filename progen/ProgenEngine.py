@@ -512,7 +512,8 @@ def simplify3DProfile(machine, printMode, hotendLeft, hotendRight, filamentLeft,
                 fff.append('      <extrusionMultiplier>'+str(filamentLeft['extrusionMultiplier'])+'</extrusionMultiplier>')
                 fff.append('      <useRetract>1</useRetract>')
                 fff.append('      <retractionDistance>'+str(machine['retractionAmountMultiplier'] * filamentLeft['retractionDistance'])+'</retractionDistance>')
-                fff.append('      <extraRestartDistance>'+str(coastVolume(hotendLeft, filamentLeft) / (layerHeight * hotendLeft['nozzleSize']) * machine['retractionAmountMultiplier'])+'</extraRestartDistance>')
+                fff.append('      <extraRestartDistance>0</extraRestartDistance>')
+                # fff.append('      <extraRestartDistance>'+str(coastVolume(hotendLeft, filamentLeft) / (layerHeight * hotendLeft['nozzleSize']) * machine['retractionAmountMultiplier'])+'</extraRestartDistance>')
                 fff.append('      <retractionZLift>'+("%.2f" % (2 * layerHeight))+'</retractionZLift>')
                 fff.append('      <retractionSpeed>'+str(min(filamentLeft['retractionSpeed'], machine['maxFeedrateE'])*60)+'</retractionSpeed>')
                 fff.append('      <useCoasting>'+str(retractValues(filamentLeft)[0])+'</useCoasting>')
@@ -529,7 +530,8 @@ def simplify3DProfile(machine, printMode, hotendLeft, hotendRight, filamentLeft,
                 fff.append('      <extrusionMultiplier>'+str(filamentRight['extrusionMultiplier'])+'</extrusionMultiplier>')
                 fff.append('      <useRetract>1</useRetract>')
                 fff.append('      <retractionDistance>'+str(machine['retractionAmountMultiplier'] * filamentRight['retractionDistance'])+'</retractionDistance>')
-                fff.append('      <extraRestartDistance>'+str(coastVolume(hotendRight, filamentRight) / (layerHeight * hotendRight['nozzleSize']) * machine['retractionAmountMultiplier'])+'</extraRestartDistance>')
+                fff.append('      <extraRestartDistance>0</extraRestartDistance>')
+                # fff.append('      <extraRestartDistance>'+str(coastVolume(hotendRight, filamentRight) / (layerHeight * hotendRight['nozzleSize']) * machine['retractionAmountMultiplier'])+'</extraRestartDistance>')
                 fff.append('      <retractionZLift>'+str(2 * layerHeight)+'</retractionZLift>')
                 fff.append('      <retractionSpeed>'+str(min(filamentRight['retractionSpeed'], machine['maxFeedrateE'])*60)+'</retractionSpeed>')
                 fff.append('      <useCoasting>'+str(retractValues(filamentRight)[0])+'</useCoasting>')
@@ -1757,7 +1759,7 @@ def purgeValues(hotend, filament, speed, layerHeight, minPurgeLength = 20): # pu
 
 def retractValues(filament):
     if filament['isFlexibleMaterial']:
-        useCoasting = 1
+        useCoasting = 0
         useWipe = 1
         onlyRetractWhenCrossingOutline = 1
         retractBetweenLayers = 1
@@ -1765,7 +1767,7 @@ def retractValues(filament):
         retractWhileWiping = 1
         onlyWipeOutlines = 1
     else:
-        useCoasting = 1
+        useCoasting = 0
         useWipe = 1
         onlyRetractWhenCrossingOutline = 0
         retractBetweenLayers = 1
