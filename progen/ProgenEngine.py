@@ -517,6 +517,7 @@ def simplify3DProfile(machine, printMode, hotendLeft, hotendRight, filamentLeft,
                 fff.append('      <retractionSpeed>'+str(min(filamentLeft['retractionSpeed'], machine['maxFeedrateE'])*60)+'</retractionSpeed>')
                 fff.append('      <useCoasting>'+str(retractValues(filamentLeft)[0])+'</useCoasting>')
                 fff.append('      <coastingDistance>'+str(coastVolume(hotendLeft, filamentLeft) / (layerHeight * hotendLeft['nozzleSize']) * machine['retractionAmountMultiplier'])+'</coastingDistance>')
+                fff.append('      <toolChangeExtraRestartDistance>'+str(coastVolume(hotendLeft, filamentLeft) / (layerHeight * hotendLeft['nozzleSize']) * machine['retractionAmountMultiplier'])+'</toolChangeExtraRestartDistance>')
                 fff.append('      <useWipe>'+str(retractValues(filamentLeft)[1])+'</useWipe>')
                 fff.append('      <wipeDistance>'+str(coastVolume(hotendLeft, filamentLeft) / (layerHeight * hotendLeft['nozzleSize']))+'</wipeDistance>')
                 fff.append('    </extruder>')
@@ -534,6 +535,7 @@ def simplify3DProfile(machine, printMode, hotendLeft, hotendRight, filamentLeft,
                 fff.append('      <retractionSpeed>'+str(min(filamentRight['retractionSpeed'], machine['maxFeedrateE'])*60)+'</retractionSpeed>')
                 fff.append('      <useCoasting>'+str(retractValues(filamentRight)[0])+'</useCoasting>')
                 fff.append('      <coastingDistance>'+str(coastVolume(hotendRight, filamentRight) / (layerHeight * hotendRight['nozzleSize']) * machine['retractionAmountMultiplier'])+'</coastingDistance>')
+                fff.append('      <toolChangeExtraRestartDistance>'+str(coastVolume(hotendRight, filamentRight) / (layerHeight * hotendRight['nozzleSize']) * machine['retractionAmountMultiplier'])+'</toolChangeExtraRestartDistance>')
                 fff.append('      <useWipe>'+str(retractValues(filamentRight)[1])+'</useWipe>')
                 fff.append('      <wipeDistance>'+str(coastVolume(hotendRight, filamentRight) / (layerHeight * hotendRight['nozzleSize']))+'</wipeDistance>')
                 fff.append('    </extruder>')
@@ -621,9 +623,9 @@ def simplify3DProfile(machine, printMode, hotendLeft, hotendRight, filamentLeft,
                     '{IF NEWTOOL=1} M800 F'+str(purgeSpeedT1)+' S'+str(mmPerSecondIncrementT1)+' E'+str(maxPurgeDistanceT1)+' P'+str(minPurgeDistanceT1)+'\t;SmartPurge - Needs Firmware v01-1.2.3,'+\
                     ';{IF NEWTOOL=1} G1 F'+str(purgeSpeedT1)+' E'+str(minPurgeDistanceT1)+'\t\t;Default purge,'+\
                     fanActionOnToolChange2+','+\
-                    "G4 P2000\t\t\t\t;Stabilize Hotend's pressure,"+\
                     'G92 E0\t\t\t\t;Zero extruder,'+\
                     'G1 F3000 E-4.5\t\t\t\t;Retract,'+\
+                    "G4 P2000\t\t\t\t;Stabilize Hotend's pressure,"+\
                     'G1 F[travel_speed]\t\t\t;End tool switch,'+\
                     'G91,'+\
                     'G1 F[travel_speed] Z'+str(machine['extruderSwitchZHop'])+','+\
