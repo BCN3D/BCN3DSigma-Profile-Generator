@@ -193,13 +193,15 @@ def main():
                     print '\n\tChoose one option (1-6):'
                     print '\t1. Generate a bundle of profiles - Simplify3D'
                     print '\t2. Generate profile files bundle - Cura'
-                    print '\t3. Test all combinations'
-                    print '\t4. Back'
+                    print '\t3. Create files for CuraResources - Development Project'
+                    print '\t4. Profile for Cura - Development Project'
+                    print '\t5. Test all combinations'
+                    print '\t6. Back'
                     x2 = 'x'
-                    while x2 not in ['1','2','3','4']:
+                    while x2 not in ['1','2','3','4', '5', '6']:
                         x2 = raw_input('\t')
 
-                singleProfileSimplify3D, curaFiles, bundleProfilesSimplify3D, testComb, curaFilesBundle = False, False, False, False, False
+                singleProfileSimplify3D, curaFiles, bundleProfilesSimplify3D, testComb, curaFilesBundle, curaRecources, curaProject = False, False, False, False, False, False, False
 
                 if x == '1':
                     singleProfileSimplify3D = True
@@ -216,32 +218,38 @@ def main():
                         curaFilesBundle = True
                         GUIHeader = title+'\n\n\n\n\n    Experimental features\n\n\n\n\t   Generate a bundle of profiles - Cura\n'
                     elif x2 == '3':
-                        testComb = True
-                        GUIHeader = title+'\n\n\n\n\n    Experimental features\n\n\n\n\n\n\t   Test all combinations\n'
+                        curaRecources = True
+                        GUIHeader = title+'\n\n\n\n\n    Experimental features\n\n\n\n\n\n\t   Create files for CuraResources - Development Project\n'
                     elif x2 == '4':
+                        curaProject = True
+                        GUIHeader = title+'\n\n\n\n\n    Experimental features\n\n\n\n\n\n\n\t   Profile for Cura - Development Project\n'
+                    elif x2 == '5':
+                        testComb = True
+                        GUIHeader = title+'\n\n\n\n\n    Experimental features\n\n\n\n\n\n\n\n\t   Test all combinations\n'
+                    elif x2 == '6':
                         experimentalMenu = False
 
                 elif x == '4':
                     break
 
-                if bundleProfilesSimplify3D or curaFilesBundle or singleProfileSimplify3D or curaFiles:
+                if bundleProfilesSimplify3D or curaFilesBundle or singleProfileSimplify3D or curaFiles or curaRecources or curaProject:
                     if bundleProfilesSimplify3D:
                         clearDisplay()
                         print GUIHeader
                         ProfileMaker.simplify3DProfilesBundle(profilesCreatedCount)
                         profilesCreatedCount = ProfileMaker.simplify3DProfilesBundle(profilesCreatedCount)
-                    elif curaFilesBundle:
-                        clearDisplay()
-                        print GUIHeader
-                        ProfileMaker.curaFilesBundle()
-                        raw_input("\n\t\tCura files created and zipped to share ;) Press Enter to continue...")
-
-                    elif curaFiles:
+                    
+                    elif curaFilesBundle or curaFiles or curaRecources or curaProject:
                         clearDisplay()
                         print GUIHeader
                         ProfileMaker.cura('--file')
-                        ProfileMaker.installCuraFiles()
-                        raw_input("\t\tPress Enter to continue...")
+                        if curaFilesBundle:
+                            ProfileMaker.curaFilesBundle()
+                        elif curaFiles or curaRecources or curaProject:
+                            action = 'curaInstall' if curaFiles else 'curaRecources' if curaRecources else 'curaProject'
+                            ProfileMaker.installCuraFiles(action)
+                        raw_input("\n\t\tPress Enter to continue...")
+
                     elif singleProfileSimplify3D:
                         
                         c = selectMachineAndPrintMode(GUIHeader)
@@ -267,19 +275,21 @@ def main():
                             newProfile = ProfileMaker.simplify3D(machine, printMode, hotendLeft, hotendRight, filamentLeft, filamentRight, '--file')
                             print "\n\tYour new Simplify3D profile '"+newProfile+"' has been created."
                             profilesCreatedCount = 1
+                    
+                    raw_input("\tPress Enter to continue...")
 
-                    if profilesCreatedCount > 0:
-                        while y not in ['Y', 'n']:
-                            y = raw_input('\tSee profile(s) data? (Y/n) ')
-                    if y == 'Y':
-                        # for l in loggedData:
-                        #     print '\t',
-                        #     for d in l.split(';'):
-                        #         print str(d)[:6].rjust(6),
-                        # print '\t'+str(profilesCreatedCount)+' profile(s) created with '+str(len(dataLog)-1)+' configurations.\n'
-                        raw_input("\tPress Enter to continue...")
-                    elif y == 'n':
-                        print ''
+                    # if profilesCreatedCount > 0:
+                    #     while y not in ['Y', 'n']:
+                    #         y = raw_input('\tSee profile(s) data? (Y/n) ')
+                    # if y == 'Y':
+                    #     # for l in loggedData:
+                    #     #     print '\t',
+                    #     #     for d in l.split(';'):
+                    #     #         print str(d)[:6].rjust(6),
+                    #     # print '\t'+str(profilesCreatedCount)+' profile(s) created with '+str(len(dataLog)-1)+' configurations.\n'
+                    #     raw_input("\tPress Enter to continue...")
+                    # elif y == 'n':
+                    #     print ''
                 elif testComb:
                     clearDisplay()
                     print GUIHeader              

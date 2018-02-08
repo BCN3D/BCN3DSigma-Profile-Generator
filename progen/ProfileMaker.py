@@ -58,50 +58,62 @@ def cura(fileAction):
             elif fileAction == '--only-filename':
                 print fileName
 
-def installCuraFiles():
-    
+def installCuraFiles(action):
+
     allowAutoInstall = False
+    root_src_dir = 'Cura'
 
-    if platform.system() == 'Darwin' and 'Cura.app' in os.listdir('/Applications'):
-        allowAutoInstall = True
-        root_src_dir = 'Cura'
-        root_dst_dir = '/Applications/Cura.app/Contents/Resources/resources'
-    
-    elif platform.system() == 'Windows':
-
-        installedCuras = []
-        
-        for folder in os.listdir('C:\Program Files'): # add [::-1] to list folders in reverse order
-            if ('Cura' in folder or 'BCN3D Cura' in folder) and ('Cura.exe' in os.listdir('C:\\Program Files\\'+folder) or 'BCN3D_Cura.exe' in os.listdir('C:\\Program Files\\'+folder)):
-                installedCuras.append(folder)
-
-        if len(installedCuras) >= 1:
-
-            # check permissions for Windows 10
-            if platform.release() == '10':
-                if is_admin():
-                    allowAutoInstall = True
-                else:
-                    pass
-            else:
-                allowAutoInstall = True
-            
-            if allowAutoInstall:
-                root_src_dir = 'Cura'
-                if len(installedCuras) > 1:
-                    print "\n\t\tYou have more than one Cura installed! Select where you want to add the BCN3D Sigma:"
-                    answer0 = ''
-                    folderOptions = []
-                    for c in range(len(installedCuras)):
-                        folderOptions.append(str(c+1))
-                        print '\t\t'+str(c+1)+'. '+installedCuras[c]
-                    while answer0 not in folderOptions:
-                        answer0 = raw_input('\t\t')            
-                    allowAutoInstall = True
-                    root_dst_dir = 'C:\\Program Files\\'+installedCuras[int(answer0)-1]
+    if action == 'curaInstall':
+        if platform.system() == 'Darwin' and 'Cura.app' in os.listdir('/Applications'):
+            allowAutoInstall = True
+            root_dst_dir = '/Applications/Cura.app/Contents/Resources/resources'
+        elif platform.system() == 'Windows':
+            installedCuras = []
+            for folder in os.listdir('C:\Program Files'): # add [::-1] to list folders in reverse order
+                if ('Cura' in folder or 'BCN3D Cura' in folder) and ('Cura.exe' in os.listdir('C:\\Program Files\\'+folder) or 'BCN3D_Cura.exe' in os.listdir('C:\\Program Files\\'+folder)):
+                    installedCuras.append(folder)
+            if len(installedCuras) >= 1:
+                # check permissions for Windows 10
+                if platform.release() == '10':
+                    if is_admin():
+                        allowAutoInstall = True
+                    else:
+                        pass
                 else:
                     allowAutoInstall = True
-                    root_dst_dir = 'C:\\Program Files\\'+installedCuras[0]
+                if allowAutoInstall:
+                    if len(installedCuras) > 1:
+                        print "\n\t\tYou have more than one Cura installed! Select where you want to add the BCN3D Sigma:"
+                        answer0 = ''
+                        folderOptions = []
+                        for c in range(len(installedCuras)):
+                            folderOptions.append(str(c+1))
+                            print '\t\t'+str(c+1)+'. '+installedCuras[c]
+                        while answer0 not in folderOptions:
+                            answer0 = raw_input('\t\t')            
+                        allowAutoInstall = True
+                        root_dst_dir = 'C:\\Program Files\\'+installedCuras[int(answer0)-1]
+                    else:
+                        allowAutoInstall = True
+                        root_dst_dir = 'C:\\Program Files\\'+installedCuras[0]
+    elif action == 'curaRecources':
+        if (platform.system() == 'Darwin' and 'CuraResources' in os.listdir('../')) or (platform.system() == 'Windows' and 'CuraResources' in os.listdir('..\\')):
+            allowAutoInstall = True
+            if platform.system() == 'Darwin':
+                root_src_dir += '/resources'
+                root_dst_dir = '../CuraResources'
+            elif platform.system() == 'Windows':
+                root_src_dir += '\\resources'
+                root_dst_dir = '..\\CuraResources'
+    elif action == 'curaProject':
+        if (platform.system() == 'Darwin' and 'CuraResources' in os.listdir('../')) or (platform.system() == 'Windows' and 'Cura\\resources' in os.listdir('..\\')):
+            allowAutoInstall = True
+            if platform.system() == 'Darwin':
+                root_src_dir += '/resources'
+                root_dst_dir = '../Cura/resources'
+            elif platform.system() == 'Windows':
+                root_src_dir += '\\resources'
+                root_dst_dir = '..\\Cura\\resources'
 
     if allowAutoInstall:
         for src_dir, dirs, files in os.walk(root_src_dir):
@@ -217,7 +229,6 @@ def simplify3DProfilesBundle(profilesCreatedCount):
 #     return bundleSize*1.05
 
 def curaFilesBundle():
-    cura('--file')
     curaSoftwareName = "Ultimaker Cura"
     curaSoftwareVersion = "3.2"
     with open('Cura/README.txt', 'w') as f:
@@ -248,3 +259,5 @@ def curaFilesBundle():
     #     pass
 
     shutil.rmtree("Cura")
+    
+    print '\n\t\tCura files zipped to share!\n'
