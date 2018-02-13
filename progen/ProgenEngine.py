@@ -1146,6 +1146,7 @@ def curaProfile(machine):
         definition.append('        "retraction_hop_only_when_collides": { "value": true },')
         definition.append('        "retraction_combing": { "value": "'+"'all'"+'" },')
         definition.append('        "retraction_hop": { "value": "2 * layer_height" },')
+        definition.append('        "hop_at_layer_change": { "value": "print_mode == '+"'regular'"+'" },')
         # definition.append('        "retraction_hop_after_extruder_switch": { "value": true },')
         definition.append('        "retraction_hop_height_after_extruder_switch": { "value": '+str(machine['extruderSwitchZHop'])+' },')
 

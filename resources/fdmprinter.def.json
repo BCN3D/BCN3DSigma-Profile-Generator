@@ -3258,6 +3258,15 @@
                     "settable_per_mesh": false,
                     "settable_per_extruder": true
                 },
+                "hop_at_layer_change":
+                {
+                    "label": "Z hop at Layer Change",
+                    "description": "Perform a Z Hop when the nozzle is moving to the next layer.",
+                    "type": "bool",
+                    "default_value": false,
+                    "settable_per_mesh": false,
+                    "settable_per_extruder": true
+                },
                 "retraction_hop": {
                     "label": "Z Hop Height",
                     "description": "The height difference when performing a Z Hop.",
