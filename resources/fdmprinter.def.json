@@ -872,7 +872,8 @@
                     "settable_per_extruder": false,
                     "settable_per_meshgroup": true,
                     "settable_globally": true,
-                    "enabled": "machine_extruder_count > 1",
+                    "reset_on_print_mode_change": true,
+                    "enabled": "machine_extruder_count > 1 and print_mode == 'regular'",
                     "children": {
                         "wall_0_extruder_nr":
                         {
@@ -885,7 +886,8 @@
                             "settable_per_extruder": false,
                             "settable_per_meshgroup": true,
                             "settable_globally": true,
-                            "enabled": "machine_extruder_count > 1"
+                            "reset_on_print_mode_change": true,
+                            "enabled": "machine_extruder_count > 1 and print_mode == 'regular'"
                         },
                         "wall_x_extruder_nr":
                         {
@@ -898,7 +900,8 @@
                             "settable_per_extruder": false,
                             "settable_per_meshgroup": true,
                             "settable_globally": true,
-                            "enabled": "machine_extruder_count > 1"
+                            "reset_on_print_mode_change": true,
+                            "enabled": "machine_extruder_count > 1 and print_mode == 'regular'"
                         }
                     }
                 },
@@ -955,7 +958,8 @@
                     "settable_per_extruder": false,
                     "settable_per_meshgroup": true,
                     "settable_globally": true,
-                    "enabled": "machine_extruder_count > 1 and max(extruderValues('roofing_layer_count')) > 0 and max(extruderValues('top_layers')) > 0"
+                    "reset_on_print_mode_change": true,
+                    "enabled": "machine_extruder_count > 1 and max(extruderValues('roofing_layer_count')) > 0 and max(extruderValues('top_layers')) > 0 and print_mode == 'regular"
                 },
                 "roofing_layer_count":
                 {
@@ -980,7 +984,8 @@
                     "settable_per_extruder": false,
                     "settable_per_meshgroup": true,
                     "settable_globally": true,
-                    "enabled": "machine_extruder_count > 1"
+                    "reset_on_print_mode_change": true,
+                    "enabled": "machine_extruder_count > 1 and print_mode == 'regular'"
                 },
                 "top_bottom_thickness":
                 {
@@ -1450,7 +1455,8 @@
                     "settable_per_extruder": false,
                     "settable_per_meshgroup": true,
                     "settable_globally": true,
-                    "enabled": "machine_extruder_count > 1"
+                    "reset_on_print_mode_change": true,
+                    "enabled": "machine_extruder_count > 1 and print_mode == 'regular'"
                 },
                 "infill_sparse_density":
                 {
@@ -1899,7 +1905,7 @@
                     "minimum_value": "0",
                     "maximum_value_warning": "10.0",
                     "maximum_value": "machine_nozzle_heat_up_speed",
-                    "enabled": "material_flow_dependent_temperature or (machine_extruder_count > 1 and material_final_print_temperature != material_print_temperature)",
+                    "enabled": "material_flow_dependent_temperature or (machine_extruder_count > 1 and material_final_print_temperature != material_print_temperature and print_mode == 'regular')",
                     "settable_per_mesh": false,
                     "settable_per_extruder": true
                 },
@@ -2115,9 +2121,33 @@
                     "minimum_value": "0",
                     "maximum_value_warning": "100",
                     "type": "int",
-                    "enabled": "retraction_enable",
+                    "value": "1000 if avoid_grinding_filament else 90",
+                    "enabled": "retraction_enable and not avoid_grinding_filament",
                     "settable_per_mesh": false,
                     "settable_per_extruder": true
+                },
+                "avoid_grinding_filament":
+                {
+                    "label": "Prevent Filament Grinding",
+                    "description": "When retracting repeatedly, this option moves the hotend to the purge tray and primes the needed amount of filament to allow working on a new piece of it. Disabling this feature can flatten the filament and cause grinding issues.",
+                    "type": "bool",
+                    "default_value": false,
+                    "enabled": false,
+                    "settable_per_extruder": true,
+                    "comments": "BCN3D setting"
+                },
+                "retraction_count_max_avoid_grinding_filament":
+                {
+                    "label": "Maximum Retraction Count",
+                    "description": "Number of retractions occurring within the retraction distance. When the number of retractions is reached, active extruder will park, prime and come back.",
+                    "type": "int",
+                    "default_value": 50,
+                    "minimum_value": "0",
+                    "minimum_value_warning": "0",
+                    "maximum_value_warning": "90",
+                    "enabled": "avoid_grinding_filament",
+                    "settable_per_extruder": true,
+                    "comments": "BCN3D setting"
                 },
                 "retraction_extrusion_window":
                 {
@@ -2143,7 +2173,7 @@
                     "minimum_value": "-273.15",
                     "minimum_value_warning": "0",
                     "maximum_value_warning": "260",
-                    "enabled": "machine_extruder_count > 1 and machine_nozzle_temp_enabled",
+                    "enabled": "machine_extruder_count > 1 and machine_nozzle_temp_enabled and print_mode == 'regular",
                     "settable_per_mesh": false,
                     "settable_per_extruder": true
                 },
@@ -3245,7 +3275,7 @@
                     "description": "After the machine switched from one extruder to the other, the build plate is lowered to create clearance between the nozzle and the print. This prevents the nozzle from leaving oozed material on the outside of a print.",
                     "type": "bool",
                     "default_value": true,
-                    "enabled": "retraction_hop_enabled and machine_extruder_count > 1",
+                    "enabled": "retraction_hop_enabled and machine_extruder_count > 1 and print_mode == 'regular",
                     "settable_per_mesh": false,
                     "settable_per_extruder": true
                 },
@@ -3280,6 +3310,32 @@
                     "default_value": true,
                     "settable_per_mesh": false,
                     "settable_per_extruder": true
+                },
+                "clone_cool_fan":
+                {
+                    "label": "Clone Print Cooling",
+                    "description": "Enables cooling fan for the idle extruder. This setting allows better temperature control for dual extruder prints.",
+                    "type": "bool",
+                    "default_value": false,
+                    "enabled": false,
+                    "settable_per_extruder": false,
+                    "comments": "BCN3D setting"
+                },
+                "clone_cool_fan_gcode":
+                {
+                    "label": "Clone Print  GCode",
+                    "description": "GCode to enable cooling fan for the idle extruder.",
+                    "type": "enum",
+                    "options":
+                    {
+                        "": "No",
+                        "M108 P1      ;enable layer fan for the idle extruder": "Yes"
+                    },
+                    "default_value": "",
+                    "value": "'M108 P1      ;enable layer fan for the idle extruder' if clone_cool_fan else ''",
+                    "enabled": false,
+                    "settable_per_extruder": false,
+                    "comments": "BCN3D setting"
                 },
                 "cool_fan_speed":
                 {
@@ -3436,7 +3492,8 @@
                     "description": "The extruder train to use for printing the support. This is used in multi-extrusion.",
                     "type": "extruder",
                     "default_value": "0",
-                    "enabled": "(support_enable or support_tree_enable) and machine_extruder_count > 1",
+                    "reset_on_print_mode_change": true,
+                    "enabled": "(support_enable or support_tree_enable) and machine_extruder_count > 1 and print_mode == 'regular'",
                     "settable_per_mesh": false,
                     "settable_per_extruder": false,
                     "children": {
@@ -3447,7 +3504,8 @@
                             "type": "extruder",
                             "default_value": "0",
                             "value": "support_extruder_nr",
-                            "enabled": "(support_enable or support_tree_enable) and machine_extruder_count > 1",
+                            "reset_on_print_mode_change": true,
+                            "enabled": "(support_enable or support_tree_enable) and machine_extruder_count > 1 and print_mode == 'regular'",
                             "settable_per_mesh": false,
                             "settable_per_extruder": false
                         },
@@ -3458,7 +3516,8 @@
                             "type": "extruder",
                             "default_value": "0",
                             "value": "support_extruder_nr",
-                            "enabled": "(support_enable or support_tree_enable) and machine_extruder_count > 1",
+                            "reset_on_print_mode_change": true,
+                            "enabled": "(support_enable or support_tree_enable) and machine_extruder_count > 1 and print_mode == 'regular'",
                             "settable_per_mesh": false,
                             "settable_per_extruder": false
                         },
@@ -3469,7 +3528,8 @@
                             "type": "extruder",
                             "default_value": "0",
                             "value": "support_extruder_nr",
-                            "enabled": "(support_enable or support_tree_enable) and machine_extruder_count > 1",
+                            "reset_on_print_mode_change": true,
+                            "enabled": "(support_enable or support_tree_enable) and machine_extruder_count > 1 and print_mode == 'regular'",
                             "settable_per_mesh": false,
                             "settable_per_extruder": false,
                             "children":
@@ -3481,7 +3541,8 @@
                                     "type": "extruder",
                                     "default_value": "0",
                                     "value": "support_interface_extruder_nr",
-                                    "enabled": "(support_enable or support_tree_enable) and machine_extruder_count > 1",
+                                    "reset_on_print_mode_change": true,
+                                    "enabled": "(support_enable or support_tree_enable) and machine_extruder_count > 1 and print_mode == 'regular'",
                                     "settable_per_mesh": false,
                                     "settable_per_extruder": false
                                 },
@@ -3492,7 +3553,8 @@
                                     "type": "extruder",
                                     "default_value": "0",
                                     "value": "support_interface_extruder_nr",
-                                    "enabled": "(support_enable or support_tree_enable) and machine_extruder_count > 1",
+                                    "reset_on_print_mode_change": true,
+                                    "enabled": "(support_enable or support_tree_enable) and machine_extruder_count > 1 and print_mode == 'regular'",
                                     "settable_per_mesh": false,
                                     "settable_per_extruder": false
                                 }
@@ -4150,7 +4212,8 @@
                     "description": "The extruder train to use for printing the skirt/brim/raft. This is used in multi-extrusion.",
                     "type": "extruder",
                     "default_value": "0",
-                    "enabled": "machine_extruder_count > 1 and resolveOrValue('adhesion_type') != 'none'",
+                    "reset_on_print_mode_change": true,
+                    "enabled": "machine_extruder_count > 1 and resolveOrValue('adhesion_type') != 'none' and print_mode == 'regular",
                     "settable_per_mesh": false,
                     "settable_per_extruder": false
                 },
@@ -4716,6 +4779,17 @@
             "description": "Settings used for printing with multiple extruders.",
             "children":
             {
+                "fix_tool_change_travel":
+                {
+                    "label": "Fix Tool Change Travel",
+                    "description": "Allows the new tool to go straight to the position where it has to print, instead of going to the last position before tool change and then travel to the position where it has to print.",
+                    "type": "bool",
+                    "default_value": false,
+                    "enabled": false,
+                    "settable_per_mesh": false,
+                    "settable_per_extruder": false,
+                    "comments": "BCN3D setting"
+                },
                 "smart_purge": {
                     "label": "Smart Purge",
                     "description": "Add an extra prime amount to compensate oozed material while the Extruder was idle. Disable Prime tower to save time and filament.",
@@ -4723,70 +4797,74 @@
                     "default_value": false,
                     "enabled": false,
                     "settable_per_extruder": true,
-                    "comments": "bcn3d setting"
-                },
-                "purge_speed":
-                {
-                    "label": "Purge Speed",
-                    "description": "The speed at which the filament is pushed by the extruder when purging in the purge tray.",
-                    "unit": "mm/s",
-                    "type": "float",
-                    "default_value": 0.8,
-                    "minimum_value": "1/60.0",
-                    "maximum_value": "machine_max_feedrate_e",
-                    "enabled": "smart_purge",
-                    "settable_per_mesh": false,
-                    "settable_per_extruder": true,
-                    "comments": "BCN3D setting"
-                },
-                "smart_purge_slope":
-                {
-                    "label": "Distance Gradient",
-                    "description": "Distance to purge per second idle. Purged distance will increase this amount each second the toolhead remains idle. If the final distance is shorter than the Minimum Purge Distance it will be increased to this value the ensure the right Hotend's pressure. If the final distance is greater than the Maximum Purge Distance it will be decreased to this value to avoid purge tray filling.",
-                    "unit": "mm/s",
-                    "type": "float",
-                    "default_value": 1.5,
-                    "minimum_value": "0",
-                    "minimum_value_warning": "0",
-                    "maximum_value_warning": "50",
-                    "enabled": "smart_purge",
-                    "settable_per_extruder": true,
-                    "comments": "BCN3D setting"
-                },
-                "smart_purge_minimum_purge_distance":
-                {
-                    "label": "Minimum Purge Distance",
-                    "description": "Minimum distance to purge when changing toolheads.",
-                    "unit": "mm",
-                    "type": "float",
-                    "default_value": 1.5,
-                    "minimum_value": "0",
-                    "minimum_value_warning": "0",
-                    "maximum_value_warning": "50",
-                    "enabled": "smart_purge",
-                    "settable_per_extruder": true,
-                    "comments": "BCN3D setting"
-                },
-                "smart_purge_maximum_purge_distance":
-                {
-                    "label": "Maximum Purge Distance",
-                    "description": "Maximum distance to purge when changing toolheads.",
-                    "unit": "mm",
-                    "type": "float",
-                    "default_value": 1.5,
-                    "minimum_value": "0",
-                    "minimum_value_warning": "0",
-                    "maximum_value_warning": "50",
-                    "enabled": "smart_purge",
-                    "settable_per_extruder": true,
-                    "comments": "BCN3D setting"
+                    "comments": "BCN3D setting",
+                    "children":
+                    {
+                        "purge_speed":
+                        {
+                            "label": "Purge Speed",
+                            "description": "The speed at which the filament is pushed by the extruder when purging in the purge tray.",
+                            "unit": "mm/s",
+                            "type": "float",
+                            "default_value": 0.8,
+                            "minimum_value": "1/60.0",
+                            "maximum_value": "machine_max_feedrate_e",
+                            "enabled": "smart_purge and print_mode == 'regular'",
+                            "settable_per_mesh": false,
+                            "settable_per_extruder": true,
+                            "comments": "BCN3D setting"
+                        },
+                        "smart_purge_slope":
+                        {
+                            "label": "Distance Gradient",
+                            "description": "Distance to purge per second idle. Purged distance will increase this amount each second the toolhead remains idle. If the final distance is shorter than the Minimum Purge Distance it will be increased to this value the ensure the right Hotend's pressure. If the final distance is greater than the Maximum Purge Distance it will be decreased to this value to avoid purge tray filling.",
+                            "unit": "mm/s",
+                            "type": "float",
+                            "default_value": 0,
+                            "minimum_value": "0",
+                            "minimum_value_warning": "0",
+                            "maximum_value_warning": "50",
+                            "enabled": "smart_purge and print_mode == 'regular'",
+                            "settable_per_extruder": true,
+                            "comments": "BCN3D setting"
+                        },
+                        "smart_purge_minimum_purge_distance":
+                        {
+                            "label": "Minimum Purge Distance",
+                            "description": "Minimum distance to purge when changing toolheads.",
+                            "unit": "mm",
+                            "type": "float",
+                            "default_value": 0,
+                            "minimum_value": "0",
+                            "minimum_value_warning": "0",
+                            "maximum_value_warning": "50",
+                            "enabled": "smart_purge and print_mode == 'regular'",
+                            "settable_per_extruder": true,
+                            "comments": "BCN3D setting"
+                        },
+                        "smart_purge_maximum_purge_distance":
+                        {
+                            "label": "Maximum Purge Distance",
+                            "description": "Maximum distance to purge when changing toolheads.",
+                            "unit": "mm",
+                            "type": "float",
+                            "default_value": 0,
+                            "minimum_value": "0",
+                            "minimum_value_warning": "0",
+                            "maximum_value_warning": "50",
+                            "enabled": "smart_purge and print_mode == 'regular'",
+                            "settable_per_extruder": true,
+                            "comments": "BCN3D setting"
+                        }
+                    }
                 },
                 "prime_tower_enable":
                 {
                     "label": "Enable Prime Tower",
                     "description": "Print a tower next to the print which serves to prime the material after each nozzle switch.",
                     "type": "bool",
-                    "enabled": "machine_extruder_count > 1",
+                    "reset_on_print_mode_change": true,
+                    "enabled": "machine_extruder_count > 1 and print_mode == 'regular'",
                     "default_value": false,
                     "resolve": "any(extruderValues('prime_tower_enable'))",
                     "settable_per_mesh": false,
@@ -4922,7 +5000,8 @@
                     "description": "Enable exterior ooze shield. This will create a shell around the model which is likely to wipe a second nozzle if it's at the same height as the first nozzle.",
                     "type": "bool",
                     "resolve": "any(extruderValues('ooze_shield_enabled'))",
-                    "enabled": "machine_extruder_count > 1",
+                    "reset_on_print_mode_change": true,
+                    "enabled": "machine_extruder_count > 1 and print_mode == 'regular'",
                     "default_value": false,
                     "settable_per_mesh": false,
                     "settable_per_extruder": false
@@ -5015,7 +5094,8 @@
                     "description": "Remove areas where multiple meshes are overlapping with each other. This may be used if merged dual material objects overlap with each other.",
                     "type": "bool",
                     "default_value": true,
-                    "value": "machine_extruder_count > 1",
+                    "reset_on_print_mode_change": true,
+                    "value": "machine_extruder_count > 1 and print_mode == 'regular'",
                     "settable_per_mesh": false,
                     "settable_per_extruder": false,
                     "settable_per_meshgroup": true
