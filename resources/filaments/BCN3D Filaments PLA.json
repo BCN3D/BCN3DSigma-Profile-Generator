@@ -24,7 +24,7 @@
     "isFlexibleMaterial": false,
     "isAbrasiveMaterial": false,
     "bedTemperature": 65,
-    "printTemperature": [200, 220],
+    "printTemperature": [190, 220],
     "standbyTemperature": 150,
     "defaultPrintSpeed": 60,
     "advisedMaxPrintSpeed": "None",
