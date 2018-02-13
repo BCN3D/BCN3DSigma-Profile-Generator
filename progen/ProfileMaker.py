@@ -106,7 +106,7 @@ def installCuraFiles(action):
                 root_src_dir += '\\resources'
                 root_dst_dir = '..\\CuraResources'
     elif action == 'curaProject':
-        if (platform.system() == 'Darwin' and 'CuraResources' in os.listdir('../')) or (platform.system() == 'Windows' and 'Cura\\resources' in os.listdir('..\\')):
+        if (platform.system() == 'Darwin' and 'resources' in os.listdir('../Cura')) or (platform.system() == 'Windows' and 'resources' in os.listdir('..\\Cura')):
             allowAutoInstall = True
             if platform.system() == 'Darwin':
                 root_src_dir += '/resources'
