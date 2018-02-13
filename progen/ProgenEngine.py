@@ -481,7 +481,6 @@ def simplify3DProfile(machine, printMode, hotendLeft, hotendRight, filamentLeft,
             topSolidLayers = max(5, int(round(quality['topBottomWidth'] / layerHeight)))        # 5 minimum layers needed
             bottomSolidLayers = topSolidLayers
             raftExtruder = primaryExtruder
-            skirtExtruder = primaryExtruder
             useCoasting, useWipe, onlyRetractWhenCrossingOutline, retractBetweenLayers, useRetractionMinTravel, retractWhileWiping, onlyWipeOutlines = retractValues(primaryFilament)
             purgeSpeedT0, mmPerSecondIncrementT0, maxPurgeDistanceT0, minPurgeDistanceT0 = purgeValuesT0
             purgeSpeedT1, mmPerSecondIncrementT1, maxPurgeDistanceT1, minPurgeDistanceT1 = purgeValuesT1
@@ -542,7 +541,6 @@ def simplify3DProfile(machine, printMode, hotendLeft, hotendRight, filamentLeft,
             fff.append('    <primaryExtruder>'+str(primaryExtruder)+'</primaryExtruder>')
             fff.append('    <raftExtruder>'+str(raftExtruder)+'</raftExtruder>')
             fff.append('    <raftSeparationDistance>'+str(primaryHotend['nozzleSize'] * 0.55)+'</raftSeparationDistance>')
-            fff.append('    <skirtExtruder>'+str(skirtExtruder)+'</skirtExtruder>')
             fff.append('    <infillExtruder>'+str(infillExtruder)+'</infillExtruder>')
             fff.append('    <supportExtruder>'+str(supportExtruder)+'</supportExtruder>')
             fff.append('    <generateSupport>'+str(generateSupport)+'</generateSupport>')
@@ -700,6 +698,7 @@ def simplify3DProfile(machine, printMode, hotendLeft, hotendRight, filamentLeft,
                 'G4 P3''</startingGcode>')
         postProcessingScript += ',{REPLACE "M104 S'+str(hotendRightTemperature)+' T1" ""}'
         fff.append('    <postProcessing>'+postProcessingScript+'</postProcessing>')
+        fff.append('    <skirtExtruder>0</skirtExtruder>')
         fff.append('  </autoConfigureExtruders>')
     if hotendRight['id'] != 'None':
         fff.append('  <autoConfigureExtruders name="Right Extruder Only"  allowedToolheads="1">')
@@ -720,6 +719,7 @@ def simplify3DProfile(machine, printMode, hotendLeft, hotendRight, filamentLeft,
             'G92 E0\t\t;zero the extruded length again</startingGcode>')
         postProcessingScript += ',{REPLACE "M104 S'+str(hotendLeftTemperature)+' T0" ""}'
         fff.append('    <postProcessing>'+postProcessingScript+'</postProcessing>')
+        fff.append('    <skirtExtruder>1</skirtExtruder>')
         fff.append('  </autoConfigureExtruders>')
     if hotendLeft['id'] != 'None' and hotendRight['id'] != 'None':
         fff.append('  <autoConfigureExtruders name="Both Extruders"  allowedToolheads="2">')
@@ -741,6 +741,7 @@ def simplify3DProfile(machine, printMode, hotendLeft, hotendRight, filamentLeft,
                 'G1 E20 F50\t\t;extrude 20mm of feed stock,'+\
                 'M605 S3\t\t;back to independent extruder steps'+\
                 'G92 E0\t\t;zero the extruded length again</startingGcode>')
+            fff.append('    <skirtExtruder>0</skirtExtruder>')
         else:
             fff.append('    <startingGcode>'+\
                 ';Sigma ProGen '+PS.progenVersionNumber+' (Build '+PS.progenBuildNumber+'),,'+\
@@ -761,6 +762,7 @@ def simplify3DProfile(machine, printMode, hotendLeft, hotendRight, filamentLeft,
                 'G92 E0\t\t;zero the extruded length,'+\
                 'G1 E20 F50\t\t;extrude 20mm of feed stock,'+\
                 'G92 E0\t\t;zero the extruded length again</startingGcode>')
+            fff.append('    <skirtExtruder>999</skirtExtruder>')
         fff.append('    <layerChangeGcode></layerChangeGcode>')
         fff.append('    <postProcessing>'+postProcessingScript+'</postProcessing>')
         fff.append('  </autoConfigureExtruders>')
@@ -910,7 +912,6 @@ def curaProfile(machine):
             # r'M82          ;set extruder to absolute mode\n'+\ # Cura 3.2 already sets it
             r'M204 S'+str(machine['acceleration'])+r'   ;set default acceleration\n'+\
             r'M205 X'+str(machine['jerk'])+' Y'+str(machine['jerk'])+r' ;set default jerk\n'+\
-            r'M108 P1      ;enable layer fan for idle extruder\n'+\
             r'M107         ;start with the fan off\n'+\
             r'G28 X0 Y0    ;move X/Y to min endstops\n'+\
             r'G28 Z0       ;move Z to min endstops\n'+\
@@ -927,6 +928,7 @@ def curaProfile(machine):
             # r'G92 E0       ;zero the extruded length\n'+\
             # r'G4 P2000     ;stabilize hotend'+"'"+r's pressure\n'+\
             # r'G1 F2400 E-8 ;retract\n'+\
+            r'{clone_cool_fan_gcode}\n'+\
             r'{print_mode_gcode}\n'+\
             r'G4 P1\n'+\
             r'G4 P2\n'+\
@@ -1149,6 +1151,11 @@ def curaProfile(machine):
 
         # cooling
         definition.append('        "cool_fan_enabled": { "value": true },')
+        definition.append('        "clone_cool_fan":')
+        definition.append('        {')
+        definition.append('            "enabled": "print_mode == '+"'regular'"+' and extruderValue(0, '+"'cool_fan_enabled'"+') and extruderValue(1, '+"'cool_fan_enabled'"+')",')
+        definition.append('            "value": "print_mode == '+"'regular'"+' and extruderValue(0, '+"'cool_fan_enabled'"+') and extruderValue(1, '+"'cool_fan_enabled'"+')"')
+        definition.append('        },')
         # definition.append('        "cool_fan_speed_0": { "value": 0 },')
         # definition.append('        "cool_fan_speed_max": { "value": "cool_fan_speed" },')
         definition.append('        "cool_fan_full_at_height": { "value": "0 if adhesion_type == '+"'raft'"+' else layer_height_0 + 4 * layer_height" },') # after 6 layers
@@ -1229,7 +1236,7 @@ def curaProfile(machine):
         # definition.append('        "raft_base_fan_speed": { "value": "raft_fan_speed" },')
 
         # dual
-        # definition.append('        "prime_tower_enable": { "value": '+str(machine['usePrimeTower']).lower()+' },')
+        # definition.append('        "prime_tower_enable": { "value": "'+str(machine['usePrimeTower']).lower()+' and print_mode == 'regular'" },')
         definition.append('        "prime_tower_enable": { "value": false },') # just for testing...
         definition.append('        "prime_tower_size": { "value": "max(25, round(math.sqrt(prime_tower_min_volume/layer_height), 2))" },')
         # definition.append('        "prime_tower_wall_thickness": { "value": "round(max(2 * prime_tower_line_width, 0.5 * (prime_tower_size - math.sqrt(max(0, prime_tower_size ** 2 - prime_tower_min_volume / layer_height)))), 3)" },')
@@ -1341,8 +1348,7 @@ def curaProfile(machine):
         definition.append('        "purge_speed": { "value": "round(max(40 * (machine_nozzle_size / material_diameter) ** 2, machine_nozzle_size * layer_height * speed_infill / (math.pi * ((material_diameter / 2) ** 2))), 2)" },')
         definition.append('        "smart_purge":')
         definition.append('        {')
-        # definition.append('            "enabled": "print_mode == '+"'regular'"+'",') # change to universal enable for dual -> machine_extruders ??
-        definition.append('            "enabled": true,')
+        definition.append('            "enabled": "print_mode == '+"'regular'"+'",')
         definition.append('            "value": true')
         definition.append('        },')  
         # definition.append('        "retract_reduction": { "enabled": true },')
@@ -1351,6 +1357,7 @@ def curaProfile(machine):
         definition.append('            "enabled": true,')
         definition.append('            "value": true')
         definition.append('        },')            
+        definition.append('        "fix_tool_change_travel": { "value": true },')
         definition.append('        "auto_apply_fixes": { "value": true }')
 
     definition.append('    }')
