@@ -910,8 +910,8 @@ def curaProfile(machine):
             r'G21          ;metric values\n'+\
             r'G90          ;absolute positioning\n'+\
             # r'M82          ;set extruder to absolute mode\n'+\ # Cura 3.2 already sets it
-            r'M204 S'+str(machine['acceleration'])+r'   ;set default acceleration\n'+\
-            r'M205 X'+str(machine['jerk'])+' Y'+str(machine['jerk'])+r' ;set default jerk\n'+\
+            r'M204 S{machine_acceleration} ;set default acceleration\n'+\
+            r'M205 X{machine_max_jerk_xy} Y{machine_max_jerk_xy} ;set default jerk\n'+\
             r'M107         ;start with the fan off\n'+\
             r'G28 X0 Y0    ;move X/Y to min endstops\n'+\
             r'G28 Z0       ;move Z to min endstops\n'+\
@@ -935,11 +935,17 @@ def curaProfile(machine):
             r'G4 P3\n'+\
             r'" },')
         definition.append(r'        "machine_end_gcode": { "default_value": "'+\
+            r'T0                       ;switch to left extruder\n'+\
+            r'G92 E0                   ,zero extruder\n'+\
+            r'G1 F50 E{switch_extruder_retraction_amount} ;prime T0\n'+\
             r'M104 S0 T0               ;left extruder heater off\n'+\
+            r'T1                       ;switch to right extruder\n'+\
+            r'G92 E0                   ,zero extruder\n'+\
+            r'G1 F50 E{switch_extruder_retraction_amount} ;prime T1\n'+\
             r'M104 S0 T1               ;right extruder heater off\n'+\
             r'M140 S0                  ;heated bed heater off\n'+\
-            r'M204 S'+str(machine['acceleration'])+r'               ;set default acceleration\n'+\
-            r'M205 X'+str(machine['jerk'])+' Y'+str(machine['jerk'])+r'             ;set default jerk\n'+\
+            r'M204 S{machine_acceleration} ;set default acceleration\n'+\
+            r'M205 X{machine_max_jerk_xy} Y{machine_max_jerk_xy} ;set default jerk\n'+\
             r'G91                      ;relative positioning\n'+\
             r'G1 Z+0.5 E-5 Y+10 F12000 ;move Z up a bit and retract filament\n'+\
             r'G28 X0 Y0                ;move X/Y to min endstops so the head is out of the way\n'+\
@@ -1018,10 +1024,9 @@ def curaProfile(machine):
         # definition.append('        "infill_overlap": { "value": "10 if infill_sparse_density < 95 and infill_pattern != '+"'"+'concentric'+"'"+' else 0" },')
         definition.append('        "skin_overlap": { "value": "0" },')
         # definition.append('        "infill_wipe_dist": { "value": "wall_line_width_0 / 4 if wall_line_count == 1 else wall_line_width_x / 4" },')
-        definition.append('        "infill_sparse_thickness": { "value": "layer_height" },')
         # definition.append('        "gradual_infill_steps": { "value": 0 },')
         # definition.append('        "gradual_infill_step_height": { "value": 5 },')
-        definition.append('        "infill_before_walls": { "value": true },')
+        definition.append('        "infill_before_walls": { "value": "infill_sparse_layer == 1" },')
         # definition.append('        "min_infill_area": { "value": 0 },')
         # definition.append('        "skin_preshrink": { "value": 0 },')
         # definition.append('        "top_skin_preshrink": { "value": 0 },')
@@ -1042,7 +1047,6 @@ def curaProfile(machine):
         temperatureInertiaFinalFix = -2.5
         definition.append('        "material_final_print_temperature": { "value": "material_print_temperature + '+str(temperatureInertiaFinalFix)+' if material_flow_dependent_temperature else material_print_temperature" },')
         # definition.append('        "retraction_enable": { "value": true },')
-        definition.append('        "material_extrusion_cool_down_speed": { "value": 1 },') # this value depends on extruded flow (not material_flow)
         definition.append('        "retract_at_layer_change": { "value": false },')
         definition.append('        "retraction_amount": { "maximum_value_warning": "machine_heat_zone_length" },')
         definition.append('        "retraction_amount_multiplier": { "value": '+str(machine['retractionAmountMultiplier'])+' },')
@@ -1070,18 +1074,14 @@ def curaProfile(machine):
         definition.append('        },')
         definition.append('        "retraction_extra_prime_amount": { "value": "coasting_volume if coasting_enable else 0" },') # Adjust for flex material
         definition.append('        "retraction_min_travel": { "value": "3.75 * machine_nozzle_size" },')
+        definition.append('        "retraction_count_max": { "value": "20 * retraction_extrusion_window" },')
         # definition.append('        "retraction_extrusion_window": { "value": "retraction_amount" },')
-        definition.append('        "switch_extruder_retraction_amount":')
-        definition.append('        {')
-        definition.append('            "value": "machine_heat_zone_length",')
-        definition.append('            "maximum_value_warning": "machine_heat_zone_length"')
-        definition.append('        },')
 
         # speed
         # definition.append('        "speed_infill": { "value": "speed_print" },')
         definition.append('        "speed_wall": { "value": "speed_print" },')
         # definition.append('        "speed_roofing": { "value": "speed_topbottom" },')
-        definition.append('        "speed_topbottom": { "value": "speed_wall_0" },')
+        definition.append('        "speed_topbottom": { "value": "speed_wall_x" },')
         # definition.append('        "speed_support_infill": { "value": "speed_support" },')
         definition.append('        "speed_support_interface": { "value": "speed_wall" },')
         definition.append('        "speed_travel": { "value": "round(speed_print if magic_spiralize else 200)" },')
@@ -1097,7 +1097,7 @@ def curaProfile(machine):
         # definition.append('        "acceleration_wall": { "value": "round(acceleration_print - (acceleration_print - acceleration_wall_0)/ 2.)" },')
         definition.append('        "acceleration_wall_x": { "value": "round(acceleration_print - (acceleration_print - acceleration_wall_0)/ 2.)" },')
         # definition.append('        "acceleration_roofing": { "value": "acceleration_topbottom" },')
-        definition.append('        "acceleration_topbottom": { "value": "acceleration_wall_0" },')
+        definition.append('        "acceleration_topbottom": { "value": "acceleration_wall_x" },')
         definition.append('        "acceleration_support": { "value": "acceleration_wall_x" },')
         # definition.append('        "acceleration_support_infill": { "value": "acceleration_support" },')
         definition.append('        "acceleration_support_interface": { "value": "acceleration_topbottom" },')
@@ -1113,7 +1113,7 @@ def curaProfile(machine):
         definition.append('        "jerk_wall_0": { "value": "jerk_wall * 0.5" },')
         # definition.append('        "jerk_wall_x": { "value": "jerk_wall" },')
         # definition.append('        "jerk_roofing": { "value": "jerk_topbottom" },')
-        definition.append('        "jerk_topbottom": { "value": "jerk_wall_0" },')
+        definition.append('        "jerk_topbottom": { "value": "jerk_wall_x" },')
         definition.append('        "jerk_support": { "value": "jerk_wall" },')
         # definition.append('        "jerk_support_infill": { "value": "jerk_support" },')
         definition.append('        "jerk_support_interface": { "value": "jerk_topbottom" },')
@@ -1146,7 +1146,8 @@ def curaProfile(machine):
         definition.append('        "retraction_hop_only_when_collides": { "value": true },')
         definition.append('        "retraction_combing": { "value": "'+"'all'"+'" },')
         definition.append('        "retraction_hop": { "value": "2 * layer_height" },')
-        definition.append('        "hop_at_layer_change": { "value": "print_mode == '+"'regular'"+'" },')
+        definition.append('        "hop_at_layer_change": { "value": "print_mode == '+"'regular'"+'" },') # should enable only if regular + idex
+        definition.append('        "retraction_hop_height_at_layer_change": { "value": 2 },')
         # definition.append('        "retraction_hop_after_extruder_switch": { "value": true },')
         definition.append('        "retraction_hop_height_after_extruder_switch": { "value": '+str(machine['extruderSwitchZHop'])+' },')
 
@@ -1201,7 +1202,7 @@ def curaProfile(machine):
         definition.append('        "extruder_prime_pos_y": { "value": "machine_depth" },')
         definition.append('        "adhesion_type": { "value": "'+"'skirt'"+'" },')
         definition.append('        "skirt_line_count": { "value": 2 },')
-        definition.append('        "skirt_brim_minimal_length": { "value": "round((20 * math.pi * (extruderValue(adhesion_extruder_nr, '+"'material_diameter'"+') / 2) ** 2) / (extruderValue(adhesion_extruder_nr, '+"'machine_nozzle_size'"+') * layer_height_0), 2)" },')
+        definition.append('        "skirt_brim_minimal_length": { "value": "round((10 * math.pi * (extruderValue(adhesion_extruder_nr, '+"'material_diameter'"+') / 2) ** 2) / (extruderValue(adhesion_extruder_nr, '+"'machine_nozzle_size'"+') * layer_height_0), 2)" },')
         # definition.append('        "skirt_gap": { "value": 3 },')
         # definition.append('        "brim_width": { "value": 8 },')
         # definition.append('        "brim_outside_only": { "value": true },')
@@ -1262,6 +1263,7 @@ def curaProfile(machine):
         # definition.append('        "remove_empty_first_layers": { "value": true },')
 
         # blackmagic
+        # definition.append('        "print_mode": { "enabled": true },')
         # definition.append('        "print_sequence": { "value": "'+"'all_at_once'"+'" },')
         # definition.append('        "infill_mesh": { "value": false },')
         # definition.append('        "infill_mesh_order": { "value": 0 },')
@@ -1271,6 +1273,7 @@ def curaProfile(machine):
         # definition.append('        "magic_spiralize": { "value": false },')
         # definition.append('        "smooth_spiralized_contours": { "value": true },')
         # definition.append('        "relative_extrusion": { "value": false },')
+
 
         # experimental
         # definition.append('        "support_tree_enable": { "value": false },')
@@ -1345,12 +1348,11 @@ def curaProfile(machine):
         # definition.append('        "adaptive_layer_height_threshold": { "value": 200 },')
 
         # BCN3D
-        definition.append('        "skirt_brim_minimal_length": { "value": "round((20 * math.pi * (extruderValue(adhesion_extruder_nr, '+"'material_diameter'"+') / 2) ** 2) / (extruderValue(adhesion_extruder_nr, '+"'machine_nozzle_size'"+') * layer_height_0), 2)" },')
         definition.append('        "purge_speed": { "value": "round(max(40 * (machine_nozzle_size / material_diameter) ** 2, machine_nozzle_size * layer_height * speed_infill / (math.pi * ((material_diameter / 2) ** 2))), 2)" },')
         definition.append('        "smart_purge":')
         definition.append('        {')
         definition.append('            "enabled": "print_mode == '+"'regular'"+'",')
-        definition.append('            "value": true')
+        definition.append('            "value": false')
         definition.append('        },')  
         # definition.append('        "retract_reduction": { "enabled": true },')
         definition.append('        "avoid_grinding_filament":')
@@ -1358,8 +1360,8 @@ def curaProfile(machine):
         definition.append('            "enabled": true,')
         definition.append('            "value": true')
         definition.append('        },')            
-        definition.append('        "fix_tool_change_travel": { "value": true },')
-        definition.append('        "auto_apply_fixes": { "value": true }')
+        # definition.append('        "retraction_count_max_avoid_grinding_filament": { "value": "retraction_count_max" },')
+        definition.append('        "fix_tool_change_travel": { "value": true }')
 
     definition.append('    }')
     definition.append('}')
@@ -1390,13 +1392,13 @@ def curaProfile(machine):
         r'G91\n'+\
         r'G1 F12000 Z{retraction_hop_height_after_extruder_switch}\n'+\
         r'G90\n'+\
-        r'G92 E0\n'+\
-        r'G1 F600 E{switch_extruder_retraction_amount}\n'+\
-        r'M800 F{purge_speed} S{smart_purge_slope} E{smart_purge_maximum_purge_distance} P{smart_purge_minimum_purge_distance} ;smartpurge\n'+\
-        r'G92 E0\n'+\
-        r'G1 F2400 E-{switch_extruder_retraction_amount}\n'+\
-        r'G92 E0\n'+\
-        r'G4 P2000\n'+\
+        r'{smart_purge_enable_gcode}G92 E0\n'+\
+        r'{smart_purge_enable_gcode}G1 F600 E{switch_extruder_retraction_amount}\n'+\
+        r'{smart_purge_enable_gcode}M800 F{purge_speed} S{smart_purge_slope} E{smart_purge_maximum_purge_distance} P{smart_purge_minimum_purge_distance} ;smartpurge\n'+\
+        r'{smart_purge_enable_gcode}G92 E0\n'+\
+        r'{smart_purge_enable_gcode}G1 F2400 E-{switch_extruder_retraction_amount}\n'+\
+        r'{smart_purge_enable_gcode}G92 E0\n'+\
+        r'{smart_purge_enable_gcode}G4 P2000\n'+\
         r'" },') # ajustar la purge speed per anar en sincronia amb la velocitat de infill
     extruder.append('        "machine_extruder_start_pos_abs": { "default_value": false },')
     extruder.append('        "machine_extruder_start_pos_x": { "default_value": 0.0 },')
@@ -1435,13 +1437,13 @@ def curaProfile(machine):
         r'G91\n'+\
         r'G1 F12000 Z{retraction_hop_height_after_extruder_switch}\n'+\
         r'G90\n'+\
-        r'G92 E0\n'+\
-        r'G1 F600 E{switch_extruder_retraction_amount}\n'+\
-        r'M800 F{purge_speed} S{smart_purge_slope} E{smart_purge_maximum_purge_distance} P{smart_purge_minimum_purge_distance} ;smartpurge\n'+\
-        r'G92 E0\n'+\
-        r'G1 F2400 E-{switch_extruder_retraction_amount}\n'+\
-        r'G92 E0\n'+\
-        r'G4 P2000\n'+\
+        r'{smart_purge_enable_gcode}G92 E0\n'+\
+        r'{smart_purge_enable_gcode}G1 F600 E{switch_extruder_retraction_amount}\n'+\
+        r'{smart_purge_enable_gcode}M800 F{purge_speed} S{smart_purge_slope} E{smart_purge_maximum_purge_distance} P{smart_purge_minimum_purge_distance} ;smartpurge\n'+\
+        r'{smart_purge_enable_gcode}G92 E0\n'+\
+        r'{smart_purge_enable_gcode}G1 F2400 E-{switch_extruder_retraction_amount}\n'+\
+        r'{smart_purge_enable_gcode}G92 E0\n'+\
+        r'{smart_purge_enable_gcode}G4 P2000\n'+\
         r'" },') # ajustar la purge speed per anar en sincronia amb la velocitat de infill
     extruder.append('        "machine_extruder_start_pos_abs": { "default_value": false },')
     extruder.append('        "machine_extruder_start_pos_x": { "default_value": 0.0 },')
@@ -1626,10 +1628,11 @@ def curaProfile(machine):
                                 qualityFile.append('material_print_temperature = =default_material_print_temperature + '+str(temperatureAdjustedToFlow(filament, hotend, layerHeight, defaultSpeed) - defaultMaterialPrintTemperature(filament)))
                                 qualityFile.append('material_print_temperature_layer_0 = '+str(int(round((getTemperature(hotend, filament, 'highTemperature'))))))
                                 qualityFile.append('material_flow_temp_graph = '+str(adjustedFlowTemperatureGraph(hotend, filament, layerHeight)))
-                                qualityFile.append('retraction_amount = =min(machine_heat_zone_length, retraction_amount_multiplier * '+("%.2f" % filament['retractionDistance'])+')')
+                                qualityFile.append('retraction_amount = =retraction_amount_multiplier * '+("%.2f" % filament['retractionDistance']))
+                                qualityFile.append('switch_extruder_retraction_amount = =retraction_amount_multiplier * '+("%.2f" % filament['toolChangeRetractionDistance']))
                                 qualityFile.append('retraction_speed = =min(machine_max_feedrate_e, '+("%.2f" % filament['retractionSpeed'])+')')
                                 qualityFile.append('retraction_prime_speed = =min('+("%.2f" % filament['retractionSpeed'])+' * 0.5, machine_max_feedrate_e)')
-                                qualityFile.append('max_retract = '+str(int(filament['retractionCount'])))
+                                # qualityFile.append('retraction_count_max_avoid_grinding_filament = '+str(int(filament['retractionCount'])))
                                 qualityFile.append('material_flow = '+("%.2f" % (filament['extrusionMultiplier'] * 100)))
                                 #  qualityFile.append('switch_extruder_extra_prime_amount = '+("%.2f" % filament['retractionSpeed'])) # Parameter that should be there to purge on toolchage
 
@@ -1676,9 +1679,9 @@ def curaProfile(machine):
                                 # BCN3D
                                 purgeSpeed, mmPerSecondIncrement, maxPurgeDistance, minPurgeDistance = purgeValues(hotend, filament, defaultSpeed, layerHeight)
                                 # qualityFile.append('purge_speed = '+("%.2f" % (purgeSpeed/60.))) # defined in machine's def
-                                qualityFile.append('smart_purge_slope = ='+str(mmPerSecondIncrement)+' if smart_purge else 0')
-                                qualityFile.append('smart_purge_maximum_purge_distance = ='+str(maxPurgeDistance)+' if smart_purge else 0')
-                                qualityFile.append('smart_purge_minimum_purge_distance = ='+str(minPurgeDistance)+' if smart_purge else 0')
+                                qualityFile.append('smart_purge_slope = '+str(mmPerSecondIncrement))
+                                qualityFile.append('smart_purge_maximum_purge_distance = '+str(maxPurgeDistance))
+                                qualityFile.append('smart_purge_minimum_purge_distance = '+str(minPurgeDistance))
 
                             fileContent = '\n'.join(qualityFile)
                             filesList.append((fileName, fileContent))
@@ -1708,7 +1711,9 @@ def curaProfile(machine):
                 variant.append('machine_heat_zone_length = 8')
                 variant.append('machine_nozzle_heat_up_speed = '+str(hotend['heatUpSpeed']))
                 variant.append('machine_nozzle_cool_down_speed = '+str(hotend['coolDownSpeed']))
-                variant.append('machine_min_cool_heat_time_window = '+str(hotend['minimumCoolHeatTimeWindow']))
+                variant.append('material_extrusion_cool_down_speed = =min(machine_nozzle_heat_up_speed - 0.01, 1)') # this value depends on extruded flow (not material_flow)
+                variant.append('machine_min_cool_heat_time_window = 0')
+                # variant.append('machine_min_cool_heat_time_window = '+str(hotend['minimumCoolHeatTimeWindow']))
                 fileContent = '\n'.join(variant)
                 filesList.append((fileName, fileContent))
 
