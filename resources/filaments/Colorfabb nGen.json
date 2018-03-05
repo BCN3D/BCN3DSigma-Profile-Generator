@@ -36,7 +36,7 @@
     "maxFlow": "None",
     "maxFlowForHighFlowHotend": "None",
     "retractionDistance": 6,
-    "toolChangeRetractionDistance": 25,
+    "toolChangeRetractionDistance": 10,
     "retractionSpeed": 40,
     "retractionCount": 50,
     "fanPercentage": [50, 100],
