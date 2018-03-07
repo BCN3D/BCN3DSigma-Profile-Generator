@@ -1100,7 +1100,7 @@ def curaProfile(machine):
         definition.append('        "speed_travel": { "value": "round(speed_print if magic_spiralize else 200)" },')
         # definition.append('        "speed_print_layer_0": { "value": "speed_layer_0" },')
         definition.append('        "speed_travel_layer_0": { "value": "round(speed_travel * speed_layer_0 / speed_print, 1)" },')
-        definition.append('        "skirt_brim_speed": { "value": "speed_infill * layer_height / layer_height_0 if adhesion_type == '+"'skirt'"+' else speed_layer_0" },')
+        definition.append('        "skirt_brim_speed": { "value": "speed_layer_0" },')
         # definition.append('        "speed_slowdown_layers = 2" },')
         definition.append('        "speed_equalize_flow_enabled": { "value": true },')
         definition.append('        "speed_equalize_flow_max": { "value": 100 },')
@@ -1254,11 +1254,14 @@ def curaProfile(machine):
         # definition.append('        "prime_tower_enable": { "value": "'+str(machine['usePrimeTower']).lower()+' and print_mode == 'regular'" },')
         definition.append('        "prime_tower_enable": { "value": true },') # just for testing...
         definition.append('        "prime_tower_size": { "value": "max(25, round(math.sqrt(prime_tower_min_volume/layer_height), 2))" },')
+        definition.append('        "prime_tower_min_volume": { "value": "2 * smart_purge_minimum_purge_distance * math.pi * (material_diameter/2) ** 2" },')        
         # definition.append('        "prime_tower_wall_thickness": { "value": "round(max(2 * prime_tower_line_width, 0.5 * (prime_tower_size - math.sqrt(max(0, prime_tower_size ** 2 - prime_tower_min_volume / layer_height)))), 3)" },')
         definition.append('        "prime_tower_wall_thickness": { "value": "max(extruderValues('+"'machine_nozzle_size'"+')) * 2" },')
-        definition.append('        "prime_tower_position_x": { "value": "machine_width - max(extruderValue(adhesion_extruder_nr, '+"'brim_width'"+') * extruderValue(adhesion_extruder_nr, '+"'initial_layer_line_width_factor'"+') / 100 if adhesion_type == '+"'brim'"+' else (extruderValue(adhesion_extruder_nr, '+"'raft_margin'"+') if adhesion_type == '+"'raft'"+' else (extruderValue(adhesion_extruder_nr, '+"'skirt_gap'"+') if adhesion_type == '+"'skirt'"+' else 0)), max(extruderValues('+"'travel_avoid_distance'"+'))) - max(extruderValues('+"'support_offset'"+')) - sum(extruderValues('+"'skirt_brim_line_width'"+')) * extruderValue(adhesion_extruder_nr, '+"'initial_layer_line_width_factor'"+') / 100 - 40" },')
-        # definition.append('        "prime_tower_position_y": { "value": "machine_depth - prime_tower_size - max(extruderValue(adhesion_extruder_nr, '+"'brim_width'"+') * extruderValue(adhesion_extruder_nr, '+"'initial_layer_line_width_factor'"+') / 100 if adhesion_type == '+"'brim'"+' else (extruderValue(adhesion_extruder_nr, '+"'raft_margin'"+') if adhesion_type == '+"'raft'"+' else (extruderValue(adhesion_extruder_nr, '+"'skirt_gap'"+') if adhesion_type == '+"'skirt'"+' else 0)), max(extruderValues('+"'travel_avoid_distance'"+'))) - max(extruderValues('+"'support_offset'"+')) - sum(extruderValues('+"'skirt_brim_line_width'"+')) * extruderValue(adhesion_extruder_nr, '+"'initial_layer_line_width_factor'"+') / 100 - 50" },')
-        definition.append('        "prime_tower_position_y": { "value": "round(machine_depth - (machine_width - prime_tower_position_x) * (machine_depth / machine_width) - prime_tower_size, 1)" },')
+        # definition.append('        "prime_tower_position_x": { "value": "machine_width - max(extruderValue(adhesion_extruder_nr, '+"'brim_width'"+') * extruderValue(adhesion_extruder_nr, '+"'initial_layer_line_width_factor'"+') / 100 if adhesion_type == '+"'brim'"+' else (extruderValue(adhesion_extruder_nr, '+"'raft_margin'"+') if adhesion_type == '+"'raft'"+' else (extruderValue(adhesion_extruder_nr, '+"'skirt_gap'"+') if adhesion_type == '+"'skirt'"+' else 0)), max(extruderValues('+"'travel_avoid_distance'"+'))) - max(extruderValues('+"'support_offset'"+')) - sum(extruderValues('+"'skirt_brim_line_width'"+')) * extruderValue(adhesion_extruder_nr, '+"'initial_layer_line_width_factor'"+') / 100 - 40" },') # fixed position, 40mm margin
+
+        # definition.append('        "prime_tower_position_y": { "value": "machine_depth - prime_tower_size - max(extruderValue(adhesion_extruder_nr, '+"'brim_width'"+') * extruderValue(adhesion_extruder_nr, '+"'initial_layer_line_width_factor'"+') / 100 if adhesion_type == '+"'brim'"+' else (extruderValue(adhesion_extruder_nr, '+"'raft_margin'"+') if adhesion_type == '+"'raft'"+' else (extruderValue(adhesion_extruder_nr, '+"'skirt_gap'"+') if adhesion_type == '+"'skirt'"+' else 0)), max(extruderValues('+"'travel_avoid_distance'"+'))) - max(extruderValues('+"'support_offset'"+')) - sum(extruderValues('+"'skirt_brim_line_width'"+')) * extruderValue(adhesion_extruder_nr, '+"'initial_layer_line_width_factor'"+') / 100 - 50" },') # fixed position, 50mm margin
+
+        # definition.append('        "prime_tower_position_y": { "value": "round(machine_depth - (machine_width - prime_tower_position_x) * (machine_depth / machine_width) - prime_tower_size, 1)" },') # position adapted to x position, following bed diagonal
         # definition.append('        "prime_tower_flow": { "value": 100 },')
         definition.append('        "prime_tower_wipe_enabled": { "value": false },')
         definition.append('        "dual_pre_wipe": { "value": false },')
@@ -1674,6 +1677,8 @@ def curaProfile(machine):
                                 qualityFile.append('acceleration_wall_0 = '+str(int(accelerationForPerimeters(hotend['nozzleSize'], layerHeight, int(defaultSpeed/60. * outlineUnderspeed)))))
 
                                 # travel
+                                if filament['isSupportMaterial']:
+                                    qualityFile.append('travel_avoid_other_parts = True')
 
                                 # cooling
                                 if filament['fanPercentage'][1] <= 0:
@@ -1692,11 +1697,13 @@ def curaProfile(machine):
                                     qualityFile.append('support_interface_density = 100')
                                     qualityFile.append('support_conical_enabled = False')
 
+
                                 # platform_adhesion
-                                # qualityFile.append("skirt_brim_minimal_length = =round("+str(filament['purgeVolume'])+" / (math.pi*(extruderValue(adhesion_extruder_nr, 'machine_nozzle_size')/2)**2), 2)") # already in machine definition
 
                                 # dual
-                                qualityFile.append("prime_tower_min_volume = "+str(filament['purgeVolume'] / 2))
+                                if filament['isSupportMaterial']:
+                                    qualityFile.append('purge_in_bucket = True')
+                                    qualityFile.append('smart_purge = True')
 
                                 # meshfix
 
@@ -1708,9 +1715,9 @@ def curaProfile(machine):
                                 # BCN3D
                                 purgeSpeed, mmPerSecondIncrement, maxPurgeDistance, minPurgeDistance = purgeValues(hotend, filament, defaultSpeed, layerHeight)
                                 # qualityFile.append('purge_speed = '+("%.2f" % (purgeSpeed/60.))) # defined in machine's def
-                                qualityFile.append('smart_purge_slope = '+str(mmPerSecondIncrement * 60))
-                                qualityFile.append('smart_purge_maximum_purge_distance = '+str(maxPurgeDistance))
-                                qualityFile.append('smart_purge_minimum_purge_distance = '+str(minPurgeDistance))
+                                qualityFile.append('smart_purge_slope = ='+str(mmPerSecondIncrement * 60)+' * retraction_amount_multiplier')
+                                qualityFile.append('smart_purge_maximum_purge_distance = ='+str(maxPurgeDistance)+' * retraction_amount_multiplier')
+                                qualityFile.append('smart_purge_minimum_purge_distance = ='+str(minPurgeDistance)+' * retraction_amount_multiplier')
 
                             fileContent = '\n'.join(qualityFile)
                             filesList.append((fileName, fileContent))
@@ -1774,30 +1781,26 @@ def purgeValues(hotend, filament, speed, layerHeight, minPurgeLength = 20): # pu
 
     # nozzleSizeBehavior
     if hotend['hotBlock'] == 'Standard':
-        hotendPurgeMultiplier = 10/10
+        hotendPurgeMultiplier = 10/10 # 10 = hot block length
     elif hotend['hotBlock'] == 'HighFlow':
-        hotendPurgeMultiplier = 14/10
-    # maxPurgeLenghtAtHotendTip = 2.25 * filament['purgeLength'] * filament['extrusionMultiplier']
-    # minPurgeLenghtAtHotendTip = 0.5  * filament['purgeLength'] * filament['extrusionMultiplier']
-    # curveGrowth = 1 # Here we assume the growth curve is constant for all materials. Change this value if it's not
-    # hotendPurgeMultiplier = (maxPurgeLenghtAtHotendTip - (maxPurgeLenghtAtHotendTip-minPurgeLenghtAtHotendTip)*math.exp(-hotend['nozzleSize']/float(curveGrowth)))/float(filament['purgeLength'])
+        hotendPurgeMultiplier = 14/10 # 14 = hot block length
 
     # F - Extrusion Speed -> adjusted to improve surplus material storage (maximum purge speed for the hotend's temperature):
-    F = 48
+    F = 50
 
-    # S - Slope of the SmartPurge function (according to NSize, Flow, PurgeLength)
-    # distanceAtNozzleTip = hotendPurgeMultiplier * filament['purgeLength'] * filament['extrusionMultiplier']
-    # slopeCorrection = 0.005 # experimental value
-    # S = float("%.4f" % ((distanceAtNozzleTip * (hotend['nozzleSize']/2.)**2) / ((filament['filamentDiameter']/2.)**2) * slopeCorrection))
+    # S - Slope of the SmartPurge function
     S = 0.0005 * hotend['nozzleSize']
 
     # P (testing value)
-    P = float("%.2f" % (hotendPurgeMultiplier * filament['purgeVolume'] / (math.pi * ((filament['filamentDiameter']/2.)**2))))
-    P = float("%.2f" % (hotendPurgeMultiplier * filament['purgeVolume'] / (math.pi * ((filament['filamentDiameter']/2.)**2)))) / 10 # better
+    nozzleMultiplier = hotend['nozzleSize'] / 0.4 # multiplier that corrects extra leaking for thicker nozzles
+    volumeFor04 = filament['purgeDistanceFor04'] * math.pi * (filament['filamentDiameter']/2.) ** 2
+    nozzleDistanceFor04 = volumeFor04 / (math.pi * (0.4 / 2) ** 2)
+    neededVolumeForCurrentHotend = nozzleDistanceFor04 * math.pi * (hotend['nozzleSize'] / 2) ** 2
+    neededExtrudedDistance = neededVolumeForCurrentHotend / (math.pi * (filament['filamentDiameter']/2.)**2)
+    P = round(neededExtrudedDistance * nozzleMultiplier, 2) # distance at nozzle equals 04 hotend * nozzleMultiplier. hotendPurgeMultiplier is not added as it's the minimum purge distance.
         
     # E - Maximum distance to purge
-    E = 2 * P
-    E = float("%.2f" % (hotendPurgeMultiplier * filament['purgeVolume'] / (math.pi * ((filament['filamentDiameter']/2.)**2)))) # better
+    E = round(P + 20 * hotendPurgeMultiplier, 2) # 20 = melt zone length
 
     return (F, S, E, P)
 
