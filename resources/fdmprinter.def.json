@@ -2044,7 +2044,7 @@
                 "retraction_amount_multiplier":
                 {
                     "label": "Retraction Distance Multiplier",
-                    "description": "Multiplier for the length of material retracted during a retraction move.",
+                    "description": "Multiplier for the length of material retracted during a retraction move. This setting compensates filament compressions in the bowden tube for different bowden types/lengths.",
                     "type": "float",
                     "default_value": 1,
                     "enabled": false,
@@ -4921,8 +4921,8 @@
                     "comments": "BCN3D setting"
                 },
                 "smart_purge": {
-                    "label": "Enable Dynamic Purge Distance",
-                    "description": "Use variable distance according to idle time.",
+                    "label": "Use Adaptive Purge Distance",
+                    "description": "Make the purged distance variable according to idle time.",
                     "type": "bool",
                     "default_value": false,
                     "enabled": "purge_in_bucket and print_mode == 'regular'",
@@ -5063,6 +5063,28 @@
                         }
                     }
                 },
+                "prime_tower_closest_to":
+                {
+                    "label": "Prime Tower Preferred Position",
+                    "description": "Select the preferred area of the buildplate to automatically place the prime tower.",
+                    "type": "enum",
+                    "options":
+                    {
+                        "top-left": "Top Left",
+                        "top": "Top",
+                        "top-right": "Top Right",
+                        "right": "Right",
+                        "bottom-right": "Bottom Right",
+                        "bottom": "Bottom",
+                        "bottom-left": "Bottom Left",
+                        "left": "Left"
+                    },
+                    "default_value": "top-right",
+                    "enabled": "resolveOrValue('prime_tower_enable')",
+                    "settable_per_mesh": false,
+                    "settable_per_extruder": false,
+                    "comments": "BCN3D setting"
+                },
                 "prime_tower_position_x":
                 {
                     "label": "Prime Tower X Position",
@@ -5071,7 +5093,7 @@
                     "unit": "mm",
                     "enabled": "resolveOrValue('prime_tower_enable')",
                     "default_value": 200,
-                    "value": "machine_width - max(extruderValue(adhesion_extruder_nr, 'brim_width') * extruderValue(adhesion_extruder_nr, 'initial_layer_line_width_factor') / 100 if adhesion_type == 'brim' else (extruderValue(adhesion_extruder_nr, 'raft_margin') if adhesion_type == 'raft' else (extruderValue(adhesion_extruder_nr, 'skirt_gap') if adhesion_type == 'skirt' else 0)), max(extruderValues('travel_avoid_distance'))) - max(extruderValues('support_offset')) - sum(extruderValues('skirt_brim_line_width')) * extruderValue(adhesion_extruder_nr, 'initial_layer_line_width_factor') / 100 - 1",
+                    "value": "round(max(min([coordinates[0] for coordinates in getSceneBoundingBox()]) - 3, prime_tower_size + max(extruderValue(adhesion_extruder_nr, 'brim_width') * extruderValue(adhesion_extruder_nr, 'initial_layer_line_width_factor') / 100 if adhesion_type == 'brim' else (extruderValue(adhesion_extruder_nr, 'raft_margin') if adhesion_type == 'raft' else (extruderValue(adhesion_extruder_nr, 'skirt_gap') if adhesion_type == 'skirt' else 0)), max(extruderValues('travel_avoid_distance'))) + max(extruderValues('support_offset')) + sum(extruderValues('skirt_brim_line_width')) * extruderValue(adhesion_extruder_nr, 'initial_layer_line_width_factor') / 100 + 5) if prime_tower_closest_to in ['top-left', 'left', 'bottom-left'] else min([coordinates[0] for coordinates in getSceneBoundingBox()]) - 3 + (max([coordinates[0] for coordinates in getSceneBoundingBox()]) + prime_tower_size + 3 - (min([coordinates[0] for coordinates in getSceneBoundingBox()]) - 3)) / 2 if prime_tower_closest_to in ['top', 'bottom'] else min(max([coordinates[0] for coordinates in getSceneBoundingBox()]) + prime_tower_size + 3, machine_width - max(extruderValue(adhesion_extruder_nr, 'brim_width') * extruderValue(adhesion_extruder_nr, 'initial_layer_line_width_factor') / 100 if adhesion_type == 'brim' else (extruderValue(adhesion_extruder_nr, 'raft_margin') if adhesion_type == 'raft' else (extruderValue(adhesion_extruder_nr, 'skirt_gap') if adhesion_type == 'skirt' else 0)), max(extruderValues('travel_avoid_distance'))) - max(extruderValues('support_offset')) - sum(extruderValues('skirt_brim_line_width')) * extruderValue(adhesion_extruder_nr, 'initial_layer_line_width_factor') / 100 - 5), 1)",
                     "maximum_value": "machine_width / 2 if machine_center_is_zero else machine_width",
                     "minimum_value": "resolveOrValue('prime_tower_size') - machine_width / 2 if machine_center_is_zero else resolveOrValue('prime_tower_size')",
                     "settable_per_mesh": false,
@@ -5085,7 +5107,7 @@
                     "unit": "mm",
                     "enabled": "resolveOrValue('prime_tower_enable')",
                     "default_value": 200,
-                    "value": "machine_depth - prime_tower_size - max(extruderValue(adhesion_extruder_nr, 'brim_width') * extruderValue(adhesion_extruder_nr, 'initial_layer_line_width_factor') / 100 if adhesion_type == 'brim' else (extruderValue(adhesion_extruder_nr, 'raft_margin') if adhesion_type == 'raft' else (extruderValue(adhesion_extruder_nr, 'skirt_gap') if adhesion_type == 'skirt' else 0)), max(extruderValues('travel_avoid_distance'))) - max(extruderValues('support_offset')) - sum(extruderValues('skirt_brim_line_width')) * extruderValue(adhesion_extruder_nr, 'initial_layer_line_width_factor') / 100 - 1",
+                    "value": "round(max(machine_depth - max([coordinates[1] for coordinates in getSceneBoundingBox()]) - prime_tower_size - 3, max(extruderValue(adhesion_extruder_nr, 'brim_width') * extruderValue(adhesion_extruder_nr, 'initial_layer_line_width_factor') / 100 if adhesion_type == 'brim' else (extruderValue(adhesion_extruder_nr, 'raft_margin') if adhesion_type == 'raft' else (extruderValue(adhesion_extruder_nr, 'skirt_gap') if adhesion_type == 'skirt' else 0)), max(extruderValues('travel_avoid_distance'))) + max(extruderValues('support_offset')) + sum(extruderValues('skirt_brim_line_width')) * extruderValue(adhesion_extruder_nr, 'initial_layer_line_width_factor') / 100 + 5) if prime_tower_closest_to in ['bottom-left', 'bottom', 'bottom-right'] else machine_depth - max([coordinates[1] for coordinates in getSceneBoundingBox()]) - prime_tower_size - 3 + (machine_depth - min([coordinates[1] for coordinates in getSceneBoundingBox()]) + 3 - (machine_depth - max([coordinates[1] for coordinates in getSceneBoundingBox()]) - prime_tower_size - 3)) / 2 if prime_tower_closest_to in ['left', 'right'] else min(machine_depth - min([coordinates[1] for coordinates in getSceneBoundingBox()]) + 3, machine_depth - prime_tower_size - max(extruderValue(adhesion_extruder_nr, 'brim_width') * extruderValue(adhesion_extruder_nr, 'initial_layer_line_width_factor') / 100 if adhesion_type == 'brim' else (extruderValue(adhesion_extruder_nr, 'raft_margin') if adhesion_type == 'raft' else (extruderValue(adhesion_extruder_nr, 'skirt_gap') if adhesion_type == 'skirt' else 0)), max(extruderValues('travel_avoid_distance'))) - max(extruderValues('support_offset')) - sum(extruderValues('skirt_brim_line_width')) * extruderValue(adhesion_extruder_nr, 'initial_layer_line_width_factor') / 100 - 5), 1)",
                     "maximum_value": "machine_depth / 2 - resolveOrValue('prime_tower_size') if machine_center_is_zero else machine_depth - resolveOrValue('prime_tower_size')",
                     "minimum_value": "machine_depth / -2 if machine_center_is_zero else 0",
                     "settable_per_mesh": false,
