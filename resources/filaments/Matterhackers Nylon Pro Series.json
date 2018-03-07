@@ -33,5 +33,5 @@
     "fanPercentage": [0, 0],
     "extrusionMultiplier": 1,
     "minimumLayerHeight": 0.2,
-    "purgeVolume": 97.31
+    "purgeDistanceFor04": 1.5
 }

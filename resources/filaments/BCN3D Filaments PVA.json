@@ -18,12 +18,12 @@
     "advisedMaxPrintSpeed": 30,
     "maxFlow": "None",
     "maxFlowForHighFlowHotend": "None",
-    "retractionDistance": 6,
-    "toolChangeRetractionDistance": 10,
+    "retractionDistance": 3,
+    "toolChangeRetractionDistance": 5,
     "retractionSpeed": 40,
     "retractionCount": 50,
     "fanPercentage": [50, 100],
     "extrusionMultiplier": 1.1,
     "minimumLayerHeight": 0,
-    "purgeVolume": 97.31
+    "purgeDistanceFor04": 1.5
 }
