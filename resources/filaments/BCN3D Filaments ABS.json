@@ -13,6 +13,7 @@
     "isSupportMaterial": false,
     "isFlexibleMaterial": false,
     "isAbrasiveMaterial": false,
+    "adhesionType": "brim",
     "bedTemperature": 90,
     "printTemperature": [240, 260],
     "standbyTemperature": 150,
