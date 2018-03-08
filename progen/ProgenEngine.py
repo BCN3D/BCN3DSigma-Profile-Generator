@@ -1684,7 +1684,7 @@ def curaProfile(machine):
                                 if filament['fanPercentage'][1] <= 0:
                                     qualityFile.append('cool_fan_enabled = False')
                                 qualityFile.append('cool_fan_speed_min = '+str(int(filament['fanPercentage'][0])))
-                                if filament['isFlexibleMaterial']:
+                                if filament['isFlexibleMaterial'] or filament['isSupportMaterial']:
                                     qualityFile.append('cool_lift_head = False')
 
                                 # support
@@ -1699,6 +1699,8 @@ def curaProfile(machine):
 
 
                                 # platform_adhesion
+                                if 'adhesionType' in filament:
+                                    qualityFile.append("adhesion_type = ='"+filament['adhesionType']+"'")
 
                                 # dual
                                 if filament['isSupportMaterial']:
