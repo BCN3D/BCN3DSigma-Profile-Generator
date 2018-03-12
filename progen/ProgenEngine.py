@@ -1576,6 +1576,13 @@ def curaProfile(machine):
                 filesList.append((fileName, fileContent))
 
     if 'qualities' not in machine:
+        totalGlobalQualities = 0
+        globalQualities = []
+        for hotend in PS.profilesData['hotend']:
+            if hotend['id'] != 'None':
+                for quality in PS.profilesData['quality']:
+                    globalQualities.append(getLayerHeight(hotend, quality))
+        totalGlobalQualities = len(list(set(globalQualities)))
         globalQualities = []
         for hotend in sorted(PS.profilesData['hotend'], key=lambda k: k['id']):
             if hotend['id'] != 'None':
@@ -1603,7 +1610,7 @@ def curaProfile(machine):
                                 qualityFile.append('type = quality')
                                 qualityFile.append('quality_type = layer'+("%.2f" % layerHeight)+'mm')
                                 qualityFile.append('global_quality = True')
-                                qualityFile.append('weight = '+str(len(globalQualities)))
+                                qualityFile.append('weight = '+str(totalGlobalQualities - len(globalQualities)))
                                 qualityFile.append('setting_version = 4')
                                 qualityFile.append('')
                                 qualityFile.append('[values]')
@@ -1634,7 +1641,7 @@ def curaProfile(machine):
                             qualityFile.append('material = '+'_'.join([filament['brand'], filament['material'], color, machine['id'], hotend['id']]).replace(' ', '_'))
                             for index in range(len(globalQualities)):
                                 if globalQualities[index] == layerHeight:
-                                    qualityFile.append('weight = '+str(index+1))
+                                    qualityFile.append('weight = '+str(totalGlobalQualities - (index+1)))
                                     break
 
                             if notSupported:
