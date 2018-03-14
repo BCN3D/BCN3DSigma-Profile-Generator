@@ -801,7 +801,7 @@ def curaProfile(machine):
         if 'BCN3D Filaments PLA' in filament['id']:
             curaPreferredMaterial = filament['id'].replace(' ', '_')
             if 'Light Blue' in filament['colors']:
-                curaPreferredMaterial += '_Orange'
+                curaPreferredMaterial += '_Light_Blue'
             break
 
     fileName = 'Cura/resources/definitions/'+machine['id']+'.def.json'
