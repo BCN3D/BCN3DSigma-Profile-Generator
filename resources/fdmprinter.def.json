@@ -615,6 +615,17 @@
                     "settable_per_mesh": false,
                     "settable_per_extruder": false,
                     "settable_per_meshgroup": false
+                },
+                "baudrate":
+                {
+                    "label": "Baudrate",
+                    "description": "",
+                    "type": "int",
+                    "default_value": 250000,
+                    "settable_per_mesh": false,
+                    "settable_per_extruder": false,
+                    "settable_per_meshgroup": false,
+                    "comments": "BCN3D Setting"
                 }
             }
         },
