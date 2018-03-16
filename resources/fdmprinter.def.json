@@ -4256,6 +4256,28 @@
             "description": "Adhesion",
             "children":
             {
+                "purge_in_bucket_before_start":
+                {
+                    "label": "Purge Before Printing",
+                    "description": "Whether to prime the filament in the bucket before printing. Turning this setting on will ensure that the extruder will have material ready at the nozzle before printing. Printing Brim or Skirt can act like priming too, in which case turning this setting off saves some time.",
+                    "type": "bool",
+                    "default_value": false,
+                    "settable_per_mesh": false,
+                    "settable_per_extruder": true,
+                    "enabled": false,
+                    "comments": "BCN3D setting"
+                },
+                "start_purge_distance": {
+                    "label": "Start Purge Distance",
+                    "description": "Filament distance purged before extruder starts printing.",
+                    "unit": "mm",
+                    "type": "float",
+                    "default_value": 20,
+                    "minimum_value": "0",
+                    "enabled": "purge_in_bucket_before_start",
+                    "settable_per_extruder": true,
+                    "comments": "BCN3D setting"
+                },
                 "prime_blob_enable":
                 {
                     "label": "Enable Prime Blob",
