@@ -965,8 +965,8 @@ def curaProfile(machine):
         definition.append('        "machine_nozzle_temp_enabled": { "value": true },')
         definition.append('        "material_bed_temp_wait": { "value": true },')
         definition.append('        "material_print_temp_wait": { "value": true },')
-        # definition.append('        "material_bed_temp_prepend": { "value": false },') # Cura 2.5 ignores it
-        # definition.append('        "material_print_temp_prepend": { "value": false },') # Cura 2.5 ignores it
+        definition.append('        "material_bed_temp_prepend": { "value": true },')
+        definition.append('        "material_print_temp_prepend": { "value": true },')
 
         # resolution
         definition.append('        "line_width": { "value": "machine_nozzle_size" },')
@@ -1209,13 +1209,14 @@ def curaProfile(machine):
         definition.append('        "support_minimal_diameter": { "value": 1.0 },')
         # definition.append('        "support_tower_roof_angle": { "value": 65 },')
         # definition.append('        "support_mesh_drop_down": { "value": true },')
-        definition.append('        "support_conical_enabled": { "value": true },')
+        # definition.append('        "support_conical_enabled": { "value": false },') # set to false until it's not an experimental feature. In some cases leads to unprintable supports
 
         # platform adhesion
-        definition.append('        "extruder_prime_pos_y": { "value": "machine_depth" },')
+        definition.append('        "start_purge_distance": { "value": 20 },')
+        # definition.append('        "extruder_prime_pos_y": { "value": "machine_depth" },')
         definition.append('        "adhesion_type": { "value": "'+"'skirt'"+'" },')
         definition.append('        "skirt_line_count": { "value": 3 },')
-        definition.append('        "skirt_brim_minimal_length": { "value": "round((max(20, switch_extruder_retraction_amount) * math.pi * (extruderValue(adhesion_extruder_nr, '+"'material_diameter'"+') / 2) ** 2) / (extruderValue(adhesion_extruder_nr, '+"'machine_nozzle_size'"+') * layer_height_0), 2)" },')
+        # definition.append('        "skirt_brim_minimal_length": { "value": "round((max(20, switch_extruder_retraction_amount) * math.pi * (extruderValue(adhesion_extruder_nr, '+"'material_diameter'"+') / 2) ** 2) / (extruderValue(adhesion_extruder_nr, '+"'machine_nozzle_size'"+') * layer_height_0), 2)" },') # not needed if the machine purges in the bucket
         # definition.append('        "skirt_gap": { "value": 3 },')
         # definition.append('        "brim_width": { "value": 8 },')
         # definition.append('        "brim_outside_only": { "value": true },')
@@ -1375,6 +1376,11 @@ def curaProfile(machine):
         definition.append('        "purge_distance": { "value": "smart_purge_minimum_purge_distance" },')
         # definition.append('        "retract_reduction": { "enabled": true },')
         definition.append('        "avoid_grinding_filament":')
+        definition.append('        {')
+        definition.append('            "enabled": true,')
+        definition.append('            "value": true')
+        definition.append('        },')
+        definition.append('        "purge_in_bucket_before_start":')
         definition.append('        {')
         definition.append('            "enabled": true,')
         definition.append('            "value": true')
@@ -1686,6 +1692,7 @@ def curaProfile(machine):
                                 # travel
                                 if filament['isSupportMaterial']:
                                     qualityFile.append('travel_avoid_other_parts = True')
+                                    qualityFile.append("support_interface_pattern = ='concentric'")
 
                                 # cooling
                                 if filament['fanPercentage'][1] <= 0:
