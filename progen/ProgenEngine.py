@@ -844,6 +844,7 @@ def curaProfile(machine):
     definition.append('    },')
     definition.append('    "overrides": {')
     definition.append('        "machine_name": { "default_value": "'+machine['name']+'" },')
+    definition.append('        "machine_prefix": { "default_value": "'+machine['prefix']+'" },')
     definition.append('        "machine_acceleration": { "default_value": '+str(machine['acceleration'])+' },')
     definition.append('        "machine_max_jerk_xy": { "value": '+str(machine['jerk'])+' },') # Adjust jerk
     if 'inherits' in machine:
@@ -983,7 +984,7 @@ def curaProfile(machine):
         # definition.append('        "support_interface_line_width": { "value": "line_width" },')
         # definition.append('        "support_roof_line_width": { "value": "extruderValue(support_roof_extruder_nr, '+"'support_interface_line_width'"+')" },')
         # definition.append('        "support_bottom_line_width": { "value": "extruderValue(support_bottom_extruder_nr, '+"'support_interface_line_width'"+')" },')
-        # definition.append('        "prime_tower_line_width": { "value": "line_width" },')
+        definition.append('        "prime_tower_line_width": { "value": "prime_tower_wall_thickness / 2" },')
         # definition.append('        "initial_layer_line_width_factor": { "value": 100 },')
         
         # shell
@@ -1257,7 +1258,8 @@ def curaProfile(machine):
         definition.append('        "prime_tower_size": { "value": "max(25, round(math.sqrt(prime_tower_min_volume/layer_height), 2))" },')
         definition.append('        "prime_tower_min_volume": { "value": "2 * smart_purge_minimum_purge_distance * math.pi * (material_diameter/2) ** 2" },')        
         # definition.append('        "prime_tower_wall_thickness": { "value": "round(max(2 * prime_tower_line_width, 0.5 * (prime_tower_size - math.sqrt(max(0, prime_tower_size ** 2 - prime_tower_min_volume / layer_height)))), 3)" },')
-        definition.append('        "prime_tower_wall_thickness": { "value": "max(extruderValues('+"'machine_nozzle_size'"+')) * 2" },')
+        # definition.append('        "prime_tower_wall_thickness": { "value": "min(extruderValues('+"'machine_nozzle_size'"+')) * 2" },')
+        definition.append('        "prime_tower_wall_thickness": { "value": "round(2 * (min(extruderValues('+"'machine_nozzle_size'"+')) + (max(extruderValues('+"'machine_nozzle_size'"+')) - min(extruderValues('+"'machine_nozzle_size'"+'))) / 2), 2)" },')
         # definition.append('        "prime_tower_position_x": { "value": "machine_width - max(extruderValue(adhesion_extruder_nr, '+"'brim_width'"+') * extruderValue(adhesion_extruder_nr, '+"'initial_layer_line_width_factor'"+') / 100 if adhesion_type == '+"'brim'"+' else (extruderValue(adhesion_extruder_nr, '+"'raft_margin'"+') if adhesion_type == '+"'raft'"+' else (extruderValue(adhesion_extruder_nr, '+"'skirt_gap'"+') if adhesion_type == '+"'skirt'"+' else 0)), max(extruderValues('+"'travel_avoid_distance'"+'))) - max(extruderValues('+"'support_offset'"+')) - sum(extruderValues('+"'skirt_brim_line_width'"+')) * extruderValue(adhesion_extruder_nr, '+"'initial_layer_line_width_factor'"+') / 100 - 40" },') # fixed position, 40mm margin
 
         # definition.append('        "prime_tower_position_y": { "value": "machine_depth - prime_tower_size - max(extruderValue(adhesion_extruder_nr, '+"'brim_width'"+') * extruderValue(adhesion_extruder_nr, '+"'initial_layer_line_width_factor'"+') / 100 if adhesion_type == '+"'brim'"+' else (extruderValue(adhesion_extruder_nr, '+"'raft_margin'"+') if adhesion_type == '+"'raft'"+' else (extruderValue(adhesion_extruder_nr, '+"'skirt_gap'"+') if adhesion_type == '+"'skirt'"+' else 0)), max(extruderValues('+"'travel_avoid_distance'"+'))) - max(extruderValues('+"'support_offset'"+')) - sum(extruderValues('+"'skirt_brim_line_width'"+')) * extruderValue(adhesion_extruder_nr, '+"'initial_layer_line_width_factor'"+') / 100 - 50" },') # fixed position, 50mm margin
