@@ -39,6 +39,16 @@
                     "settable_per_extruder": false,
                     "settable_per_meshgroup": false
                 },
+                "machine_prefix":
+                {
+                    "label": "Machine Prefix",
+                    "description": "The prefix of your 3D printer model.",
+                    "default_value": "U",
+                    "type": "str",
+                    "settable_per_mesh": false,
+                    "settable_per_extruder": false,
+                    "settable_per_meshgroup": false
+                },
                 "machine_show_variants":
                 {
                     "label": "Show Machine Variants",
