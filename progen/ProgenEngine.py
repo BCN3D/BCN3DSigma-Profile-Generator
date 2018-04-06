@@ -1090,13 +1090,13 @@ def curaProfile(machine):
         # definition.append('        "retraction_extrusion_window": { "value": "retraction_amount" },')
 
         # speed
-        # definition.append('        "speed_infill": { "value": "speed_print" },')
+        definition.append('        "speed_infill": { "value": "round(speed_print / infill_sparse_layer, 1)" },')
         # definition.append('        "speed_wall": { "value": "speed_print" },') # defined in quality
         definition.append('        "speed_wall_x": { "value": "round(speed_print - (speed_print - speed_wall) / 2, 1)" },')
         definition.append('        "speed_wall_0": { "value": "speed_wall" },')
         # definition.append('        "speed_roofing": { "value": "speed_topbottom" },')
         definition.append('        "speed_topbottom": { "value": "speed_wall_x" },')
-        # definition.append('        "speed_support_infill": { "value": "speed_support" },')
+        definition.append('        "speed_support_infill": { "value": "round(speed_support / support_infill_sparse_layer, 1)" },')
         definition.append('        "speed_support_interface": { "value": "speed_wall" },')
         definition.append('        "speed_travel": { "value": "round(speed_print if magic_spiralize else 200)" },')
         # definition.append('        "speed_print_layer_0": { "value": "speed_layer_0" },')
