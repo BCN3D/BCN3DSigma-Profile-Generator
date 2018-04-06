@@ -1315,7 +1315,7 @@ def curaProfile(machine):
         definition.append('            "value": '+str(machine['useAutoTemperature']).lower())
         definition.append('        },')
         # definition.append('        "material_flow_temp_graph": { "enabled": "machine_nozzle_temp_enabled and material_flow_dependent_temperature" },') # Bad visualization
-        # definition.append('        "meshfix_maximum_resolution": { "value": 0.01 },')
+        definition.append('        "meshfix_maximum_resolution": { "value": 0.0125  },')
         # definition.append('        "support_skip_some_zags": { "value": false },')
         # definition.append('        "support_skip_zag_per_mm": { "value": 20 },')
         # definition.append('        "support_zag_skip_count": { "value": 5 },')
