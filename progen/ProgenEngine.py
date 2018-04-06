@@ -1175,10 +1175,10 @@ def curaProfile(machine):
         # definition.append('        "cool_fan_speed_0": { "value": 0 },')
         # definition.append('        "cool_fan_speed_max": { "value": "cool_fan_speed" },')
         definition.append('        "cool_fan_full_at_height": { "value": "0 if adhesion_type == '+"'raft'"+' else layer_height_0 + 4 * layer_height" },') # after 6 layers
-        definition.append('        "cool_min_layer_time": { "value": 10 },')
+        definition.append('        "cool_min_layer_time": { "value": 0 },')
         # definition.append('        "cool_min_layer_time_fan_speed_max": { "value": 10 },')
         definition.append('        "cool_min_speed": { "value": "speed_wall_0" },')
-        definition.append('        "cool_lift_head": { "value": true },')
+        # definition.append('        "cool_lift_head": { "value": false },')
 
         # support
         # definition.append('        "support_enable": { "value": false },')
@@ -1315,7 +1315,7 @@ def curaProfile(machine):
         definition.append('            "value": '+str(machine['useAutoTemperature']).lower())
         definition.append('        },')
         # definition.append('        "material_flow_temp_graph": { "enabled": "machine_nozzle_temp_enabled and material_flow_dependent_temperature" },') # Bad visualization
-        definition.append('        "meshfix_maximum_resolution": { "value": 0.0125  },')
+        definition.append('        "meshfix_maximum_resolution": { "value": 0.0125 },')
         # definition.append('        "support_skip_some_zags": { "value": false },')
         # definition.append('        "support_skip_zag_per_mm": { "value": 20 },')
         # definition.append('        "support_zag_skip_count": { "value": 5 },')
@@ -1700,8 +1700,8 @@ def curaProfile(machine):
                                 if filament['fanPercentage'][1] <= 0:
                                     qualityFile.append('cool_fan_enabled = False')
                                 qualityFile.append('cool_fan_speed_min = '+str(int(filament['fanPercentage'][0])))
-                                if filament['isFlexibleMaterial'] or filament['isSupportMaterial']:
-                                    qualityFile.append('cool_lift_head = False')
+                                # if filament['isFlexibleMaterial'] or filament['isSupportMaterial']:
+                                #     qualityFile.append('cool_lift_head = False')
 
                                 # support
                                 if filament['isSupportMaterial']:
