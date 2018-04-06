@@ -984,7 +984,7 @@ def curaProfile(machine):
         # definition.append('        "support_interface_line_width": { "value": "line_width" },')
         # definition.append('        "support_roof_line_width": { "value": "extruderValue(support_roof_extruder_nr, '+"'support_interface_line_width'"+')" },')
         # definition.append('        "support_bottom_line_width": { "value": "extruderValue(support_bottom_extruder_nr, '+"'support_interface_line_width'"+')" },')
-        definition.append('        "prime_tower_line_width": { "value": "prime_tower_wall_thickness / 2" },')
+        definition.append('        "prime_tower_line_width": { "value": "prime_tower_wall_thickness / 2 if prime_tower_wall_thickness <= round(2 * (min(extruderValues('+"'machine_nozzle_size'"+')) + (max(extruderValues('+"'machine_nozzle_size'"+')) - min(extruderValues('+"'machine_nozzle_size'"+'))) / 2), 2) else machine_nozzle_size" },')
         # definition.append('        "initial_layer_line_width_factor": { "value": 100 },')
         
         # shell
