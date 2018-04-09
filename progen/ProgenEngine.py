@@ -1722,6 +1722,7 @@ def curaProfile(machine):
                                 if filament['isSupportMaterial']:
                                     qualityFile.append('purge_in_bucket = True')
                                     qualityFile.append('smart_purge = True')
+                                    qualityFile.append('prime_tower_flow = =int(5 * round(float(material_flow * 1.2)/5))')
 
                                 # meshfix
 
