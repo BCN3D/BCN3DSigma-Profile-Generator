@@ -807,7 +807,6 @@ def curaProfile(machine):
     fileName = 'Cura/resources/definitions/'+machine['id']+'.def.json'
     definition = []
     definition.append('{')
-    definition.append('    "id": "'+machine['id']+'",')
     definition.append('    "version": 2,')
     definition.append('    "name": "'+machine['name']+'",')
     if 'inherits' in machine:
@@ -824,8 +823,6 @@ def curaProfile(machine):
     definition.append('        "platform_offset": [0, 0, 0],')
     definition.append('        "has_machine_quality": true,')
     definition.append('        "visible": true,')
-    if 'variants' in machine:
-        definition.append('        "variant_definition": "'+machine['variants']+'",')
     if 'qualities' in machine:
         definition.append('        "quality_definition": "'+machine['qualities']+'",')
     definition.append('        "has_materials": true,')
