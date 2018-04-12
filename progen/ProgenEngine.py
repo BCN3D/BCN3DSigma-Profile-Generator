@@ -1392,109 +1392,58 @@ def curaProfile(machine):
     fileContent = '\n'.join(definition)
     filesList.append((fileName, fileContent))
 
-    fileName = 'Cura/resources/extruders/'+machine['id']+'_extruder_left.def.json'
-    extruder = []
-    extruder.append('{')
-    extruder.append('    "id": "'+machine['id']+'_extruder_left",')
-    extruder.append('    "version": 2,')
-    extruder.append('    "name": "Extruder Left",')
-    extruder.append('    "inherits": "fdmextruder",')
-    extruder.append('    "metadata": {')
-    extruder.append('        "machine": "'+machine['id']+'",')
-    extruder.append('        "position": "0",')
-    extruder.append('        "quality_definition": "'+machine['id']+'_extruder_left"')
-    extruder.append('    },')
-    extruder.append('')
-    extruder.append('    "overrides": {')
-    extruder.append('        "extruder_nr": {')
-    extruder.append('            "default_value": 0,')
-    extruder.append('            "maximum_value": "1"')
-    extruder.append('        },')
-    extruder.append('        "machine_nozzle_offset_x": { "default_value": 0.0 },')
-    extruder.append('        "machine_nozzle_offset_y": { "default_value": 0.0 },')
-    extruder.append(r'        "machine_extruder_start_code": { "default_value": "'+\
-        r'G91\n'+\
-        r'G1 F12000 Z{retraction_hop_height_after_extruder_switch}\n'+\
-        r'G90\n'+\
-        r'{purge_in_bucket_enable_gcode}G92 E0\n'+\
-        r'{purge_in_bucket_enable_gcode}G1 F600 E{switch_extruder_retraction_amount}\n'+\
-        r'{purge_in_bucket_enable_gcode}G1 F{purge_speed_gcode} E{purge_distance} ;defaultpurge\n'+\
-        r'{purge_in_bucket_enable_gcode}G92 E0\n'+\
-        r'{purge_in_bucket_enable_gcode}G1 F2400 E-{switch_extruder_retraction_amount}\n'+\
-        r'{purge_in_bucket_enable_gcode}G92 E0\n'+\
-        r'{purge_in_bucket_enable_gcode}G4 P2000\n'+\
-        r'{smart_purge_enable_gcode}G92 E0\n'+\
-        r'{smart_purge_enable_gcode}G1 F600 E{switch_extruder_retraction_amount}\n'+\
-        r'{smart_purge_enable_gcode}M800 F{purge_speed_gcode} S{smart_purge_slope_gcode} E{smart_purge_maximum_purge_distance} P{smart_purge_minimum_purge_distance} ;smartpurge\n'+\
-        r'{smart_purge_enable_gcode}G92 E0\n'+\
-        r'{smart_purge_enable_gcode}G1 F2400 E-{switch_extruder_retraction_amount}\n'+\
-        r'{smart_purge_enable_gcode}G92 E0\n'+\
-        r'{smart_purge_enable_gcode}G4 P2000\n'+\
-        r'" },') # ajustar la purge speed per anar en sincronia amb la velocitat de infill
-    extruder.append('        "machine_extruder_start_pos_abs": { "default_value": false },')
-    extruder.append('        "machine_extruder_start_pos_x": { "default_value": 0.0 },')
-    extruder.append('        "machine_extruder_start_pos_y": { "default_value": 0.0 },')
-    extruder.append('        "machine_extruder_end_code": { "default_value": "" },')
-    extruder.append('        "machine_extruder_end_pos_abs": { "default_value": false },')
-    extruder.append('        "machine_extruder_end_pos_x": { "default_value": 0.0 },')
-    extruder.append('        "machine_extruder_end_pos_y": { "default_value": 0.0 },')
-    extruder.append('        "extruder_prime_pos_x": { "default_value": 0.0 }')
-    extruder.append('    }')
-    extruder.append('}')
-    fileContent = '\n'.join(extruder)
-    filesList.append((fileName, fileContent))
-
-    fileName = 'Cura/resources/extruders/'+machine['id']+'_extruder_right.def.json'
-    extruder = []
-    extruder.append('{')
-    extruder.append('    "id": "'+machine['id']+'_extruder_right",')
-    extruder.append('    "version": 2,')
-    extruder.append('    "name": "Extruder Right",')
-    extruder.append('    "inherits": "fdmextruder",')
-    extruder.append('    "metadata": {')
-    extruder.append('        "machine": "'+machine['id']+'",')
-    extruder.append('        "position": "1",')
-    extruder.append('        "quality_definition": "'+machine['id']+'_extruder_right"')
-    extruder.append('    },')
-    extruder.append('')
-    extruder.append('    "overrides": {')
-    extruder.append('        "extruder_nr": {')
-    extruder.append('            "default_value": 1,')
-    extruder.append('            "maximum_value": "1"')
-    extruder.append('        },')
-    extruder.append('        "machine_nozzle_offset_x": { "default_value": 0.0 },')
-    extruder.append('        "machine_nozzle_offset_y": { "default_value": 0.0 },')
-    extruder.append(r'        "machine_extruder_start_code": { "default_value": "'+\
-        r'G91\n'+\
-        r'G1 F12000 Z{retraction_hop_height_after_extruder_switch}\n'+\
-        r'G90\n'+\
-        r'{purge_in_bucket_enable_gcode}G92 E0\n'+\
-        r'{purge_in_bucket_enable_gcode}G1 F600 E{switch_extruder_retraction_amount}\n'+\
-        r'{purge_in_bucket_enable_gcode}G1 F{purge_speed_gcode} E{purge_distance} ;defaultpurge\n'+\
-        r'{purge_in_bucket_enable_gcode}G92 E0\n'+\
-        r'{purge_in_bucket_enable_gcode}G1 F2400 E-{switch_extruder_retraction_amount}\n'+\
-        r'{purge_in_bucket_enable_gcode}G92 E0\n'+\
-        r'{purge_in_bucket_enable_gcode}G4 P2000\n'+\
-        r'{smart_purge_enable_gcode}G92 E0\n'+\
-        r'{smart_purge_enable_gcode}G1 F600 E{switch_extruder_retraction_amount}\n'+\
-        r'{smart_purge_enable_gcode}M800 F{purge_speed_gcode} S{smart_purge_slope_gcode} E{smart_purge_maximum_purge_distance} P{smart_purge_minimum_purge_distance} ;smartpurge\n'+\
-        r'{smart_purge_enable_gcode}G92 E0\n'+\
-        r'{smart_purge_enable_gcode}G1 F2400 E-{switch_extruder_retraction_amount}\n'+\
-        r'{smart_purge_enable_gcode}G92 E0\n'+\
-        r'{smart_purge_enable_gcode}G4 P2000\n'+\
-        r'" },') # ajustar la purge speed per anar en sincronia amb la velocitat de infill
-    extruder.append('        "machine_extruder_start_pos_abs": { "default_value": false },')
-    extruder.append('        "machine_extruder_start_pos_x": { "default_value": 0.0 },')
-    extruder.append('        "machine_extruder_start_pos_y": { "default_value": 0.0 },')
-    extruder.append('        "machine_extruder_end_code": { "default_value": "" },')
-    extruder.append('        "machine_extruder_end_pos_abs": { "default_value": false },')
-    extruder.append('        "machine_extruder_end_pos_x": { "default_value": 0.0 },')
-    extruder.append('        "machine_extruder_end_pos_y": { "default_value": 0.0 },')
-    extruder.append('        "extruder_prime_pos_x": { "value": "machine_width" }')
-    extruder.append('    }')
-    extruder.append('}')
-    fileContent = '\n'.join(extruder)
-    filesList.append((fileName, fileContent))
+    for extruderSide in ['left', 'right']:
+        fileName = 'Cura/resources/extruders/'+machine['id']+'_extruder_'+extruderSide+'.def.json'
+        extruder = []
+        extruder.append('{')
+        extruder.append('    "id": "'+machine['id']+'_extruder_'+extruderSide+'",')
+        extruder.append('    "version": 2,')
+        extruder.append('    "name": "Extruder '+extruderSide.capitalize()+'",')
+        extruder.append('    "inherits": "fdmextruder",')
+        extruder.append('    "metadata": {')
+        extruder.append('        "machine": "'+machine['id']+'",')
+        extruder.append('        "position": "'+str(0 if extruderSide is 'left' else 1)+'",')
+        extruder.append('        "quality_definition": "'+str(machine['id'] if 'qualities' not in machine else machine['qualities'])+'_extruder_'+extruderSide+'"')
+        extruder.append('    },')
+        extruder.append('')
+        extruder.append('    "overrides": {')
+        extruder.append('        "extruder_nr": {')
+        extruder.append('            "default_value": '+str(0 if extruderSide is 'left' else 1)+',')
+        extruder.append('            "maximum_value": "1"')
+        extruder.append('        },')
+        extruder.append('        "machine_nozzle_offset_x": { "default_value": 0.0 },')
+        extruder.append('        "machine_nozzle_offset_y": { "default_value": 0.0 },')
+        extruder.append(r'        "machine_extruder_start_code": { "default_value": "'+\
+            r'G91\n'+\
+            r'G1 F12000 Z{retraction_hop_height_after_extruder_switch}\n'+\
+            r'G90\n'+\
+            r'{purge_in_bucket_enable_gcode}G92 E0\n'+\
+            r'{purge_in_bucket_enable_gcode}G1 F600 E{switch_extruder_retraction_amount}\n'+\
+            r'{purge_in_bucket_enable_gcode}G1 F{purge_speed_gcode} E{purge_distance} ;defaultpurge\n'+\
+            r'{purge_in_bucket_enable_gcode}G92 E0\n'+\
+            r'{purge_in_bucket_enable_gcode}G1 F2400 E-{switch_extruder_retraction_amount}\n'+\
+            r'{purge_in_bucket_enable_gcode}G92 E0\n'+\
+            r'{purge_in_bucket_enable_gcode}G4 P2000\n'+\
+            r'{smart_purge_enable_gcode}G92 E0\n'+\
+            r'{smart_purge_enable_gcode}G1 F600 E{switch_extruder_retraction_amount}\n'+\
+            r'{smart_purge_enable_gcode}M800 F{purge_speed_gcode} S{smart_purge_slope_gcode} E{smart_purge_maximum_purge_distance} P{smart_purge_minimum_purge_distance} ;smartpurge\n'+\
+            r'{smart_purge_enable_gcode}G92 E0\n'+\
+            r'{smart_purge_enable_gcode}G1 F2400 E-{switch_extruder_retraction_amount}\n'+\
+            r'{smart_purge_enable_gcode}G92 E0\n'+\
+            r'{smart_purge_enable_gcode}G4 P2000\n'+\
+            r'" },') # ajustar la purge speed per anar en sincronia amb la velocitat de infill
+        extruder.append('        "machine_extruder_start_pos_abs": { "default_value": false },')
+        extruder.append('        "machine_extruder_start_pos_x": { "default_value": 0.0 },')
+        extruder.append('        "machine_extruder_start_pos_y": { "default_value": 0.0 },')
+        extruder.append('        "machine_extruder_end_code": { "default_value": "" },')
+        extruder.append('        "machine_extruder_end_pos_abs": { "default_value": false },')
+        extruder.append('        "machine_extruder_end_pos_x": { "default_value": 0.0 },')
+        extruder.append('        "machine_extruder_end_pos_y": { "default_value": 0.0 },')
+        extruder.append('        "extruder_prime_pos_x": { "default_value": '+str(0.0 if extruderSide is 'left' else '"machine_width"')+' }')
+        extruder.append('    }')
+        extruder.append('}')
+        fileContent = '\n'.join(extruder)
+        filesList.append((fileName, fileContent))
 
     for filament in sorted(PS.profilesData['filament'], key=lambda k: k['id']):
         for color in filament['colors']:
@@ -1657,7 +1606,7 @@ def curaProfile(machine):
 
                             if not notSupported:
                                 # resolution
-                                qualityFile.append('layer_height = '+("%.2f" % layerHeight))
+                                # qualityFile.append('layer_height = '+("%.2f" % layerHeight))
 
                                 #shell
                                 qualityFile.append('wall_thickness = =round(max( 3 * machine_nozzle_size, '+("%.2f" % quality['wallWidth'])+'), 1)')     # 3 minimum Perimeters needed
