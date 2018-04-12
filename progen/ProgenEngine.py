@@ -1439,7 +1439,7 @@ def curaProfile(machine):
         extruder.append('        "machine_extruder_end_pos_abs": { "default_value": false },')
         extruder.append('        "machine_extruder_end_pos_x": { "default_value": 0.0 },')
         extruder.append('        "machine_extruder_end_pos_y": { "default_value": 0.0 },')
-        extruder.append('        "extruder_prime_pos_x": { "default_value": '+str(0.0 if extruderSide is 'left' else '"machine_width"')+' }')
+        extruder.append('        "extruder_prime_pos_x": { '+str('"default_value": 0.0' if extruderSide is 'left' else '"value": "machine_width"')+' }')
         extruder.append('    }')
         extruder.append('}')
         fileContent = '\n'.join(extruder)
