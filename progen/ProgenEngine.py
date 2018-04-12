@@ -825,6 +825,8 @@ def curaProfile(machine):
     definition.append('        "visible": true,')
     if 'qualities' in machine:
         definition.append('        "quality_definition": "'+machine['qualities']+'",')
+    if 'variants' in machine:
+        definition.append('        "variant_definition": "'+machine['variants']+'",')
     definition.append('        "has_materials": true,')
     definition.append('        "has_machine_materials": true,')
     definition.append('        "has_variant_materials": true,')
