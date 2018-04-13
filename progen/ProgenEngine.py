@@ -823,10 +823,10 @@ def curaProfile(machine):
     definition.append('        "platform_offset": [0, 0, 0],')
     definition.append('        "has_machine_quality": true,')
     definition.append('        "visible": true,')
-    if 'qualities' in machine:
-        definition.append('        "quality_definition": "'+machine['qualities']+'",')
     if 'variants' in machine:
         definition.append('        "variant_definition": "'+machine['variants']+'",')
+    if 'qualities' in machine:
+        definition.append('        "quality_definition": "'+machine['qualities']+'",')
     definition.append('        "has_materials": true,')
     definition.append('        "has_machine_materials": true,')
     definition.append('        "has_variant_materials": true,')
@@ -1026,7 +1026,7 @@ def curaProfile(machine):
 
         # infill
         # definition.append('        "infill_extruder_nr": { "value": -1 },')
-        # definition.append('        "infill_pattern": { "value": "'+"'lines'"+' if infill_sparse_density > 25 else '+"'grid'"+'" },')
+        definition.append('        "infill_pattern": { "value": "'+"'grid'"+'" },')
         # definition.append('        "zig_zaggify_infill": { "value": true },')
         # definition.append('        "infill_angles": { "value": [] },')
         # definition.append('        "infill_offset_x": { "value": 0 },')
