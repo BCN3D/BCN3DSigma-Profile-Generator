@@ -23,8 +23,8 @@
         "Yellow": "#FEE500"
     },
     "filamentDiameter": 2.85,
-    "filamentPricePerKg": 0,
-    "filamentDensity": 0,
+    "filamentPricePerKg": 47.93,
+    "filamentDensity": 1.20,
     "isSupportMaterial": false,
     "isFlexibleMaterial": false,
     "isAbrasiveMaterial": false,
