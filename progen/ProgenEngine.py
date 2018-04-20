@@ -267,7 +267,7 @@ def simplify3DProfile(machine, printMode, hotendLeft, hotendRight, filamentLeft,
         'M104 S0 T0\t\t\t;left extruder heater off,'+\
         'M104 S0 T1\t\t\t;right extruder heater off,'+\
         'M204 S'+str(machine['acceleration'])+'\t\t\t;set default acceleration,'+\
-        'M205 X'+str(machine['jerk'])+' Y'+str(machine['jerk'])+'\t\t\t;set default jerk,'+\
+        'M205 X'+str(machine['jerk'])+' Y'+str(machine['jerk'])+'\t\t;set default jerk,'+\
         'M140 S0\t\t\t;heated bed heater off,'+\
         'G91\t\t\t;relative positioning,'+\
         'G1 Z+0.5 E-5 Y+10 F[travel_speed]\t;move Z up a bit and retract filament,'+\
@@ -663,7 +663,7 @@ def simplify3DProfile(machine, printMode, hotendLeft, hotendRight, filamentLeft,
                 'M82\t\t;set extruder to absolute mode,'+\
                 'M107\t\t;start with the fan off,'+\
                 'M204 S'+str(machine['acceleration'])+'\t\t;set default acceleration,'+\
-                'M205 X'+str(machine['jerk'])+' Y'+str(machine['jerk'])+'\t\t;set default jerk,'+\
+                'M205 X'+str(machine['jerk'])+' Y'+str(machine['jerk'])+'\t;set default jerk,'+\
                 'G28 X0 Y0\t\t;move X/Y to min endstops,'+\
                 'G28 Z0\t\t;move Z to min endstops,'+\
                 'G92 E0\t\t;zero the extruded length,'+\
@@ -684,7 +684,7 @@ def simplify3DProfile(machine, printMode, hotendLeft, hotendRight, filamentLeft,
                 'M108 P1\t\t;enable layer fan for idle extruder,'+\
                 'M107\t\t;start with the fan off,'+\
                 'M204 S'+str(machine['acceleration'])+'\t\t;set default acceleration,'+\
-                'M205 X'+str(machine['jerk'])+' Y'+str(machine['jerk'])+'\t\t;set default jerk,'+\
+                'M205 X'+str(machine['jerk'])+' Y'+str(machine['jerk'])+'\t;set default jerk,'+\
                 'G28 X0 Y0\t\t;move X/Y to min endstops,'+\
                 'G28 Z0\t\t;move Z to min endstops,'+\
                 'T0\t\t;switch to the left extruder,'+\
@@ -710,7 +710,7 @@ def simplify3DProfile(machine, printMode, hotendLeft, hotendRight, filamentLeft,
             'M82\t\t;set extruder to absolute mode,'+\
             'M107\t\t;start with the fan off,'+\
             'M204 S'+str(machine['acceleration'])+'\t\t;set default acceleration,'+\
-            'M205 X'+str(machine['jerk'])+' Y'+str(machine['jerk'])+'\t\t;set default jerk,'+\
+            'M205 X'+str(machine['jerk'])+' Y'+str(machine['jerk'])+'\t;set default jerk,'+\
             'G28 X0 Y0\t\t;move X/Y to min endstops,'+\
             'G28 Z0\t\t;move Z to min endstops,'+\
             'G92 E0\t\t;zero the extruded length,'+\
@@ -732,7 +732,7 @@ def simplify3DProfile(machine, printMode, hotendLeft, hotendRight, filamentLeft,
                 'M108 P1\t\t;enable layer fan for idle extruder,'+\
                 'M107\t\t;start with the fan off,'+\
                 'M204 S'+str(machine['acceleration'])+'\t\t;set default acceleration,'+\
-                'M205 X'+str(machine['jerk'])+' Y'+str(machine['jerk'])+'\t\t;set default jerk,'+\
+                'M205 X'+str(machine['jerk'])+' Y'+str(machine['jerk'])+'\t;set default jerk,'+\
                 'G28 X0 Y0\t\t;move X/Y to min endstops,'+\
                 'G28 Z0\t\t;move Z to min endstops,'+\
                 'T0\t\t;switch to the left extruder,'+\
@@ -751,7 +751,7 @@ def simplify3DProfile(machine, printMode, hotendLeft, hotendRight, filamentLeft,
                 'M108 P1\t\t;enable layer fan for idle extruder,'+\
                 'M107\t\t;start with the fan off,'+\
                 'M204 S'+str(machine['acceleration'])+'\t\t;set default acceleration,'+\
-                'M205 X'+str(machine['jerk'])+' Y'+str(machine['jerk'])+'\t\t;set default jerk,'+\
+                'M205 X'+str(machine['jerk'])+' Y'+str(machine['jerk'])+'\t;set default jerk,'+\
                 'G28 X0 Y0\t\t;move X/Y to min endstops,'+\
                 'G28 Z0\t\t;move Z to min endstops,'+\
                 'T1\t\t;switch to the right extruder,'+\
@@ -1608,7 +1608,7 @@ def curaProfile(machine):
 
                             if not notSupported:
                                 # resolution
-                                # qualityFile.append('layer_height = '+("%.2f" % layerHeight))
+                                qualityFile.append('layer_height = '+("%.2f" % layerHeight))
 
                                 #shell
                                 qualityFile.append('wall_thickness = =round(max( 3 * machine_nozzle_size, '+("%.2f" % quality['wallWidth'])+'), 1)')     # 3 minimum Perimeters needed
