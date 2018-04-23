@@ -1215,7 +1215,11 @@ def curaProfile(machine):
         definition.append('        "start_purge_distance": { "value": 20 },')
         # definition.append('        "extruder_prime_pos_y": { "value": "machine_depth" },')
         definition.append('        "adhesion_type": { "value": "'+"'skirt'"+'" },')
-        definition.append('        "skirt_line_count": { "value": 3 },')
+        definition.append('        "skirt_line_count":')
+        definition.append('        {')
+        definition.append('            "enabled": false,')
+        definition.append('            "value": 3')
+        definition.append('        },')
         # definition.append('        "skirt_brim_minimal_length": { "value": "round((max(20, switch_extruder_retraction_amount) * math.pi * (extruderValue(adhesion_extruder_nr, '+"'material_diameter'"+') / 2) ** 2) / (extruderValue(adhesion_extruder_nr, '+"'machine_nozzle_size'"+') * layer_height_0), 2)" },') # not needed if the machine purges in the bucket
         # definition.append('        "skirt_gap": { "value": 3 },')
         # definition.append('        "brim_width": { "value": 8 },')
