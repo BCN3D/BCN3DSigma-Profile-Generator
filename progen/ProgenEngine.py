@@ -1197,7 +1197,7 @@ def curaProfile(machine):
         # definition.append('        "support_infill_sparse_thickness": { "value": "resolveOrValue('+"'layer_height'"+')" },')
         # definition.append('        "gradual_support_infill_steps": { "value": 0 },')
         # definition.append('        "gradual_support_infill_step_height": { "value": 1 },')
-        definition.append('        "support_interface_enable": { "value": true },')
+        definition.append('        "support_interface_enable": { "value": false },')
         definition.append('        "support_interface_density": { "value": 75 },')
         definition.append('        "support_interface_height": { "value": "5 * layer_height" },')
         # definition.append('        "support_roof_height": { "value": "extruderValue(support_roof_extruder_nr, '+"'support_interface_height'"+')" },')
@@ -1646,7 +1646,6 @@ def curaProfile(machine):
                                 # travel
                                 if filament['isSupportMaterial']:
                                     qualityFile.append('travel_avoid_other_parts = True')
-                                    qualityFile.append("support_interface_pattern = ='concentric'")
 
                                 # cooling
                                 if filament['fanPercentage'][1] <= 0:
@@ -1662,6 +1661,8 @@ def curaProfile(machine):
                                     qualityFile.append("support_xy_overrides_z = ='z_overrides_xy'")
                                     qualityFile.append('support_xy_distance = 0.5')
                                     qualityFile.append('support_z_distance = 0')
+                                    qualityFile.append("support_interface_enable = True")
+                                    qualityFile.append("support_interface_pattern = ='concentric'")
                                     qualityFile.append('support_interface_density = 100')
                                     qualityFile.append('support_conical_enabled = False')
 
