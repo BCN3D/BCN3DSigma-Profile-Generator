@@ -1465,7 +1465,7 @@ def curaProfile(machine):
                 material.append('            <material>'+filament['material']+'</material>')
                 material.append('            <color>'+color+'</color>')
                 material.append('        </name>')
-                material.append('        <GUID>'+str(uuid.uuid1())+'</GUID>')
+                material.append('        <GUID>'+str(uuid.uuid5(uuid.NAMESPACE_DNS, str(filament['brand']+filament['material']+color).replace(' ', '-')))+'</GUID>')
                 material.append('        <version>1</version>')
                 material.append('        <color_code>'+filament['colors'][color]+'</color_code>')
                 if filament['brand'] == 'BCN3D Filaments':
