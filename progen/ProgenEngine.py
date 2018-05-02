@@ -983,7 +983,7 @@ def curaProfile(machine):
         # definition.append('        "support_interface_line_width": { "value": "line_width" },')
         # definition.append('        "support_roof_line_width": { "value": "extruderValue(support_roof_extruder_nr, '+"'support_interface_line_width'"+')" },')
         # definition.append('        "support_bottom_line_width": { "value": "extruderValue(support_bottom_extruder_nr, '+"'support_interface_line_width'"+')" },')
-        definition.append('        "prime_tower_line_width": { "value": "prime_tower_wall_thickness / 2 if prime_tower_wall_thickness <= round(2 * (min(extruderValues('+"'machine_nozzle_size'"+')) + (max(extruderValues('+"'machine_nozzle_size'"+')) - min(extruderValues('+"'machine_nozzle_size'"+'))) / 2), 2) else machine_nozzle_size" },')
+        definition.append('        "prime_tower_line_width": { "value": "machine_nozzle_size if not prime_tower_enable else (prime_tower_wall_thickness / 2 if prime_tower_wall_thickness <= round(2 * (min(extruderValues('+"'machine_nozzle_size'"+')) + (max(extruderValues('+"'machine_nozzle_size'"+')) - min(extruderValues('+"'machine_nozzle_size'"+'))) / 2), 2) else machine_nozzle_size)" },')
         # definition.append('        "initial_layer_line_width_factor": { "value": 100 },')
         
         # shell
@@ -1717,9 +1717,9 @@ def curaProfile(machine):
                 variant.append('machine_nozzle_expansion_angle = '+str(hotend['nozzleExpansionAngle']))
                 variant.append('machine_heat_zone_length = 8')
                 variant.append('machine_nozzle_heat_up_speed = '+str(hotend['heatUpSpeed']))
-                variant.append('machine_nozzle_cool_down_speed = '+str(hotend['coolDownSpeed']))
-                variant.append('material_extrusion_cool_down_speed = =min(machine_nozzle_heat_up_speed - 0.01, 1)') # this value depends on extruded flow (not material_flow)
-                variant.append('machine_min_cool_heat_time_window = 0')
+                variant.append('machine_nozzle_cool_down_speed = '+str(hotend['coolDownSpeed'])) # this value depends on extruded flow (not material_flow)
+                # variant.append('material_extrusion_cool_down_speed = =min(machine_nozzle_heat_up_speed - 0.01, 1)') # this value depends on extruded flow (not material_flow)
+                variant.append('machine_min_cool_heat_time_window = 5')
                 # variant.append('machine_min_cool_heat_time_window = '+str(hotend['minimumCoolHeatTimeWindow']))
                 fileContent = '\n'.join(variant)
                 filesList.append((fileName, fileContent))
