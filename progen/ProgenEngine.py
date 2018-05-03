@@ -1182,17 +1182,19 @@ def curaProfile(machine):
         # support
         # definition.append('        "support_enable": { "value": false },')
         # definition.append('        "support_type": { "value": "'+"'everywhere'"+'" },')
+        definition.append('        "support_angle": { "value": 60 },')
         # definition.append('        "support_pattern": { "value": "'+"'zigzag'"+'" },')
         # definition.append('        "support_connect_zigzags": { "value": true },')
+        definition.append('        "support_z_distance": { "value": "max(2 * layer_height, 0.15)" },')
         # definition.append('        "support_top_distance": { "value": "extruderValue(support_roof_extruder_nr if support_roof_enable else support_infill_extruder_nr, '+"'support_z_distance'"+')" },')
-        # definition.append('        "support_bottom_distance": { "value": "extruderValue(support_bottom_extruder_nr if support_bottom_enable else support_infill_extruder_nr, '+"'support_z_distance'"+') if support_type == '+"'everywhere'"+' else 0" },')
-        definition.append('        "support_z_distance": { "value": "max(layer_height, 0.15)" },')
-        definition.append('        "support_xy_overrides_z": { "value": "'+"'xy_overrides_z'"+'" },')
+        definition.append('        "support_bottom_distance": { "value": "layer_height" },')
+        # definition.append('        "support_xy_overrides_z": { "value": "'+"'z_overrides_xy'"+'" },') # default is z_overrides_xy
         definition.append('        "support_xy_distance": { "value": "machine_nozzle_size * 2" },')
-        # definition.append('        "support_xy_distance_overhang": { "value": "machine_nozzle_size / 2" },')
-        # definition.append('        "support_bottom_stair_step_height": { "value": 0.3 },')
-        definition.append('        "support_join_distance": { "value": 10 },')
-        definition.append('        "support_offset": { "value": 1 },')
+        definition.append('        "support_xy_distance_overhang": { "value": "machine_nozzle_size" },')
+        # definition.append('        "support_bottom_stair_step_height": { "value": "0.3" },')
+        # definition.append('        "support_bottom_stair_step_width": { "value": 5 },')
+        definition.append('        "support_join_distance": { "value": 2 },')
+        definition.append('        "support_offset": { "value": "machine_nozzle_size / 2" },')
         definition.append('        "support_infill_rate": { "value": 15 },')
         # definition.append('        "support_infill_sparse_thickness": { "value": "resolveOrValue('+"'layer_height'"+')" },')
         # definition.append('        "gradual_support_infill_steps": { "value": 0 },')
@@ -1201,12 +1203,12 @@ def curaProfile(machine):
         definition.append('        "support_interface_density": { "value": 75 },')
         definition.append('        "support_interface_height": { "value": "5 * layer_height" },')
         # definition.append('        "support_roof_height": { "value": "extruderValue(support_roof_extruder_nr, '+"'support_interface_height'"+')" },')
-        # definition.append('        "support_bottom_height": { "value": "extruderValue(support_interface_extruder_nr, '+"'support_interface_height'"+')" },')
+        definition.append('        "support_bottom_height": { "value": "3 * layer_height" },')
         definition.append('        "support_interface_skip_height": { "value": "layer_height" },')
         definition.append('        "support_interface_pattern": { "value": "'+"'lines'"+'" },')
         # definition.append('        "support_use_towers": { "value": true },')
         # definition.append('        "support_tower_diameter": { "value": 3.0 },')
-        definition.append('        "support_minimal_diameter": { "value": 1.0 },')
+        definition.append('        "support_minimal_diameter": { "value": 3.0 },')
         # definition.append('        "support_tower_roof_angle": { "value": 65 },')
         # definition.append('        "support_mesh_drop_down": { "value": true },')
         # definition.append('        "support_conical_enabled": { "value": false },') # set to false until it's not an experimental feature. In some cases leads to unprintable supports
@@ -1658,14 +1660,24 @@ def curaProfile(machine):
                                 # support
                                 if filament['isSupportMaterial']:
                                     # qualityFile.append('support_enable = True') # Not working
-                                    qualityFile.append('support_infill_rate = 25')
-                                    qualityFile.append("support_xy_overrides_z = ='z_overrides_xy'")
-                                    qualityFile.append('support_xy_distance = 0.5')
+                                    qualityFile.append('support_angle = 45')
+                                    qualityFile.append("support_pattern = ='triangles'")
+                                    qualityFile.append('support_infill_rate = 50')
                                     qualityFile.append('support_z_distance = 0')
+                                    qualityFile.append('support_bottom_distance = 0')                                   
+                                    qualityFile.append('support_xy_distance = =machine_nozzle_size / 2')
+                                    # qualityFile.append("support_xy_overrides_z = ='z_overrides_xy'") # already in main def
+                                    qualityFile.append('support_xy_distance_overhang = =machine_nozzle_size / 2')
+                                    qualityFile.append('support_bottom_stair_step_height = =layer_height')
+                                    qualityFile.append('support_join_distance = 3')
+                                    qualityFile.append('support_offset = 3')
+                                    qualityFile.append('gradual_support_infill_steps = 2')
                                     qualityFile.append("support_interface_enable = True")
-                                    qualityFile.append("support_interface_pattern = ='concentric'")
                                     qualityFile.append('support_interface_density = 100')
-                                    qualityFile.append('support_conical_enabled = False')
+                                    qualityFile.append("support_interface_pattern = ='concentric'")
+                                    qualityFile.append("support_bottom_pattern = ='zigzag'")
+                                    qualityFile.append("support_use_towers = False")
+                                    # qualityFile.append('support_conical_enabled = False') # already in main def
 
 
                                 # platform_adhesion
