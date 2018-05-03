@@ -1672,6 +1672,7 @@ def curaProfile(machine):
                                     qualityFile.append('support_join_distance = 3')
                                     qualityFile.append('support_offset = 3')
                                     qualityFile.append('gradual_support_infill_steps = 2')
+                                    qualityFile.append('support_infill_sparse_layer = =int(0.15/layer_height) + 1 if int(0.15/layer_height) * layer_height <= 0.75 * machine_nozzle_size else int(0.15/layer_height)')
                                     qualityFile.append("support_interface_enable = True")
                                     qualityFile.append('support_interface_density = 100')
                                     qualityFile.append("support_interface_pattern = ='concentric'")
