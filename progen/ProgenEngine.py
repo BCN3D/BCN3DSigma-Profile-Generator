@@ -999,6 +999,7 @@ def curaProfile(machine):
         # definition.append('        "top_bottom_pattern_0": { "value": "top_bottom_pattern" },')
         definition.append('        "skin_angles": { "value": "[0, 90]" },')
         definition.append('        "wall_0_inset": { "value": "wall_line_width_x - wall_line_width_0" },')
+        definition.append('        "wall_0_wipe_dist": { "value": 0 },')
         definition.append('        "optimize_wall_printing_order": { "value": true },')
         # definition.append('        "outer_inset_first": { "value": false },')
         # definition.append('        "alternate_extra_perimeter": { "value": false },')
@@ -1159,7 +1160,7 @@ def curaProfile(machine):
         definition.append('        "retraction_hop_only_when_collides": { "value": true },')
         definition.append('        "retraction_combing": { "value": "'+"'all'"+'" },')
         definition.append('        "retraction_hop": { "value": "2 * layer_height" },')
-        definition.append('        "hop_at_layer_change": { "value": "print_mode == '+"'regular'"+'" },') # should enable only if regular + idex
+        definition.append('        "hop_at_layer_change": { "value": "print_mode == '+"'regular'"+' and not magic_spiralize" },') # should enable only if regular + idex
         definition.append('        "retraction_hop_height_at_layer_change": { "value": 2 },')
         # definition.append('        "retraction_hop_after_extruder_switch": { "value": true },')
         definition.append('        "retraction_hop_height_after_extruder_switch": { "value": '+str(machine['extruderSwitchZHop'])+' },')
@@ -1198,7 +1199,7 @@ def curaProfile(machine):
         definition.append('        "support_infill_rate": { "value": 15 },')
         # definition.append('        "support_infill_sparse_thickness": { "value": "resolveOrValue('+"'layer_height'"+')" },')
         # definition.append('        "gradual_support_infill_steps": { "value": 0 },')
-        # definition.append('        "gradual_support_infill_step_height": { "value": 1 },')
+        definition.append('        "gradual_support_infill_step_height": { "value": "max(5 * layer_height, 1)" },')
         definition.append('        "support_interface_enable": { "value": false },')
         definition.append('        "support_interface_density": { "value": 75 },')
         definition.append('        "support_interface_height": { "value": "5 * layer_height" },')
@@ -1331,7 +1332,7 @@ def curaProfile(machine):
         # definition.append('        "draft_shield_height": { "value": 10 },')
         # definition.append('        "conical_overhang_enabled": { "value": false },')
         # definition.append('        "conical_overhang_angle": { "value": 50 },')
-        definition.append('        "coasting_enable": { "value": true },')
+        # definition.append('        "coasting_enable": { "value": false },')
         definition.append('        "coasting_min_volume": { "value": "coasting_volume * 4" },')
         # definition.append('        "coasting_speed": { "value": 90 },')
         # definition.append('        "skin_alternate_rotation": { "value": false },')
@@ -1621,8 +1622,7 @@ def curaProfile(machine):
                                 qualityFile.append('wall_thickness = =round(max( 3 * machine_nozzle_size, '+("%.2f" % quality['wallWidth'])+'), 1)')     # 3 minimum Perimeters needed
                                 qualityFile.append('top_bottom_thickness = =max( 5 * layer_height, '+("%.2f" % quality['topBottomWidth'])+')') # 5 minimum layers needed
                                 qualityFile.append('travel_compensate_overlapping_walls_enabled = '+('False' if filament['isFlexibleMaterial'] else 'True'))
-                                qualityFile.append('wall_0_wipe_dist = '+('0' if retractValues(filament)[1] == 0 else '=round('+str(coastVolume(hotend, filament))+' / (layer_height * machine_nozzle_size), 2)'))
-
+                                # qualityFile.append('wall_0_wipe_dist = '+('0' if retractValues(filament)[1] == 0 else '=round('+str(coastVolume(hotend, filament))+' / (layer_height * machine_nozzle_size), 2)')) # already in def
                                 # infill
                                 qualityFile.append('infill_sparse_density = '+str(int(quality['infillPercentage'])))
                                 # qualityFile.append('infill_sparse_density = ='+str(int(quality['infillPercentage']))+" if infill_pattern != 'cubicsubdiv' else "+str(int(min(100, quality['infillPercentage'] * 1.25)))) # if is not working on Cura 3.2
