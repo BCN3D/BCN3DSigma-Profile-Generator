@@ -999,7 +999,7 @@ def curaProfile(machine):
         # definition.append('        "top_bottom_pattern_0": { "value": "top_bottom_pattern" },')
         definition.append('        "skin_angles": { "value": "[0, 90]" },')
         definition.append('        "wall_0_inset": { "value": "wall_line_width_x - wall_line_width_0" },')
-        definition.append('        "wall_0_wipe_dist": { "value": 0 },')
+        # definition.append('        "wall_0_wipe_dist": { "value": "machine_nozzle_size / 2" },')
         definition.append('        "optimize_wall_printing_order": { "value": true },')
         # definition.append('        "outer_inset_first": { "value": false },')
         # definition.append('        "alternate_extra_perimeter": { "value": false },')
