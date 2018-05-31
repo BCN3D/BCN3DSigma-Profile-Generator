@@ -893,7 +893,13 @@ def curaProfile(machine):
         definition.append('        "machine_max_feedrate_y": { "default_value": 200 },')
         definition.append('        "machine_max_feedrate_z": { "default_value": 12 },')
         definition.append('        "machine_max_feedrate_e": { "default_value": '+str(machine['maxFeedrateE'])+' },')
-        definition.append('        "print_sequence": { "enabled": true },')
+        definition.append('        "print_sequence":')
+        definition.append('        {')
+        definition.append('            "enabled": true,')
+        definition.append('            "dual_enabled": false,')
+        definition.append('            "reset_on_used_extruders_change": true,')
+        definition.append('            "dual_value":  "all_at_once"')
+        definition.append('        },')
         definition.append('        "layer_height": { "maximum_value": "0.75 * min(extruderValues('+"'machine_nozzle_size'"+'))" },')
         definition.append('        "layer_height_0":')
         definition.append('        {')
@@ -918,15 +924,15 @@ def curaProfile(machine):
             r'G1 Z5 F200   ;safety Z axis movement\n'+\
             r'T1           ;switch to the right extruder\n'+\
             r'G92 E0       ;zero the extruded length\n'+\
-            # r'G1 E20 F50   ;extrude 20mm of feed stock\n'+\
-            # r'G92 E0       ;zero the extruded length\n'+\
-            # r'G4 P2000     ;stabilize hotend'+"'"+r's pressure\n'+\
+            r'{purge_in_bucket_before_start_r_enable_gcode}\n'+\
+            r'G92 E0       \n'+\
+            r'G4 P2000     ;stabilize hotend'+"'"+r's pressure\n'+\
             # r'G1 F2400 E-8 ;retract\n'+\
             r'T0           ;switch to the left extruder\n'+\
             r'G92 E0       ;zero the extruded length\n'+\
-            # r'G1 E20 F50   ;extrude 20mm of feed stock\n'+\
-            # r'G92 E0       ;zero the extruded length\n'+\
-            # r'G4 P2000     ;stabilize hotend'+"'"+r's pressure\n'+\
+            r'{purge_in_bucket_before_start_r_enable_gcode}\n'+\
+            r'G92 E0\n'+\
+            r'G4 P2000     ;stabilize hotend'+"'"+r's pressure\n'+\
             # r'G1 F2400 E-8 ;retract\n'+\
             r'{clone_cool_fan_gcode}\n'+\
             r'{print_mode_gcode}\n'+\
@@ -984,7 +990,7 @@ def curaProfile(machine):
         # definition.append('        "support_roof_line_width": { "value": "extruderValue(support_roof_extruder_nr, '+"'support_interface_line_width'"+')" },')
         # definition.append('        "support_bottom_line_width": { "value": "extruderValue(support_bottom_extruder_nr, '+"'support_interface_line_width'"+')" },')
         definition.append('        "prime_tower_line_width": { "value": "machine_nozzle_size if not prime_tower_enable else (prime_tower_wall_thickness / 2 if prime_tower_wall_thickness <= round(2 * (min(extruderValues('+"'machine_nozzle_size'"+')) + (max(extruderValues('+"'machine_nozzle_size'"+')) - min(extruderValues('+"'machine_nozzle_size'"+'))) / 2), 2) else machine_nozzle_size)" },')
-        # definition.append('        "initial_layer_line_width_factor": { "value": 100 },')
+        definition.append('        "initial_layer_line_width_factor": { "value": 120 },')
         
         # shell
         # definition.append('        "wall_extruder_nr": { "value": -1 },')
@@ -998,7 +1004,7 @@ def curaProfile(machine):
         definition.append('        "top_bottom_pattern": { "value": "'+"'zigzag'"+'" },')
         # definition.append('        "top_bottom_pattern_0": { "value": "top_bottom_pattern" },')
         definition.append('        "skin_angles": { "value": "[0, 90]" },')
-        definition.append('        "wall_0_inset": { "value": "wall_line_width_x - wall_line_width_0" },')
+        # definition.append('        "wall_0_inset": { "value": "wall_line_width_x - wall_line_width_0" },') # disabled, default value 0
         # definition.append('        "wall_0_wipe_dist": { "value": "machine_nozzle_size / 2" },')
         definition.append('        "optimize_wall_printing_order": { "value": true },')
         # definition.append('        "outer_inset_first": { "value": false },')
@@ -1160,7 +1166,11 @@ def curaProfile(machine):
         definition.append('        "retraction_hop_only_when_collides": { "value": true },')
         definition.append('        "retraction_combing": { "value": "'+"'all'"+'" },')
         definition.append('        "retraction_hop": { "value": "2 * layer_height" },')
-        definition.append('        "hop_at_layer_change": { "value": "print_mode == '+"'regular'"+' and not magic_spiralize" },') # should enable only if regular + idex
+        definition.append('        "hop_at_layer_change":')
+        definition.append('        {')
+        definition.append('            "dual_value": "print_mode == '+"'regular'"+' and not magic_spiralize",')
+        definition.append('            "reset_on_used_extruders_change": true')
+        definition.append('        },')
         definition.append('        "retraction_hop_height_at_layer_change": { "value": 2 },')
         # definition.append('        "retraction_hop_after_extruder_switch": { "value": true },')
         definition.append('        "retraction_hop_height_after_extruder_switch": { "value": '+str(machine['extruderSwitchZHop'])+' },')
@@ -1169,8 +1179,10 @@ def curaProfile(machine):
         definition.append('        "cool_fan_enabled": { "value": true },')
         definition.append('        "clone_cool_fan":')
         definition.append('        {')
-        definition.append('            "enabled": "print_mode == '+"'regular'"+' and extruderValue(0, '+"'cool_fan_enabled'"+') and extruderValue(1, '+"'cool_fan_enabled'"+')",')
-        definition.append('            "value": "print_mode == '+"'regular'"+' and extruderValue(0, '+"'cool_fan_enabled'"+') and extruderValue(1, '+"'cool_fan_enabled'"+')"')
+        # definition.append('            "enabled": "print_mode == '+"'regular'"+' and extruderValue(0, '+"'cool_fan_enabled'"+') and extruderValue(1, '+"'cool_fan_enabled'"+')",')
+        definition.append('            "dual_value": "print_mode == '+"'regular'"+' and extruderValue(0, '+"'cool_fan_enabled'"+') and extruderValue(1, '+"'cool_fan_enabled'"+')",')
+        definition.append('            "reset_on_used_extruders_change": true,')
+        definition.append('            "dual_enabled": true')
         definition.append('        },')
         # definition.append('        "cool_fan_speed_0": { "value": 0 },')
         # definition.append('        "cool_fan_speed_max": { "value": "cool_fan_speed" },')
@@ -1218,6 +1230,12 @@ def curaProfile(machine):
         definition.append('        "start_purge_distance": { "value": 20 },')
         # definition.append('        "extruder_prime_pos_y": { "value": "machine_depth" },')
         definition.append('        "adhesion_type": { "value": "'+"'skirt'"+'" },')
+        definition.append('        "adhesion_extruder_nr":')
+        definition.append('        {')
+        definition.append('            "dual_value": -1,')
+        definition.append('            "dual_enable": false,')
+        definition.append('            "reset_on_used_extruders_change": true')
+        definition.append('        },')
         definition.append('        "skirt_line_count":')
         definition.append('        {')
         definition.append('            "enabled": false,')
@@ -1391,8 +1409,9 @@ def curaProfile(machine):
         definition.append('        },')
         definition.append('        "purge_in_bucket_before_start":')
         definition.append('        {')
-        definition.append('            "enabled": true,')
-        definition.append('            "value": true')
+        # definition.append('            "reset_on_print_mode_change": true,') # not needed
+        definition.append('            "value": true,')
+        definition.append('            "enabled": true')
         definition.append('        },')
         # definition.append('        "retraction_count_max_avoid_grinding_filament": { "value": "retraction_count_max" },')
         definition.append('        "fix_tool_change_travel": { "value": true }')

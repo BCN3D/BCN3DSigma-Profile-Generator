@@ -4277,6 +4277,36 @@
                     "enabled": false,
                     "comments": "BCN3D setting"
                 },
+                "purge_in_bucket_before_start_l_enable_gcode":
+                {
+                    "label": "Purge Before Printing L Enable GCode",
+                    "description": "GCode to enable Purge Before Printing L commands.",
+                    "type": "enum",
+                    "options":
+                   {
+                       ";": "No",
+                       "": "Yes"
+                   },
+                    "default_value": "",
+                    "value": "'G1 F' + str(extruderValue(0, 'purge_speed_gcode')) + ' E' + str(extruderValue(0, 'start_purge_distance')) + ' ;extrude ' + str(extruderValue(0, 'start_purge_distance')) + 'mm of feed stock' if extruderValue(0, 'purge_in_bucket_before_start') and 0 in getUsedExtruders() else ''",
+                    "enabled": false,
+                    "comments": "BCN3D setting"
+                },
+                "purge_in_bucket_before_start_r_enable_gcode":
+                {
+                    "label": "Purge Before Printing R Enable GCode",
+                    "description": "GCode to enable Purge Before Printing R commands.",
+                    "type": "enum",
+                    "options":
+                    {
+                        ";": "No",
+                        "": "Yes"
+                    },
+                    "default_value": "",
+                    "value": "purge_in_bucket_before_start_l_enable_gcode if print_mode != 'regular' else 'G1 F' + str(extruderValue(1, 'purge_speed_gcode')) + ' E' + str(extruderValue(1, 'start_purge_distance')) + ' ;extrude ' + str(extruderValue(1, 'start_purge_distance')) + 'mm of feed stock' if extruderValue(1, 'purge_in_bucket_before_start') and 1 in getUsedExtruders() else ''",
+                    "enabled": false,
+                    "comments": "BCN3D setting"
+                },
                 "start_purge_distance": {
                     "label": "Start Purge Distance",
                     "description": "Filament distance purged before extruder starts printing.",
@@ -4346,8 +4376,8 @@
                 {
                     "label": "Build Plate Adhesion Extruder",
                     "description": "The extruder train to use for printing the skirt/brim/raft. This is used in multi-extrusion.",
-                    "type": "extruder",
-                    "default_value": "0",
+                    "type": "optional_extruder",
+                    "default_value": "-1",
                     "reset_on_print_mode_change": true,
                     "enabled": "machine_extruder_count > 1 and resolveOrValue('adhesion_type') != 'none' and print_mode == 'regular'",
                     "settable_per_mesh": false,
