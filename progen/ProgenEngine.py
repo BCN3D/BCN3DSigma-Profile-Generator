@@ -930,7 +930,7 @@ def curaProfile(machine):
             # r'G1 F2400 E-8 ;retract\n'+\
             r'T0           ;switch to the left extruder\n'+\
             r'G92 E0       ;zero the extruded length\n'+\
-            r'{purge_in_bucket_before_start_r_enable_gcode}\n'+\
+            r'{purge_in_bucket_before_start_l_enable_gcode}\n'+\
             r'G92 E0\n'+\
             r'G4 P2000     ;stabilize hotend'+"'"+r's pressure\n'+\
             # r'G1 F2400 E-8 ;retract\n'+\
