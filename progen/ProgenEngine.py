@@ -691,7 +691,7 @@ def simplify3DProfile(machine, printMode, hotendLeft, hotendRight, filamentLeft,
                 'M605 S4\t\t;clone extruders steps,'+\
                 'G92 E0\t\t;zero the extruded length,'+\
                 'G1 E20 F50\t\t;extrude 20mm of feed stock,'+\
-                'M605 S3\t\t;back to independent extruder steps'+\
+                'M605 S3\t\t;back to independent extruder steps,'+\
                 'G92 E0\t\t;zero the extruded length again'+printModeGcode+''+\
                 'G4 P1,'+\
                 'G4 P2,'+\
@@ -739,7 +739,7 @@ def simplify3DProfile(machine, printMode, hotendLeft, hotendRight, filamentLeft,
                 'M605 S4\t\t;clone extruders steps,'+\
                 'G92 E0\t\t;zero the extruded length,'+\
                 'G1 E20 F50\t\t;extrude 20mm of feed stock,'+\
-                'M605 S3\t\t;back to independent extruder steps'+\
+                'M605 S3\t\t;back to independent extruder steps,'+\
                 'G92 E0\t\t;zero the extruded length again</startingGcode>')
             fff.append('    <skirtExtruder>0</skirtExtruder>')
         else:
@@ -854,6 +854,7 @@ def curaProfile(machine):
         # definition.append('        "retraction_combing": { "value": "'+"'all'"+'" },')
         definition.append('        "retraction_speed": { "maximum_value_warning": "machine_max_feedrate_e" },')
         definition.append('        "retraction_amount_multiplier": { "value": '+str(machine['retractionAmountMultiplier'])+' },')
+        definition.append('        "retraction_count_max": { "value": 100 },')
         definition.append('        "retraction_retract_speed":')
         definition.append('        {')
         definition.append('            "value": "min(retraction_speed, machine_max_feedrate_e)",')
@@ -975,15 +976,13 @@ def curaProfile(machine):
         definition.append('        "material_print_temp_prepend": { "value": true },')
 
         # resolution
-        definition.append('        "line_width": { "value": "machine_nozzle_size" },')
-        definition.append('        "wall_line_width_x": { "value": "machine_nozzle_size" },')
-        definition.append('        "infill_line_width": { "value": "machine_nozzle_size" },')
+        definition.append('        "line_width": { "value": "machine_nozzle_size - 0.05" },')
         # definition.append('        "line_width": { "value": "round(machine_nozzle_size * 0.875, 3)" },')
         # definition.append('        "wall_line_width": { "value": "line_width" },')
-        definition.append('        "wall_line_width_0": { "value": "machine_nozzle_size * 0.875" },')
-        # definition.append('        "wall_line_width_x": { "value": "machine_nozzle_size * 0.85" },')
+        # definition.append('        "wall_line_width_0": { "value": "line_width" },')
+        definition.append('        "wall_line_width_x": { "value": "max(line_width - 0.05, 0.1 + 0.4 * machine_nozzle_size)" },')
         # definition.append('        "skin_line_width": { "value": "line_width" },')
-        # definition.append('        "infill_line_width": { "value": "machine_nozzle_size * 1.25" },')
+        definition.append('        "infill_line_width": { "value": "machine_nozzle_size" },')
         # definition.append('        "skirt_brim_line_width": { "value": "line_width" },')
         definition.append('        "support_line_width": { "value": "infill_line_width" },')
         # definition.append('        "support_interface_line_width": { "value": "line_width" },')
@@ -1004,7 +1003,7 @@ def curaProfile(machine):
         definition.append('        "top_bottom_pattern": { "value": "'+"'zigzag'"+'" },')
         # definition.append('        "top_bottom_pattern_0": { "value": "top_bottom_pattern" },')
         definition.append('        "skin_angles": { "value": "[0, 90]" },')
-        # definition.append('        "wall_0_inset": { "value": "wall_line_width_x - wall_line_width_0" },') # disabled, default value 0
+        definition.append('        "wall_0_inset": { "value": 0 },')
         # definition.append('        "wall_0_wipe_dist": { "value": "machine_nozzle_size / 2" },')
         definition.append('        "optimize_wall_printing_order": { "value": true },')
         # definition.append('        "outer_inset_first": { "value": false },')
@@ -1039,14 +1038,14 @@ def curaProfile(machine):
         # definition.append('        "infill_offset_x": { "value": 0 },')
         # definition.append('        "infill_offset_y": { "value": 0 },')
         # definition.append('        "sub_div_rad_add": { "value": "wall_line_width_x" },')
-        # definition.append('        "infill_overlap": { "value": "10 if infill_sparse_density < 95 and infill_pattern != '+"'"+'concentric'+"'"+' else 0" },')
-        definition.append('        "skin_overlap": { "value": "0" },')
-        # definition.append('        "infill_wipe_dist": { "value": "wall_line_width_0 / 4 if wall_line_count == 1 else wall_line_width_x / 4" },')
+        definition.append('        "infill_overlap": { "value": 0 },')
+        definition.append('        "skin_overlap": { "value": 15 },')
+        definition.append('        "infill_wipe_dist": { "value": 0 },')
         # definition.append('        "gradual_infill_steps": { "value": 0 },')
         # definition.append('        "gradual_infill_step_height": { "value": 5 },')
         definition.append('        "infill_before_walls": { "value": "infill_sparse_layer == 1" },')
         # definition.append('        "min_infill_area": { "value": 0 },')
-        # definition.append('        "skin_preshrink": { "value": 0 },')
+        definition.append('        "skin_preshrink": { "value": "expand_skins_expand_distance" },')
         # definition.append('        "top_skin_preshrink": { "value": 0 },')
         # definition.append('        "bottom_skin_preshrink": { "value": 0 },')
         # definition.append('        "bottom_skin_preshrink": { "value": 0 },')
@@ -1092,8 +1091,8 @@ def curaProfile(machine):
         definition.append('        },')
         definition.append('        "retraction_extra_prime_amount": { "value": "coasting_volume if coasting_enable else 0" },') # Adjust for flex material
         definition.append('        "retraction_min_travel": { "value": "3.75 * machine_nozzle_size" },')
-        definition.append('        "retraction_count_max": { "value": "20 * retraction_extrusion_window" },')
-        # definition.append('        "retraction_extrusion_window": { "value": "retraction_amount" },')
+        definition.append('        "retraction_count_max": { "value": "10 * retraction_extrusion_window" },')
+        definition.append('        "retraction_extrusion_window": { "value": 1 },')
 
         # speed
         definition.append('        "speed_infill": { "value": "round(speed_print / infill_sparse_layer, 1)" },')
@@ -1109,7 +1108,7 @@ def curaProfile(machine):
         definition.append('        "speed_travel_layer_0": { "value": "round(speed_travel * speed_layer_0 / speed_print, 1)" },')
         definition.append('        "skirt_brim_speed": { "value": "speed_layer_0" },')
         # definition.append('        "speed_slowdown_layers = 2" },')
-        definition.append('        "speed_equalize_flow_enabled": { "value": true },')
+        # definition.append('        "speed_equalize_flow_enabled": { "value": false },')
         definition.append('        "speed_equalize_flow_max": { "value": 100 },')
         definition.append('        "acceleration_enabled": { "value": true },')
         definition.append('        "acceleration_print": { "value": "machine_acceleration" },')
@@ -1320,7 +1319,6 @@ def curaProfile(machine):
         # definition.append('        "smooth_spiralized_contours": { "value": true },')
         # definition.append('        "relative_extrusion": { "value": false },')
 
-
         # experimental
         # definition.append('        "support_tree_enable": { "value": false },')
         # definition.append('        "support_tree_angle": { "value": 40 },')
@@ -1350,8 +1348,8 @@ def curaProfile(machine):
         # definition.append('        "draft_shield_height": { "value": 10 },')
         # definition.append('        "conical_overhang_enabled": { "value": false },')
         # definition.append('        "conical_overhang_angle": { "value": 50 },')
-        # definition.append('        "coasting_enable": { "value": false },')
-        definition.append('        "coasting_min_volume": { "value": "coasting_volume * 4" },')
+        definition.append('        "coasting_enable": { "value": true },')
+        definition.append('        "coasting_min_volume": { "value": "coasting_volume" },')
         # definition.append('        "coasting_speed": { "value": 90 },')
         # definition.append('        "skin_alternate_rotation": { "value": false },')
         # definition.append('        "cross_infill_pocket_size": { "value": "infill_line_distance" },')
@@ -1448,6 +1446,7 @@ def curaProfile(machine):
             r'G90\n'+\
             r'{purge_in_bucket_enable_gcode}G92 E0\n'+\
             r'{purge_in_bucket_enable_gcode}G1 F600 E{switch_extruder_retraction_amount}\n'+\
+            r'{purge_in_bucket_enable_gcode}G92 E0\n'+\
             r'{purge_in_bucket_enable_gcode}G1 F{purge_speed_gcode} E{purge_distance} ;defaultpurge\n'+\
             r'{purge_in_bucket_enable_gcode}G92 E0\n'+\
             r'{purge_in_bucket_enable_gcode}G1 F2400 E-{switch_extruder_retraction_amount}\n'+\

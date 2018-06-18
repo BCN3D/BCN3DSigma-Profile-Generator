@@ -30,7 +30,7 @@
     "advisedMaxPrintSpeed": "None",
     "maxFlow": 15,
     "maxFlowForHighFlowHotend": 18,
-    "retractionDistance": 6,
+    "retractionDistance": 4,
     "toolChangeRetractionDistance": 10,
     "retractionSpeed": 40,
     "retractionCount": 50,
