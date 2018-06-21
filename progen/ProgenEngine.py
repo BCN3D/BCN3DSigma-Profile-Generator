@@ -1,7 +1,7 @@
 #!/usr/bin/python -tt
 # coding: utf-8
 
-# Guillem Àvila Padró - Oct 2017
+# Guillem Àvila Padró - Jun 2018
 # Released under GNU LICENSE
 # https://opensource.org/licenses/GPL-3.0
 
@@ -13,6 +13,10 @@ import ProgenSettings as PS
 import Logger
 
 def simplify3DProfile(machine, printMode, hotendLeft, hotendRight, filamentLeft, filamentRight):
+    '''
+        makes all content for a new profile according to machine, printMode, hotendLeft, hotendRight, filamentLeft, filamentRight
+        returns a tuple of 2 strings, one is the file name and one is all the file content
+    '''
     if printMode not in machine['printMode'] or (printMode != 'regular' and (hotendLeft['id'] != hotendRight['id'] or filamentLeft['id'] != filamentRight['id'])):
         print 'fail!'
         return
@@ -775,6 +779,10 @@ def simplify3DProfile(machine, printMode, hotendLeft, hotendRight, filamentLeft,
 
 def curaProfile(machine):
     '''
+        makes all content for a new profile according to machine. The files mix all filaments and hotends found in the resources folder.
+        returns a list of tuples of 2 strings, first string is the file name and second one is all the file content.
+
+
         Values hierarchy:
             
             quality->material->variant->definition
@@ -1229,12 +1237,6 @@ def curaProfile(machine):
         definition.append('        "start_purge_distance": { "value": 20 },')
         # definition.append('        "extruder_prime_pos_y": { "value": "machine_depth" },')
         definition.append('        "adhesion_type": { "value": "'+"'skirt'"+'" },')
-        definition.append('        "adhesion_extruder_nr":')
-        definition.append('        {')
-        definition.append('            "dual_value": -1,')
-        definition.append('            "dual_enable": false,')
-        definition.append('            "reset_on_used_extruders_change": true')
-        definition.append('        },')
         definition.append('        "skirt_line_count":')
         definition.append('        {')
         definition.append('            "enabled": false,')
@@ -1752,14 +1754,20 @@ def curaProfile(machine):
                 variant.append('machine_nozzle_heat_up_speed = '+str(hotend['heatUpSpeed']))
                 variant.append('machine_nozzle_cool_down_speed = '+str(hotend['coolDownSpeed'])) # this value depends on extruded flow (not material_flow)
                 # variant.append('material_extrusion_cool_down_speed = =min(machine_nozzle_heat_up_speed - 0.01, 1)') # this value depends on extruded flow (not material_flow)
-                variant.append('machine_min_cool_heat_time_window = 5')
-                # variant.append('machine_min_cool_heat_time_window = '+str(hotend['minimumCoolHeatTimeWindow']))
+                variant.append('machine_min_cool_heat_time_window = '+str(hotend['minimumCoolHeatTimeWindow']))
                 fileContent = '\n'.join(variant)
                 filesList.append((fileName, fileContent))
 
     return filesList
 
 def getLayerHeight(hotend, quality):
+    '''
+        returns a layer height discretization table, so all hotends can be mixed properly.
+        The steps are: 
+            0.025mm from 0   to 0.1mm layer height 
+            0.05mm  from 0.1 to 0.2mm layer height 
+            0.1mm   from 0.2 to infmm layer height 
+    '''
     rawLayerHeight = hotend['nozzleSize'] * quality['layerHeightMultiplier']
     if rawLayerHeight > 0.1:
         if rawLayerHeight > 0.2:
@@ -1771,16 +1779,17 @@ def getLayerHeight(hotend, quality):
     return round(rawLayerHeight / base) * base
 
 def purgeValues(hotend, filament, speed, layerHeight, minPurgeLength = 20): # purge at least 20mm so the filament weight is enough to stay inside the purge container
-    
     '''
+    Defines the purge values for given hotend, filament, speed, layerHeight -> this makes the purge extrusion to be closest to normal print extrusion and leave the bucket with the proper hotend pressure
+
     SmartPurge Command:
     M800 F-- S-- E-- P--
         F - Speed
-        S - Slope (according to NSize, Flow, PurgeLength) - [mm] -> this distance will be added to the P distance each second the hotend is idle. Up to E distance 
+        S - Slope should be choosen according to NozzleSize, Flow, PurgeLength - [extra mm purged per second idle] -> this distance will be added to the P distance each second the hotend is idle. Up to E distance 
         E - Maximum distance to purge
         P - Minimum distance to purge
 
-    purges max(P, min(S * idleTime, E)) mm @ F speed
+    Firmware will choose the purge distance following: max(P, min(S * idleTime, E)) mm @ F speed
     '''
 
     # nozzleSizeBehavior
@@ -1809,6 +1818,9 @@ def purgeValues(hotend, filament, speed, layerHeight, minPurgeLength = 20): # pu
     return (F, S, E, P)
 
 def retractValues(filament):
+    '''
+        general values for retraction settings (should be equal for all slicers, so they're summarized in this function)
+    '''
     if filament['isFlexibleMaterial']:
         useCoasting = 0
         useWipe = 1
@@ -1828,9 +1840,18 @@ def retractValues(filament):
     return useCoasting, useWipe, onlyRetractWhenCrossingOutline, retractBetweenLayers, useRetractionMinTravel, retractWhileWiping, onlyWipeOutlines
 
 def coastVolume(hotend, filament):
+    '''
+        to get the right coasting volume. Experimentally found it's ok to work with nozzle size cubed
+    '''
     return float("%.2f" % ((hotend['nozzleSize'])**3))
 
 def maxFlowValue(hotend, filament, layerHeight):
+    '''
+        Filaments can have or not a maxFlow value experimentally calculated.
+        This flow can be different according to hotend type (normal or HighFlow design).
+        The function returns the allowed maxFlow when printing according to known data from the material.
+        Returns the flow in mm3/s
+    '''
     if hotend['nozzleSize'] <= 0.6:
         if filament['maxFlow'] == 'None':
             return hotend['nozzleSize']*layerHeight*filament['advisedMaxPrintSpeed']
@@ -1846,6 +1867,11 @@ def maxFlowValue(hotend, filament, layerHeight):
             return filament['maxFlowForHighFlowHotend']
 
 def getTemperature(hotend, filament, temperatureToAdjust):
+    '''
+        Easy function to compensate the temperature for the hotends. HS Hotend has less heat transfer and needs higher temperatures in the block to get the same temperature at the nozzle tip.
+        Returns filament's temperature compensated.
+        Allows the parameter lowTemperature / highTemperature to choose betwenn low/high temperature values from filament's json.
+    '''
     if temperatureToAdjust == "lowTemperature":
         adjustedTemperature = filament['printTemperature'][0] + hotend['temperatureCompensation']
     elif temperatureToAdjust == "highTemperature":
@@ -1853,10 +1879,21 @@ def getTemperature(hotend, filament, temperatureToAdjust):
     return adjustedTemperature
 
 def defaultMaterialPrintTemperature(filament):
-    # Exclusive function for Cura to get default_material_print_temperature
+    '''
+        Exclusive function for Cura to get default_material_print_temperature
+    '''
     return int(round((filament['printTemperature'][0] + filament['printTemperature'][1])/2.))
 
 def adjustedFlowTemperatureGraph(hotend, filament, layerHeight):
+    '''
+        Function for Cura which makes a new list of flows and temperatures to work with AutoTemperature.
+        According to filaments' allowed maxflow and temperatures range.
+        List style:
+            [
+                [flow1, temp1],
+                [flow2, temp2]
+            ]
+    '''
     adjustedGraph = []
     if 'flowTemperatureGraph' in filament:
         for pair in filament['flowTemperatureGraph']:
@@ -1877,7 +1914,10 @@ def adjustedFlowTemperatureGraph(hotend, filament, layerHeight):
     return adjustedGraph
 
 def temperatureAdjustedToFlow(filament, hotend, layerHeight, speed, base = 5):
-    # adaptative temperature according to flow values. Rounded to base
+    '''
+        Adaptive temperature according to flow values. Rounded to base.
+        Similar to Cura AutoTemperature, but intended to be used per whole prints, not per layer
+    '''
     flow = hotend['nozzleSize']*layerHeight*float(speed)/60 # [mm3/sec]
 
     # Warning if something is not working properly
@@ -1903,7 +1943,9 @@ def temperatureAdjustedToFlow(filament, hotend, layerHeight, speed, base = 5):
     return int(temperature)
 
 def fanSpeed(hotend, filament, temperature, layerHeight, base = 5):
-    # adaptative fan speed according to temperature values. Rounded to base
+    '''
+        Adaptive fan speed according to temperature values. Rounded to base
+    '''
     if getTemperature(hotend, filament, 'highTemperature') - getTemperature(hotend, filament, 'lowTemperature') == 0 or filament['fanPercentage'][1] == 0:
         fanSpeed = filament['fanPercentage'][0]
     else:
@@ -1915,6 +1957,17 @@ def fanSpeed(hotend, filament, temperature, layerHeight, base = 5):
     return min(fanSpeed, 100) # Repassar. Aquest 100 no hauria de ser necessari
 
 def timeVsTemperature(element, value, command):
+
+    '''
+        Nozzles heat up in the linear stage but Sigma/Sigmax beds tend to heat up in time following a logarithmic function.
+        element: bed / hotend dict
+        value: time / temperature
+        command: getTime / getTemperature
+        
+        Returns needed time for one element to reach that temperature 
+        OR
+        Returns reached temperature in one element after that time
+    '''
 
     # bed heating curve parameters
     bedParameterA1 = 51
@@ -1950,6 +2003,10 @@ def timeVsTemperature(element, value, command):
         return max(0, temperature)
 
 def firstHeatSequence(hotendLeft, hotendRight, leftHotendTemp, rightHotendTemp, bedTemp, software):
+    '''
+        Using timeVsTemperature function defines the optimal start gcode for all elements to get to the desired temperature together, for all hotend/filament MEX/IDEX combination.
+        Returns the gcode string. 
+    '''
     useSmartSequence = False
     if useSmartSequence:
         startSequenceString = '; Start Heating Sequence. If you changed temperatures manually all elements may not heat in sync,'
@@ -1999,9 +2056,18 @@ def firstHeatSequence(hotendLeft, hotendRight, leftHotendTemp, rightHotendTemp, 
     return startSequenceString
 
 def accelerationForPerimeters(nozzleSize, layerHeight, outerWallSpeed, base = 5, multiplier = 30000, defaultAcceleration = 2000):
+    '''
+        The lower the flow and the higher the print speed, the more pronounced the ringing effect becomes.
+        Decreasing acceleration for perimeters can reduce this artifact while maintaining fast overall speeds.
+        Function returns an acceleration value to fit the extruded flow (multiplier = 30000 is an experimental value) and print speed. 
+        Rounded to base to avoid too many decimals.
+    '''
     return min(defaultAcceleration, int(base * round((nozzleSize * layerHeight * multiplier * 1/(outerWallSpeed**(1/2.)))/float(base))))
 
 def speedMultiplier(hotend, filament):
+    '''
+        Experimental function that returns a multiplier for printing speed according to hotend nozzle size for flexible materials.
+    '''
     if filament['isFlexibleMaterial']:
         return float(filament['defaultPrintSpeed'])/24*hotend['nozzleSize']
         # 24*hotend['nozzleSize'] -> experimental value that works better with flexibles
@@ -2010,6 +2076,14 @@ def speedMultiplier(hotend, filament):
         # 60 -> speed for base material (PLA) at base quality (Standard)
 
 def speedValues(hotendLeft, hotendRight, filamentLeft, filamentRight, layerHeight, firstLayerHeight, infillLayerInterval, quality, action):
+    '''
+        Returns speed values:
+            - default speed                 [mm/min]
+            - first layer speed multiplier  [from 0 to 1]
+            - outer wall speed multiplier   [from 0 to 1]
+            - support speed multiplier      [from 0 to 1]
+        Specially important function which takes care of all extruded flows and print temperatures for all combinations Hotend-Material-UsedExtruders and adapts the speeds to them.
+    '''
     if action == 'MEX Left' or action == 'IDEX, Infill with Right' or action == 'IDEX, Supports with Right':
         primaryHotend = hotendLeft
         primaryFilament = filamentLeft

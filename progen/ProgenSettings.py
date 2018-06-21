@@ -1,7 +1,7 @@
 #!/usr/bin/python -tt
 # coding: utf-8
 
-# Guillem Àvila Padró - Oct 2017
+# Guillem Àvila Padró - Jun 2018
 # Released under GNU LICENSE
 # https://opensource.org/licenses/GPL-3.0
 
@@ -22,6 +22,9 @@ def init():
     loggedData = ["LFilament;RFilament;Extruder;Quality;LNozzle;RNozzle;InfillExt;PrimaryExt;SupportExt;LFlow;RFlow;Layers/Infill;DefaultSpeed;FirstLayerUnderspeed;OutLineUnderspeed;SupportUnderspeed;FirstLayerHeightPercentage;LTemp;RTemp;BTemp;\n"]
 
 def readProfilesData():
+    '''
+        Load all the data from resources, so if the files are changed after starting the script it doesn't affect profile generation.
+    '''
     profilesData = dict([("machine", []), ("hotend", []), ("filament", []), ("quality", [])])
     for machine in os.listdir('./resources/machines'):
         if machine[-5:] == '.json':

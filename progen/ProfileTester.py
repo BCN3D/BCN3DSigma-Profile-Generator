@@ -1,7 +1,7 @@
 #!/usr/bin/python -tt
 # coding: utf-8
 
-# Guillem Àvila Padró - Oct 2017
+# Guillem Àvila Padró - Jun 2018
 # Released under GNU LICENSE
 # https://opensource.org/licenses/GPL-3.0
 
@@ -36,35 +36,6 @@ def testSimplify3D():
                     sys.stdout.flush()
     print '\r\t\tTesting Simplify3D Profiles: OK. Profiles tested: '+str(realSimplify3DProfilesAvailable)
     return realSimplify3DProfilesAvailable
-
-def testCura():
-
-    # Calculate All profiles available to create
-    totalSmaProfiles = (len(PS.profilesData['hotend'])-1) *  len(PS.profilesData['filament']) * 2
-    nozzleSizes = []
-    for hotend in sorted(PS.profilesData['hotend'], key=lambda k: k['id'])[:-1]:
-        nozzleSizes.append(hotend['nozzleSize'])
-    curaGroupedSizes = {x:nozzleSizes.count(x) for x in nozzleSizes}
-    curaIDEXHotendsCombinations = 0
-    for size in curaGroupedSizes:
-        curaIDEXHotendsCombinations += curaGroupedSizes[size]**2
-
-    realCuraProfilesAvailable = (totalSmaProfiles + curaIDEXHotendsCombinations * len(PS.profilesData['filament'])**2) * len(PS.profilesData['quality'])
-
-    # Start iteration
-    combinationCount = 0
-    totalProfilesAvailable = len(PS.profilesData['hotend'])**2 * len(PS.profilesData['filament'])**2 * len(PS.profilesData['quality'])
-    for hotendLeft in sorted(PS.profilesData['hotend'], key=lambda k: k['id']):
-        for hotendRight in sorted(PS.profilesData['hotend'], key=lambda k: k['id']):
-            for filamentLeft in sorted(PS.profilesData['filament'], key=lambda k: k['id']):
-                for filamentRight in sorted(PS.profilesData['filament'], key=lambda k: k['id']):
-                    for quality in sorted(PS.profilesData['quality'], key=lambda k: k['index']):
-                        ProgenEngine.curaProfile(hotendLeft, hotendRight, filamentLeft, filamentRight, quality)
-                        combinationCount += 1
-                        sys.stdout.write("\r\t\tTesting Cura Profiles:       %d%%" % int(float(combinationCount)/totalProfilesAvailable*100))
-                        sys.stdout.flush()
-    print '\r\t\tTesting Cura Profiles:       OK. Profiles Tested: '+str(realCuraProfilesAvailable)
-    return realCuraProfilesAvailable
 
 def testCura2():
     

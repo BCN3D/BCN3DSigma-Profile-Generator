@@ -1,7 +1,7 @@
 #!/usr/bin/python -tt
 # coding: utf-8
 
-# Guillem Àvila Padró - Oct 2017
+# Guillem Àvila Padró - Jun 2018
 # Released under GNU LICENSE
 # https://opensource.org/licenses/GPL-3.0
 
@@ -15,6 +15,15 @@ import ProgenSettings as PS
 import ProgenEngine
 
 def simplify3D(machine, printMode, hotendLeft, hotendRight, filamentLeft, filamentRight, fileAction):
+    '''
+        Generates the content of a profile file.
+        Returns the file name.
+
+        * fileaction outputs:
+            --file: makes a new file .fff in the progen folder
+            --no-file: prints profile file content
+            --only-filename: prints profile file name
+    '''
     fileName, fileContent = ProgenEngine.simplify3DProfile(machine, printMode, hotendLeft, hotendRight, filamentLeft, filamentRight)
     if fileAction == '--file':
         with open(fileName, "w") as f:
@@ -26,7 +35,15 @@ def simplify3D(machine, printMode, hotendLeft, hotendRight, filamentLeft, filame
     return fileName
 
 def cura(fileAction):
+    '''
+        Generates the content of all profile files.
+        Returns nothing.
 
+        * fileaction outputs:
+            --file: makes a new file .fff in the progen folder
+            --no-file: for all files in a profile, prints each file content
+            --only-filename: for all files in a profile, prints each file name
+    '''
     if "Cura" in os.listdir('.'):
         shutil.rmtree("Cura")
     os.mkdir('Cura')
@@ -59,6 +76,10 @@ def cura(fileAction):
                 print fileName
 
 def installCuraFiles(action):
+    '''
+        If it's allowed, takes all the files of a profile made with cura(--file) and MOVES them to the right folders (for Mac and Windows).
+        If it's not allowed prints a message explaining it.
+    '''
 
     allowAutoInstall = False
     root_src_dir = 'Cura'
@@ -142,6 +163,9 @@ def is_admin():
         return False
 
 def simplify3DProfilesBundle(profilesCreatedCount):
+    '''
+        makes a zip with all profile files
+    '''
     # y = 'y'
     # if getSimplify3DBundleSize()/1024/1024 >= 150: # define Size limit to notice (in MB)
     #     print '\t\tEstimated space needed during the process: '+str(int(getSimplify3DBundleSize()*1.075/1024/1024))+' MB.'
@@ -229,6 +253,9 @@ def simplify3DProfilesBundle(profilesCreatedCount):
 #     return bundleSize*1.05
 
 def curaFilesBundle():
+    '''
+        makes a zip with all profile files + a README
+    '''
     curaSoftwareName = "Ultimaker Cura"
     curaSoftwareVersion = "3.2"
     with open('Cura/README.txt', 'w') as f:

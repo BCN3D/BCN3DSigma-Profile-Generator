@@ -1,20 +1,11 @@
 #!/usr/bin/python -tt
 # coding: utf-8
 
-# Guillem Àvila Padró - Oct 2017
+# Guillem Àvila Padró - Jun 2018
 # Released under GNU LICENSE
 # https://opensource.org/licenses/GPL-3.0
 
-# Version Changelog
-# - Internal structure major changes and code clean up & optimization
-# - Cura 2 integration
-# - SmartPurge activated by default. Needs Firmware v01-1.2.3
-# - Raft improvements
-# - First layer improvements
-# - Layer height standarization
-
 # ToDo:
-# - move all generics to definition -> errors when trying to apply
 # - rewrite Logger.py
 
 import os
@@ -31,6 +22,10 @@ from progen import ProgenEngine
 from progen import Logger
 
 def selectMachineAndPrintMode(header):
+    '''
+        print Machine / Print Mode menus
+        returns user's choice in a tuple (machine, printmode)
+    '''
     clearDisplay()
     print header
     print "\n\tSelect your BCN3D machine (1-"+str(len(PS.profilesData['machine']))+'):'
@@ -62,6 +57,10 @@ def selectMachineAndPrintMode(header):
 
 
 def selectHotendAndFilament(extruder, header):
+    '''
+        print Hotend / Filament menus
+        returns user's choice in a tuple (hotend, filament)
+    '''
     clearDisplay()
     print header
     print "\n\tSelect Sigma's "+extruder+" Hotend (1-"+str(len(PS.profilesData['hotend']))+'):'
@@ -90,6 +89,10 @@ def selectHotendAndFilament(extruder, header):
     return (int(answer0)-1, int(answer1)-1)
 
 def selectQuality(header):
+    '''
+        print Quality menus
+        returns user's choice
+    '''    
     clearDisplay()
     print header
     print "\n\tSelect Quality:"
@@ -105,6 +108,10 @@ def selectQuality(header):
     return int(answer0)-1   
 
 def validArguments():
+    '''
+        checks all arguments are valid
+        returns True/False
+    '''
     if len(sys.argv) > 1 and len(sys.argv) == 8:
         machine = sys.argv[1]+'.json' in os.listdir('./resources/machines')
         printMode = False
@@ -132,6 +139,9 @@ def clearDisplay():
         os.system('clear')
 
 def main():
+    '''
+        Print all the menus and call the right actions.
+    '''
     # if platform.system() == 'Windows':
     #     # os.system('color f0')
     #     os.system('mode con: cols=154 lines=35')
