@@ -60,7 +60,8 @@ def cura(fileAction):
         if i < 1:
             os.mkdir('Cura/resources/materials/'+machine['manufacturer'])
             i += 1
-        shutil.copyfile('resources/meshes/'+machine['id']+'_bed.stl', 'Cura/resources/meshes/'+machine['id']+'_bed.stl')
+        # shutil.copyfile('resources/meshes/'+machine['id']+'_bed.stl', 'Cura/resources/meshes/'+machine['id']+'_bed.stl')
+        shutil.copyfile('resources/meshes/' + machine['mesh'], 'Cura/resources/meshes/' + machine['mesh'])
         if 'qualities' not in machine:
             os.mkdir('Cura/resources/quality/'+machine['id'])
     os.mkdir('Cura/resources/variants')
