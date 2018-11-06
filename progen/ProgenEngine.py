@@ -800,9 +800,14 @@ def curaProfile(machine):
 
     for quality in sorted(PS.profilesData['quality'], key=lambda k: k['index']):
         curaPreferredQuality = quality['id'].replace(' ', '_')
-        if 'Standard' in quality['id']:
-            curaPreferredQuality = quality['id'].replace(' ', '_')
-            break
+        if 'sigmax' in machine['id'].lower():
+            if 'High' in quality['id']:
+                curaPreferredQuality = quality['id'].replace(' ', '_')
+                break
+        else:
+            if 'Standard' in quality['id']:
+                curaPreferredQuality = quality['id'].replace(' ', '_')
+                break
 
     for filament in sorted(PS.profilesData['filament'], key=lambda k: k['id']):
         curaPreferredMaterial = filament['id'].replace(' ', '_')
@@ -1287,7 +1292,9 @@ def curaProfile(machine):
         definition.append('        "prime_tower_min_volume": { "value": "2 * smart_purge_minimum_purge_distance * math.pi * (material_diameter/2) ** 2" },')        
         # definition.append('        "prime_tower_wall_thickness": { "value": "round(max(2 * prime_tower_line_width, 0.5 * (prime_tower_size - math.sqrt(max(0, prime_tower_size ** 2 - prime_tower_min_volume / layer_height)))), 3)" },')
         # definition.append('        "prime_tower_wall_thickness": { "value": "min(extruderValues('+"'machine_nozzle_size'"+')) * 2" },')
-        definition.append('        "prime_tower_wall_thickness": { "value": "round(2 * (min(extruderValues('+"'machine_nozzle_size'"+')) + (max(extruderValues('+"'machine_nozzle_size'"+')) - min(extruderValues('+"'machine_nozzle_size'"+'))) / 2), 2)" },')
+        # definition.append('        "prime_tower_wall_thickness": { "value": "round(2 * (min(extruderValues('+"'machine_nozzle_size'"+')) + (max(extruderValues('+"'machine_nozzle_size'"+')) - min(extruderValues('+"'machine_nozzle_size'"+'))) / 2), 2)" },')
+        definition.append('        "prime_tower_wall_thickness": { "value": 2.4},')
+
         # definition.append('        "prime_tower_position_x": { "value": "machine_width - max(extruderValue(adhesion_extruder_nr, '+"'brim_width'"+') * extruderValue(adhesion_extruder_nr, '+"'initial_layer_line_width_factor'"+') / 100 if adhesion_type == '+"'brim'"+' else (extruderValue(adhesion_extruder_nr, '+"'raft_margin'"+') if adhesion_type == '+"'raft'"+' else (extruderValue(adhesion_extruder_nr, '+"'skirt_gap'"+') if adhesion_type == '+"'skirt'"+' else 0)), max(extruderValues('+"'travel_avoid_distance'"+'))) - max(extruderValues('+"'support_offset'"+')) - sum(extruderValues('+"'skirt_brim_line_width'"+')) * extruderValue(adhesion_extruder_nr, '+"'initial_layer_line_width_factor'"+') / 100 - 40" },') # fixed position, 40mm margin
 
         # definition.append('        "prime_tower_position_y": { "value": "machine_depth - prime_tower_size - max(extruderValue(adhesion_extruder_nr, '+"'brim_width'"+') * extruderValue(adhesion_extruder_nr, '+"'initial_layer_line_width_factor'"+') / 100 if adhesion_type == '+"'brim'"+' else (extruderValue(adhesion_extruder_nr, '+"'raft_margin'"+') if adhesion_type == '+"'raft'"+' else (extruderValue(adhesion_extruder_nr, '+"'skirt_gap'"+') if adhesion_type == '+"'skirt'"+' else 0)), max(extruderValues('+"'travel_avoid_distance'"+'))) - max(extruderValues('+"'support_offset'"+')) - sum(extruderValues('+"'skirt_brim_line_width'"+')) * extruderValue(adhesion_extruder_nr, '+"'initial_layer_line_width_factor'"+') / 100 - 50" },') # fixed position, 50mm margin
@@ -1650,20 +1657,29 @@ def curaProfile(machine):
                                 # qualityFile.append('infill_sparse_density = ='+str(int(quality['infillPercentage']))+" if infill_pattern != 'cubicsubdiv' else "+str(int(min(100, quality['infillPercentage'] * 1.25)))) # if is not working on Cura 3.2
 
                                 # material -> default_material_print_temperature, material_bed_temperature,  must be set into material to avoid conflicts
-                                qualityFile.append('material_print_temperature = =default_material_print_temperature + '+str(temperatureAdjustedToFlow(filament, hotend, layerHeight, defaultSpeed) - defaultMaterialPrintTemperature(filament)))
-                                qualityFile.append('material_print_temperature_layer_0 = '+str(int(round((getTemperature(hotend, filament, 'highTemperature'))))))
+                                if ('r19' in machine['id']) and ('PLA' in filament['id']) and ('BCN3D' in filament['id']): # if machine is an R19 and the filament is BCN3DPLA...
+                                    qualityFile.append('material_print_temperature = ' + str(filament['printTemperatureR19']))
+                                    qualityFile.append('material_print_temperature_layer_0 = '+str(filament['printTemperatureLayer0R19']))
+                                    qualityFile.append('material_flow = '+ str(filament['materialFlowR19']))
+                                    qualityFile.append('speed_wall = ' + str(filament['wallSpeedR19']))
+                                    qualityFile.append('purge_distance = ' + str(filament['purgeDistanceR19']))
+                                    
+                                else:
+                                    qualityFile.append('material_print_temperature = =default_material_print_temperature + '+str(temperatureAdjustedToFlow(filament, hotend, layerHeight, defaultSpeed) - defaultMaterialPrintTemperature(filament)))
+                                    qualityFile.append('material_print_temperature_layer_0 = '+str(int(round((getTemperature(hotend, filament, 'highTemperature'))))))
+                                    qualityFile.append('material_flow = '+("%.2f" % (filament['extrusionMultiplier'] * 100)))
+                                    qualityFile.append('speed_wall = =round(speed_print * '+("%.2f" % outlineUnderspeed)+', 1)')
                                 qualityFile.append('material_flow_temp_graph = '+str(adjustedFlowTemperatureGraph(hotend, filament, layerHeight)))
                                 qualityFile.append('retraction_amount = =retraction_amount_multiplier * '+("%.2f" % filament['retractionDistance']))
                                 qualityFile.append('switch_extruder_retraction_amount = =retraction_amount_multiplier * '+("%.2f" % filament['toolChangeRetractionDistance']))
                                 qualityFile.append('retraction_speed = =min(machine_max_feedrate_e, '+("%.2f" % filament['retractionSpeed'])+')')
                                 qualityFile.append('retraction_prime_speed = =min('+("%.2f" % filament['retractionSpeed'])+' * 0.5, machine_max_feedrate_e)')
                                 # qualityFile.append('retraction_count_max_avoid_grinding_filament = '+str(int(filament['retractionCount'])))
-                                qualityFile.append('material_flow = '+("%.2f" % (filament['extrusionMultiplier'] * 100)))
                                 #  qualityFile.append('switch_extruder_extra_prime_amount = '+("%.2f" % filament['retractionSpeed'])) # Parameter that should be there to purge on toolchage
 
                                 # speed
                                 qualityFile.append('speed_print = '+("%.2f" % (defaultSpeed/60.)))
-                                qualityFile.append('speed_wall = =round(speed_print * '+("%.2f" % outlineUnderspeed)+', 1)')
+                                #speed_wall moved to conditional PLA statement line 1660
                                 qualityFile.append('speed_support = =round(speed_print * '+("%.2f" % supportUnderspeed)+', 1)')
                                 qualityFile.append('speed_layer_0 = =round(speed_print * '+("%.2f" % firstLayerUnderspeed)+', 1)')
                                 qualityFile.append('acceleration_wall_0 = '+str(int(accelerationForPerimeters(hotend['nozzleSize'], layerHeight, int(defaultSpeed/60. * outlineUnderspeed)))))
@@ -2072,7 +2088,7 @@ def speedMultiplier(hotend, filament):
     '''
     if filament['isFlexibleMaterial']:
         return float(filament['defaultPrintSpeed'])/24*hotend['nozzleSize']
-        # 24*hotend['nozzleSize'] -> experimental value that works better with flexibles
+        # 24*hotend['nozzleSize'] -> experimental value that works better with flexibles
     else:
         return float(filament['defaultPrintSpeed'])/60
         # 60 -> speed for base material (PLA) at base quality (Standard)

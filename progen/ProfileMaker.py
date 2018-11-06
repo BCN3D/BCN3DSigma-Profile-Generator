@@ -136,7 +136,6 @@ def installCuraFiles(action):
             elif platform.system() == 'Windows':
                 root_src_dir += '\\resources'
                 root_dst_dir = '..\\Cura\\resources'
-
     if allowAutoInstall:
         for src_dir, dirs, files in os.walk(root_src_dir):
             dst_dir = src_dir.replace(root_src_dir, root_dst_dir, 1)
