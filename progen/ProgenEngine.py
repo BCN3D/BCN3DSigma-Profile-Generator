@@ -352,7 +352,7 @@ def simplify3DProfile(machine, printMode, hotendLeft, hotendRight, filamentLeft,
                     primaryHotend = hotendLeft
                     layerHeight = getLayerHeight(primaryHotend, quality)
                     firstLayerHeight = primaryHotend['nozzleSize'] / 2.
-                    retractionMinTravel = hotendLeft['nozzleSize'] * 3.75
+                    retractionMinTravel = 1
                     supportHorizontalPartOffset = 2 * hotendLeft['nozzleSize']
                     defaultSpeed, firstLayerUnderspeed, outlineUnderspeed, supportUnderspeed = speedValues(hotendLeft, hotendRight, filamentLeft, filamentRight, layerHeight, firstLayerHeight, infillLayerInterval, quality, 'MEX Left')
                     hotendLeftTemperature = temperatureAdjustedToFlow(filamentLeft, hotendLeft, layerHeight, defaultSpeed)
@@ -791,12 +791,18 @@ def curaProfile(machine):
     '''
 
     filesList = [] # List containing tuples: (fileName, fileContent)
-
     for hotend in sorted(PS.profilesData['hotend'], key=lambda k: k['id']):
-        curaPreferredVariant = hotend['id'].replace(' ', '_')
-        if machine['defaultHotend'] in hotend['id']:
+        if 'variants' in machine:
+            variantprefix = machine['variants']
+        else:
+            variantprefix = machine['id']
+        if 'none' in hotend['id'].replace(' ', '_').lower():
             curaPreferredVariant = hotend['id'].replace(' ', '_')
-            break
+        else:
+            curaPreferredVariant = variantprefix + '_' + hotend['id'].replace(' ', '_')
+            if machine['defaultHotend'].lower() == hotend['id'].lower():
+                curaPreferredVariant = variantprefix + '_' + hotend['id'].replace(' ', '_')
+                break
 
     for quality in sorted(PS.profilesData['quality'], key=lambda k: k['index']):
         curaPreferredQuality = quality['id'].replace(' ', '_')
@@ -847,7 +853,7 @@ def curaProfile(machine):
     definition.append('        "has_variant_materials": true,')
     definition.append('        "has_variants": true,')
     definition.append('        "preferred_material": "*'+curaPreferredMaterial+'*",')
-    definition.append('        "preferred_variant": "*'+curaPreferredVariant+'*",')
+    definition.append('        "preferred_variant": "'+curaPreferredVariant+'*",')
     definition.append('        "preferred_quality": "*'+curaPreferredQuality+'*",')
     definition.append('        "variants_name": "Hotend",')
     definition.append('        "machine_extruder_trains":')
@@ -927,35 +933,68 @@ def curaProfile(machine):
         # definition.append('            "default_value": false,')
         # definition.append('            "resolve": "'+"'True' if 'True' in extruderValues('support_enable') else 'False'"+'"') # Not working
         # definition.append('        },')
-        definition.append('        "machine_start_gcode": { "default_value": "'+\
-            r';Sigma ProGen '+PS.progenVersionNumber+' (Build '+PS.progenBuildNumber+r')\n\n'+\
-            r'G21          ;metric values\n'+\
-            r'G90          ;absolute positioning\n'+\
-            # r'M82          ;set extruder to absolute mode\n'+\ # Cura 3.2 already sets it
-            r'M204 S{machine_acceleration} ;set default acceleration\n'+\
-            r'M205 X{machine_max_jerk_xy} Y{machine_max_jerk_xy} ;set default jerk\n'+\
-            r'M107         ;start with the fan off\n'+\
-            r'G28 X0 Y0    ;move X/Y to min endstops\n'+\
-            r'G28 Z0       ;move Z to min endstops\n'+\
-            r'G1 Z5 F200   ;safety Z axis movement\n'+\
-            r'T1           ;switch to the right extruder\n'+\
-            r'G92 E0       ;zero the extruded length\n'+\
-            r'{purge_in_bucket_before_start_r_enable_gcode}\n'+\
-            r'G92 E0       \n'+\
-            r'G4 P2000     ;stabilize hotend'+"'"+r's pressure\n'+\
-            # r'G1 F2400 E-8 ;retract\n'+\
-            r'T0           ;switch to the left extruder\n'+\
-            r'G92 E0       ;zero the extruded length\n'+\
-            r'{purge_in_bucket_before_start_l_enable_gcode}\n'+\
-            r'G92 E0\n'+\
-            r'G4 P2000     ;stabilize hotend'+"'"+r's pressure\n'+\
-            # r'G1 F2400 E-8 ;retract\n'+\
-            r'{clone_cool_fan_gcode}\n'+\
-            r'{print_mode_gcode}\n'+\
-            r'G4 P1\n'+\
-            r'G4 P2\n'+\
-            r'G4 P3\n'+\
-            r'" },')
+        if 'r19' in machine['id'].lower():
+            definition.append('        "machine_start_gcode": { "default_value": "'+\
+                r';Sigma ProGen '+PS.progenVersionNumber+' (Build '+PS.progenBuildNumber+r')\n\n'+\
+                r'G21          ;metric values\n'+\
+                r'G90          ;absolute positioning\n'+\
+                # r'M82          ;set extruder to absolute mode\n'+\ # Cura 3.2 already sets it
+                r'M204 S{machine_acceleration} ;set default acceleration\n'+\
+                r'M205 X{machine_max_jerk_xy} Y{machine_max_jerk_xy} ;set default jerk\n'+\
+                r'M107         ;start with the fan off\n'+\
+                r'G28 X0 Y0    ;move X/Y to min endstops\n'+\
+                r'G28 Z0       ;move Z to min endstops\n'+\
+                r'G1 Z5 F200   ;safety Z axis movement\n'+\
+                r'T1           ;switch to the right extruder\n'+\
+                r'G92 E0       ;zero the extruded length\n'+\
+                r'{purge_in_bucket_before_start_r_enable_gcode}\n'+\
+                r'G92 E0       \n'+\
+                r'G4 P2000     ;stabilize hotend'+"'"+r's pressure\n'+\
+                # r'G1 F2400 E-8 ;retract\n'+\
+                r'T0           ;switch to the left extruder\n'+\
+                r'G92 E0       ;zero the extruded length\n'+\
+                r'{purge_in_bucket_before_start_l_enable_gcode}\n'+\
+                r'G92 E0\n'+\
+                r'G4 P2000     ;stabilize hotend'+"'"+r's pressure\n'+\
+                # r'G1 F2400 E-8 ;retract\n'+\
+                r'{clone_cool_fan_gcode}\n'+\
+                r'{print_mode_gcode}\n'+\
+                r'M92 E510.9\n'+\
+                r'M500\n'+\
+                r'G4 P1\n'+\
+                r'G4 P2\n'+\
+                r'G4 P3\n'+\
+                r'" },')
+        else:
+            definition.append('        "machine_start_gcode": { "default_value": "' + \
+                r';Sigma ProGen ' + PS.progenVersionNumber + ' (Build ' + PS.progenBuildNumber + r')\n\n' + \
+                r'G21          ;metric values\n' + \
+                r'G90          ;absolute positioning\n' + \
+                # r'M82          ;set extruder to absolute mode\n'+\ # Cura 3.2 already sets it
+                r'M204 S{machine_acceleration} ;set default acceleration\n' + \
+                r'M205 X{machine_max_jerk_xy} Y{machine_max_jerk_xy} ;set default jerk\n' + \
+                r'M107         ;start with the fan off\n' + \
+                r'G28 X0 Y0    ;move X/Y to min endstops\n' + \
+                r'G28 Z0       ;move Z to min endstops\n' + \
+                r'G1 Z5 F200   ;safety Z axis movement\n' + \
+                r'T1           ;switch to the right extruder\n' + \
+                r'G92 E0       ;zero the extruded length\n' + \
+                r'{purge_in_bucket_before_start_r_enable_gcode}\n' + \
+                r'G92 E0       \n' + \
+                r'G4 P2000     ;stabilize hotend' + "'" + r's pressure\n' + \
+                # r'G1 F2400 E-8 ;retract\n'+\
+                r'T0           ;switch to the left extruder\n' + \
+                r'G92 E0       ;zero the extruded length\n' + \
+                r'{purge_in_bucket_before_start_l_enable_gcode}\n' + \
+                r'G92 E0\n' + \
+                r'G4 P2000     ;stabilize hotend' + "'" + r's pressure\n' + \
+                # r'G1 F2400 E-8 ;retract\n'+\
+                r'{clone_cool_fan_gcode}\n' + \
+                r'{print_mode_gcode}\n' + \
+                r'G4 P1\n' + \
+                r'G4 P2\n' + \
+                r'G4 P3\n' + \
+                r'" },')
         definition.append(r'        "machine_end_gcode": { "default_value": "'+\
             r'M104 S0 T0               ;left extruder heater off\n'+\
             r'M104 S0 T1               ;right extruder heater off\n'+\
@@ -991,11 +1030,11 @@ def curaProfile(machine):
         definition.append('        "material_print_temp_prepend": { "value": true },')
 
         # resolution
-        definition.append('        "line_width": { "value": "machine_nozzle_size - 0.05" },')
+        definition.append('        "line_width": { "value": "machine_nozzle_size" },')
         # definition.append('        "line_width": { "value": "round(machine_nozzle_size * 0.875, 3)" },')
-        # definition.append('        "wall_line_width": { "value": "line_width" },')
+        definition.append('        "wall_line_width": { "value": "line_width" },')
         # definition.append('        "wall_line_width_0": { "value": "line_width" },')
-        definition.append('        "wall_line_width_x": { "value": "max(line_width - 0.05, 0.1 + 0.4 * machine_nozzle_size)" },')
+        definition.append('        "wall_line_width_x": { "value": "line_width - 0.05" },')
         # definition.append('        "skin_line_width": { "value": "line_width" },')
         definition.append('        "infill_line_width": { "value": "machine_nozzle_size" },')
         # definition.append('        "skirt_brim_line_width": { "value": "line_width" },')
@@ -1005,6 +1044,7 @@ def curaProfile(machine):
         # definition.append('        "support_bottom_line_width": { "value": "extruderValue(support_bottom_extruder_nr, '+"'support_interface_line_width'"+')" },')
         definition.append('        "prime_tower_line_width": { "value": "machine_nozzle_size if not prime_tower_enable else (prime_tower_wall_thickness / 2 if prime_tower_wall_thickness <= round(2 * (min(extruderValues('+"'machine_nozzle_size'"+')) + (max(extruderValues('+"'machine_nozzle_size'"+')) - min(extruderValues('+"'machine_nozzle_size'"+'))) / 2), 2) else machine_nozzle_size)" },')
         definition.append('        "initial_layer_line_width_factor": { "value": 120 },')
+        definition.append('        "prime_tower_closest_to": { "default_value": "top" },')
         
         # shell
         # definition.append('        "wall_extruder_nr": { "value": -1 },')
@@ -1017,11 +1057,11 @@ def curaProfile(machine):
         # definition.append('        "bottom_thickness": { "value": "top_bottom_thickness" },')
         definition.append('        "top_bottom_pattern": { "value": "'+"'zigzag'"+'" },')
         # definition.append('        "top_bottom_pattern_0": { "value": "top_bottom_pattern" },')
-        definition.append('        "skin_angles": { "value": "[0, 90]" },')
+        definition.append('        "skin_angles": { "value": "[45, -45]" },')
         definition.append('        "wall_0_inset": { "value": 0 },')
         # definition.append('        "wall_0_wipe_dist": { "value": "machine_nozzle_size / 2" },')
         definition.append('        "optimize_wall_printing_order": { "value": true },')
-        # definition.append('        "outer_inset_first": { "value": false },')
+        definition.append('        "outer_inset_first": { "value": true },')
         # definition.append('        "alternate_extra_perimeter": { "value": false },')
         # definition.append('        "fill_perimeter_gaps": { "value": "'+"'everywhere'"+'" },')
         # definition.append('        "filter_out_tiny_gaps": { "value": true },')
@@ -1053,8 +1093,8 @@ def curaProfile(machine):
         # definition.append('        "infill_offset_x": { "value": 0 },')
         # definition.append('        "infill_offset_y": { "value": 0 },')
         # definition.append('        "sub_div_rad_add": { "value": "wall_line_width_x" },')
-        definition.append('        "infill_overlap": { "value": 0 },')
-        definition.append('        "skin_overlap": { "value": 15 },')
+        definition.append('        "infill_overlap": { "value": 15 },')
+        definition.append('        "skin_overlap": { "value": 25 },')
         definition.append('        "infill_wipe_dist": { "value": 0 },')
         # definition.append('        "gradual_infill_steps": { "value": 0 },')
         # definition.append('        "gradual_infill_step_height": { "value": 5 },')
@@ -1104,7 +1144,7 @@ def curaProfile(machine):
         definition.append('            "value": "min(retraction_speed * 0.25, machine_max_feedrate_e)",')
         definition.append('            "maximum_value_warning": "machine_max_feedrate_e"')
         definition.append('        },')
-        definition.append('        "retraction_extra_prime_amount": { "value": "coasting_volume if coasting_enable else 0" },') # Adjust for flex material
+        definition.append('        "retraction_extra_prime_amount": { "value": "0.06" },') # Adjust for flex material
         definition.append('        "retraction_min_travel": { "value": "3.75 * machine_nozzle_size" },')
         definition.append('        "retraction_count_max": { "value": "10 * retraction_extrusion_window" },')
         definition.append('        "retraction_extrusion_window": { "value": 1 },')
@@ -1135,7 +1175,7 @@ def curaProfile(machine):
         definition.append('        "acceleration_support": { "value": "acceleration_wall_x" },')
         # definition.append('        "acceleration_support_infill": { "value": "acceleration_support" },')
         definition.append('        "acceleration_support_interface": { "value": "acceleration_topbottom" },')
-        definition.append('        "acceleration_travel": { "value": "acceleration_print if magic_spiralize else machine_acceleration" },')
+        definition.append('        "acceleration_travel": { "value": "1500" },')
         definition.append('        "acceleration_layer_0": { "value": "acceleration_topbottom" },')
         # definition.append('        "acceleration_print_layer_0": { "value": "acceleration_layer_0" },')
         # definition.append('        "acceleration_travel_layer_0": { "value": "acceleration_layer_0 * acceleration_travel / acceleration_print" },')
@@ -1182,10 +1222,11 @@ def curaProfile(machine):
         definition.append('        "retraction_hop": { "value": "2 * layer_height" },')
         definition.append('        "hop_at_layer_change":')
         definition.append('        {')
+        definition.append('            "value": true,')
         definition.append('            "dual_value": "print_mode == '+"'regular'"+' and not magic_spiralize",')
         definition.append('            "reset_on_used_extruders_change": true')
         definition.append('        },')
-        definition.append('        "retraction_hop_height_at_layer_change": { "value": 2 },')
+        definition.append('        "retraction_hop_height_at_layer_change": { "value": "2 * layer_height" },')
         # definition.append('        "retraction_hop_after_extruder_switch": { "value": true },')
         definition.append('        "retraction_hop_height_after_extruder_switch": { "value": '+str(machine['extruderSwitchZHop'])+' },')
 
@@ -1241,7 +1282,7 @@ def curaProfile(machine):
         # definition.append('        "support_conical_enabled": { "value": false },') # set to false until it's not an experimental feature. In some cases leads to unprintable supports
 
         # platform adhesion
-        definition.append('        "start_purge_distance": { "value": 20 },')
+        definition.append('        "start_purge_distance": { "value": 15 },')
         # definition.append('        "extruder_prime_pos_y": { "value": "machine_depth" },')
         definition.append('        "adhesion_type": { "value": "'+"'skirt'"+'" },')
         definition.append('        "skirt_line_count":')
@@ -1293,7 +1334,7 @@ def curaProfile(machine):
         # definition.append('        "prime_tower_wall_thickness": { "value": "round(max(2 * prime_tower_line_width, 0.5 * (prime_tower_size - math.sqrt(max(0, prime_tower_size ** 2 - prime_tower_min_volume / layer_height)))), 3)" },')
         # definition.append('        "prime_tower_wall_thickness": { "value": "min(extruderValues('+"'machine_nozzle_size'"+')) * 2" },')
         # definition.append('        "prime_tower_wall_thickness": { "value": "round(2 * (min(extruderValues('+"'machine_nozzle_size'"+')) + (max(extruderValues('+"'machine_nozzle_size'"+')) - min(extruderValues('+"'machine_nozzle_size'"+'))) / 2), 2)" },')
-        definition.append('        "prime_tower_wall_thickness": { "value": 2.4},')
+        definition.append('        "prime_tower_wall_thickness": { "value": 4.8},')
 
         # definition.append('        "prime_tower_position_x": { "value": "machine_width - max(extruderValue(adhesion_extruder_nr, '+"'brim_width'"+') * extruderValue(adhesion_extruder_nr, '+"'initial_layer_line_width_factor'"+') / 100 if adhesion_type == '+"'brim'"+' else (extruderValue(adhesion_extruder_nr, '+"'raft_margin'"+') if adhesion_type == '+"'raft'"+' else (extruderValue(adhesion_extruder_nr, '+"'skirt_gap'"+') if adhesion_type == '+"'skirt'"+' else 0)), max(extruderValues('+"'travel_avoid_distance'"+'))) - max(extruderValues('+"'support_offset'"+')) - sum(extruderValues('+"'skirt_brim_line_width'"+')) * extruderValue(adhesion_extruder_nr, '+"'initial_layer_line_width_factor'"+') / 100 - 40" },') # fixed position, 40mm margin
 
@@ -1407,15 +1448,23 @@ def curaProfile(machine):
         definition.append('        "purge_in_bucket":')
         definition.append('        {')
         definition.append('            "enabled": "print_mode == '+"'regular'"+'",')
-        definition.append('            "value": false')
+        definition.append('            "value": true')
         definition.append('        },')  
         definition.append('        "purge_distance": { "value": "smart_purge_minimum_purge_distance" },')
         # definition.append('        "retract_reduction": { "enabled": true },')
-        definition.append('        "avoid_grinding_filament":')
-        definition.append('        {')
-        definition.append('            "enabled": true,')
-        definition.append('            "value": true')
-        definition.append('        },')
+        if 'r19' in machine['id'].lower():
+            definition.append('        "avoid_grinding_filament":')
+            definition.append('        {')
+            definition.append('            "enabled": true,')
+            definition.append('            "value": false')
+            definition.append('        },')
+        else:
+
+            definition.append('        "avoid_grinding_filament":')
+            definition.append('        {')
+            definition.append('            "enabled": true,')
+            definition.append('            "value": true')
+            definition.append('        },')
         definition.append('        "purge_in_bucket_before_start":')
         definition.append('        {')
         # definition.append('            "reset_on_print_mode_change": true,') # not needed
@@ -1548,21 +1597,23 @@ def curaProfile(machine):
                 # material.append('        <setting key="adhesion tendency">0</setting>') # material_adhesion_tendency
                 # material.append('        <setting key="surface energy">100</setting>') # material_surface_energy
                 material.append('')
-                material.append('        <machine>')
                 for m in sorted(PS.profilesData['machine'], key=lambda k: k['id']):
-                    if 'qualities' not in m:
-                        material.append('           <machine_identifier manufacturer="'+m['manufacturer']+'" product="'+m['id']+'" />')
-                for hotend in sorted(PS.profilesData['hotend'], key=lambda k: k['id']):
-                    if hotend['id'] != 'None':
-                        if filament['isAbrasiveMaterial'] and hotend['material'] == "Brass":
-                            material.append('           <hotend id="'+hotend['id']+'">')
-                            material.append('                <setting key="hardware compatible">no</setting>')
-                            # material.append('                <setting key="standby temperature">100</setting>')
-                            # material.append('                <setting key="retraction amount">6.5</setting>')
-                            material.append('           </hotend>')
-                        else:
-                            material.append('           <hotend id="'+hotend['id']+'" />')
-                material.append('        </machine>')
+                    if not 'x' in m['id'].lower():
+                        material.append('        <machine>')
+                        if 'qualities' not in m:
+                            material.append('           <machine_identifier manufacturer="'+m['manufacturer']+'" product="'+m['id']+'" />')
+                        for hotend in sorted(PS.profilesData['hotend'], key=lambda k: k['id']):
+                            if ('e3d' in hotend['id'].lower() or 'r19' not in m['id'].lower()):  # Old hotends should not appear in the new machine's qualities.
+                                if hotend['id'] != 'None':
+                                    if filament['isAbrasiveMaterial'] and hotend['material'] == "Brass":
+                                        material.append('           <hotend id="'+hotend['id']+'">')
+                                        material.append('                <setting key="hardware compatible">no</setting>')
+                                        # material.append('                <setting key="standby temperature">100</setting>')
+                                        # material.append('                <setting key="retraction amount">6.5</setting>')
+                                        material.append('           </hotend>')
+                                    else:
+                                        material.append('           <hotend id="'+hotend['id']+'" />')
+                        material.append('        </machine>')
                 material.append('    </settings>')
                 material.append('</fdmmaterial>')
                 fileContent = '\n'.join(material)
@@ -1580,220 +1631,222 @@ def curaProfile(machine):
         for hotend in sorted(PS.profilesData['hotend'], key=lambda k: k['id']):
             if hotend['id'] != 'None':
                 for filament in sorted(PS.profilesData['filament'], key=lambda k: k['id']):
-                    if 'Generic' in filament['colors']:
-                        colorsList = ['Generic']
-                    else:
-                        colorsList = filament['colors']
-                    for color in colorsList:
-                        for quality in sorted(PS.profilesData['quality'], key=lambda k: k['index']):
-                            layerHeight = getLayerHeight(hotend, quality)
-                            firstLayerHeight = hotend['nozzleSize']/2.
-                            defaultSpeed, firstLayerUnderspeed, outlineUnderspeed, supportUnderspeed = speedValues(hotend, hotend, filament, filament, layerHeight, firstLayerHeight, 1, quality, 'MEX Left')
-                            # Create a new global quality for the new layer height
-                            if layerHeight not in globalQualities:
-                                globalQualities.append(layerHeight)
-                                fileName = 'Cura/resources/quality/'+machine['id']+'/'+machine['id']+'_global_Layer_'+("%.2f" % layerHeight)+'_mm_Quality.inst.cfg'
+                    if 'e3d' in hotend['id'].lower() or 'r19' not in machine['id'].lower(): # Old hotends should not appear in the new machine's qualities.
+                        if 'Generic' in filament['colors']:
+                            colorsList = ['Generic']
+                        else:
+                            colorsList = filament['colors']
+                        for color in colorsList:
+                            for quality in sorted(PS.profilesData['quality'], key=lambda k: k['index']):
+                                layerHeight = getLayerHeight(hotend, quality)
+                                firstLayerHeight = hotend['nozzleSize']/2.
+                                defaultSpeed, firstLayerUnderspeed, outlineUnderspeed, supportUnderspeed = speedValues(hotend, hotend, filament, filament, layerHeight, firstLayerHeight, 1, quality, 'MEX Left')
+                                # Create a new global quality for the new layer height
+                                if layerHeight not in globalQualities:
+                                    globalQualities.append(layerHeight)
+                                    fileName = 'Cura/resources/quality/'+machine['id']+'/'+machine['id']+'_global_Layer_'+("%.2f" % layerHeight)+'_mm_Quality.inst.cfg'
+                                    qualityFile = []
+                                    qualityFile.append('[general]')
+                                    qualityFile.append('version = 2')
+                                    qualityFile.append('name = Global Layer '+("%.2f" % layerHeight)+' mm')
+                                    qualityFile.append('definition = '+machine['id'])
+                                    qualityFile.append('')
+                                    qualityFile.append('[metadata]')
+                                    qualityFile.append('type = quality')
+                                    qualityFile.append('quality_type = layer'+("%.2f" % layerHeight)+'mm')
+                                    qualityFile.append('global_quality = True')
+                                    qualityFile.append('weight = '+str(totalGlobalQualities - len(globalQualities)))
+                                    qualityFile.append('setting_version = 4')
+                                    qualityFile.append('')
+                                    qualityFile.append('[values]')
+                                    qualityFile.append('layer_height = '+("%.2f" % layerHeight))
+                                    fileContent = '\n'.join(qualityFile)
+                                    filesList.append((fileName, fileContent))
+    
+                                fileName = 'Cura/resources/quality/'+machine['id']+'/'+'_'.join([machine['id'], hotend['id'], filament['brand'], filament['material'], color, quality['id'], 'Quality.inst.cfg']).replace(' ', '_')
+    
+                                # keep all default values commented
+    
+                                if filament['isAbrasiveMaterial'] and hotend['material'] == "Brass":
+                                    notSupported = True
+                                elif layerHeight < filament['minimumLayerHeight']:
+                                    notSupported = True
+                                else:
+                                    notSupported = False
+    
                                 qualityFile = []
                                 qualityFile.append('[general]')
                                 qualityFile.append('version = 2')
-                                qualityFile.append('name = Global Layer '+("%.2f" % layerHeight)+' mm')
+                                qualityFile.append('name = Not Supported' if notSupported else 'name = '+quality['id']+' Quality')
                                 qualityFile.append('definition = '+machine['id'])
                                 qualityFile.append('')
                                 qualityFile.append('[metadata]')
                                 qualityFile.append('type = quality')
                                 qualityFile.append('quality_type = layer'+("%.2f" % layerHeight)+'mm')
-                                qualityFile.append('global_quality = True')
-                                qualityFile.append('weight = '+str(totalGlobalQualities - len(globalQualities)))
+                                qualityFile.append('material = '+'_'.join([filament['brand'], filament['material'], color, machine['id'], hotend['id']]).replace(' ', '_'))
+                                for index in range(len(globalQualities)):
+                                    if globalQualities[index] == layerHeight:
+                                        qualityFile.append('weight = '+str(totalGlobalQualities - (index+1)))
+                                        break
+    
+                                if notSupported:
+                                    qualityFile.append('supported = False')
                                 qualityFile.append('setting_version = 4')
                                 qualityFile.append('')
                                 qualityFile.append('[values]')
-                                qualityFile.append('layer_height = '+("%.2f" % layerHeight))
+    
+                                if not notSupported:
+                                    # resolution
+                                    qualityFile.append('layer_height = '+("%.2f" % layerHeight))
+    
+                                    #shell
+                                    qualityFile.append('wall_thickness = =round(max( 4 * machine_nozzle_size, '+("%.2f" % quality['wallWidth'])+'), 1)')     # 3 minimum Perimeters needed
+                                    qualityFile.append('top_bottom_thickness = =max( 5 * layer_height, '+("%.2f" % quality['topBottomWidth'])+')') # 5 minimum layers needed
+                                    qualityFile.append('travel_compensate_overlapping_walls_enabled = '+('False' if filament['isFlexibleMaterial'] else 'True'))
+                                    # qualityFile.append('wall_0_wipe_dist = '+('0' if retractValues(filament)[1] == 0 else '=round('+str(coastVolume(hotend, filament))+' / (layer_height * machine_nozzle_size), 2)')) # already in def
+                                    # infill
+                                    qualityFile.append('infill_sparse_density = '+str(int(quality['infillPercentage'])))
+                                    # qualityFile.append('infill_sparse_density = ='+str(int(quality['infillPercentage']))+" if infill_pattern != 'cubicsubdiv' else "+str(int(min(100, quality['infillPercentage'] * 1.25)))) # if is not working on Cura 3.2
+    
+                                    # material -> default_material_print_temperature, material_bed_temperature,  must be set into material to avoid conflicts
+                                    if ('PLA' in filament['id']) and ('BCN3D' in filament['id']): # if machine is an R19 and the filament is BCN3DPLA...
+                                        if ('e3D' in hotend['id']):
+                                            qualityFile.append('material_print_temperature = ' + str(filament['printTemperatureR19']))
+                                            qualityFile.append('material_print_temperature_layer_0 = '+str(filament['printTemperatureLayer0R19']))
+                                            qualityFile.append('material_flow = '+ str(filament['materialFlowR19']))
+                                        qualityFile.append('purge_distance = ' + str(filament['purgeDistanceR19']))
+                                        qualityFile.append('speed_wall = ' + str(filament['wallSpeedR19']))
+                                        qualityFile.append('speed_layer_0 = ' + str(filament['wallSpeedLayer0R19']))
+                                        
+                                    else:
+                                        qualityFile.append('material_print_temperature = =default_material_print_temperature + '+str(temperatureAdjustedToFlow(filament, hotend, layerHeight, defaultSpeed) - defaultMaterialPrintTemperature(filament)))
+                                        qualityFile.append('material_print_temperature_layer_0 = '+str(int(round((getTemperature(hotend, filament, 'highTemperature'))))))
+                                        qualityFile.append('material_flow = '+("%.2f" % (filament['extrusionMultiplier'] * 100)))
+                                        qualityFile.append('speed_wall = =round(speed_print * '+("%.2f" % outlineUnderspeed)+', 1)')
+                                        qualityFile.append('speed_layer_0 = =round(speed_print * '+("%.2f" % firstLayerUnderspeed)+', 1)')
+                                    qualityFile.append('material_flow_temp_graph = '+str(adjustedFlowTemperatureGraph(hotend, filament, layerHeight)))
+                                    qualityFile.append('retraction_amount = =retraction_amount_multiplier * '+("%.2f" % filament['retractionDistance']))
+                                    qualityFile.append('switch_extruder_retraction_amount = =retraction_amount_multiplier * '+("%.2f" % filament['toolChangeRetractionDistance']))
+                                    qualityFile.append('retraction_speed = =min(machine_max_feedrate_e, '+("%.2f" % filament['retractionSpeed'])+')')
+                                    qualityFile.append('retraction_prime_speed = =min('+("%.2f" % filament['retractionSpeed'])+' * 0.5, machine_max_feedrate_e)')
+                                    # qualityFile.append('retraction_count_max_avoid_grinding_filament = '+str(int(filament['retractionCount'])))
+                                    #  qualityFile.append('switch_extruder_extra_prime_amount = '+("%.2f" % filament['retractionSpeed'])) # Parameter that should be there to purge on toolchage
+    
+                                    # speed
+                                    qualityFile.append('speed_print = '+("%.2f" % (defaultSpeed/60.)))
+                                    # Speed wall setting moved to conditional statement in line 1660                                    
+                                    qualityFile.append('speed_support = =round(speed_print * '+("%.2f" % supportUnderspeed)+', 1)')
+                                    qualityFile.append('acceleration_wall_0 = '+str(int(accelerationForPerimeters(hotend['nozzleSize'], layerHeight, int(defaultSpeed/60. * outlineUnderspeed)))))
+    
+                                    # travel
+                                    if filament['isSupportMaterial']:
+                                        qualityFile.append('travel_avoid_other_parts = True')
+    
+                                    # cooling
+                                    if filament['fanPercentage'][1] <= 0:
+                                        qualityFile.append('cool_fan_enabled = False')
+                                    qualityFile.append('cool_fan_speed_min = '+str(int(filament['fanPercentage'][0])))
+                                    # if filament['isFlexibleMaterial'] or filament['isSupportMaterial']:
+                                    #     qualityFile.append('cool_lift_head = False')
+    
+                                    # support
+                                    if filament['isSupportMaterial']:
+                                        # qualityFile.append('support_enable = True') # Not working
+                                        qualityFile.append('support_angle = 45')
+                                        qualityFile.append("support_pattern = ='triangles'")
+                                        qualityFile.append('support_infill_rate = 50')
+                                        qualityFile.append('support_z_distance = 0')
+                                        qualityFile.append('support_bottom_distance = 0')                                   
+                                        qualityFile.append('support_xy_distance = =machine_nozzle_size / 2')
+                                        # qualityFile.append("support_xy_overrides_z = ='z_overrides_xy'") # already in main def
+                                        qualityFile.append('support_xy_distance_overhang = =machine_nozzle_size / 2')
+                                        qualityFile.append('support_bottom_stair_step_height = =layer_height')
+                                        qualityFile.append('support_join_distance = 3')
+                                        qualityFile.append('support_offset = 3')
+                                        qualityFile.append('gradual_support_infill_steps = 2')
+                                        qualityFile.append('support_infill_sparse_layer = =int(0.15/layer_height) + 1 if int(0.15/layer_height) * layer_height <= 0.75 * machine_nozzle_size else int(0.15/layer_height)')
+                                        qualityFile.append("support_interface_enable = True")
+                                        qualityFile.append('support_interface_density = 100')
+                                        qualityFile.append("support_interface_pattern = ='concentric'")
+                                        qualityFile.append("support_bottom_pattern = ='zigzag'")
+                                        qualityFile.append("support_use_towers = False")
+                                        # qualityFile.append('support_conical_enabled = False') # already in main def
+    
+    
+                                    # platform_adhesion
+                                    if 'adhesionType' in filament:
+                                        qualityFile.append("adhesion_type = ='"+filament['adhesionType']+"'")
+    
+                                    # dual
+                                    if filament['isSupportMaterial']:
+                                        qualityFile.append('purge_in_bucket = True')
+                                        qualityFile.append('smart_purge = True')
+                                        qualityFile.append('prime_tower_flow = =int(5 * round(float(material_flow * 1.2)/5))')
+    
+                                    # meshfix
+    
+                                    # blackmagic
+    
+                                    # experimental
+                                    qualityFile.append('coasting_volume = ='+str(coastVolume(hotend, filament))+' * retraction_amount_multiplier')
+    
+                                    # BCN3D
+                                    purgeSpeed, mmPerSecondIncrement, maxPurgeDistance, minPurgeDistance = purgeValues(hotend, filament, defaultSpeed, layerHeight)
+                                    # qualityFile.append('purge_speed = '+("%.2f" % (purgeSpeed/60.))) # defined in machine's def
+                                    qualityFile.append('smart_purge_slope = ='+str(mmPerSecondIncrement * 60)+' * retraction_amount_multiplier')
+                                    qualityFile.append('smart_purge_maximum_purge_distance = ='+str(maxPurgeDistance)+' * retraction_amount_multiplier')
+                                    qualityFile.append('smart_purge_minimum_purge_distance = ='+str(minPurgeDistance)+' * retraction_amount_multiplier')
+    
                                 fileContent = '\n'.join(qualityFile)
                                 filesList.append((fileName, fileContent))
 
-                            fileName = 'Cura/resources/quality/'+machine['id']+'/'+'_'.join([machine['id'], hotend['id'], filament['brand'], filament['material'], color, quality['id'], 'Quality.inst.cfg']).replace(' ', '_')
-
-                            # keep all default values commented
-
-                            if filament['isAbrasiveMaterial'] and hotend['material'] == "Brass":
-                                notSupported = True
-                            elif layerHeight < filament['minimumLayerHeight']:
-                                notSupported = True
-                            else:
-                                notSupported = False
-
-                            qualityFile = []
-                            qualityFile.append('[general]')
-                            qualityFile.append('version = 2')
-                            qualityFile.append('name = Not Supported' if notSupported else 'name = '+quality['id']+' Quality')
-                            qualityFile.append('definition = '+machine['id'])
-                            qualityFile.append('')
-                            qualityFile.append('[metadata]')
-                            qualityFile.append('type = quality')
-                            qualityFile.append('quality_type = layer'+("%.2f" % layerHeight)+'mm')
-                            qualityFile.append('material = '+'_'.join([filament['brand'], filament['material'], color, machine['id'], hotend['id']]).replace(' ', '_'))
-                            for index in range(len(globalQualities)):
-                                if globalQualities[index] == layerHeight:
-                                    qualityFile.append('weight = '+str(totalGlobalQualities - (index+1)))
-                                    break
-
-                            if notSupported:
-                                qualityFile.append('supported = False')
-                            qualityFile.append('setting_version = 4')
-                            qualityFile.append('')
-                            qualityFile.append('[values]')
-
-                            if not notSupported:
-                                # resolution
-                                qualityFile.append('layer_height = '+("%.2f" % layerHeight))
-
-                                #shell
-                                qualityFile.append('wall_thickness = =round(max( 3 * machine_nozzle_size, '+("%.2f" % quality['wallWidth'])+'), 1)')     # 3 minimum Perimeters needed
-                                qualityFile.append('top_bottom_thickness = =max( 5 * layer_height, '+("%.2f" % quality['topBottomWidth'])+')') # 5 minimum layers needed
-                                qualityFile.append('travel_compensate_overlapping_walls_enabled = '+('False' if filament['isFlexibleMaterial'] else 'True'))
-                                # qualityFile.append('wall_0_wipe_dist = '+('0' if retractValues(filament)[1] == 0 else '=round('+str(coastVolume(hotend, filament))+' / (layer_height * machine_nozzle_size), 2)')) # already in def
-                                # infill
-                                qualityFile.append('infill_sparse_density = '+str(int(quality['infillPercentage'])))
-                                # qualityFile.append('infill_sparse_density = ='+str(int(quality['infillPercentage']))+" if infill_pattern != 'cubicsubdiv' else "+str(int(min(100, quality['infillPercentage'] * 1.25)))) # if is not working on Cura 3.2
-
-                                # material -> default_material_print_temperature, material_bed_temperature,  must be set into material to avoid conflicts
-                                if ('r19' in machine['id']) and ('PLA' in filament['id']) and ('BCN3D' in filament['id']): # if machine is an R19 and the filament is BCN3DPLA...
-                                    qualityFile.append('material_print_temperature = ' + str(filament['printTemperatureR19']))
-                                    qualityFile.append('material_print_temperature_layer_0 = '+str(filament['printTemperatureLayer0R19']))
-                                    qualityFile.append('material_flow = '+ str(filament['materialFlowR19']))
-                                    qualityFile.append('speed_wall = ' + str(filament['wallSpeedR19']))
-                                    qualityFile.append('purge_distance = ' + str(filament['purgeDistanceR19']))
-                                    
-                                else:
-                                    qualityFile.append('material_print_temperature = =default_material_print_temperature + '+str(temperatureAdjustedToFlow(filament, hotend, layerHeight, defaultSpeed) - defaultMaterialPrintTemperature(filament)))
-                                    qualityFile.append('material_print_temperature_layer_0 = '+str(int(round((getTemperature(hotend, filament, 'highTemperature'))))))
-                                    qualityFile.append('material_flow = '+("%.2f" % (filament['extrusionMultiplier'] * 100)))
-                                    qualityFile.append('speed_wall = =round(speed_print * '+("%.2f" % outlineUnderspeed)+', 1)')
-                                qualityFile.append('material_flow_temp_graph = '+str(adjustedFlowTemperatureGraph(hotend, filament, layerHeight)))
-                                qualityFile.append('retraction_amount = =retraction_amount_multiplier * '+("%.2f" % filament['retractionDistance']))
-                                qualityFile.append('switch_extruder_retraction_amount = =retraction_amount_multiplier * '+("%.2f" % filament['toolChangeRetractionDistance']))
-                                qualityFile.append('retraction_speed = =min(machine_max_feedrate_e, '+("%.2f" % filament['retractionSpeed'])+')')
-                                qualityFile.append('retraction_prime_speed = =min('+("%.2f" % filament['retractionSpeed'])+' * 0.5, machine_max_feedrate_e)')
-                                # qualityFile.append('retraction_count_max_avoid_grinding_filament = '+str(int(filament['retractionCount'])))
-                                #  qualityFile.append('switch_extruder_extra_prime_amount = '+("%.2f" % filament['retractionSpeed'])) # Parameter that should be there to purge on toolchage
-
-                                # speed
-                                qualityFile.append('speed_print = '+("%.2f" % (defaultSpeed/60.)))
-                                #speed_wall moved to conditional PLA statement line 1660
-                                qualityFile.append('speed_support = =round(speed_print * '+("%.2f" % supportUnderspeed)+', 1)')
-                                qualityFile.append('speed_layer_0 = =round(speed_print * '+("%.2f" % firstLayerUnderspeed)+', 1)')
-                                qualityFile.append('acceleration_wall_0 = '+str(int(accelerationForPerimeters(hotend['nozzleSize'], layerHeight, int(defaultSpeed/60. * outlineUnderspeed)))))
-
-                                # travel
-                                if filament['isSupportMaterial']:
-                                    qualityFile.append('travel_avoid_other_parts = True')
-
-                                # cooling
-                                if filament['fanPercentage'][1] <= 0:
-                                    qualityFile.append('cool_fan_enabled = False')
-                                qualityFile.append('cool_fan_speed_min = '+str(int(filament['fanPercentage'][0])))
-                                # if filament['isFlexibleMaterial'] or filament['isSupportMaterial']:
-                                #     qualityFile.append('cool_lift_head = False')
-
-                                # support
-                                if filament['isSupportMaterial']:
-                                    # qualityFile.append('support_enable = True') # Not working
-                                    qualityFile.append('support_angle = 45')
-                                    qualityFile.append("support_pattern = ='triangles'")
-                                    qualityFile.append('support_infill_rate = 50')
-                                    qualityFile.append('support_z_distance = 0')
-                                    qualityFile.append('support_bottom_distance = 0')                                   
-                                    qualityFile.append('support_xy_distance = =machine_nozzle_size / 2')
-                                    # qualityFile.append("support_xy_overrides_z = ='z_overrides_xy'") # already in main def
-                                    qualityFile.append('support_xy_distance_overhang = =machine_nozzle_size / 2')
-                                    qualityFile.append('support_bottom_stair_step_height = =layer_height')
-                                    qualityFile.append('support_join_distance = 3')
-                                    qualityFile.append('support_offset = 3')
-                                    qualityFile.append('gradual_support_infill_steps = 2')
-                                    qualityFile.append('support_infill_sparse_layer = =int(0.15/layer_height) + 1 if int(0.15/layer_height) * layer_height <= 0.75 * machine_nozzle_size else int(0.15/layer_height)')
-                                    qualityFile.append("support_interface_enable = True")
-                                    qualityFile.append('support_interface_density = 100')
-                                    qualityFile.append("support_interface_pattern = ='concentric'")
-                                    qualityFile.append("support_bottom_pattern = ='zigzag'")
-                                    qualityFile.append("support_use_towers = False")
-                                    # qualityFile.append('support_conical_enabled = False') # already in main def
-
-
-                                # platform_adhesion
-                                if 'adhesionType' in filament:
-                                    qualityFile.append("adhesion_type = ='"+filament['adhesionType']+"'")
-
-                                # dual
-                                if filament['isSupportMaterial']:
-                                    qualityFile.append('purge_in_bucket = True')
-                                    qualityFile.append('smart_purge = True')
-                                    qualityFile.append('prime_tower_flow = =int(5 * round(float(material_flow * 1.2)/5))')
-
-                                # meshfix
-
-                                # blackmagic
-
-                                # experimental
-                                qualityFile.append('coasting_volume = ='+str(coastVolume(hotend, filament))+' * retraction_amount_multiplier')
-
-                                # BCN3D
-                                purgeSpeed, mmPerSecondIncrement, maxPurgeDistance, minPurgeDistance = purgeValues(hotend, filament, defaultSpeed, layerHeight)
-                                # qualityFile.append('purge_speed = '+("%.2f" % (purgeSpeed/60.))) # defined in machine's def
-                                qualityFile.append('smart_purge_slope = ='+str(mmPerSecondIncrement * 60)+' * retraction_amount_multiplier')
-                                qualityFile.append('smart_purge_maximum_purge_distance = ='+str(maxPurgeDistance)+' * retraction_amount_multiplier')
-                                qualityFile.append('smart_purge_minimum_purge_distance = ='+str(minPurgeDistance)+' * retraction_amount_multiplier')
-
-                            fileContent = '\n'.join(qualityFile)
-                            filesList.append((fileName, fileContent))
-
     if 'variants' not in machine:
         for hotend in sorted(PS.profilesData['hotend'], key=lambda k: k['id']):
-            if hotend['id'] != 'None':
-                fileName = 'Cura/resources/variants/'+machine['id']+'_'+hotend['id'].replace(' ', '_')+'.inst.cfg'
-                variant = []
-                variant.append('[general]')
-                variant.append('name = '+hotend['id'])
-                variant.append('version = 2')
-                variant.append('definition = '+machine['id'])
-                variant.append('')
-                variant.append('[metadata]')
-                variant.append('author = '+machine['author'])
-                variant.append('type = variant')
-                variant.append('setting_version = 4')
-                variant.append('')
-                variant.append('[values]')
-                # machine settings
-                variant.append('machine_nozzle_id = '+str(hotend['id']))
-                variant.append('machine_nozzle_size = '+str(hotend['nozzleSize']))
-                variant.append('machine_nozzle_tip_outer_diameter = '+str(hotend['nozzleTipOuterDiameter']))
-                variant.append('machine_nozzle_head_distance = '+str(hotend['nozzleHeadDistance']))
-                variant.append('machine_nozzle_expansion_angle = '+str(hotend['nozzleExpansionAngle']))
-                variant.append('machine_heat_zone_length = 8')
-                variant.append('machine_nozzle_heat_up_speed = '+str(hotend['heatUpSpeed']))
-                variant.append('machine_nozzle_cool_down_speed = '+str(hotend['coolDownSpeed'])) # this value depends on extruded flow (not material_flow)
-                # variant.append('material_extrusion_cool_down_speed = =min(machine_nozzle_heat_up_speed - 0.01, 1)') # this value depends on extruded flow (not material_flow)
-                variant.append('machine_min_cool_heat_time_window = '+str(hotend['minimumCoolHeatTimeWindow']))
-                fileContent = '\n'.join(variant)
-                filesList.append((fileName, fileContent))
+            if 'e3d' in hotend['id'].lower() or 'r19' not in machine['id'].lower(): # Old hotends should not appear in the new machine's qualities.
+                if hotend['id'] != 'None':
+                    fileName = 'Cura/resources/variants/'+machine['id']+'_'+hotend['id'].replace(' ', '_')+'.inst.cfg'
+                    variant = []
+                    variant.append('[general]')
+                    variant.append('name = '+hotend['id'])
+                    variant.append('version = 2')
+                    variant.append('definition = '+machine['id'])
+                    variant.append('')
+                    variant.append('[metadata]')
+                    variant.append('author = '+machine['author'])
+                    variant.append('type = variant')
+                    variant.append('setting_version = 4')
+                    variant.append('')
+                    variant.append('[values]')
+                    # machine settings
+                    variant.append('machine_nozzle_id = '+str(hotend['id']))
+                    variant.append('machine_nozzle_size = '+str(hotend['nozzleSize']))
+                    variant.append('machine_nozzle_tip_outer_diameter = '+str(hotend['nozzleTipOuterDiameter']))
+                    variant.append('machine_nozzle_head_distance = '+str(hotend['nozzleHeadDistance']))
+                    variant.append('machine_nozzle_expansion_angle = '+str(hotend['nozzleExpansionAngle']))
+                    variant.append('machine_heat_zone_length = 8')
+                    variant.append('machine_nozzle_heat_up_speed = '+str(hotend['heatUpSpeed']))
+                    variant.append('machine_nozzle_cool_down_speed = '+str(hotend['coolDownSpeed'])) # this value depends on extruded flow (not material_flow)
+                    # variant.append('material_extrusion_cool_down_speed = =min(machine_nozzle_heat_up_speed - 0.01, 1)') # this value depends on extruded flow (not material_flow)
+                    variant.append('machine_min_cool_heat_time_window = '+str(hotend['minimumCoolHeatTimeWindow']))
+                    fileContent = '\n'.join(variant)
+                    filesList.append((fileName, fileContent))
 
     return filesList
 
 def getLayerHeight(hotend, quality):
     '''
-        returns a layer height discretization table, so all hotends can be mixed properly.
-        The steps are: 
-            0.025mm from 0   to 0.1mm layer height 
-            0.05mm  from 0.1 to 0.2mm layer height 
-            0.1mm   from 0.2 to infmm layer height 
+        returns a layer height discretization
+        The discretization is as follows:
+        Draft quality should have a LayerHeight of 0.5*Nozzle diameter
+        The rest of values will be computed as that height minus a Delta specified in the quality file.
+
+        There's a special case: At HighQuality and NozzleSize = 0.6, the layer height should be 0.15 instead of 0.2
     '''
-    rawLayerHeight = hotend['nozzleSize'] * quality['layerHeightMultiplier']
-    if rawLayerHeight > 0.1:
-        if rawLayerHeight > 0.2:
-            base = 0.1
-        else:
-            base = 0.05
-    else:
-        base = 0.025
+
+    rawLayerHeight = hotend['nozzleSize'] / 2 - quality['layerHeightDelta']
+    if hotend['nozzleSize'] == 0.6 and quality['id'].lower() == 'high':
+        rawLayerHeight = 0.15
+    base = 0.05
     return round(rawLayerHeight / base) * base
 
 def purgeValues(hotend, filament, speed, layerHeight, minPurgeLength = 20): # purge at least 20mm so the filament weight is enough to stay inside the purge container
@@ -1859,9 +1912,9 @@ def retractValues(filament):
 
 def coastVolume(hotend, filament):
     '''
-        to get the right coasting volume. Experimentally found it's ok to work with nozzle size cubed
+        to get the right coasting volume. Experimentally found
     '''
-    return float("%.2f" % ((hotend['nozzleSize'])**3))
+    return float("%.2f" % ((hotend['nozzleSize'])*0.3 - 0.06))
 
 def maxFlowValue(hotend, filament, layerHeight):
     '''
@@ -2113,7 +2166,59 @@ def speedValues(hotendLeft, hotendRight, filamentLeft, filamentRight, layerHeigh
         secondaryHotend = hotendLeft
         secondaryFilament = filamentLeft
 
+
+
+
     primaryExtruderDefaultSpeed = quality['defaultSpeed']*speedMultiplier(primaryHotend, primaryFilament)
+    """ Hand selecting velocities from experimental values by the BCN3D team. The velocities are arranged in matrix
+    where the row is the quality from high to standard to low and the column is the hotend nozzle size, from 0.3 to 1 mm
+    
+    if the configuration is not in the previous list, the velocity is selected as done before.
+    """
+    speedvalues_quality_hotend = [[50, 50, 50, 45, 35, 21],
+                                  [50, 50, 42, 33, 30, 19],
+                                  [35, 50, 38, 32, 26, 17]]
+    if quality['id'].lower() == 'high':
+        if primaryHotend['nozzleSize'] == 0.3:
+            primaryExtruderDefaultSpeed = speedvalues_quality_hotend[0][0]
+        elif primaryHotend['nozzleSize'] == 0.4:
+            primaryExtruderDefaultSpeed = speedvalues_quality_hotend[0][1]
+        elif primaryHotend['nozzleSize'] == 0.5:
+            primaryExtruderDefaultSpeed = speedvalues_quality_hotend[0][2]
+        elif primaryHotend['nozzleSize'] == 0.6:
+            primaryExtruderDefaultSpeed = speedvalues_quality_hotend[0][3]
+        elif primaryHotend['nozzleSize'] == 0.8:
+            primaryExtruderDefaultSpeed = speedvalues_quality_hotend[0][4]
+        elif primaryHotend['nozzleSize'] == 1:
+            primaryExtruderDefaultSpeed = speedvalues_quality_hotend[0][5]
+    elif quality['id'].lower() == 'standard':
+        if primaryHotend['nozzleSize'] == 0.3:
+            primaryExtruderDefaultSpeed = speedvalues_quality_hotend[1][0]
+        elif primaryHotend['nozzleSize'] == 0.4:
+            primaryExtruderDefaultSpeed = speedvalues_quality_hotend[1][1]
+        elif primaryHotend['nozzleSize'] == 0.5:
+            primaryExtruderDefaultSpeed = speedvalues_quality_hotend[1][2]
+        elif primaryHotend['nozzleSize'] == 0.6:
+            primaryExtruderDefaultSpeed = speedvalues_quality_hotend[1][3]
+        elif primaryHotend['nozzleSize'] == 0.8:
+            primaryExtruderDefaultSpeed = speedvalues_quality_hotend[1][4]
+        elif primaryHotend['nozzleSize'] == 1:
+            primaryExtruderDefaultSpeed = speedvalues_quality_hotend[1][5]
+    elif quality['id'].lower() == 'draft':
+        if primaryHotend['nozzleSize'] == 0.3:
+            primaryExtruderDefaultSpeed = speedvalues_quality_hotend[2][0]
+        elif primaryHotend['nozzleSize'] == 0.4:
+            primaryExtruderDefaultSpeed = speedvalues_quality_hotend[2][1]
+        elif primaryHotend['nozzleSize'] == 0.5:
+            primaryExtruderDefaultSpeed = speedvalues_quality_hotend[2][2]
+        elif primaryHotend['nozzleSize'] == 0.6:
+            primaryExtruderDefaultSpeed = speedvalues_quality_hotend[2][3]
+        elif primaryHotend['nozzleSize'] == 0.8:
+            primaryExtruderDefaultSpeed = speedvalues_quality_hotend[2][4]
+        elif primaryHotend['nozzleSize'] == 1:
+            primaryExtruderDefaultSpeed = speedvalues_quality_hotend[2][5]
+
+
     primaryExtruderMaxSpeed = maxFlowValue(primaryHotend, primaryFilament, layerHeight)/(primaryHotend['nozzleSize']*layerHeight)
     firstLayerPrimaryExtruderMaxSpeed = maxFlowValue(primaryHotend, primaryFilament, firstLayerHeight)/(primaryHotend['nozzleSize']*firstLayerHeight)
 

@@ -20,6 +20,7 @@
     "defaultHotend": "0.6mm - Brass",
     "qualities": "bcn3dsigma",
     "printMode": ["regular", "mirror", "duplication"],
-    "retractionAmountMultiplier": 1.2,
-    "extruderSwitchZHop": 5
+    "retractionAmountMultiplier": 1,
+    "extruderSwitchZHop": 2,
+    "usePrimeTower": true
 }

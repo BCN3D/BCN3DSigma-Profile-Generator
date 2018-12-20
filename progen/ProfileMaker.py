@@ -285,6 +285,6 @@ def curaFilesBundle():
     # except:
     #     pass
 
-    shutil.rmtree("Cura")
-    
+    # shutil.rmtree("Cura")
+    print 'Not removing the Cura folder'
     print '\n\t\tCura files zipped to share!\n'

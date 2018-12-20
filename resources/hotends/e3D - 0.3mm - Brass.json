@@ -1,0 +1,13 @@
+{
+    "id": "e3D - 0.3mm - Brass",
+    "nozzleSize": 0.3,
+    "nozzleTipOuterDiameter": 0.89,
+    "nozzleHeadDistance": 3.5,
+    "nozzleExpansionAngle": 46.33,
+    "material": "Brass",
+    "temperatureCompensation": 0,
+    "hotBlock": "Standard",
+    "heatUpSpeed": 0.74,
+    "coolDownSpeed": 1.38,
+    "minimumCoolHeatTimeWindow": 5
+}

@@ -1,11 +1,11 @@
 {
     "id": "Draft",
-    "index": 4,
-    "layerHeightMultiplier": 0.5,
+    "index": 3,
+    "layerHeightDelta": 0,
     "defaultSpeed": 60,
     "firstLayerUnderspeed": 0.85,
     "outlineUnderspeed": 0.85,
-    "topBottomWidth": 0.8,
+    "topBottomWidth": 0.2,
     "wallWidth": 1.2,
-    "infillPercentage": 15
+    "infillPercentage": 20
 }

@@ -1,11 +1,11 @@
 {
     "id": "High",
-    "index": 2,
-    "layerHeightMultiplier": 0.24,
+    "index": 1,
+    "layerHeightDelta": 0.1,
     "defaultSpeed": 50,
     "firstLayerUnderspeed": 0.7,
     "outlineUnderspeed": 0.4,
-    "topBottomWidth": 0.8,
+    "topBottomWidth": 0.2,
     "wallWidth": 1.2,
     "infillPercentage": 20
 }

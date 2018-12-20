@@ -1,0 +1,13 @@
+{
+    "id": "e3D - 0.5mm - Hardened Steel",
+    "nozzleSize": 0.5,
+    "nozzleTipOuterDiameter": 1.09,
+    "nozzleHeadDistance": 3.5,
+    "nozzleExpansionAngle": 47,
+    "material": "Hardened Steel",
+    "temperatureCompensation": 5,
+    "hotBlock": "Standard",
+    "heatUpSpeed": 2,
+    "coolDownSpeed": 1.6,
+    "minimumCoolHeatTimeWindow": 5
+}

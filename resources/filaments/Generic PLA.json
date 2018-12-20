@@ -1,20 +1,9 @@
 {
-    "id": "BCN3D Filaments PLA",
-    "brand": "BCN3D Filaments",
+    "id": "Generic PLA",
+    "brand": "Generic",
     "material": "PLA",
     "colors": {
-        "White": "#FEFEFE",
-        "Silver": "#646862",
-        "Dark Blue": "#0016C3",
-        "Purple": "#B5A4CC",
-        "Gold": "#CB9D2D",
-        "Green": "#2AB954",
-        "Yellow": "#FEDE00",
-        "Black": "#0E0E0E",
-        "Light Blue": "#4AA0F6",
-        "Red": "#FE2600",
-        "Orange": "#F86B15",
-        "Grey": "#A0A2A3"
+        "Generic": "#343537"
     },
     "filamentDiameter": 2.85,
     "filamentPricePerKg": 19.95,
