@@ -1,10 +1,9 @@
 {
-    "id": "BCN3D Filaments PET-G",
-    "brand": "BCN3D Filaments",
+    "id": "Generic PET-G",
+    "brand": "Generic",
     "material": "PET-G",
     "colors": {
-        "Black": "#0E0E0E",
-        "White": "#FFFFFF"
+        "Generic": "#B22744"
     },
     "filamentDiameter": 2.85,
     "filamentPricePerKg": 19.95,

@@ -1,10 +1,9 @@
 {
-    "id": "BCN3D Filaments ABS",
-    "brand": "BCN3D Filaments",
+    "id": "Generic ABS",
+    "brand": "Generic",
     "material": "ABS",
     "colors": {
-        "Black": "#0E0E0E",
-        "White": "#FEFEFE"
+        "Generic": "#8cb219"
     },
     "filamentDiameter": 2.85,
     "filamentPricePerKg": 24.79,

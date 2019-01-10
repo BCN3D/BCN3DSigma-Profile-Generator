@@ -1535,7 +1535,10 @@ def curaProfile(machine):
 
     for filament in sorted(PS.profilesData['filament'], key=lambda k: k['id']):
         for color in filament['colors']:
-            fileName = 'Cura/resources/materials/'+machine['manufacturer']+'/'+(filament['brand']+'_'+filament['material']+'_'+color+'.xml.fdm_material').replace(' ', '_')
+            if color.lower() != 'generic':
+                fileName = 'Cura/resources/materials/'+machine['manufacturer']+'/'+(filament['brand']+'_'+filament['material']+'_'+color+'.xml.fdm_material').replace(' ', '_')
+            else:
+                fileName = 'Cura/resources/materials/'+machine['manufacturer']+'/'+(filament['brand']+'_'+filament['material']+'_'+'.xml.fdm_material').replace(' ', '_')
             if (filament['brand']+'_'+filament['material']+'_'+color+'.xml.fdm_material').replace(' ', '_') not in os.listdir('Cura/resources/materials/'+machine['manufacturer']):
                 material = []
                 material.append('<?xml version="1.0" encoding="UTF-8"?>')
