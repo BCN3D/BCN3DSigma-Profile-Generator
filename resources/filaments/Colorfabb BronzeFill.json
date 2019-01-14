@@ -1,9 +1,10 @@
 {
     "id": "Colorfabb BronzeFill",
     "brand": "Colorfabb",
-    "material": "Composites",
+    "material": "BronzeFill",
     "colors": {
-        "BronzeFill": "#A49064"
+        "Generic": "#A49064",
+        "Brown": "#A49064"
     },
     "filamentDiameter": 2.9,
     "filamentPricePerKg": 66.6,

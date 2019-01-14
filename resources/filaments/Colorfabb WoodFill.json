@@ -1,9 +1,10 @@
 {
     "id": "Colorfabb WoodFill",
     "brand": "Colorfabb",
-    "material": "Composites",
+    "material": "WoodFill",
     "colors": {
-        "WoodFill": "#DDC798"
+        "Generic": "#DDC798",
+        "Beige": "#DDC798"
     },
     "filamentDiameter": 2.9,
     "filamentPricePerKg": 66.58,

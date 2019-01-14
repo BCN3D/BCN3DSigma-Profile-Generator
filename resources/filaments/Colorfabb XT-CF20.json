@@ -1,9 +1,10 @@
 {
     "id": "Colorfabb XT-CF20",
     "brand": "Colorfabb",
-    "material": "Composites",
+    "material": "XT-CF20",
     "colors": {
-        "XT-CF20": "#343537"
+        "Generic": "#343537",
+        "Dark Blue": "#343537"
     },
     "filamentDiameter": 2.85,
     "filamentPricePerKg": 66.60,

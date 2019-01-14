@@ -3,6 +3,7 @@
     "brand": "BCN3D Filaments",
     "material": "PET-G",
     "colors": {
+        "Generic": "#B22744",
         "Black": "#0E0E0E",
         "White": "#FFFFFF"
     },

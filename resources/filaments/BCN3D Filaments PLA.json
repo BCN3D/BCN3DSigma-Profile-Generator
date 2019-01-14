@@ -3,6 +3,7 @@
     "brand": "BCN3D Filaments",
     "material": "PLA",
     "colors": {
+        "Generic": "#343537",
         "White": "#FEFEFE",
         "Silver": "#646862",
         "Dark Blue": "#0016C3",

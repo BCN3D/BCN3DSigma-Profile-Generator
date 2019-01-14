@@ -1,9 +1,10 @@
 {
     "id": "Colorfabb CopperFill",
     "brand": "Colorfabb",
-    "material": "Composites",
+    "material": "CopperFill",
     "colors": {
-        "CopperFill": "#B58164"
+        "Generic": "#B58164",
+        "Brown": "#B58164"
     },
     "filamentDiameter": 2.9,
     "filamentPricePerKg": 66.6,

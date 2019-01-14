@@ -3,6 +3,7 @@
     "brand": "BCN3D Filaments",
     "material": "ABS",
     "colors": {
+        "Generic": "#8cb219",
         "Black": "#0E0E0E",
         "White": "#FEFEFE"
     },

@@ -1,9 +1,10 @@
 {
     "id": "Colorfabb SteelFill",
     "brand": "Colorfabb",
-    "material": "Composites",
+    "material": "SteelFill",
     "colors": {
-        "SteelFill": "#80867F"
+        "Generic": "#80867F",
+        "Grey": "#80867F"
     },
     "filamentDiameter": 2.85,
     "filamentPricePerKg": 66.6,

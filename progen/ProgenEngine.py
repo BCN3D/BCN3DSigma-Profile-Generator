@@ -1536,23 +1536,25 @@ def curaProfile(machine):
     for filament in sorted(PS.profilesData['filament'], key=lambda k: k['id']):
         for color in filament['colors']:
             if color.lower() != 'generic':
-                fileName = 'Cura/resources/materials/'+machine['manufacturer']+'/'+(filament['brand']+'_'+filament['material']+'_'+color+'.xml.fdm_material').replace(' ', '_')
+                brand = filament['brand']
+                fileName = (filament['brand']+'_'+filament['material']+'_'+color+'.xml.fdm_material').replace(' ', '_')
             else:
-                fileName = 'Cura/resources/materials/'+machine['manufacturer']+'/'+(filament['brand']+'_'+filament['material']+'_'+'.xml.fdm_material').replace(' ', '_')
-            if (filament['brand']+'_'+filament['material']+'_'+color+'.xml.fdm_material').replace(' ', '_') not in os.listdir('Cura/resources/materials/'+machine['manufacturer']):
+                brand = 'Generic'
+                fileName = ('generic'+'_'+filament['material'].lower()+'.xml.fdm_material').replace(' ', '_')
+            if fileName not in os.listdir('Cura/resources/materials/'+machine['manufacturer']):
                 material = []
                 material.append('<?xml version="1.0" encoding="UTF-8"?>')
                 material.append('<fdmmaterial xmlns="http://www.ultimaker.com/material" version="1.3">')
                 material.append('    <metadata>')
                 material.append('        <name>')
-                material.append('            <brand>'+filament['brand']+'</brand>')
+                material.append('            <brand>'+brand+'</brand>')
                 material.append('            <material>'+filament['material']+'</material>')
                 material.append('            <color>'+color+'</color>')
                 material.append('        </name>')
-                material.append('        <GUID>'+str(uuid.uuid5(uuid.NAMESPACE_DNS, str(filament['brand']+filament['material']+color).replace(' ', '-')))+'</GUID>')
+                material.append('        <GUID>'+str(uuid.uuid5(uuid.NAMESPACE_DNS, str(brand+filament['material']+color).replace(' ', '-')))+'</GUID>')
                 material.append('        <version>1</version>')
                 material.append('        <color_code>'+filament['colors'][color]+'</color_code>')
-                if filament['brand'] == 'BCN3D Filaments':
+                if brand == 'BCN3D Filaments':
                     material.append('        <instructions>http://bcn3dtechnologies.com/en/3d-printer-filaments</instructions>')
                     material.append('        <author>')
                     material.append('            <organization>BCN3D Technologies</organization>')
@@ -1620,10 +1622,9 @@ def curaProfile(machine):
                 material.append('    </settings>')
                 material.append('</fdmmaterial>')
                 fileContent = '\n'.join(material)
-                filesList.append((fileName, fileContent))
+                filesList.append(('Cura/resources/materials/'+machine['manufacturer']+'/'+fileName, fileContent))
 
     if 'qualities' not in machine:
-        totalGlobalQualities = 0
         globalQualities = []
         for hotend in PS.profilesData['hotend']:
             if hotend['id'] != 'None':
@@ -1635,173 +1636,171 @@ def curaProfile(machine):
             if hotend['id'] != 'None':
                 for filament in sorted(PS.profilesData['filament'], key=lambda k: k['id']):
                     if 'e3d' in hotend['id'].lower() or 'r19' not in machine['id'].lower(): # Old hotends should not appear in the new machine's qualities.
-                        if 'Generic' in filament['colors']:
-                            colorsList = ['Generic']
-                        else:
-                            colorsList = filament['colors']
-                        for color in colorsList:
-                            for quality in sorted(PS.profilesData['quality'], key=lambda k: k['index']):
-                                layerHeight = getLayerHeight(hotend, quality)
-                                firstLayerHeight = hotend['nozzleSize']/2.
-                                defaultSpeed, firstLayerUnderspeed, outlineUnderspeed, supportUnderspeed = speedValues(hotend, hotend, filament, filament, layerHeight, firstLayerHeight, 1, quality, 'MEX Left')
-                                # Create a new global quality for the new layer height
-                                if layerHeight not in globalQualities:
-                                    globalQualities.append(layerHeight)
-                                    fileName = 'Cura/resources/quality/'+machine['id']+'/'+machine['id']+'_global_Layer_'+("%.2f" % layerHeight)+'_mm_Quality.inst.cfg'
-                                    qualityFile = []
-                                    qualityFile.append('[general]')
-                                    qualityFile.append('version = 2')
-                                    qualityFile.append('name = Global Layer '+("%.2f" % layerHeight)+' mm')
-                                    qualityFile.append('definition = '+machine['id'])
-                                    qualityFile.append('')
-                                    qualityFile.append('[metadata]')
-                                    qualityFile.append('type = quality')
-                                    qualityFile.append('quality_type = layer'+("%.2f" % layerHeight)+'mm')
-                                    qualityFile.append('global_quality = True')
-                                    qualityFile.append('weight = '+str(totalGlobalQualities - len(globalQualities)))
-                                    qualityFile.append('setting_version = 4')
-                                    qualityFile.append('')
-                                    qualityFile.append('[values]')
-                                    qualityFile.append('layer_height = '+("%.2f" % layerHeight))
-                                    fileContent = '\n'.join(qualityFile)
-                                    filesList.append((fileName, fileContent))
-    
-                                fileName = 'Cura/resources/quality/'+machine['id']+'/'+'_'.join([machine['id'], hotend['id'], filament['brand'], filament['material'], color, quality['id'], 'Quality.inst.cfg']).replace(' ', '_')
-    
-                                # keep all default values commented
-    
-                                if filament['isAbrasiveMaterial'] and hotend['material'] == "Brass":
-                                    notSupported = True
-                                elif layerHeight < filament['minimumLayerHeight']:
-                                    notSupported = True
-                                else:
-                                    notSupported = False
-    
+                        for quality in sorted(PS.profilesData['quality'], key=lambda k: k['index']):
+                            layerHeight = getLayerHeight(hotend, quality)
+                            firstLayerHeight = hotend['nozzleSize']/2.
+                            defaultSpeed, firstLayerUnderspeed, outlineUnderspeed, supportUnderspeed = speedValues(hotend, hotend, filament, filament, layerHeight, firstLayerHeight, 1, quality, 'MEX Left')
+                            # Create a new global quality for the new layer height
+                            if layerHeight not in globalQualities:
+                                globalQualities.append(layerHeight)
+                                fileName = 'Cura/resources/quality/'+machine['id']+'/'+machine['id']+'_global_Layer_'+("%.2f" % layerHeight)+'_mm_Quality.inst.cfg'
                                 qualityFile = []
                                 qualityFile.append('[general]')
                                 qualityFile.append('version = 2')
-                                qualityFile.append('name = Not Supported' if notSupported else 'name = '+quality['id']+' Quality')
+                                qualityFile.append('name = Global Layer '+("%.2f" % layerHeight)+' mm')
                                 qualityFile.append('definition = '+machine['id'])
                                 qualityFile.append('')
                                 qualityFile.append('[metadata]')
                                 qualityFile.append('type = quality')
                                 qualityFile.append('quality_type = layer'+("%.2f" % layerHeight)+'mm')
-                                qualityFile.append('material = '+'_'.join([filament['brand'], filament['material'], color, machine['id'], hotend['id']]).replace(' ', '_'))
-                                for index in range(len(globalQualities)):
-                                    if globalQualities[index] == layerHeight:
-                                        qualityFile.append('weight = '+str(totalGlobalQualities - (index+1)))
-                                        break
-    
-                                if notSupported:
-                                    qualityFile.append('supported = False')
+                                qualityFile.append('global_quality = True')
+                                qualityFile.append('weight = '+str(totalGlobalQualities - len(globalQualities)))
                                 qualityFile.append('setting_version = 4')
                                 qualityFile.append('')
                                 qualityFile.append('[values]')
-    
-                                if not notSupported:
-                                    # resolution
-                                    qualityFile.append('layer_height = '+("%.2f" % layerHeight))
-    
-                                    #shell
-                                    qualityFile.append('wall_thickness = =round(max( 4 * machine_nozzle_size, '+("%.2f" % quality['wallWidth'])+'), 1)')     # 3 minimum Perimeters needed
-                                    qualityFile.append('top_bottom_thickness = =max( 5 * layer_height, '+("%.2f" % quality['topBottomWidth'])+')') # 5 minimum layers needed
-                                    qualityFile.append('travel_compensate_overlapping_walls_enabled = '+('False' if filament['isFlexibleMaterial'] else 'True'))
-                                    # qualityFile.append('wall_0_wipe_dist = '+('0' if retractValues(filament)[1] == 0 else '=round('+str(coastVolume(hotend, filament))+' / (layer_height * machine_nozzle_size), 2)')) # already in def
-                                    # infill
-                                    qualityFile.append('infill_sparse_density = '+str(int(quality['infillPercentage'])))
-                                    # qualityFile.append('infill_sparse_density = ='+str(int(quality['infillPercentage']))+" if infill_pattern != 'cubicsubdiv' else "+str(int(min(100, quality['infillPercentage'] * 1.25)))) # if is not working on Cura 3.2
-    
-                                    # material -> default_material_print_temperature, material_bed_temperature,  must be set into material to avoid conflicts
-                                    if ('PLA' in filament['id']) and ('BCN3D' in filament['id']): # if machine is an R19 and the filament is BCN3DPLA...
-                                        if ('e3D' in hotend['id']):
-                                            qualityFile.append('material_print_temperature = ' + str(filament['printTemperatureR19']))
-                                            qualityFile.append('material_print_temperature_layer_0 = '+str(filament['printTemperatureLayer0R19']))
-                                            qualityFile.append('material_flow = '+ str(filament['materialFlowR19']))
-                                        qualityFile.append('purge_distance = ' + str(filament['purgeDistanceR19']))
-                                        qualityFile.append('speed_wall = ' + str(filament['wallSpeedR19']))
-                                        qualityFile.append('speed_layer_0 = ' + str(filament['wallSpeedLayer0R19']))
-                                        
-                                    else:
-                                        qualityFile.append('material_print_temperature = =default_material_print_temperature + '+str(temperatureAdjustedToFlow(filament, hotend, layerHeight, defaultSpeed) - defaultMaterialPrintTemperature(filament)))
-                                        qualityFile.append('material_print_temperature_layer_0 = '+str(int(round((getTemperature(hotend, filament, 'highTemperature'))))))
-                                        qualityFile.append('material_flow = '+("%.2f" % (filament['extrusionMultiplier'] * 100)))
-                                        qualityFile.append('speed_wall = =round(speed_print * '+("%.2f" % outlineUnderspeed)+', 1)')
-                                        qualityFile.append('speed_layer_0 = =round(speed_print * '+("%.2f" % firstLayerUnderspeed)+', 1)')
-                                    qualityFile.append('material_flow_temp_graph = '+str(adjustedFlowTemperatureGraph(hotend, filament, layerHeight)))
-                                    qualityFile.append('retraction_amount = =retraction_amount_multiplier * '+("%.2f" % filament['retractionDistance']))
-                                    qualityFile.append('switch_extruder_retraction_amount = =retraction_amount_multiplier * '+("%.2f" % filament['toolChangeRetractionDistance']))
-                                    qualityFile.append('retraction_speed = =min(machine_max_feedrate_e, '+("%.2f" % filament['retractionSpeed'])+')')
-                                    qualityFile.append('retraction_prime_speed = =min('+("%.2f" % filament['retractionSpeed'])+' * 0.5, machine_max_feedrate_e)')
-                                    # qualityFile.append('retraction_count_max_avoid_grinding_filament = '+str(int(filament['retractionCount'])))
-                                    #  qualityFile.append('switch_extruder_extra_prime_amount = '+("%.2f" % filament['retractionSpeed'])) # Parameter that should be there to purge on toolchage
-    
-                                    # speed
-                                    qualityFile.append('speed_print = '+("%.2f" % (defaultSpeed/60.)))
-                                    # Speed wall setting moved to conditional statement in line 1660                                    
-                                    qualityFile.append('speed_support = =round(speed_print * '+("%.2f" % supportUnderspeed)+', 1)')
-                                    qualityFile.append('acceleration_wall_0 = '+str(int(accelerationForPerimeters(hotend['nozzleSize'], layerHeight, int(defaultSpeed/60. * outlineUnderspeed)))))
-    
-                                    # travel
-                                    if filament['isSupportMaterial']:
-                                        qualityFile.append('travel_avoid_other_parts = True')
-    
-                                    # cooling
-                                    if filament['fanPercentage'][1] <= 0:
-                                        qualityFile.append('cool_fan_enabled = False')
-                                    qualityFile.append('cool_fan_speed_min = '+str(int(filament['fanPercentage'][0])))
-                                    # if filament['isFlexibleMaterial'] or filament['isSupportMaterial']:
-                                    #     qualityFile.append('cool_lift_head = False')
-    
-                                    # support
-                                    if filament['isSupportMaterial']:
-                                        # qualityFile.append('support_enable = True') # Not working
-                                        qualityFile.append('support_angle = 45')
-                                        qualityFile.append("support_pattern = ='triangles'")
-                                        qualityFile.append('support_infill_rate = 50')
-                                        qualityFile.append('support_z_distance = 0')
-                                        qualityFile.append('support_bottom_distance = 0')                                   
-                                        qualityFile.append('support_xy_distance = =machine_nozzle_size / 2')
-                                        # qualityFile.append("support_xy_overrides_z = ='z_overrides_xy'") # already in main def
-                                        qualityFile.append('support_xy_distance_overhang = =machine_nozzle_size / 2')
-                                        qualityFile.append('support_bottom_stair_step_height = =layer_height')
-                                        qualityFile.append('support_join_distance = 3')
-                                        qualityFile.append('support_offset = 3')
-                                        qualityFile.append('gradual_support_infill_steps = 2')
-                                        qualityFile.append('support_infill_sparse_layer = =int(0.15/layer_height) + 1 if int(0.15/layer_height) * layer_height <= 0.75 * machine_nozzle_size else int(0.15/layer_height)')
-                                        qualityFile.append("support_interface_enable = True")
-                                        qualityFile.append('support_interface_density = 100')
-                                        qualityFile.append("support_interface_pattern = ='concentric'")
-                                        qualityFile.append("support_bottom_pattern = ='zigzag'")
-                                        qualityFile.append("support_use_towers = False")
-                                        # qualityFile.append('support_conical_enabled = False') # already in main def
-    
-    
-                                    # platform_adhesion
-                                    if 'adhesionType' in filament:
-                                        qualityFile.append("adhesion_type = ='"+filament['adhesionType']+"'")
-    
-                                    # dual
-                                    if filament['isSupportMaterial']:
-                                        qualityFile.append('purge_in_bucket = True')
-                                        qualityFile.append('smart_purge = True')
-                                        qualityFile.append('prime_tower_flow = =int(5 * round(float(material_flow * 1.2)/5))')
-    
-                                    # meshfix
-    
-                                    # blackmagic
-    
-                                    # experimental
-                                    qualityFile.append('coasting_volume = ='+str(coastVolume(hotend, filament))+' * retraction_amount_multiplier')
-    
-                                    # BCN3D
-                                    purgeSpeed, mmPerSecondIncrement, maxPurgeDistance, minPurgeDistance = purgeValues(hotend, filament, defaultSpeed, layerHeight)
-                                    # qualityFile.append('purge_speed = '+("%.2f" % (purgeSpeed/60.))) # defined in machine's def
-                                    qualityFile.append('smart_purge_slope = ='+str(mmPerSecondIncrement * 60)+' * retraction_amount_multiplier')
-                                    qualityFile.append('smart_purge_maximum_purge_distance = ='+str(maxPurgeDistance)+' * retraction_amount_multiplier')
-                                    qualityFile.append('smart_purge_minimum_purge_distance = ='+str(minPurgeDistance)+' * retraction_amount_multiplier')
-    
+                                qualityFile.append('layer_height = '+("%.2f" % layerHeight))
                                 fileContent = '\n'.join(qualityFile)
                                 filesList.append((fileName, fileContent))
+
+                            fileName = 'Cura/resources/quality/'+machine['id']+'/'+'_'.join([machine['id'], hotend['id'], filament['brand'], filament['material'], quality['id'], 'Quality.inst.cfg']).replace(' ', '_')
+
+                            # keep all default values commented
+
+                            if filament['isAbrasiveMaterial'] and hotend['material'] == "Brass":
+                                notSupported = True
+                            elif layerHeight < filament['minimumLayerHeight']:
+                                notSupported = True
+                            else:
+                                notSupported = False
+
+                            qualityFile = []
+                            qualityFile.append('[general]')
+                            qualityFile.append('version = 2')
+                            qualityFile.append('name = Not Supported' if notSupported else 'name = '+quality['id']+' Quality')
+                            qualityFile.append('definition = '+machine['id'])
+                            qualityFile.append('')
+                            qualityFile.append('[metadata]')
+                            qualityFile.append('type = quality')
+                            qualityFile.append('quality_type = layer'+("%.2f" % layerHeight)+'mm')
+                            # if filament['brand'] == "BCN3D Filaments":
+                            qualityFile.append('material = '+'generic_'+'_'.join([filament['material'].lower(), machine['id'], hotend['id']]).replace(' ', '_'))
+                            # else:
+                            #     qualityFile.append('material = '+'_'.join([filament['brand'], filament['material'], machine['id'], hotend['id']]).replace(' ', '_'))
+                            for index in range(len(globalQualities)):
+                                if globalQualities[index] == layerHeight:
+                                    qualityFile.append('weight = '+str(totalGlobalQualities - (index+1)))
+                                    break
+
+                            if notSupported:
+                                qualityFile.append('supported = False')
+                            qualityFile.append('setting_version = 4')
+                            qualityFile.append('')
+                            qualityFile.append('[values]')
+
+                            if not notSupported:
+                                # resolution
+                                qualityFile.append('layer_height = '+("%.2f" % layerHeight))
+
+                                #shell
+                                qualityFile.append('wall_thickness = =round(max( 4 * machine_nozzle_size, '+("%.2f" % quality['wallWidth'])+'), 1)')     # 3 minimum Perimeters needed
+                                qualityFile.append('top_bottom_thickness = =max( 5 * layer_height, '+("%.2f" % quality['topBottomWidth'])+')') # 5 minimum layers needed
+                                qualityFile.append('travel_compensate_overlapping_walls_enabled = '+('False' if filament['isFlexibleMaterial'] else 'True'))
+                                # qualityFile.append('wall_0_wipe_dist = '+('0' if retractValues(filament)[1] == 0 else '=round('+str(coastVolume(hotend, filament))+' / (layer_height * machine_nozzle_size), 2)')) # already in def
+                                # infill
+                                qualityFile.append('infill_sparse_density = '+str(int(quality['infillPercentage'])))
+                                # qualityFile.append('infill_sparse_density = ='+str(int(quality['infillPercentage']))+" if infill_pattern != 'cubicsubdiv' else "+str(int(min(100, quality['infillPercentage'] * 1.25)))) # if is not working on Cura 3.2
+
+                                # material -> default_material_print_temperature, material_bed_temperature,  must be set into material to avoid conflicts
+                                if ('PLA' in filament['id']) and ('BCN3D' in filament['id']): # if machine is an R19 and the filament is BCN3DPLA...
+                                    if ('e3D' in hotend['id']):
+                                        qualityFile.append('material_print_temperature = ' + str(filament['printTemperatureR19']))
+                                        qualityFile.append('material_print_temperature_layer_0 = '+str(filament['printTemperatureLayer0R19']))
+                                        qualityFile.append('material_flow = '+ str(filament['materialFlowR19']))
+                                    qualityFile.append('purge_distance = ' + str(filament['purgeDistanceR19']))
+                                    qualityFile.append('speed_wall = ' + str(filament['wallSpeedR19']))
+                                    qualityFile.append('speed_layer_0 = ' + str(filament['wallSpeedLayer0R19']))
+
+                                else:
+                                    qualityFile.append('material_print_temperature = =default_material_print_temperature + '+str(temperatureAdjustedToFlow(filament, hotend, layerHeight, defaultSpeed) - defaultMaterialPrintTemperature(filament)))
+                                    qualityFile.append('material_print_temperature_layer_0 = '+str(int(round((getTemperature(hotend, filament, 'highTemperature'))))))
+                                    qualityFile.append('material_flow = '+("%.2f" % (filament['extrusionMultiplier'] * 100)))
+                                    qualityFile.append('speed_wall = =round(speed_print * '+("%.2f" % outlineUnderspeed)+', 1)')
+                                    qualityFile.append('speed_layer_0 = =round(speed_print * '+("%.2f" % firstLayerUnderspeed)+', 1)')
+                                qualityFile.append('material_flow_temp_graph = '+str(adjustedFlowTemperatureGraph(hotend, filament, layerHeight)))
+                                qualityFile.append('retraction_amount = =retraction_amount_multiplier * '+("%.2f" % filament['retractionDistance']))
+                                qualityFile.append('switch_extruder_retraction_amount = =retraction_amount_multiplier * '+("%.2f" % filament['toolChangeRetractionDistance']))
+                                qualityFile.append('retraction_speed = =min(machine_max_feedrate_e, '+("%.2f" % filament['retractionSpeed'])+')')
+                                qualityFile.append('retraction_prime_speed = =min('+("%.2f" % filament['retractionSpeed'])+' * 0.5, machine_max_feedrate_e)')
+                                # qualityFile.append('retraction_count_max_avoid_grinding_filament = '+str(int(filament['retractionCount'])))
+                                #  qualityFile.append('switch_extruder_extra_prime_amount = '+("%.2f" % filament['retractionSpeed'])) # Parameter that should be there to purge on toolchage
+
+                                # speed
+                                qualityFile.append('speed_print = '+("%.2f" % (defaultSpeed/60.)))
+                                # Speed wall setting moved to conditional statement in line 1660
+                                qualityFile.append('speed_support = =round(speed_print * '+("%.2f" % supportUnderspeed)+', 1)')
+                                qualityFile.append('acceleration_wall_0 = '+str(int(accelerationForPerimeters(hotend['nozzleSize'], layerHeight, int(defaultSpeed/60. * outlineUnderspeed)))))
+
+                                # travel
+                                if filament['isSupportMaterial']:
+                                    qualityFile.append('travel_avoid_other_parts = True')
+
+                                # cooling
+                                if filament['fanPercentage'][1] <= 0:
+                                    qualityFile.append('cool_fan_enabled = False')
+                                qualityFile.append('cool_fan_speed_min = '+str(int(filament['fanPercentage'][0])))
+                                # if filament['isFlexibleMaterial'] or filament['isSupportMaterial']:
+                                #     qualityFile.append('cool_lift_head = False')
+
+                                # support
+                                if filament['isSupportMaterial']:
+                                    # qualityFile.append('support_enable = True') # Not working
+                                    qualityFile.append('support_angle = 45')
+                                    qualityFile.append("support_pattern = ='triangles'")
+                                    qualityFile.append('support_infill_rate = 50')
+                                    qualityFile.append('support_z_distance = 0')
+                                    qualityFile.append('support_bottom_distance = 0')
+                                    qualityFile.append('support_xy_distance = =machine_nozzle_size / 2')
+                                    # qualityFile.append("support_xy_overrides_z = ='z_overrides_xy'") # already in main def
+                                    qualityFile.append('support_xy_distance_overhang = =machine_nozzle_size / 2')
+                                    qualityFile.append('support_bottom_stair_step_height = =layer_height')
+                                    qualityFile.append('support_join_distance = 3')
+                                    qualityFile.append('support_offset = 3')
+                                    qualityFile.append('gradual_support_infill_steps = 2')
+                                    qualityFile.append('support_infill_sparse_layer = =int(0.15/layer_height) + 1 if int(0.15/layer_height) * layer_height <= 0.75 * machine_nozzle_size else int(0.15/layer_height)')
+                                    qualityFile.append("support_interface_enable = True")
+                                    qualityFile.append('support_interface_density = 100')
+                                    qualityFile.append("support_interface_pattern = ='concentric'")
+                                    qualityFile.append("support_bottom_pattern = ='zigzag'")
+                                    qualityFile.append("support_use_towers = False")
+                                    # qualityFile.append('support_conical_enabled = False') # already in main def
+
+
+                                # platform_adhesion
+                                if 'adhesionType' in filament:
+                                    qualityFile.append("adhesion_type = ='"+filament['adhesionType']+"'")
+
+                                # dual
+                                if filament['isSupportMaterial']:
+                                    qualityFile.append('purge_in_bucket = True')
+                                    qualityFile.append('smart_purge = True')
+                                    qualityFile.append('prime_tower_flow = =int(5 * round(float(material_flow * 1.2)/5))')
+
+                                # meshfix
+
+                                # blackmagic
+
+                                # experimental
+                                qualityFile.append('coasting_volume = ='+str(coastVolume(hotend, filament))+' * retraction_amount_multiplier')
+
+                                # BCN3D
+                                purgeSpeed, mmPerSecondIncrement, maxPurgeDistance, minPurgeDistance = purgeValues(hotend, filament, defaultSpeed, layerHeight)
+                                # qualityFile.append('purge_speed = '+("%.2f" % (purgeSpeed/60.))) # defined in machine's def
+                                qualityFile.append('smart_purge_slope = ='+str(mmPerSecondIncrement * 60)+' * retraction_amount_multiplier')
+                                qualityFile.append('smart_purge_maximum_purge_distance = ='+str(maxPurgeDistance)+' * retraction_amount_multiplier')
+                                qualityFile.append('smart_purge_minimum_purge_distance = ='+str(minPurgeDistance)+' * retraction_amount_multiplier')
+
+                            fileContent = '\n'.join(qualityFile)
+                            filesList.append((fileName, fileContent))
 
     if 'variants' not in machine:
         for hotend in sorted(PS.profilesData['hotend'], key=lambda k: k['id']):

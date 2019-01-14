@@ -3,6 +3,7 @@
     "brand": "BCN3D Filaments",
     "material": "PVA",
     "colors": {
+        "Generic": "#E6E3C8",
         "Natural": "#343537"
     },
     "filamentDiameter": 2.85,

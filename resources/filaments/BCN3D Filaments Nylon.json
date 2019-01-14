@@ -3,6 +3,7 @@
     "brand": "BCN3D Filaments",
     "material": "Nylon",
     "colors": {
+        "Generic": "#343537",
         "Black": "#0E0E0E",
         "White": "#FEFEFE"
     },
