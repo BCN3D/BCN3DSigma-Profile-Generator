@@ -6,6 +6,7 @@
         "Generic": "#DDC798",
         "Beige": "#DDC798"
     },
+    "qualities": ["High", "Standard"],
     "filamentDiameter": 2.9,
     "filamentPricePerKg": 66.58,
     "filamentDensity": 1.21,

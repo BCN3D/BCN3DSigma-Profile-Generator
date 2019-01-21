@@ -1636,7 +1636,7 @@ def curaProfile(machine):
             if hotend['id'] != 'None':
                 for filament in sorted(PS.profilesData['filament'], key=lambda k: k['id']):
                     if 'e3d' in hotend['id'].lower() or 'r19' not in machine['id'].lower(): # Old hotends should not appear in the new machine's qualities.
-                        for quality in sorted(PS.profilesData['quality'], key=lambda k: k['index']):
+                        for quality in sorted([q for q in PS.profilesData['quality'] if q['id'] in filament['qualities']], key=lambda k: k['index']):
                             layerHeight = getLayerHeight(hotend, quality)
                             firstLayerHeight = hotend['nozzleSize']/2.
                             defaultSpeed, firstLayerUnderspeed, outlineUnderspeed, supportUnderspeed = speedValues(hotend, hotend, filament, filament, layerHeight, firstLayerHeight, 1, quality, 'MEX Left')

@@ -7,6 +7,7 @@
         "Black": "#0E0E0E",
         "White": "#FEFEFE"
     },
+    "qualities": ["High", "Standard"],
     "filamentDiameter": 2.85,
     "filamentPricePerKg": 24.79,
     "filamentDensity": 1.04,

@@ -6,6 +6,7 @@
         "Generic": "#80867F",
         "Grey": "#80867F"
     },
+    "qualities": ["High", "Standard"],
     "filamentDiameter": 2.85,
     "filamentPricePerKg": 66.6,
     "filamentDensity": 3.13,

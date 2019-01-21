@@ -6,6 +6,7 @@
         "Generic": "#AB8860",
         "Brown": "#AB8860"
     },
+    "qualities": ["High", "Standard"],
     "filamentDiameter": 2.9,
     "filamentPricePerKg": 61.46,
     "filamentDensity": 1.21,
